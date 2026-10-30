@@ -387,6 +387,13 @@ def mech_table(head, rows):
     return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}">{out}</span><!--/MECHTABLE-->'
 
 
+def mech_text(*paragraphs):
+    """A mechanic's details as plain paragraphs in the row's box, no table (owner 2026-10-30, 7.38 Roshan's pits: "не
+    таблицей, а абзацем с удобной информацией"). li() puts it under the row's text."""
+    rows = "".join(f'<span class="mech-abil-row"><span class="mech-abil-line">{p}</span></span>' for p in paragraphs)
+    return f'<!--MECHTABLE--><span class="mech-abils mech-cols-1 mech-text">{rows}</span><!--/MECHTABLE-->'
+
+
 BEFORE, AFTER = "Before", "After"
 
 

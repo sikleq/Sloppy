@@ -340,8 +340,7 @@ def _pane_values(desc, props=None) -> dict:
             if (props or {}).get(key) or found.get(key)}
 
 
-from .cards_rows import (_CardRow, _card_row, _glue_tail_tip, _lead_ability_chip, _merge_same_rows, _row_html,
-                         fold_long_rows)
+from .cards_rows import _CardRow, _card_row, _lead_ability_chip, _merge_same_rows, _row_html, fold_long_rows
 
 
 def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hint=None):
@@ -404,7 +403,7 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
         if not isinstance(d, str) or d.lstrip().startswith("<div"):
             rows.append(_bold_numbers_html(d) if isinstance(d, str) else d)
         else:
-            rows.append(_card_row(*_lead_ability_chip(_glue_tail_tip(d))))
+            rows.append(_card_row(*_lead_ability_chip(d)))
     rows = _merge_same_rows(rows)
     rows = [_row_html(r) if isinstance(r, _CardRow) else r for r in rows]
     rows = fold_long_rows(rows)

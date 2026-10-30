@@ -1285,6 +1285,40 @@ def _postprocess_same_change_abilities(lines):
     return out
 
 
+_GROUP_NAMES_RE = re.compile(r'\("([^"]+)", "[^"]+"\)')
+
+
+def _postprocess_group_rows_home(lines):
+    """A row of the hero's own list that names every ability of a block of several (7.38 Jakiro "Both Liquid Fire and
+    Liquid Frost abilities are now available …", "Liquid Frost is always applied with the first attack, Liquid Fire -
+    with the second") goes to the top of that block's list, next to its "Aghanim's Shard reworked" (owner
+    2026-10-30: "надо поставить к Liquid Fire/Frost"); a hero list left empty goes."""
+    out = list(lines)
+    for g, ln in enumerate(lines):
+        if "W(ability_group(" not in ln:
+            continue
+        names = _GROUP_NAMES_RE.findall(ln)
+        head = next((k for k in range(g - 1, -1, -1) if "W(hero_header(" in out[k]), None)
+        if len(names) < 2 or head is None or g + 1 >= len(out) or out[g + 1].strip() != "W(ul_open())" \
+                or out[head + 1].strip() != "W(ul_open())":
+            continue
+        stop = next((k for k in range(head + 2, g) if out[k].strip() == "W(ul_close())"), None)
+        if stop is None:
+            continue
+        moved = [k for k in range(head + 2, stop)
+                 if out[k].strip().startswith("W(li(") and all(n in out[k] for n in names)]
+        if not moved:
+            continue
+        rows = [out[k] for k in moved]
+        gi = g - len(moved)                                    # the group's line once the rows are out
+        out = [x for k, x in enumerate(out) if k not in moved]
+        out[gi + 2:gi + 2] = rows
+        if out[head + 2].strip() == "W(ul_close())":
+            del out[head + 1:head + 3]
+        return _postprocess_group_rows_home(out)
+    return out
+
+
 def _fold_into_row(lines, idx, text):
     """Append `text` to the "?" popup of the W(li(…)) at lines[idx]: extend an
     existing inline_note with <br>, otherwise add one. A row that already has
@@ -4529,6 +4563,7 @@ def generate(version):
     out = _postprocess_mechanic_lists(out)             # General subgroups of lists -> mechanic blocks, tables (10-30)
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
     out = _postprocess_same_change_abilities(out)     # one block, stacked icons (owner 2026-10-30)
+    out = _postprocess_group_rows_home(out)           # a hero row about all of a block's abilities -> that block
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is

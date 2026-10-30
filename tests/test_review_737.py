@@ -471,15 +471,15 @@ def _as_hero(hero, fn, *args):
         _State.current_hero = keep
 
 
-def test_a_card_row_opening_with_a_heros_ability_shows_its_icon_and_a_dash():
-    """Owner 2026-10-30 (7.38 Invoker's new facets): "его способности заменить на иконки"; after the icon a dash, not a
-    colon ("меняем двоеточие на тире"); a word that is no ability of the hero's stays."""
+def test_a_card_row_opening_with_a_heros_ability_shows_its_icon_and_the_text():
+    """Owner 2026-10-30 (7.38 Invoker's new facets): "его способности заменить на иконки"; after the icon the text, with
+    no colon or dash ("убрать тире всё-таки после иконок"); a word that is no ability of the hero's stays."""
     from patch.cards_item_abilities import _pane_parts
     _, body = _as_hero("invoker", _pane_parts, ["Quas: When Invoker reaches level 6, he gains a bonus level",
                                                  "Passive: Grants armor.", "Unknown Thing: does a thing."])
     assert 'class="ability-chip" data-tooltip="Quas"' in body and "invoker_quas.png" in body
-    assert '<span class="acr-lead-dash">–</span> When Invoker reaches' in body and ">Quas:" not in body
-    assert "acr-lead-colon" not in body and ">Unknown Thing: does" in body
+    assert '</span></span>When Invoker reaches' in body and ">Quas:" not in body
+    assert "acr-lead-colon" not in body and "acr-lead-dash" not in body and ">Unknown Thing: does" in body
 
 
 def test_card_rows_saying_the_same_of_several_abilities_merge_into_one_with_their_icons():
@@ -502,10 +502,15 @@ def test_card_rows_saying_the_same_of_several_abilities_merge_into_one_with_thei
     ("Sun Strike: Now Aghanim's Scepter grants Cataclysm exclusively with this facet", "scepter"),
 ])
 def test_a_card_row_about_an_aghanims_upgrade_gets_its_stripe(text, kind):
-    """Owner 2026-10-30, 7.38 Invoker's facets: "не подсвечено аганимной подложкой, как и шард — шардовой"."""
+    """Owner 2026-10-30, 7.38 Invoker's facets: "не подсвечено аганимной подложкой, как и шард — шардовой"; the glyph at
+    the END of the text, glued to its last word, as on every list row ("по правилам в конце строки")."""
     from patch.cards_item_abilities import _pane_parts
     _, body = _as_hero("invoker", _pane_parts, [text, "Alacrity: Grants bonus attack range"])
-    assert body.count(f'<div class="ability-change-row aghanim-{kind}"><span class="aghanim-marker {kind}">') == 1
+    assert body.count(f'<div class="ability-change-row aghanim-{kind} acr-aghs"><span class="acr-lead-chips">') == 1
+    last = text.rsplit(" ", 1)[1]
+    assert f'<span class="li-tail">{last}</b><span class="aghanim-marker {kind}"></span></span></div>' in body \
+        or f'<span class="li-tail">{last}<span class="aghanim-marker {kind}"></span></span></div>' in body \
+        or f'<span class="li-tail"><b class="iab-num">{last}</b><span class="aghanim-marker {kind}"></span></span></div>' in body
     assert body.count("aghanim-marker") == 1                  # the other row stays plain
 
 
@@ -516,14 +521,17 @@ def test_a_card_rows_closing_tip_never_wraps_alone():
     _, body = _as_hero("invoker", _pane_parts, [
         "E.M.P.: Pulls units to its center at 150 units per second " + inline_note("Unchanged from previous Shard")])
     import re
-    assert re.search(r'<span class="li-tail">second&nbsp;(?:<!--INLINETIP-->)?(?:<!--TIP-->)?<span class="info-tip"', body)
+    assert re.search(r'<span class="li-tail">second(?:<!--INLINETIP-->)?(?:<!--TIP-->)?<span class="info-tip"', body)
 
 
 def test_a_folded_texts_icons_do_not_grow():
+    import re
     """Owner 2026-10-30: a hovered icon in a folded text was cut with the text (7.38 Mind of Tornarus' Wex)."""
     import os
     css = open(os.path.join(os.path.dirname(__file__), "..", "styles.css"), encoding="utf-8").read()
     assert ".acr-fold:not(.is-open) .acr-fold-body .ability-chip:hover > img { transform: none;" in css
+    # open, nothing cuts it (owner: "wex тут всё ещё обрезается при наведении")
+    assert re.search(r"\.acr-fold\.is-open \.acr-fold-body \{[^}]*overflow: visible", css)
 
 
 def test_an_existing_roshan_blocks_items_link_too():
@@ -534,3 +542,25 @@ def test_an_existing_roshan_blocks_items_link_too():
     out = g._postprocess_roshan_block(lines)
     assert out[3] == 'W(li("Roshan no longer drops " + item_link("Aghanim\'s Blessing"), t("DEL")))'
     assert out[5] == lines[5]                                  # only the Roshan block's rows
+
+
+def test_hero_rows_about_all_of_a_blocks_abilities_go_to_that_block():
+    """Owner 2026-10-30, 7.38 Jakiro: "Both Liquid Fire and Liquid Frost …" and "… Liquid Frost is always applied with
+    the first attack, Liquid Fire - with the second" → the Liquid Fire / Frost block, above its Shard row."""
+    lines = ['W(hero_header("Jakiro"))', 'W(ul_open())', 'W(li("Now always attacks with his ice head first", t("NEW")))',
+             'W(li("Both Liquid Fire and Liquid Frost abilities are now available", t("REWORK")))',
+             'W(li("Liquid Frost first, Liquid Fire second", t("REWORK")))', 'W(ul_close())',
+             'W(ability_group(("Liquid Fire", "jakiro_liquid_fire"), ("Liquid Frost", "jakiro_liquid_ice")))',
+             'W(ul_open())', 'W(li("Aghanim\'s Shard reworked: not share cooldowns", t("REWORK")))', 'W(ul_close())']
+    out = g._postprocess_group_rows_home(lines)
+    k = next(i for i, x in enumerate(out) if "ability_group" in x)
+    assert out[:4] == lines[:3] + ['W(ul_close())']
+    assert out[k + 2:k + 5] == [lines[3], lines[4], lines[8]]
+
+
+def test_mech_text_is_paragraphs_in_the_rows_box():
+    """Owner 2026-10-30, 7.38 Roshan's pits: "не таблицей, а абзацем"."""
+    from patch.mech_abilities import mech_text
+    out = mech_text("Roshan starts in the <b>Bottom pit</b>.")
+    assert out.startswith("<!--MECHTABLE-->") and "mech-head" not in out and "mech-cell" not in out
+    assert '<span class="mech-abil-line">Roshan starts in the <b>Bottom pit</b>.</span>' in out

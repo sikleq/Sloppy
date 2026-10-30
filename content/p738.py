@@ -58,16 +58,13 @@ def build():
 
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
-    # Valve's six lines behind a "?" as a table (owner 2026-10-28: "много текста спрятано в [?]"), by time: when
-    # Roshan is in which pit (owner 2026-10-30: "переделать блок с информацией, когда он где находится")
-    W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), extra=mech_table(
-        ["When", "Pit", "Location"],
-        [["Start of the game – 15:00", "Bottom", "Slightly closer to Radiant's jungle entrance"],
-         ["Day, from 15:00", "Bottom", "Slightly closer to Radiant's jungle entrance"],
-         ["Night, from 15:00", "Top", "Slightly closer to Dire's jungle entrance"],
-         "From 15:00 Roshan walks across the river to the pit of the time of day. On the way he no longer gets bonus "
-         "movement speed, but gets +25% Slow Resistance on top of his new base 25%",
-         "Only the active pit shows as a minimap icon"])))
+    # Valve's six lines behind a "?" (owner 2026-10-28: "много текста спрятано в [?]") as one paragraph of when Roshan
+    # is where (owner 2026-10-30: "не таблицей, а абзацем с удобной информацией")
+    W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), extra=mech_text(
+        "Roshan starts in the <b>Bottom pit</b>, slightly closer to Radiant's jungle entrance. From <b>15:00</b> he "
+        "follows the time of day: <b>Bottom pit at day</b>, <b>Top pit at night</b> (slightly closer to Dire's jungle "
+        "entrance), walking across the river between them. On the way he no longer gets bonus movement speed, but gets "
+        "+25% Slow Resistance on top of his new base 25%. Only the active pit shows as a minimap icon.")))
     W(li("Added a Roshan icon near the minimap that shows Roshan's state (alive, dead, maybe alive) and location", t("QoL"), extra=inline_note("If Roshan is dead, the status will also include a timer until his possible respawn<br>Since Roshan's respawn takes between 8 to 11 minutes, during this window the status will say that he may be alive, but also include a timer until the guaranteed respawn<br>If a team gains vision over Roshan or Roshan's Roar of Retribution is heard during this status, the timer will be updated to inform that Roshan is alive<br>Templar Assassin's Third Eye Innate will cause the icon to display exactly when and where Roshan will respawn")))
     W(li("Knockback now has a 2s cooldown before it can be applied to the same unit again", t("NERF"), extra=inline_note("The knockback of Roshan's Walk: since 7.33 Roshan pushes units aside while walking between his pits (listed among knockback effects in 7.36b)")))
     W(li("Roshan no longer drops " + item_link("Aghanim's Blessing"), t("DEL")))
@@ -2036,8 +2033,6 @@ def build():
     W(hero_header("Jakiro"))
     W(ul_open())
     W(li("Now always attacks with his ice head first, then his fire head", t("NEW"), extra=inline_note("The cooler head prevailed!")))
-    W(li("Both Liquid Fire and Liquid Frost abilities are now available to the hero at the same time. They have a shared level and cooldown", t("REWORK")))
-    W(li("This results in swapping special attacks: Liquid Frost is always applied with the first attack, Liquid Fire - with the second, whenever applicable", t("REWORK")))
     W(ul_close())
     W(facet_header("jakiro_fire"))
     W(ul_open())
@@ -2057,6 +2052,8 @@ def build():
     ]))
     W(ability_group(("Liquid Fire", "jakiro_liquid_fire"), ("Liquid Frost", "jakiro_liquid_ice")))
     W(ul_open())
+    W(li("Both Liquid Fire and Liquid Frost abilities are now available to the hero at the same time. They have a shared level and cooldown", t("REWORK")))
+    W(li("This results in swapping special attacks: Liquid Frost is always applied with the first attack, Liquid Fire - with the second, whenever applicable", t("REWORK")))
     W(li("Aghanim's Shard reworked: Makes Liquid Fire and Liquid Frost abilities not share cooldowns", t("REWORK")))
     W(ul_close())
     W(subgroup("Talents"))

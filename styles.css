@@ -3653,7 +3653,9 @@ h4.subgroup .subgroup-new-type {
   mask-image: linear-gradient(to bottom, #000 15%, transparent); }
 .acr-fold:not(.is-open) .acr-fold-body:hover { -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
   mask-image: linear-gradient(to bottom, #000 35%, transparent); }
-.acr-fold.is-open .acr-fold-body { max-height: none; cursor: auto; -webkit-mask-image: none; mask-image: none; }
+/* open, nothing is cut: a hovered icon grows past the text's edge (owner 2026-10-30, 7.38 Mind of Tornarus' Wex) */
+.acr-fold.is-open .acr-fold-body { max-height: none; overflow: visible; cursor: auto; -webkit-mask-image: none;
+  mask-image: none; }
 /* the open / close control: a strip of soft glass over the faded text's bottom — a slight blur growing smoothly
    downward, a faint warm tint and a thin highlight along its top (owner 2026-10-30: "эффект стекла снизу, но не
    резкий, а плавный … чтобы не нагружало страницу"). Light on the page: no animation; the blur is one 22px strip,
@@ -4607,6 +4609,10 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
 .ability-chip[data-tooltip]::after { bottom: calc(100% + 22px); }
 /* "[Wex] – …" in a card row; several abilities saying one thing stand side by side (owner 2026-10-30) */
 .acr-lead-chips .ability-chip + .ability-chip { margin-left: -2px; }
+/* a card text row about an Aghanim's upgrade: its stripe reaches a little left of the text, the text and icon start
+   where the plain rows' do, the glyph closes the text (owner 2026-10-30: "в конце строки … и выровнять строки") */
+.ability-change-row.acr-aghs { margin-left: -6px; padding-left: 6px; }
+.ability-change-row.acr-aghs .aghanim-marker { margin: 0 0 0 6px; vertical-align: -2px; }
 /* a folded text's icons don't grow: the fold would cut the grown icon and its name (owner 2026-10-30); a click opens
    the text, and there they grow */
 .acr-fold:not(.is-open) .acr-fold-body .ability-chip:hover > img { transform: none; box-shadow: none; }

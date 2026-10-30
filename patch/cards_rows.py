@@ -16,9 +16,9 @@ _LEAD_ROW_RE = re.compile(r"^([A-Z][\w'.\- ]{2,40}?):\s")
 
 def _lead_ability_chip(text):
     """(chips, rest) of a card row's text. A row that opens with one of the hero's abilities ("Quas: When Invoker
-    reaches level 6 …", 7.38 Quas Focus): the ability's icon in place of its name, then a dash — "[Wex] – …"; the icon
-    grows on hover with the name above it, as in every facet row (owner 2026-10-30, the colon swapped for the dash the
-    same day). A name that is no ability of the hero's with an icon stays a word: no chips, the text as it was."""
+    reaches level 6 …", 7.38 Quas Focus): the ability's icon in place of its name, the text right after it — "[Wex] …";
+    the icon grows on hover with the name above it, as in every facet row (owner 2026-10-30: a colon, then a dash, then
+    "убрать тире всё-таки"). A name that is no ability of the hero's with an icon stays a word: no chips, the text as it was."""
     from .elements import _hero_ability_slug
     from .images import ABIL_CDN, _LOCAL_ABIL_ICONS
     from .mech_abilities import ability_chip
@@ -62,25 +62,34 @@ def _merge_same_rows(rows):
 
 
 def _row_html(row):
+    """The icons straight before the text, no dash (owner 2026-10-30: "убрать тире всё-таки после иконок"); an
+    Aghanim's row's glyph at the END of the text, as on every list row ("иконки аганима/шарда поставить по правилам в
+    конце строки"), and the text lined up with the plain rows' (.acr-aghs)."""
     chips, text, aghs = row
-    lead = (f'<span class="acr-lead-chips">{"".join(chips)}</span><span class="acr-lead-dash">–</span> '
-            if chips else "")
-    cls = f" aghanim-{aghs}" if aghs else ""
+    lead = f'<span class="acr-lead-chips">{"".join(chips)}</span>' if chips else ""
+    cls = f" aghanim-{aghs} acr-aghs" if aghs else ""
     marker = f'<span class="aghanim-marker {aghs}"></span>' if aghs else ""
-    return f'<div class="ability-change-row{cls}">{marker}{lead}{_bold_numbers_html(text)}</div>'
+    return f'<div class="ability-change-row{cls}">{lead}{_bold_numbers_html(_glue_tail(text, marker))}</div>'
 
 
-# a row's closing "?" (an inline_note) and the word before it never part on a wrap: a bare "?" on a line of its own is
-# not allowed (owner 2026-10-30, 7.38 Mind of Tornarus' E.M.P. row); as iab_attach_tail does for an item's ability
-_TAIL_TIP_RE = re.compile(r"(\S+)\s+((?:<!--INLINETIP-->)?<!--TIP-->.*<!--/TIP-->(?:<!--/INLINETIP-->)?)\s*$", re.S)
+# the row's closing cluster — its Aghanim's glyph, then its "?" (an inline_note) — and the word before it never part on
+# a wrap: a bare "?" on a line of its own is not allowed (owner 2026-10-30, 7.38 Mind of Tornarus' E.M.P. row); as
+# iab_attach_tail does for an item's ability and page rows for their glyph
+_TAIL_TIPS_RE = re.compile(r"\s*((?:<!--INLINETIP-->)?<!--TIP-->.*<!--/TIP-->(?:<!--/INLINETIP-->)?)\s*$", re.S)
 
 
-def _glue_tail_tip(text):
-    m = _TAIL_TIP_RE.search(text)
-    between = re.sub(r"<!--TIP-->.*?<!--/TIP-->|<!--/?INLINETIP-->", "", m.group(2), flags=re.S) if m else ""
-    if not m or "<" in m.group(1) or ">" in m.group(1) or between.strip():
-        return text                             # words between two tips: only the last tip's word could glue
-    return text[:m.start()] + f'<span class="li-tail">{m.group(1)}&nbsp;{m.group(2)}</span>'
+def _glue_tail(text, marker=""):
+    m = _TAIL_TIPS_RE.search(text)
+    tips = m.group(1) if m else ""
+    if tips and re.sub(r"<!--TIP-->.*?<!--/TIP-->|<!--/?INLINETIP-->", "", tips, flags=re.S).strip():
+        tips = ""                               # words between two tips: only the last tip's word could glue
+    body = text[:m.start()] if tips else text.rstrip()
+    if not (tips or marker):
+        return text
+    w = re.search(r"(\S+)$", body)
+    if w and "<" not in w.group(1) and ">" not in w.group(1):
+        return body[:w.start()] + f'<span class="li-tail">{w.group(1)}{marker}{tips}</span>'
+    return body + f'<span class="li-tail">{marker}{tips}</span>'
 
 
 FOLD_CHARS = 600                 # a card side longer than this folds (owner 2026-10-30: "раскатай на весь сайт"; 28
