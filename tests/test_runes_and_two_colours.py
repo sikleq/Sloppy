@@ -4,6 +4,8 @@ read as a third meaning)."""
 import os
 import sys
 
+import pytest
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts", "gen"))
@@ -37,6 +39,7 @@ def test_a_power_rune_row_shows_our_own_power_rune_icon():
 def test_the_power_rune_icon_is_the_generators_bunch_of_three_runes():
     """power.png is what scripts/gen/gen_power_rune_icon.py draws (not a hand-made file): 32 px, transparent round
     the bunch, with the front Double Damage's blue and the Regeneration green and Haste red behind it."""
+    pytest.importorskip("PIL")                  # CI installs no imaging libraries
     from PIL import Image, ImageChops
     import gen_power_rune_icon as gp
     on_disk = Image.open(os.path.join(ROOT, "icons", "runes", "power.png")).convert("RGBA")
@@ -48,6 +51,7 @@ def test_the_power_rune_icon_is_the_generators_bunch_of_three_runes():
 def test_the_terrain_power_layer_button_is_our_power_rune_icon():
     """Owner 2026-10-28: the Terrain page's Power layer button shows our power-rune icon (48 px, like its other
     buttons), no longer a random rune; the map's markers still cycle the 7 runes."""
+    pytest.importorskip("PIL")                  # CI installs no imaging libraries
     from PIL import Image, ImageChops
     import gen_power_rune_icon as gp
     btn = Image.open(os.path.join(ROOT, "icons", "ui", "gothic", "tc_power.png")).convert("RGBA")

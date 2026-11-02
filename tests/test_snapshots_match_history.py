@@ -1,7 +1,8 @@
 """2026-09-27: data/stats/<v>/{items,heroes,abilities}.json must be that patch's KV, not a copy of the previous
 patch's (items.json 7.41 was 7.40c byte for byte; 7.37e kept Khanda's 7.37d recipe; heroes.json 7.41 was
 7.40c). Checked against the patch's own game files in the store (dota-patch-files; since 2026-10-24, before that
-the d2vpkr history in outputs/) where it exists locally; skipped elsewhere (CI)."""
+the d2vpkr history in outputs/): build.yml checks the store out for CI, so this runs there too; skipped only on a
+machine without the store."""
 import importlib.util
 import pathlib
 import sys

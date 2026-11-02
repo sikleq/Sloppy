@@ -4,6 +4,8 @@ whole map."""
 import os
 import sys
 
+import pytest
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts", "gen"))
@@ -31,6 +33,7 @@ def test_a_row_without_parts_still_has_one_button():
 
 
 def test_cliffs_are_lines_gone_and_new_not_a_stream_bank():
+    pytest.importorskip("PIL")                  # cliff_changes reads the map's pictures; CI installs no imaging libraries
     removed, added = th.cliff_changes("737e", "738")
     assert removed and added
     # a stream's bank (river level on one side) is never a cliff

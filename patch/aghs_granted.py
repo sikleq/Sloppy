@@ -12,17 +12,18 @@ import os
 import re
 
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_BLOCK_RE = re.compile(r'(?m)^\s*"([a-z0-9_]+)"\s*$')
+_BLOCK_RE = re.compile(r'(?m)^\s*"([a-z0-9_]+)"\s*$\s*\{')      # a name alone on its line, then its block
+_BRACE_RE = re.compile(r"[{}]")
 _GRANT_RE = re.compile(r'"IsGrantedBy(Shard|Scepter)"\s+"1"')
 OLD_PATH = os.path.join(_HERE, "data", "rules", "aghs_granted_old.json")
 
 
 def _braced(text, i):
     depth = 0
-    for j in range(i, len(text)):
-        depth += {"{": 1, "}": -1}.get(text[j], 0)
+    for m in _BRACE_RE.finditer(text, i):
+        depth += 1 if m.group() == "{" else -1
         if depth == 0:
-            return text[i:j]
+            return text[i:m.start()]
     return text[i:]
 
 
@@ -33,9 +34,7 @@ def scan(text) -> tuple:
     text = "\n".join(line.split("//")[0] for line in text.splitlines())
     grants, hidden = {}, set()
     for m in _BLOCK_RE.finditer(text):
-        if not text[m.end():].lstrip().startswith("{"):
-            continue
-        body = _braced(text, text.index("{", m.end()))
+        body = _braced(text, m.end() - 1)
         if '"AbilityBehavior"' not in body:
             continue                                 # a hero, unit or value block, not an ability
         g = _GRANT_RE.search(body)

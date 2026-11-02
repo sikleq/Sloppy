@@ -79,15 +79,58 @@ def test_renamed_item_header_shows_old_arrow_new():
             '<a class="entity-link"') in html
 
 
-@pytest.mark.slow
+def _ability_audit():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("audit_abilities", ROOT / "scripts" / "audit" / "audit_abilities.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def test_ability_audit_ignores_sub_ability_slugs():
-    # audit-live 2026-10-22 failed: sub_ability("rattletrap_jetpack", "Jetpack") was read as ability("rattletrap_jetpack")
-    import subprocess
-    import sys
-    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "audit" / "audit_abilities.py")],
-                       cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
-    assert r.returncode == 0, r.stdout[-2000:]
-    assert "rattletrap_rattletrap" not in r.stdout
+    # audit-live 2026-10-22 failed: sub_ability("rattletrap_jetpack", "Jetpack") was read as ability("rattletrap_jetpack").
+    # A stub of Valve's answer: this test ran the live audit, so it failed offline and on any rename on Valve's side
+    # (.github/workflows/audit-live.yml runs that one)
+    a = _ability_audit()
+    src = 'W(hero_header("Clockwerk"))\nW(sub_ability("rattletrap_jetpack", "Jetpack"))\nW(ability("Cogs"))\n'
+    calls = a.find_calls([("p9.py", src)])
+    assert [c[:2] for c in calls] == [("Clockwerk", "Cogs")]
+    assert a.find_problems(calls, {"Clockwerk": {"rattletrap_cogs": "Cogs"}}) == []
+    assert a.report([]) == 0
+
+
+def test_ability_audit_still_reports_a_renamed_ability_and_a_bad_slug(capsys):
+    a = _ability_audit()
+    src = 'W(hero_header("Axe"))\nW(ability("Old Name", slug="axe_x"))\nW(ability("Lost", slug="axe_lost"))\n'
+    problems = a.find_problems(a.find_calls([("p9.py", src)]), {"Axe": {"axe_x": "New Name"}})
+    assert [p[6] for p in problems] == ["renamed -> 'New Name'", "slug not in hero's ability list"]
+    assert a.report(problems) == 1
+    assert "[Axe] 'Old Name' -> 'New Name'" in capsys.readouterr().out
+
+
+def test_ability_audit_owner_of_a_card_is_the_header_of_its_own_file():
+    # Tormentor's cards at the top of p738.py were blamed on the previous file's last hero, Windranger
+    a = _ability_audit()
+    calls = a.find_calls([("p1.py", 'W(hero_header("Windranger"))\n'),
+                          ("p2.py", 'W(ability_change(old=dict(name="A"), new=dict(name="B")))\n')])
+    assert calls == []
+
+
+def test_the_ability_audit_imports_without_the_network():
+    assert _ability_audit().HEROLIST.startswith("https://")
+
+
+def test_a_test_cannot_reach_the_network(no_network):
+    from urllib.request import urlopen
+    with pytest.raises(OSError):
+        urlopen("https://www.dota2.com/", timeout=1)
+    assert no_network == ["www.dota2.com"]
+    no_network.clear()          # the guard's teardown would fail this test
+
+
+def test_audit_live_still_runs_the_ability_audit():
+    assert "audit_all.py" in (ROOT / ".github" / "workflows" / "audit-live.yml").read_text(encoding="utf-8")
+    assert "audit_abilities.py" in (ROOT / "scripts" / "audit" / "audit_all.py").read_text(encoding="utf-8")
 
 
 def test_quick_wit_card_highlights_the_new_attack_speed():

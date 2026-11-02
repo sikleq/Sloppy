@@ -1034,11 +1034,15 @@ def test_now_is_a_tier_artifact_is_a_header_and_its_ability_a_row():
 
 
 # CI has no network cache: every version the scaffold tests generate must have its datafeed committed, or the
-# test fetches dota2.com live and fails when Valve answers "null" (2026-10-21)
+# test fetches dota2.com live and fails when Valve answers "null" (2026-10-21). So must the previous patch's: generate()
+# fetches it for the ability diff, wrote it into data/ and swallowed a failed download (audit 2026-11-02: 7.30e, 7.37e,
+# 7.40c, 7.41e)
 @pytest.mark.parametrize("version", sorted({"7.31", "7.38", "7.41", "7.41a", "7.41b", "7.41c", "7.41d", "7.41f"}))
 def test_scaffold_versions_have_a_committed_datafeed(version):
     import subprocess
+    from patch.meta import _prev_patch_version
     root = os.path.dirname(os.path.dirname(__file__))
-    tracked = subprocess.run(["git", "ls-files", f"data/{version}_datafeed.json"], cwd=root,
-                             capture_output=True, text=True).stdout.strip()
-    assert tracked, f"git add -f data/{version}_datafeed.json"
+    for v in (version, _prev_patch_version(version)):
+        tracked = subprocess.run(["git", "ls-files", f"data/{v}_datafeed.json"], cwd=root,
+                                 capture_output=True, text=True).stdout.strip()
+        assert tracked, f"git add -f data/{v}_datafeed.json"
