@@ -61,6 +61,8 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     ("Nyx Assassin", "nyx_assassin_nyxth_sense"),
     ("Snapfire", "snapfire_buckshot"),
     ("Venomancer", "venomancer_sepsis"),
+    ("Morphling", "morphling_accumulation"),
+    ("Skywrath Mage", "skywrath_mage_ruin_and_restoration"),
     ("Beastmaster", "beastmaster_rugged"),
     ("Clinkz", "clinkz_bone_and_arrow"),
     ("Centaur Warrunner", "centaur_rawhide"),
