@@ -26,6 +26,10 @@ def _lead_ability_chip(text):
     if not m or m.group(1) in ("Active", "Passive", "Toggle", "Aura", "Ultimate"):
         return (), text
     slug = _hero_ability_slug(_State.current_hero, m.group(1))
+    if slug not in _LOCAL_ABIL_ICONS and _State.current_patch_version:   # a name its slug doesn't spell (Unicycle)
+        from .ability_kv import hero_abilities
+        known = hero_abilities(_State.current_hero, _State.current_patch_version).get(m.group(1).lower())
+        slug = known[0] if known else slug
     if slug not in _LOCAL_ABIL_ICONS:
         return (), text
     return (ability_chip(m.group(1), f"{ABIL_CDN}{slug}.png"),), text[m.end():]
@@ -69,7 +73,8 @@ def _row_html(row):
     lead = f'<span class="acr-lead-chips">{"".join(chips)}</span>' if chips else ""
     cls = f" aghanim-{aghs} acr-aghs" if aghs else ""
     marker = f'<span class="aghanim-marker {aghs}"></span>' if aghs else ""
-    return f'<div class="ability-change-row{cls}">{lead}{_bold_numbers_html(_glue_tail(text, marker))}</div>'
+    from .mech_abilities import rune_name_chips
+    return f'<div class="ability-change-row{cls}">{lead}{rune_name_chips(_bold_numbers_html(_glue_tail(text, marker)))}</div>'
 
 
 # the row's closing cluster — its Aghanim's glyph, then its "?" (an inline_note) — and the word before it never part on

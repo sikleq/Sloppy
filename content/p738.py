@@ -171,7 +171,7 @@ def build():
     ]), t("NEW")))
     # Valve's sentence; only "Easy" -> "Small" (the camp rename, content-rules)
     W(li("Each creep can only be upgraded twice, meaning a Small camp will never reach an Ancient status (sorry, Pollywogs)", t("NEW")))
-    W(li("Units are not upgraded while the camp is blocked, and the number of upgraded units can't be increased", t("NEW")))
+    W(li("Units are not upgraded if the camp is blocked. Amount of upgraded units can't be increased, so if there is only 1 Ancient creep, attempting to stack that camp will not create another Ancient creep", t("NEW")))
     W(ul_close())
 
     # Pollywog
@@ -940,18 +940,18 @@ def build():
     ]))
     W(ability("Flux", slug="arc_warden_flux"))
     W(ul_open())
-    W(li("Now has the same effect for both Arc Warden and Tempest Double", t("NEW"), extra=inline_note("Deals 15/30/45/60 damage per second and slows target's movement speed by 14/21/28/35%<br>Previous values: Arc Warden: 15/30/45/60 damage per second and 15/22/30/39% Movement Slow. Tempest Double: 20/45/70/95 damage per second and 5/8/11/14% Movement Slow")))
+    W(li("Now has the same effect for both Arc Warden and Tempest Double", t("REWORK"), extra=inline_note("Deals 15/30/45/60 damage per second and slows target's movement speed by 14/21/28/35%<br>Previous values: Arc Warden: 15/30/45/60 damage per second and 15/22/30/39% Movement Slow. Tempest Double: 20/45/70/95 damage per second and 5/8/11/14% Movement Slow")))
     W(li("Aghanim's Scepter: Silences when the target is alone. Increases damage by 50% and duration by 2s", t("NEW")))
     W(ul_close())
     W(ability("Magnetic Field", slug="arc_warden_magnetic_field"))
     W(ul_open())
     W(li("Now is a Point Targeted ability with 900 cast range. Can be double tapped for self-cast to create the field centered on the caster", t("NEW")))
-    W(li("Now has the same effect for both Arc Warden and Tempest Double", t("NEW"), extra=inline_note("Creates a circular distortion field that grants 100% evasion and 30/60/90/120 bonus attack speed to all allied units within<br>Previous values: Arc Warden: Field grants 100% evasion and 30/60/90/120 bonus attack speed. Tempest Double: Field increases attack range by 150 and base attack damage by 20/40/60/80")))
+    W(li("Now has the same effect for both Arc Warden and Tempest Double", t("REWORK"), extra=inline_note("Creates a circular distortion field that grants 100% evasion and 30/60/90/120 bonus attack speed to all allied units within<br>Previous values: Arc Warden: Field grants 100% evasion and 30/60/90/120 bonus attack speed. Tempest Double: Field increases attack range by 150 and base attack damage by 20/40/60/80")))
     W(li("No longer upgraded with Aghanim's Shard", t("DEL")))
     W(ul_close())
     W(ability("Spark Wraith", slug="arc_warden_spark_wraith"))
     W(ul_open())
-    W(li("Now has the same effect for both Arc Warden and Tempest Double", t("NEW"), extra=inline_note("Spark activates in 1.5 seconds, flies at a speed of 550, slows enemy for 0.5/0.6/0.7/0.8s and deals 100/170/240/310 damage<br>Previous values: Arc Warden: Spark activates in 2 seconds, flies at a speed of 400, slows enemy for 0.6/0.8/1/1.2s, deals 100/180/260/340 damage. Tempest Double: Spark activates in 1 second, flies at a speed of 725, slows enemy for 0.4/0.5/0.6/0.7s and deals 75/140/205/270 damage")))
+    W(li("Now has the same effect for both Arc Warden and Tempest Double", t("REWORK"), extra=inline_note("Spark activates in 1.5 seconds, flies at a speed of 550, slows enemy for 0.5/0.6/0.7/0.8s and deals 100/170/240/310 damage<br>Previous values: Arc Warden: Spark activates in 2 seconds, flies at a speed of 400, slows enemy for 0.6/0.8/1/1.2s, deals 100/180/260/340 damage. Tempest Double: Spark activates in 1 second, flies at a speed of 725, slows enemy for 0.4/0.5/0.6/0.7s and deals 75/140/205/270 damage")))
     W(li("Aghanim's Shard: When Spark Wraith activates, a secondary Spark Wraith will fuse with the next closest target that deals 80% damage. Increases Spark Wraith search radius by 100", t("NEW")))
     W(li("No longer upgraded with Aghanim's Scepter", t("DEL")))
     W(li("No longer does 40% more damage to non-hero units", t("DEL")))
@@ -1116,14 +1116,14 @@ def build():
     W(li("Damage gain per level decreased from +5.1 to +3.3", b(5.1, 3.3)))
     W(li("Damage at level 30 decreased by 61 (from 227-234 to 166-173)", br(227, 234, 166, 173)))
     W(ul_close())
-    W(ability("Belligerent", slug="brewmaster_belligerent", innate=True))
-    W(ul_open())
-    W(li("Bonus Attack Damage increased from 20% to 25%", b(20, 25)))
-    W(ul_close())
     W(facet_header("brewmaster_roll_out_the_barrel"))
     W(ul_open())
     W(li("Cinder Brew: Barrel Speed increased from 900 to 950", b(900, 950)))
     W(li("Cinder Brew: Barrel Impact Damage increased from 40/60/80/100 to 40/70/100/130", b([40, 60, 80, 100], [40, 70, 100, 130])))
+    W(ul_close())
+    W(ability("Belligerent", slug="brewmaster_belligerent", innate=True))
+    W(ul_open())
+    W(li("Bonus Attack Damage increased from 20% to 25%", b(20, 25)))
     W(ul_close())
     W(ability("Drunken Brawler", slug="brewmaster_drunken_brawler"))
     W(ability("Storm Brawler", slug="brewmaster_drunken_brawler_storm"))
@@ -1148,7 +1148,7 @@ def build():
     W(ability("Bristleback", slug="bristleback_bristleback"))
     W(ul_open())
     W(li("Aghanim's Scepter Mana Cost increased from 100 to 125", b(100, 125, l=True)))
-    W(li("Quill Sprays that were released by the ability now deal damage that is classified as reflection damage", t("MISC")))
+    W(li("Quill Sprays that were released by the ability now deal damage that is classified as reflection damage", t("REWORK")))
     W(ul_close())
     W(ability("Warpath", slug="bristleback_warpath"))
     W(ul_open())
@@ -1191,7 +1191,7 @@ def build():
     W(ul_close())
     W(ability("Retaliate", slug="centaur_return"))
     W(ul_open())
-    W(li("Damage done is now classified as reflection damage", t("MISC")))
+    W(li("Damage done is now classified as reflection damage", t("REWORK")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -1261,9 +1261,6 @@ def build():
 
     # Clinkz
     W(hero_header("Clinkz"))
-    W(ul_open())
-    W(li("Tar Bomb: Can now be put on autocast so Clinkz will throw a tar bomb when attacking, if the ability is available", t("NEW")))
-    W(ul_close())
     W(facet_header("clinkz_suppressive_fire"))
     W(ul_open())
     W(li("Strafe: Miss chance debuff duration rescaled to 2s and is no longer dependent on Strafe's remaining duration", t("REWORK"), extra=inline_note("Duration is refreshed with each attack under the Strafe effect")))
@@ -1274,6 +1271,10 @@ def build():
     W(ul_open())
     W(li("Death Pact: Now can be cast while rooted or leashed, but without teleporting Clinkz to the target location", t("BUFF")))
     W(li("Death Pact: Added alt-cast mode which disables teleportation", t("NEW")))
+    W(ul_close())
+    W(ability("Tar Bomb", slug="clinkz_tar_bomb"))
+    W(ul_open())
+    W(li("Can now be put on autocast so Clinkz will throw a tar bomb when attacking, if the ability is available", t("QoL")))
     W(ul_close())
     W(ability("Death Pact", slug="clinkz_death_pact"))
     W(ul_open())
@@ -1303,7 +1304,7 @@ def build():
     W(ul_close())
     W(facet_header("rattletrap_hookup"))
     W(ul_open())
-    W(li("Hookshot: Now requires at least one other allied hero to be within a 350 radius of the Hookshot target", t("REWORK")))
+    W(li("Hookshot: Now requires at least one other allied hero to be within a 350 radius of the Hookshot target", t("NEW")))
     W(li("Hookshot: No longer requires to hook an allied target", t("BUFF")))
     W(ul_close())
     W(ability("Battery Assault", slug="rattletrap_battery_assault"))
@@ -1317,11 +1318,6 @@ def build():
 
     # Crystal Maiden
     W(hero_header("Crystal Maiden"))
-    W(ability("Blueheart Floe", slug="crystal_maiden_blueheart_floe", innate=True))
-    W(ul_open())
-    W(li("Now levels up with Freezing Field", t("REWORK")))
-    W(li("Mana Regen Amplification rescaled from 50% to 25/50/75/100%", b(50, [25, 50, 75, 100])))
-    W(ul_close())
     W(facet_header("crystal_maiden_frozen_expanse"))
     W(ul_open())
     W(li("Removed", t("DEL")))
@@ -1337,6 +1333,11 @@ def build():
     W(new_facet("crystal_maiden_glacial_guard", desc=[
         "Crystal Nova: Increases radius by 100 and grants allied heroes in the affected area a 40/70/100/130 physical barrier for 4s. Crystal Maiden receives double the barrier",
     ]))
+    W(ability("Blueheart Floe", slug="crystal_maiden_blueheart_floe", innate=True))
+    W(ul_open())
+    W(li("Now levels up with Freezing Field", t("REWORK")))
+    W(li("Mana Regen Amplification rescaled from 50% to 25/50/75/100%", b(50, [25, 50, 75, 100])))
+    W(ul_close())
     W(ability("Crystal Nova", slug="crystal_maiden_crystal_nova"))
     W(ul_open())
     W(li("Slow Duration decreased from 5s to 4s", b(5, 4)))
@@ -1355,6 +1356,10 @@ def build():
     W(li("Damage gain per level decreased from +5 to +2.7", b(5, 2.7)))
     W(li("Damage at level 30 decreased by 75 (from 221-227 to 146-152)", br(221, 227, 146, 152)))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
+    W(ul_close())
+    W(facet_header("dark_seer_atkspd"))
+    W(ul_open())
+    W(li("Quick Wit: Attack Speed per Intelligence increased from 0.5 to 1", b(0.5, 1)))
     W(ul_close())
     W(ability_change(
         old=dict(
@@ -1375,10 +1380,6 @@ def build():
         summary="New innate ability.",
         tag="new",
     ))
-    W(facet_header("dark_seer_atkspd"))
-    W(ul_open())
-    W(li("Quick Wit: Attack Speed per Intelligence increased from 0.5 to 1", b(0.5, 1)))
-    W(ul_close())
 
     # Dark Willow
     W(hero_header("Dark Willow"))
@@ -1621,8 +1622,10 @@ def build():
     W(ability("Precision Aura", slug="drow_ranger_trueshot"))
     W(ul_open())
     W(li("Now levels with Marksmanship", t("REWORK")))
-    _pill1 = scale_pill("16% + 1% per level", lambda L: 16 + 1*L)
-    W(li("Self Agility percentage bonus rescaled from 2% per hero level to 4/8/12/" + _pill1[0] + "", t("REWORK"), extra=inline_note("Allies still get 50% of the total bonus") + _pill1[1]))
+    W(li_formula("Self Agility percentage bonus rescaled", "2% per hero level", "4/8/12/16% + 1% per level",
+                 lambda L: 2 * L, lambda L: [4, 8, 12, 16][0 if L < 6 else min(3, (L - 6) // 6 + 1)] + 1 * L,
+                 levels=[1, 5, 6, 11, 12, 17, 18, 25, 30], tag_levels=range(1, 31), label="Hero level", value_fmt="{:g}%",
+                 inline_note_text="Allies still get 50% of the total bonus. Marksmanship taken at hero levels 6, 12 and 18"))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -1836,7 +1839,7 @@ def build():
     W(ul_close())
     W(ability("Scurry", slug="hoodwink_scurry"))
     W(ul_open())
-    W(li("All sources of evasion are doubled for the duration, including Redirect Chance from Mistwoods Wayfarer", t("BUFF")))
+    W(li("All sources of evasion are doubled for the duration, including Redirect Chance from Mistwoods Wayfarer", t("NEW")))
     W(ul_close())
     W(ability("Sharpshooter", slug="hoodwink_sharpshooter"))
     W(ul_open())
@@ -2328,9 +2331,17 @@ def build():
     W(li("Agility gain increased from 2.0 to 2.8", b(2, 2.8)))
     W(li("Intelligence gain decreased from 2.0 to 1.4", b(2, 1.4)))
     W(li("Damage gain per level decreased from +4.1 to +2.8", b(4.1, 2.8)))
-    W(li("Damage at level 30 decreased by 52 (from 185-189 to 133-137)", t("NERF")))
+    W(li("Damage at level 30 decreased by 52 (from 185-189 to 133-137)", br(185, 189, 133, 137)))
     W(li(attr_change("Universal", "Agility"), t("REWORK"), extra=inline_note("Spirit Bear remains a Universal Hero")))
     W(li("Damage at level 1 unchanged (38-42)", t("MISC")))
+    W(ul_close())
+    W(facet_header("lone_druid_unbearable"))
+    W(ul_open())
+    W(li("Removed", t("DEL"), extra=inline_note("It's a facet's name, not the description")))
+    W(ul_close())
+    W(facet_header("lone_druid_bear_necessities"))
+    W(ul_open())
+    W(li("Stat Bonus increased from 30/45/60/75% to 45/55/65/75%", b([30, 45, 60, 75], [45, 55, 65, 75])))
     W(ul_close())
     W(ability_change(
         old=dict(
@@ -2350,14 +2361,6 @@ def build():
         summary="Reworked",
         tag="rework",
     ))
-    W(facet_header("lone_druid_unbearable"))
-    W(ul_open())
-    W(li("Removed", t("DEL"), extra=inline_note("It's a facet's name, not the description")))
-    W(ul_close())
-    W(facet_header("lone_druid_bear_necessities"))
-    W(ul_open())
-    W(li("Stat Bonus increased from 30/45/60/75% to 45/55/65/75%", b([30, 45, 60, 75], [45, 55, 65, 75])))
-    W(ul_close())
     W(ability("Spirit Link", slug="lone_druid_spirit_link"))
     W(ul_open())
     W(li("Now follows global Lifesteal rules (as a result, gained 40% creep penalty)", t("NERF")))
@@ -2373,7 +2376,7 @@ def build():
     W(ul_open())
     W(li("Collision Damage increased from 20/25/30/35% to 22/28/34/40%", b([20, 25, 30, 35], [22, 28, 34, 40])))
     W(li("Collision Radius increased from 150 to 175", b(150, 175)))
-    W(li("Improved Glaive collision behavior for orbiting Glaives", t("BUFF")))
+    W(li("Improved Glaive collision behavior for orbiting Glaives", t("QoL")))
     W(li("Aghanim's Shard Collision Damage Bonus increased from +15% to +20%", b(15, 20), extra=inline_note("Total Collision Damage with Shard increased from 35/40/45/50% to 42/48/54/60% — " + b([35, 40, 45, 50], [42, 48, 54, 60]))))
     W(ul_close())
 
@@ -2386,7 +2389,7 @@ def build():
     W(li("Agility gain decreased from 1.8 to 1.7", b(1.8, 1.7)))
     W(li("Intelligence gain increased from 1.2 to 1.7", b(1.2, 1.7)))
     W(li("Damage gain per level decreased from +4.2 to +3.4", b(4.2, 3.4)))
-    W(li("Damage at level 30 decreased by 40 (from 202-207 to 162-167)", t("NERF")))
+    W(li("Damage at level 30 decreased by 40 (from 202-207 to 162-167)", br(202, 207, 162, 167)))
     W(li(attr_change("Universal", "Strength"), t("REWORK")))
     W(li("Damage at level 1 unchanged (50-55)", t("MISC")))
     W(ul_close())
@@ -2407,7 +2410,7 @@ def build():
     W(li("Damage at level 1 increased by 7 (from 48-56 to 55-63)", br(48, 56, 55, 63)))
     W(li("Intelligence gain increased from 1.6 to 2.1", b(1.6, 2.1)))
     W(li("Damage gain per level decreased from +4.7 to +3.2", b(4.7, 3.2)))
-    W(li("Damage at level 30 decreased by 46 (from 214-222 to 168-176)", t("NERF")))
+    W(li("Damage at level 30 decreased by 46 (from 214-222 to 168-176)", br(214, 222, 168, 176)))
     W(ul_close())
     W(facet_header("magnataur_reverse_polarity"))
     W(ul_open())
@@ -2450,7 +2453,7 @@ def build():
     W(li("Damage at level 1 increased from 50-56 to 56-60", br(50, 56, 56, 60)))
     W(li("Intelligence gain increased from 1.5 to 1.9", b(1.5, 1.9)))
     W(li("Damage gain per level decreased from +4.4 to +3.0", b(4.4, 3)))
-    W(li("Damage at level 30 decreased by 44-46 (from 207-213 to 163-167)", t("NERF")))
+    W(li("Damage at level 30 decreased by 44-46 (from 207-213 to 163-167)", br(207, 213, 163, 167)))
     W(ul_close())
     W(facet_header("marci_sidekick"))
     W(ul_open())
@@ -2534,10 +2537,6 @@ def build():
 
     # Meepo
     W(hero_header("Meepo"))
-    W(ability("Sticky Fingers", slug="meepo_sticky_fingers", innate=True))
-    W(ul_open())
-    W(li("Updated to the new Neutral crafting system. Increases selection of Artifacts and Enchantments from 4 to 5", b(4, 5)))
-    W(ul_close())
     W(facet_header("meepo_pack_rat"))
     W(ul_open())
     W(li("Removed", t("DEL")))
@@ -2549,6 +2548,10 @@ def build():
     W(new_facet("meepo_codependent", desc=[
         "Divided We Stand: All Meepos have a stackable aura that increases nearby Meepos' attack speed by 7% and armor by 2. Radius: 600",
     ]))
+    W(ability("Sticky Fingers", slug="meepo_sticky_fingers", innate=True))
+    W(ul_open())
+    W(li("Updated to the new Neutral crafting system. Increases selection of Artifacts and Enchantments from 4 to 5", b(4, 5)))
+    W(ul_close())
 
     # Mirana
     W(hero_header("Mirana"))
@@ -2561,12 +2564,8 @@ def build():
     W(li("Agility gain increased from 2.5 to 3.1", b(2.5, 3.1)))
     W(li("Intelligence gain increased from 1.4 to 1.9", b(1.4, 1.9)))
     W(li("Damage gain per level decreased from +4.1 to +3.1", b(4.1, 3.1)))
-    W(li("Damage at level 30 decreased by 40-38 (from 191-195 to 151-157)", t("NERF")))
+    W(li("Damage at level 30 decreased by 40-38 (from 191-195 to 151-157)", br(191, 195, 151, 157)))
     W(li(attr_change("Universal", "Agility"), t("REWORK")))
-    W(ul_close())
-    W(ability("Selemene's Faithful", slug="mirana_selemenes_faithful", innate=True))
-    W(ul_open())
-    W(li("Healing Lotus Effectiveness increased from 20% to 50%", b(20, 50)))
     W(ul_close())
     W(facet_header("mirana_moonlight"))
     W(ul_open())
@@ -2582,6 +2581,10 @@ def build():
     W(new_facet("mirana_leaps_and_bounds", desc=[
         "Leap: Upon landing, Leap roots targets in a 250 radius around Mirana for 1.1/1.4/1.7/2s",
     ]))
+    W(ability("Selemene's Faithful", slug="mirana_selemenes_faithful", innate=True))
+    W(ul_open())
+    W(li("Healing Lotus Effectiveness increased from 20% to 50%", b(20, 50)))
+    W(ul_close())
     W(ability("Starstorm", slug="mirana_starfall"))
     W(ul_open())
     W(li("Second Meteor Damage decreased from 80% to 60%", b(80, 60)))
@@ -2624,8 +2627,6 @@ def build():
     W(hero_header("Morphling"))
     W(ul_open())
     W(li("Removed Adaptive Strike (Strength) ability as it is merged with an Agility one", t("DEL")))
-    W(li("Accumulation: No longer grants +100% bonus stats from the Talent Tree's All Attribute bonus", t("DEL")))
-    W(li("Accumulation: Now Talent Tree's All Attribute bonus provides an additional +3 to Morphling's primary attribute", t("BUFF")))
     W(ul_close())
     W(facet_header("morphling_agi"))
     W(ul_open())
@@ -2636,6 +2637,11 @@ def build():
         old_desc=["Hero's Primary Attribute is Strength", "Morphling's Agility to Strength ratio affects his Cooldown speed: up to 60% faster at 175% Agility/Strength ratio, regular speed at 50%. Doesn't affect items. Replicated abilities are also affected"],
         new_desc=["Changes Morphling's Primary Attribute to Strength. Morphling gains +1% Spell Amp per 4 Agility. Spell Amplification effect is breakable",
                   "Adaptive Strike: Stuns enemy target for 0.5-2.4s depending on Morphling's Strength. Has the same rules as a knockback effect" + " " + inline_note("Maximum effect is reached when Morphling's Strength is 50% higher than his Agility")]))
+    W(ability("Accumulation", slug="morphling_accumulation", innate=True))
+    W(ul_open())
+    W(li("Now Talent Tree's All Attribute bonus provides an additional +3 to Morphling's primary attribute", t("NEW")))
+    W(li("No longer grants +100% bonus stats from the Talent Tree's All Attribute bonus", t("DEL")))
+    W(ul_close())
     W(ability("Waveform", slug="morphling_waveform"))
     W(ul_open())
     W(li("No longer attacks enemies by default", t("DEL")))
@@ -2680,7 +2686,7 @@ def build():
     W(ability("Gunslinger", slug="muerta_gunslinger"))
     W(ul_open())
     W(li("Secondary shot chance decreased from 26/34/42/50% to 18/27/36/45%", b([26, 34, 42, 50], [18, 27, 36, 45])))
-    W(li("Secondary shot now prioritizes heroes, then non-hero units, then buildings", t("BUFF")))
+    W(li("Secondary shot now prioritizes heroes, then non-hero units, then buildings", t("NEW")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2706,7 +2712,7 @@ def build():
     W(hero_stat_card())
     W(li("Base Damage decreased by 2", bstat_h("Nature's Prophet", "AttackDamageMin", "7.37e", -2), extra=note_box(hero="Nature's Prophet", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage gain per level increased from +3.5 to +4.2", b(3.5, 4.2)))
-    W(li("Damage at level 30 increased by 25 (from 155-165 to 180-190)", t("BUFF")))
+    W(li("Damage at level 30 increased by 25 (from 155-165 to 180-190)", br(155, 165, 180, 190)))
     W(li(attr_change("Intelligence", "Universal"), t("REWORK")))
     W(li("Damage at level 1 unchanged (40-50)", t("MISC")))
     W(ul_close())
@@ -2784,7 +2790,7 @@ def build():
     W(li("Agility gain increased from 2.3 to 2.9", b(2.3, 2.9)))
     W(li("Intelligence gain increased from 2.5 to 2.6", b(2.5, 2.6)))
     W(li("Damage gain per level decreased from +5.1 to +3.7", b(5.1, 3.7)))
-    W(li("Damage at level 30 decreased by 52 (from 228-232 to 176-180)", t("NERF")))
+    W(li("Damage at level 30 decreased by 52 (from 228-232 to 176-180)", br(228, 232, 176, 180)))
     W(li("Damage at level 1 unchanged (51-55)", t("MISC")))
     W(ul_close())
     W(facet_change("nyx_assassin_burn_mana",
@@ -3063,14 +3069,21 @@ def build():
     W(ul_close())
     W(facet_header("queenofpain_facet_bondage"))
     W(ul_open())
-    W(li("Now is a facet that improves Succubus", t("NEW")))
-    W(li("Succubus: Now also makes Spell Lifesteal apply to reflected Magical and Pure Damage", t("BUFF"), extra=inline_note("Succubus will not provide lifesteal on reflected physical damage from spells")))
+    W(li("Now is a facet that improves Succubus: also makes Spell Lifesteal apply to reflected Magical and Pure Damage", t("NEW"), extra=inline_note("Succubus will not provide lifesteal on reflected physical damage from spells")))
     W(ul_close())
-    W(ability("Succubus", slug="queenofpain_succubus"))
+    W(ability_change(
+        summary="Succubus is now an innate ability.",
+        tag="rework",
+        # the 7.37e tooltip names no numbers: spell_lifesteal 12, spell_lifesteal_close 18, close_radius 300, max_radius 800 of its KV
+        old=dict(name="Succubus", slug="queenofpain_succubus", desc=[
+            "Queen of Pain gains Spell Lifesteal that increases with proximity to her enemies. Lifesteal is at its maximum when the enemy is 300 units or closer to her and at its minimum when the enemy is 800 units or further from her. Minimum lifesteal: 12%. Maximum lifesteal: 18%."]),
+        new=dict(name="Succubus", slug="queenofpain_succubus", innate=True, desc=[
+            hl("All sources of Spell Lifesteal also apply to Pure Damage", "new") + ". Queen of Pain gains Spell Lifesteal that increases with proximity to her enemies. Lifesteal is at its maximum when the enemy is 300 units or closer to her and at its minimum when the enemy is 800 units or further from her. Minimum lifesteal: " + hl("2%", "nerf") + ". Maximum lifesteal: " + hl("14%", "nerf") + "."]),
+    ))
     W(ul_open())
-    W(li("Now is an innate ability", t("REWORK")))
-    W(li("Now also makes all sources of Spell Lifesteal apply to Pure Damage", t("NEW")))
-    W(li("Spell Lifesteal decreased from 12-18% to 2-14%", br(12, 18, 2, 14)))
+    W(li("Now is an innate ability", t("REWORK"), covered=True))
+    W(li("Now also makes all sources of Spell Lifesteal apply to Pure Damage", t("NEW"), covered=True))
+    W(li("Spell Lifesteal decreased from 12-18% to 2-14%", br(12, 18, 2, 14), covered=True))
     W(ul_close())
     W(ability("Shadow Strike", slug="queenofpain_shadow_strike"))
     W(ul_open())
@@ -3086,7 +3099,7 @@ def build():
     W(ul_close())
     W(ability("Storm Surge", slug="razor_storm_surge"))
     W(ul_open())
-    W(li("Strike Damage is now classified as reflection damage", t("MISC")))
+    W(li("Strike Damage is now classified as reflection damage", t("REWORK")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -3098,11 +3111,11 @@ def build():
     W(facet_header("riki_contract_killer"))
     W(ul_open())
     W(li("Backstab: Hero Assist XP rescaled from 25/100/100/100 to 25/75/125/175", b([25, 100, 100, 100], [25, 75, 125, 175])))
-    W(li("Backstab: Riki also gets 25/75/125/175 bonus experience for courier and ward kills", t("BUFF")))
+    W(li("Backstab: Riki also gets 25/75/125/175 bonus experience for courier and ward kills", t("NEW")))
     W(ul_close())
     W(facet_header("riki_exterminator"))
     W(ul_open())
-    W(li("Tricks of the Trade: When Riki kills a non-hero unit during Tricks of the Trade, the cooldown is reduced by 0.75s", t("BUFF")))
+    W(li("Tricks of the Trade: When Riki kills a non-hero unit during Tricks of the Trade, the cooldown is reduced by 0.75s", t("NEW")))
     W(ul_close())
     W(ability("Smoke Screen", slug="riki_smoke_screen"))
     W(ul_open())
@@ -3250,12 +3263,12 @@ def build():
             "Curses the target area, causing enemy heroes to take damage over time and slowing their movement speed. If a target casts a spell, they are silenced for a short period. The duration is paused as long as the target is silenced."]),
         new=dict(name="Arcane Curse", slug="silencer_curse_of_the_silent", desc=[
             "Curses the target area, dealing damage and causing enemy heroes to take damage over time and slowing their movement speed. Silenced enemies take 1.5x slow and damage. Anytime affected enemies cast a spell, the duration is increased. The duration is paused as long as the target is silenced " + inline_note("Returned to pre-7.36 behavior")
-            + " " + hl("Duration can be decreased by Status Resistance or increased by Debuff Duration bonuses", "buff") + ".",
+            + " " + hl("Duration can be decreased by Status Resistance or increased by Debuff Duration bonuses", "new") + ".",
             "Initial Damage: 20/40/60/80. Damage: 16/24/32/40. Radius: 350. Base Duration: 6s. Movement Slow: 16/19/22/25%. Penalty Duration: 2s. Silenced Multiplier: 1.5x",
             "Cast Range: 1000, Mana Cost: 120/130/140/150, Cooldown: 22/20/18/16s"]),
         summary="Ability reworked", tag="rework"))
     W(ul_open())
-    W(li("Compared to previous iterations, ability duration can now be decreased by Status Resistance or increased by Debuff Duration bonuses", t("BUFF"),
+    W(li("Compared to previous iterations, ability duration can now be decreased by Status Resistance or increased by Debuff Duration bonuses", t("NEW"),
          covered=True))                  # highlighted in the card above
     W(ul_close())
     W(ability("Glaives of Wisdom", slug="silencer_glaives_of_wisdom"))
@@ -3284,8 +3297,9 @@ def build():
 
     # Skywrath Mage
     W(hero_header("Skywrath Mage"))
+    W(ability("Ruin and Restoration", slug="skywrath_mage_ruin_and_restoration", innate=True))
     W(ul_open())
-    W(li("Ruin and Restoration: Spell Lifesteal rescaled from 20/30/40/50% to 25/30/35/40%", b([20, 30, 40, 50], [25, 30, 35, 40])))
+    W(li("Spell Lifesteal rescaled from 20/30/40/50% to 25/30/35/40%", b([20, 30, 40, 50], [25, 30, 35, 40])))
     W(ul_close())
     W(ability("Arcane Bolt", slug="skywrath_mage_arcane_bolt"))
     W(ul_open())
@@ -3861,10 +3875,6 @@ def build():
     W(li("Damage at level 30 decreased by 45-43 (from 203-208 to 158-165)", br(203, 208, 158, 165)))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(ul_close())
-    W(ability("Eldwurm Scholar", slug="winter_wyvern_eldwurm_scholar", innate=True))
-    W(ul_open())
-    W(li("Now applies to Shrines of Wisdom instead of removed Wisdom Runes", t("REWORK"), extra=inline_note("Effect and mechanics are not changed")))
-    W(ul_close())
     W(facet_header("winter_wyvern_heal_mana"))
     W(ul_open())
     W(li("Removed", t("DEL")))
@@ -3880,9 +3890,13 @@ def build():
     W(new_facet("winter_wyvern_recursive", desc=[
         "Winter's Curse: Makes all affected enemies take 125% of physical, magical and pure damage from Winter Wyvern. Whenever the cursed enemy dies, Winter's Curse is recast on the lowest health enemy hero affected by the Curse. The recast has minimum, maximum, and bonus durations equal to 50% of the default spell" + " " + inline_note("Can't be recast on illusions. Amount of recasts is unlimited. Durations are not affected by the amount of recasts and are always equal to 50% of the default Winter's Curse"),
     ]))
+    W(ability("Eldwurm Scholar", slug="winter_wyvern_eldwurm_scholar", innate=True))
+    W(ul_open())
+    W(li("Now applies to Shrines of Wisdom instead of removed Wisdom Runes", t("REWORK"), extra=inline_note("Effect and mechanics are not changed")))
+    W(ul_close())
     W(ability("Winter's Curse", slug="winter_wyvern_winters_curse"))
     W(ul_open())
-    W(li("Affected units no longer take increased magical and pure damage bonus from Winter Wyvern by default", t("NERF")))
+    W(li("Affected units no longer take increased magical and pure damage bonus from Winter Wyvern by default", t("DEL")))
     W(ul_close())
 
     # Witch Doctor
@@ -3932,7 +3946,7 @@ def build():
     W(ul_open())
     W(li("Leap Distance rescaled from 500 to 300/400/500/600", b(500, [300, 400, 500, 600])))
     W(li("Slow Duration decreased from 1.6s to 1.4s", b(1.6, 1.4)))
-    W(li("Vision Radius is now affected by changes to Area of Effect", t("BUFF")))
+    W(li("Vision Radius is now affected by changes to Area of Effect", t("NEW")))
     W(ul_close())
 
     write_footer()

@@ -2269,11 +2269,6 @@ def build():
 
     # Venomancer
     W(hero_header("Venomancer"))
-    W(ability("Septic Shock", slug="venomancer_sepsis", innate=True))
-    W(ul_open())
-    W(li("Aghanim's Scepter Base Damage per debuff increased from 20% to 25%", b(20, 25)))
-    W(li("Aghanim's Scepter no longer gives Plague Wards the ability to deal Septic Shock damage (moved to Plague Carrier facet)", t("DEL")))
-    W(ul_close())
     W(facet_change("venomancer_plague_carrier",
         old_desc=[
             "Plague Ward can be cast on allies, attaching a ward onto them. While attached, wards are untargetable and die one at a time whenever the unit they are attached onto receives 100/150/200/250 damage. Wards attack the same target their attached unit is attacking."
@@ -2283,6 +2278,11 @@ def build():
             "Septic Shock: Allows Plague Wards to deal Septic Shock damage based on their damage. When Venomous Gale impacts enemy heroes, 2 Plague Wards are created around them based on the current level of Plague Ward.",
         ],
     ))
+    W(ability("Septic Shock", slug="venomancer_sepsis", innate=True))
+    W(ul_open())
+    W(li("Aghanim's Scepter Base Damage per debuff increased from 20% to 25%", b(20, 25)))
+    W(li("Aghanim's Scepter no longer gives Plague Wards the ability to deal Septic Shock damage (moved to Plague Carrier facet)", t("DEL")))
+    W(ul_close())
     W(ability("Plague Ward", slug="venomancer_plague_ward"))
     W(ul_open())
     W(li("Ward HP increased from 120/230/340/450 to 150/250/350/450", b([120, 230, 340, 450], [150, 250, 350, 450])))

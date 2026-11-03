@@ -251,7 +251,7 @@ CANONICAL_TAGS = [
     # the mirror: "Radius is now affected by Area of Effect bonuses" is a new property — NEW (owner 2026-10-16, 7.41
     # Congregations of the Deep / Water Bubble (Large); were BUFF)
     (re.compile(r'\bnow (?:also )?(?:affected|increased|modified) by (?:\w+ )?(?:AoE|Area of Effect) (?:bonus(?:es)?|increase)'
-                r'|\bnow (?:also )?(?:affected|increased) by bonuses to (?:AoE|Area of Effect)\b', re.I), 'NEW'),
+                r'|\bnow (?:also )?(?:affected|increased) by (?:bonuses|changes) to (?:AoE|Area of Effect)\b', re.I), 'NEW'),
     # the shop an item is bought in ("Item moved back to Secret Shop from Miscellaneous Shop", 7.41 Ring of Health /
     # Void Stone): where it is sold, a structural move like "Moved from Tier 4 to Tier 2" — REWORK (owner 2026-10-17;
     # were NERF)
@@ -291,8 +291,8 @@ CANONICAL_TAGS = [
     (re.compile(r'\bno longer (?:reduces|decreases) ', re.I),       'BUFF'),
     (re.compile(r'\bno longer requires (?:a |an )?(?:skill point|mana|charge)', re.I), 'BUFF'),
     # Owner 2026-09-27: what a TOGGLE may be switched under (silence, invisibility) doesn't change the
-    # gameplay of such an ability → MISC. (Damage type rows stay as they were: "Damage type changed" REWORK,
-    # "classified as reflection damage" MISC.)
+    # gameplay of such an ability → MISC. (Damage type rows stay as they were: "Damage type changed" and, owner
+    # 2026-11-02, "classified as reflection damage" REWORK.)
     (re.compile(r'\btoggl(?:e|es|ed|ing)\b[^.]*?\b(?:no longer (?:be )?(?:disabled|breaks?|stops?)|while silenced)', re.I), 'MISC'),
     (re.compile(r'\b(?:can now|now can) be toggled while\b', re.I), 'MISC'),
     # Owner 2026-09-27: an effect that stops working on a class of targets → DEL (as "is not applied if");
@@ -578,6 +578,7 @@ TAG_OVERRIDES = {
     "now has a shared cooldown":    "MISC",
     "now requires aghanim's":       "NERF",    # a capability now gated behind Aghs (checked before "now requires")
     "now requires a single target tree": "NERF",  # 7.37 Nature's Call (Ironwood Treant): a new cast restriction
+    "now requires at least one other allied hero": "NEW",  # 7.38 Hookshot (Hookup): a new condition (owner 2026-11-02)
     "now requires":                 "REWORK",  # "Now requires X instead of Y"
     "instead of only higher":       "BUFF",    # scope widened ("…equal or higher level, instead of only higher"; audit 2026-10-03)
     # 7.37e proofread (2026-10-28): the effect decides, not the phrase template
@@ -666,6 +667,20 @@ TAG_OVERRIDES = {
     "no longer requires enchant totem to be leveled": "NEW",   # Slugger: active without Enchant Totem
     "multicasts now prioritize":              "NEW",    # Fire Shield: a target order for multicasts
     "is now applied during the rush":         "NEW",    # Phantom Rush: the agility during the rush too
+    # 7.38 re-read (2026-11-02), by the owner's rules: a new property is NEW even when it helps
+    "all sources of evasion are doubled":     "NEW",    # Scurry had no evasion in 7.37e
+    "now prioritizes heroes":                 "NEW",    # Gunslinger: a target order, as Fire Shield above
+    "kills a non-hero unit during":           "NEW",    # Exterminator: a new way to cut Tricks of the Trade's cooldown
+    "bonus experience for courier and ward":  "NEW",    # Contract Killer: a new source of experience
+    "spell lifesteal apply to reflected":     "NEW",    # Succubus (Bondage)
+    "can now be decreased by status resistance": "NEW", # Arcane Curse: both ways, Debuff Duration lengthens it
+    "all attribute bonus provides an additional": "NEW",  # Accumulation: +3 replaces the removed +100%
+    "improved glaive collision behavior":     "QoL",    # as "improved behavior" above (owner 2026-10-28)
+    "can now be put on autocast":             "QoL",    # as "added an auto-cast" above (Tar Bomb)
+    # the owner's own answers to the 7.38 re-read (2026-11-02)
+    "classified as reflection damage":        "REWORK", # Quill Spray, Strike Damage: the kind of damage changes
+    "no longer take increased":               "DEL",    # Winter's Curse: the amplification is gone
+    "now has the same effect for both":       "REWORK", # Arc Warden and his Double: values evened out both ways
     # 7.37d proofread (2026-10-29)
     "no longer doubles its bonuses":          "DEL",    # Bracer / Wraith Band / Null Talisman: the 25-minute doubling
     "no longer makes caster or ally unslowable": "DEL", # Disperser Suppress (40% slow resistance comes instead, NEW)
@@ -4564,6 +4579,8 @@ def generate(version):
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
     out = _postprocess_same_change_abilities(out)     # one block, stacked icons (owner 2026-10-30)
     out = _postprocess_group_rows_home(out)           # a hero row about all of a block's abilities -> that block
+    out = _postprocess_facet_improves_row(out)        # "Now is a facet that improves X" + "X: …" -> one row (owner)
+    out = _postprocess_facets_first(out)              # a hero's facets, then his abilities (owner 2026-11-02)
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is
@@ -4581,14 +4598,54 @@ _LEVEL_OF_RE = re.compile(
     r'to \(\+(?P<b>\d+(?:\.\d+)?) with every level of (?P<abil>[^)"]+)\)", t\("[A-Za-z]+"\)\)\)\s*$')
 
 
+_PCT_LEVEL_PILL_RE = re.compile(r'^\s*(_pill\d+) = scale_pill\("(?P<last>\d+(?:\.\d+)?)% \+ (?P<per>\d+(?:\.\d+)?)% per level"')
+_PCT_LEVEL_ROW_RE = re.compile(
+    r'^(?P<ind>\s*)W\(li\("(?P<pre>[^"]*?) rescaled from (?P<a>\d+(?:\.\d+)?)% per hero level to (?P<vals>(?:\d+(?:\.\d+)?%?/)+)" '
+    r'\+ _pill\d+\[0\] \+ "", t\("[A-Za-z]+"\)(?:, extra=inline_note\("(?P<note>[^"]*)"\) \+ _pill\d+\[1\])?\)\)\s*$')
+_ANY_SLUG_RE = re.compile(r'^\s*W\(ability\("[^"]+", slug="([^"]+)"')
+
+
+def _pct_level_formula(pill, row, slug, version):
+    """"… rescaled from 2% per hero level to 4/8/12/16% + 1% per level" (7.38 Precision Aura) -> a formula table by hero
+    level, as the rule above (owner 2026-11-02): the levels come from the ability it depends on, or its own."""
+    from patch.ability_kv import _hero_blocks
+    p, m = _PCT_LEVEL_PILL_RE.match(pill), _PCT_LEVEL_ROW_RE.match(row)
+    if not (p and m):
+        return None
+    vals = [v.rstrip("%") for v in m.group("vals").split("/") if v] + [p.group("last")]
+    blocks = _hero_blocks(version) if version else {}
+    parent = str((blocks.get(slug) or {}).get("DependentOnAbility", ""))
+    ult = "ULTIMATE" in str((blocks.get(parent) or blocks.get(slug) or {}).get("AbilityType", "")).upper() or bool(parent)
+    if ult:
+        at, levels = "6, 12 and 18", "[1, 5, 6, 11, 12, 17, 18, 25, 30]"
+        idx = "0 if L < 6 else min(3, (L - 6) // 6 + 1)"
+    else:
+        at, levels = "1, 3, 5 and 7", "[1, 3, 5, 7, 10, 20, 30]"
+        idx = "min(3, (L - 1) // 2)"
+    who = f"{parent} taken at hero levels {at}" if parent else f"Taken at hero levels {at}"
+    note = f'{m.group("note")}. {who}' if m.group("note") else who
+    ind = m.group("ind")
+    return (f'{ind}W(li_formula("{m.group("pre")} rescaled", "{m.group("a")}% per hero level", '
+            f'"{"/".join(vals)}% + {p.group("per")}% per level",\n'
+            f'{ind}             lambda L: {m.group("a")} * L, lambda L: [{", ".join(vals)}][{idx}] + {p.group("per")} * L,\n'
+            f'{ind}             levels={levels}, tag_levels=range(1, 31), label="Hero level", value_fmt="{{:g}}%",\n'
+            f'{ind}             inline_note_text="{note}"))')
+
+
 def _postprocess_ability_level_formula(lines, version):
     """"Radius increase rescaled from (+50 with every 10 hero levels) to (+40 with every level of Echo Slam)" -> a
     formula table by hero level with its BUFF / NERF, not a REWORK row (owner 2026-10-27, 7.39 Aftershock). The
     ability's levels: an ultimate at 6 / 12 / 18, a basic ability at 1 / 3 / 5 / 7 (as soon as it can be taken)."""
     from patch.ability_kv import _hero_blocks
     by_name = {name.lower(): slug for name, slug in ABILS.values()}
-    out = []
+    out, slug_here = [], ""
     for line in lines:
+        s = _ANY_SLUG_RE.match(line)
+        slug_here = s.group(1) if s else slug_here
+        formula = _pct_level_formula(out[-1], line, slug_here, version) if out else None
+        if formula:
+            out[-1] = formula
+            continue
         m = _LEVEL_OF_RE.match(line)
         if not m:
             out.append(line)
@@ -4655,10 +4712,86 @@ def _postprocess_innate_cards(lines, version):
                 f'{ind}))']
         if reworked:
             out.append(f"{ind}# TODO[covered]: the rows the card shows (its texts, the header's level) get covered=True")
+        new_text = ability_text(slug, version) or ""
+        if became and re.search(r"\d", new_text) and not re.search(r"\d", ability_text(slug, prev) or ""):
+            # 7.38 Succubus: the old tooltip names no numbers, so its side would not say what the row's "from" was
+            out.append(f"{ind}# TODO[old-values]: the old side gets its numbers from {prev}'s KV, the new side highlights the change")
         out.append(lines[i + 1])
         for r in rows:
-            out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if _NOW_INNATE_ROW_RE.match(r) else r)
+            shown = _NOW_INNATE_ROW_RE.match(r) or (became and _row_values_in_text(r, new_text))
+            out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if shown else r)
         i += 2 + len(rows)
+    return out
+
+
+_ROW_TO_VALUES_RE = re.compile(r'^\s*W\(li\("[^"]* (?:decreased|increased|rescaled) from [^"]* to ([^"]+)"')
+
+
+def _row_values_in_text(row, text):
+    """A "… from A to B" row whose every B is in the card's new text says what the card says (owner 2026-11-02: "Spell
+    Lifesteal decreased from 12-18% to 2-14%" goes in the new side of Succubus' card)."""
+    m = _ROW_TO_VALUES_RE.match(row)
+    values = set(re.findall(r"\d+(?:\.\d+)?", m.group(1))) if m else set()
+    return bool(values) and values <= set(re.findall(r"\d+(?:\.\d+)?", text))
+
+
+_FACET_IMPROVES_RE = re.compile(r'^(\s*)W\(li\("Now is a facet that improves ([^"]+)", t\("[A-Za-z]+"\)\)\)\s*$')
+
+
+def _postprocess_facet_improves_row(lines):
+    """"Now is a facet that improves Succubus" + "Succubus: Now also makes …" -> one row, tagged NEW (owner 2026-11-02)."""
+    out, i = [], 0
+    while i < len(lines):
+        m = _FACET_IMPROVES_RE.match(lines[i])
+        nxt = lines[i + 1] if i + 1 < len(lines) else ""
+        rest = m and re.match(r'^\s*W\(li\("' + re.escape(m.group(2)) + r': (?:Now )?(.)(.*)$', nxt)
+        if not rest:
+            out.append(lines[i])
+            i += 1
+            continue
+        tail = re.sub(r't\("[A-Za-z]+"\)', 't("NEW")', rest.group(2), count=1)
+        out.append(f'{m.group(1)}W(li("Now is a facet that improves {m.group(2)}: {rest.group(1).lower()}{tail}')
+        i += 2
+    return out
+
+
+_BLOCK_START_RE = re.compile(r'^\s*W\((ability|ability_change|ability_group|new_ability|facet_header|new_facet|facet_change)\(')
+_FACET_KINDS = ("facet_header", "new_facet", "facet_change")
+_HERO_END_RE = re.compile(r'^\s*(?:W\((?:hero_header|section|unit_header|item_header|plain_header|enchant_header)\(|write_footer\(|save_html\()')
+
+
+def _facets_first(span):
+    """One hero's lines with his facet blocks before his ability blocks, each kind in its order (entity-rendering.md). A
+    hero whose facets own the abilities that follow them (sub=True, 7.39 Invoker) stays as written."""
+    stop = next((k for k, ln in enumerate(span) if "W(subgroup(" in ln), None)
+    if stop is None:
+        stop = len(span)
+        while stop and (not span[stop - 1].strip() or span[stop - 1].lstrip().startswith("#")):
+            stop -= 1
+    starts = [k for k in range(stop) if _BLOCK_START_RE.match(span[k])]
+    if not starts or any("sub=True" in ln for ln in span[:stop]):
+        return span
+    blocks = [span[a:b] for a, b in zip(starts, starts[1:] + [stop])]
+    kinds = [_BLOCK_START_RE.match(b[0]).group(1) in _FACET_KINDS for b in blocks]
+    if kinds == sorted(kinds, reverse=True):
+        return span
+    facets = [b for b, f in zip(blocks, kinds) if f]
+    others = [b for b, f in zip(blocks, kinds) if not f]
+    return span[:starts[0]] + [ln for b in facets + others for ln in b] + span[stop:]
+
+
+def _postprocess_facets_first(lines):
+    """A hero's rows, his facets, then his abilities: an innate block written before the facets put a second run of
+    abilities after them (owner 2026-11-02, 7.38 Morphling: "сначала способность, потом фасеты, потом опять способности")."""
+    out, i = [], 0
+    while i < len(lines):
+        if not lines[i].lstrip().startswith("W(hero_header("):
+            out.append(lines[i])
+            i += 1
+            continue
+        end = next((k for k in range(i + 1, len(lines)) if _HERO_END_RE.match(lines[k])), len(lines))
+        out += [lines[i]] + _facets_first(lines[i + 1:end])
+        i = end
     return out
 
 

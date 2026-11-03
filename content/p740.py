@@ -1988,13 +1988,13 @@ def build():
 
     # Night Stalker
     W(hero_header("Night Stalker"))
-    W(ability("Heart of Darkness", slug="night_stalker_heart_of_darkness"))  # innate
-    W(ul_open())
-    W(li("No longer reduces Night Stalker's health regeneration by 20% during the day", t("BUFF")))
-    W(ul_close())
     W(facet_header("night_stalker_voidbringer"))
     W(ul_open())
     W(li("Voidbringer: No longer has decreased number of +2 All Attributes bonuses", t("BUFF")))
+    W(ul_close())
+    W(ability("Heart of Darkness", slug="night_stalker_heart_of_darkness"))  # innate
+    W(ul_open())
+    W(li("No longer reduces Night Stalker's health regeneration by 20% during the day", t("BUFF")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2898,13 +2898,13 @@ def build():
 
     # Venomancer
     W(hero_header("Venomancer"))
-    W(ability("Septic Shock", slug="venomancer_sepsis", innate=True))
-    W(ul_open())
-    W(li("Base Damage per Debuff decreased from 10% to 8%", b(10, 8)))
-    W(ul_close())
     W(facet_header("venomancer_plague_carrier"))
     W(ul_open())
     W(li("Venomous Gale: Plague Wards created by Venomous Gale have 75% health and damage", b(100, 75), extra=inline_note("Previously 100% health and damage")))
+    W(ul_close())
+    W(ability("Septic Shock", slug="venomancer_sepsis", innate=True))
+    W(ul_open())
+    W(li("Base Damage per Debuff decreased from 10% to 8%", b(10, 8)))
     W(ul_close())
 
     # Viper

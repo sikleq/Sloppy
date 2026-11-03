@@ -4455,6 +4455,9 @@ h4.subgroup {
 .ability-chip[data-tooltip]:hover::after {
   opacity: 1;
 }
+/* a transparent name still has width: by the right edge it widened the phone page (7.38, 7.40, 7.41 Lifesteal tables) */
+.facet-chip[data-tooltip]:not(:hover)::after,
+.ability-chip[data-tooltip]:not(:hover)::after { display: none; }
 /* a facet row's ability ("Defense Matrix: …"): its icon as a square the size of the facet chip in place of the
    name, the name on hover (owner 2026-10-27) */
 .ability-chip {
@@ -11290,6 +11293,8 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
   border-radius: 6px 6px 0 0; line-height: 18px; flex-wrap: wrap; row-gap: 0; }
 /* the name stays on one line; long values (Dagon's 5 levels) wrap below it, still on the right */
 .iab-title { white-space: nowrap; }
+/* a long header wraps on a phone, or it widens the whole page (7.38 Demonic Cleanse: 471 px on a 375 px screen) */
+@media (max-width: 640px) { .iab-title { white-space: normal; } }
 .iab-name { color: var(--text-bright); font-weight: 600; }
 /* "Passive (Scales with Duel)": what the ability levels with, moved out of the text (owner 2026-10-24) */
 .iab-scale { color: var(--text-dim); font-weight: 400; font-size: 0.92em; }

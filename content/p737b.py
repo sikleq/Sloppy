@@ -503,13 +503,13 @@ def build():
 
     # Tinker
     W(hero_header("Tinker"))
-    W(ability("Defense Matrix", slug="tinker_defense_matrix"))
-    W(ul_open())
-    W(li("Mana Cost increased from 70/80/90/100 to 80/95/110/125", b([70, 80, 90, 100], [80, 95, 110, 125], l=True)))
-    W(ul_close())
     W(facet_header("tinker_repair_bots"))
     W(ul_open())
     W(li("March of the Machines: Heal per second decreased from 15/25/35/45 to 14/21/28/35", b([15, 25, 35, 45], [14, 21, 28, 35])))
+    W(ul_close())
+    W(ability("Defense Matrix", slug="tinker_defense_matrix"))
+    W(ul_open())
+    W(li("Mana Cost increased from 70/80/90/100 to 80/95/110/125", b([70, 80, 90, 100], [80, 95, 110, 125], l=True)))
     W(ul_close())
     W(ability("March of the Machines", slug="tinker_march_of_the_machines"))
     W(ul_open())

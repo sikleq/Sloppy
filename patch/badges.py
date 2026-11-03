@@ -277,10 +277,11 @@ def step_levels(*formula_texts, max_level=30):
 
 def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
        level_prefix='L', level_fmt=None, jump_at=20, headline_level=None,
-       effective_unchanged=False, axis_label=None, extra_formulas=()):
+       effective_unchanged=False, axis_label=None, extra_formulas=(), tag_levels=None):
     """Formula-based change. Returns (trigger_html, badge_html, table_html).
     The trigger wraps formula_text as a clickable pill that toggles the table.
-    Tag is determined by `headline_level` (default L1).
+    Tag = the mean of the signed per-level deltas over `levels`, or over `tag_levels` when the table shows only some of
+    the levels that count. `headline_level` changes the first badge, not the tag.
     levels: list of int levels to show; defaults to L1-15 + L20, L25, L30.
             Can also pass an int N -> range(1, N+1).
     value_fmt: format string for level values (e.g. '{:.2f}%' or '{:g}').
@@ -345,19 +346,19 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
     # deltas across ALL levels (including 0% ones) — same convention as
     # `b()`. Per-level formulas like "2% -> 1.9% + 0.1% per level" can be
     # 0% at L1 but a clear buff later; the filter still surfaces them.
-    signed_pcts = []
-    for L in levels:
+    def signed_pct(L):
         ov, nv = old_fn(L), new_fn(L)
         if ov == nv or ov == 0:
-            signed_pcts.append(0.0)
-            continue
+            return 0.0
         pct = (nv - ov) / ov * 100
         if round(pct) == 0:
-            signed_pcts.append(0.0)
-            continue
+            return 0.0
         is_buff = (nv < ov) if l else (nv > ov)
-        signed_pcts.append(abs(pct) if is_buff else -abs(pct))
-    avg_signed = sum(signed_pcts) / len(signed_pcts) if signed_pcts else 0.0
+        return abs(pct) if is_buff else -abs(pct)
+    signed_pcts = [signed_pct(L) for L in levels]
+    # 7.38 Precision Aura: 9 picked columns read +9% (L1's +150% counts as one of nine), all 30 hero levels -1.75%
+    tag_pcts = signed_pcts if tag_levels is None else [signed_pct(L) for L in tag_levels]
+    avg_signed = sum(tag_pcts) / len(tag_pcts) if tag_pcts else 0.0
     overall_eff = ('buff' if avg_signed > 0 else
                    'nerf' if avg_signed < 0 else
                    overall1)

@@ -484,6 +484,41 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 - Ringmaster 7.39: «will be granted one upon death (instead of upon respawn)» — **NEW**, «will no longer be granted …»
   — **DEL**.
 
+## Вторая вычитка 7.38 (2026-11-02)
+
+| Строка | Тег | Почему |
+|:---|:---:|:---|
+| «Vision Radius is now affected by changes to Area of Effect» | **NEW** | как «now affected by AoE bonuses» (владелец 2026-10-16) |
+| «All sources of evasion are doubled …» (Scurry) | **NEW** | в 7.37e уклонения у способности не было |
+| «… now prioritizes heroes, then …» (Gunslinger) | **NEW** | новый порядок целей, как Fire Shield 7.37c |
+| «When Riki kills a non-hero unit …, the cooldown is reduced», «bonus experience for courier and ward kills» | **NEW** | новое свойство, не число прежнего |
+| «Now also makes Spell Lifesteal apply to reflected …» | **NEW** | новое свойство |
+| «… can now be decreased by Status Resistance or increased by Debuff Duration» (Arcane Curse) | **NEW** | действует в обе стороны, это не усиление |
+| «Improved Glaive collision behavior» | **QoL** | как «Improved behavior» (владелец 2026-10-28) |
+| «Can now be put on autocast …» (Tar Bomb) | **QoL** | как «Added an auto-cast» (7.39) |
+| «… is now classified as reflection damage» (Quill Spray, Strike Damage) | **REWORK** | владелец 2026-11-02, меняется вид урона |
+| «Affected units no longer take increased … damage» (Winter's Curse) | **DEL** | владелец 2026-11-02 |
+| «Skill points … All Attributes starting at level 2 instead of level 6» | **REWORK** | владелец 2026-11-02 |
+| «Now has the same effect for both Arc Warden and Tempest Double» | **REWORK** | владелец 2026-11-02, значения уравнены в обе стороны |
+| «Hookshot: Now requires at least one other allied hero …» | **NEW** | владелец 2026-11-02 |
+| «rescaled from 2% per hero level to 4/8/12/16% + 1% per level» (Precision Aura) | **NERF** | среднее по всем 30 уровням героя −1,75%, `tag_levels` в `formula-tables.md` |
+
+- У героя сначала строки, потом фасеты, потом способности (`_postprocess_facets_first`; владелец 2026-11-02, Morphling: «сначала
+  способность, потом фасеты, потом опять способности. Это неправильно»). Исключение: фасет с вложенными способностями `sub=True`
+  (7.39 Invoker). Правка на всех страницах 7.37–7.40.
+- «Now is a facet that improves X» + «X: Now also …» — одна строка (`_postprocess_facet_improves_row`).
+- Карточка «is now an innate ability»: строка «… from A to B», чьи B есть в новом тексте, уходит в карточку (`covered`). Старая
+  подсказка игры без чисел (Succubus 7.37e) дополняется числами из KV прошлого патча: черновик ставит `# TODO[old-values]`.
+- «rescaled from 2% per hero level to 4/8/12/16% + 1% per level» — таблица по уровню героя (`_pct_level_formula`), уровни способности
+  от той, от которой она зависит (Precision Aura от Marksmanship: 6, 12, 18).
+- Значок в строке карточки: имя, которое не складывается в slug (Unicycle → `ringmaster_summon_unicycle`), ищется в файлах игры
+  (`hero_abilities`). Руны в тексте строки карточки — со значками (`rune_name_chips`, 7.38 Runed Replica).
+
+Страница 7.38 старше правил генератора: заметка героя с именем способности («Accumulation: …», «Ruin and Restoration: …»,
+«Tar Bomb: …») перенесена в блок способности, Succubus получил карточку «is now an innate ability», строки «Damage at level
+30» — проценты `br()`, как у остальных героев. На телефоне длинная шапка карточки переносится (`.iab-title`): Demonic
+Cleanse раздвигал страницу до 471 px. Тест `tests/test_review_738.py`.
+
 ## Вычитка 7.37e (2026-10-28)
 
 | Строка | Тег | Почему |

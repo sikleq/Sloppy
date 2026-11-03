@@ -156,13 +156,13 @@ def build():
 
     # Enigma
     W(hero_header("Enigma"))
-    W(ability("Demonic Summoning", slug="enigma_demonic_conversion"))
-    W(ul_open())
-    W(li("Eidolons created from multiplying will now automatically attack the same target as their parent", t("NEW")))
-    W(ul_close())
     W(facet_header("enigma_fragment"))
     W(ul_open())
     W(li("Damage threshold increased from 350 to 375", b(350, 375, l=True)))
+    W(ul_close())
+    W(ability("Demonic Summoning", slug="enigma_demonic_conversion"))
+    W(ul_open())
+    W(li("Eidolons created from multiplying will now automatically attack the same target as their parent", t("NEW")))
     W(ul_close())
 
     # Kez

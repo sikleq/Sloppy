@@ -326,6 +326,14 @@ def build():
 
     # Beastmaster
     W(hero_header("Beastmaster"))
+    W(facet_header("beastmaster_wild_hunt"))
+    W(ul_open())
+    W(li("Inner Beast: Bonus Attack Speed per unit rescaled from 1/2/3/4/5 to 2/3/4/5", t("NERF"), extra=inline_note("Levels 1-4 unchanged; the 1 it had at level 0 as an innate is gone (now a basic ability)")))
+    W(ul_close())
+    W(facet_header("beastmaster_beast_mode"))
+    W(ul_open())
+    W(li("Inner Beast: Active Bonus Attack Speed rescaled from 10/20/30/40/50 to 20/30/40/50", t("NERF"), extra=inline_note("Levels 1-4 unchanged; the 10 it had at level 0 as an innate is gone (now a basic ability)")))
+    W(ul_close())
     W(ability_change(
         old=dict(name="Inner Beast", slug="beastmaster_inner_beast", innate=True, desc=game_ability_desc("beastmaster_inner_beast", "7.36c")),
         new=dict(name="Rugged", slug="beastmaster_rugged", innate=True, desc=game_ability_desc("beastmaster_rugged", "7.37")),
@@ -335,14 +343,6 @@ def build():
     W(ul_open())
     W(li("Beastmaster's melee hero damage block chance is increased from 50% to 100% versus non-hero units", b(50, 100), covered=True))
     W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
-    W(facet_header("beastmaster_wild_hunt"))
-    W(ul_open())
-    W(li("Inner Beast: Bonus Attack Speed per unit rescaled from 1/2/3/4/5 to 2/3/4/5", t("NERF"), extra=inline_note("Levels 1-4 unchanged; the 1 it had at level 0 as an innate is gone (now a basic ability)")))
-    W(ul_close())
-    W(facet_header("beastmaster_beast_mode"))
-    W(ul_open())
-    W(li("Inner Beast: Active Bonus Attack Speed rescaled from 10/20/30/40/50 to 20/30/40/50", t("NERF"), extra=inline_note("Levels 1-4 unchanged; the 10 it had at level 0 as an innate is gone (now a basic ability)")))
     W(ul_close())
     W(ability("Wild Axes", slug="beastmaster_wild_axes"))
     W(ul_open())
@@ -610,6 +610,10 @@ def build():
 
     # Earthshaker
     W(hero_header("Earthshaker"))
+    W(facet_header("earthshaker_slugger"))
+    W(ul_open())
+    W(li("Knockback effect is now applied on any kill made by an Earthshaker's ability, not just Enchant Totem", t("NEW")))
+    W(ul_close())
     W(ability_change(
         old=dict(name="Aftershock", slug="earthshaker_aftershock", innate=True, desc=game_ability_desc("earthshaker_aftershock", "7.36c")),
         new=dict(name="Spirit Cairn", slug="earthshaker_spirit_cairn", innate=True, desc=game_ability_desc("earthshaker_spirit_cairn", "7.37")),
@@ -619,10 +623,6 @@ def build():
     W(ul_open())
     W(li("When Earthshaker dies, a 75 radius fissure is created where he died. This fissure blocks movement, provides vision and allows Earthshaker to gain experience around it", t("MISC"), covered=True))
     W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
-    W(facet_header("earthshaker_slugger"))
-    W(ul_open())
-    W(li("Knockback effect is now applied on any kill made by an Earthshaker's ability, not just Enchant Totem", t("NEW")))
     W(ul_close())
     W(ability("Aftershock", slug="earthshaker_aftershock"))
     W(ul_open())
@@ -893,6 +893,14 @@ def build():
 
     # Lone Druid
     W(hero_header("Lone Druid"))
+    W(facet_header("lone_druid_unbearable"))
+    W(ul_open())
+    W(li("Summon Spirit Bear: Now also increases the attack distance threshold between Lone Druid and the Spirit Bear by 500", t("NEW")))
+    W(ul_close())
+    W(new_facet("lone_druid_bear_necessities", desc=[
+        "Lone Druid can only use 3 slots of his inventory but he gets 50/60/70/80% bonus passive stats from them. Scales with True Form",
+        "Bonuses apply to the following stats" + " " + inline_note("Strength, Agility and Intelligence<br>Health, Mana and Evasion<br>Attack Speed and Bonus Damage<br>Health and Mana Regen"),
+    ]))
     W(ability_change(
         old=dict(name="Summon Spirit Bear", slug="lone_druid_spirit_bear", innate=True, desc=game_ability_desc("lone_druid_spirit_bear", "7.36c")),
         new=dict(name="Gift Bearer", slug="lone_druid_gift_bearer", innate=True, desc=game_ability_desc("lone_druid_gift_bearer", "7.37")),
@@ -903,14 +911,6 @@ def build():
     W(li("Lone Druid can re-roll his Neutral Token once per tier", t("MISC"), covered=True))
     W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
     W(ul_close())
-    W(facet_header("lone_druid_unbearable"))
-    W(ul_open())
-    W(li("Summon Spirit Bear: Now also increases the attack distance threshold between Lone Druid and the Spirit Bear by 500", t("NEW")))
-    W(ul_close())
-    W(new_facet("lone_druid_bear_necessities", desc=[
-        "Lone Druid can only use 3 slots of his inventory but he gets 50/60/70/80% bonus passive stats from them. Scales with True Form",
-        "Bonuses apply to the following stats" + " " + inline_note("Strength, Agility and Intelligence<br>Health, Mana and Evasion<br>Attack Speed and Bonus Damage<br>Health and Mana Regen"),
-    ]))
     W(ability("Summon Spirit Bear", slug="lone_druid_spirit_bear"))
     W(ul_open())
     W(li("Spirit Bear can no longer equip its own neutral items. Now copies and shares a cooldown with Lone Druid's currently equipped neutral item", t("REWORK")))
@@ -918,13 +918,13 @@ def build():
 
     # Luna
     W(hero_header("Luna"))
-    W(ability("Selemene's Favor", slug="luna_selemenes_favor", innate=True))
-    W(ul_open())
-    W(li("Ability removed", t("DEL")))
-    W(ul_close())
     W(facet_header("luna_moonshield"))
     W(ul_open())
     W(li("Renamed from Lunar Orbit to Moonshield", t("MISC")))
+    W(ul_close())
+    W(ability("Selemene's Favor", slug="luna_selemenes_favor", innate=True))
+    W(ul_open())
+    W(li("Ability removed", t("DEL")))
     W(ul_close())
     W(ability_change(
         summary="Lunar Blessing is now an innate ability.",
@@ -1084,17 +1084,17 @@ def build():
 
     # Nyx Assassin
     W(hero_header("Nyx Assassin"))
-    W(ability("Nyxth Sense", slug="nyx_assassin_nyxth_sense", innate=True))
-    W(ul_open())
-    W(li("Now also reveals enemy heroes in fog of war", t("NEW")))
-    W(li("Radius decreased from 400 to 350", b(400, 350)))
-    W(ul_close())
     W(facet_header("nyx_assassin_burn_mana"))
     W(ul_open())
     W(li("Percentage of Current Mana Burned rescaled from 15/20/25/30% to 15%", b([15, 20, 25, 30], 15)))
     W(li("Now only triggers from Nyx's ability damage", t("NERF")))
     W(li("No longer scales with Vendetta", t("DEL")))
     W(li("No longer has a damage threshold", t("DEL")))
+    W(ul_close())
+    W(ability("Nyxth Sense", slug="nyx_assassin_nyxth_sense", innate=True))
+    W(ul_open())
+    W(li("Now also reveals enemy heroes in fog of war", t("NEW")))
+    W(li("Radius decreased from 400 to 350", b(400, 350)))
     W(ul_close())
     W(ability("Vendetta", slug="nyx_assassin_vendetta"))
     W(ul_open())
@@ -1574,6 +1574,11 @@ def build():
     W(ul_open())
     W(li("Templar Assassin and her teammates can see Roshan's respawn timer", t("NEW"), extra=inline_note("Third Eye Roshan respawn indicator is above the Scan ability")))
     W(ul_close())
+    W(facet_change("templar_assassin_voidblades",
+        old_desc=["Enemies hit by Psi Blades split damage are slowed."],
+        new_desc=[
+        "Meld: Attacking a target with Meld also applies the bonus damage and debuff to enemies hit by the Psi Blades spill",
+    ]))
     W(ability_change(
         old=dict(name="Psi Blades", slug="templar_assassin_psi_blades", innate=True, desc=game_ability_desc("templar_assassin_psi_blades", "7.36c")),
         new=dict(name="Third Eye", slug="templar_assassin_third_eye", innate=True, desc=game_ability_desc("templar_assassin_third_eye", "7.37")),
@@ -1583,11 +1588,6 @@ def build():
     W(ul_open())
     W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
     W(ul_close())
-    W(facet_change("templar_assassin_voidblades",
-        old_desc=["Enemies hit by Psi Blades split damage are slowed."],
-        new_desc=[
-        "Meld: Attacking a target with Meld also applies the bonus damage and debuff to enemies hit by the Psi Blades spill",
-    ]))
     W(ability("Meld", slug="templar_assassin_meld"))
     W(ul_open())
     W(li("Bonus damage and reductions are now applied when denying allies or traps", t("NEW")))
@@ -1635,13 +1635,13 @@ def build():
 
     # Tinker
     W(hero_header("Tinker"))
-    W(ability("Defense Matrix", slug="tinker_defense_matrix"))
-    W(ul_open())
-    W(li("Damage Barrier decreased from 100/180/240/320 to 80/160/240/320", b([100, 180, 240, 320], [80, 160, 240, 320])))
-    W(ul_close())
     W(facet_header("tinker_repair_bots"))
     W(ul_open())
     W(li("March of the Machines: Heal per second increased from 15/20/25/30 to 15/25/35/45", b([15, 20, 25, 30], [15, 25, 35, 45])))
+    W(ul_close())
+    W(ability("Defense Matrix", slug="tinker_defense_matrix"))
+    W(ul_open())
+    W(li("Damage Barrier decreased from 100/180/240/320 to 80/160/240/320", b([100, 180, 240, 320], [80, 160, 240, 320])))
     W(ul_close())
     W(ability("Warp Flare", slug="tinker_warp_grenade"))
     W(ul_open())
@@ -1771,6 +1771,10 @@ def build():
     W(ul_open())
     W(li("Base Damage decreased by 2", bstat_h("Venomancer", "AttackDamageMin", "7.36c", -2), extra=note_box(hero="Venomancer", field="AttackDamageMin", before_patch="7.36c") + inline_note("Venomancer's attacks deal extra magical damage based on how many debuffs the attack target has. Only counts debuffs from Venomancer and his Plague Wards. Base Damage per debuff: 10%")))
     W(ul_close())
+    W(facet_header("venomancer_plague_carrier"))
+    W(ul_open())
+    W(li("When attached to a carrier, ward health is now also increased by 1/1.5/2/2.5% of the carrier's max health", t("BUFF")))
+    W(ul_close())
     W(ability_change(
         old=dict(name="Poison Sting", slug="venomancer_poison_sting", innate=True, desc=game_ability_desc("venomancer_poison_sting", "7.36c")),
         new=dict(name="Septic Shock", slug="venomancer_sepsis", innate=True, desc=game_ability_desc("venomancer_sepsis", "7.37")),
@@ -1780,10 +1784,6 @@ def build():
     W(ul_open())
     W(li("Can be upgraded with Aghanim's Scepter. Increases Septic Shock base damage per debuff from 10% to 20%. Plague Wards also deal Septic Shock damage based on their attack damage", b(10, 20)))
     W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
-    W(facet_header("venomancer_plague_carrier"))
-    W(ul_open())
-    W(li("When attached to a carrier, ward health is now also increased by 1/1.5/2/2.5% of the carrier's max health", t("BUFF")))
     W(ul_close())
     W(ability("Poison Sting", slug="venomancer_poison_sting"))
     W(ul_open())
@@ -1819,6 +1819,9 @@ def build():
 
     # Visage
     W(hero_header("Visage"))
+    W(new_facet("visage_gold_assumption", desc=[
+        "Soul Assumption: Soul Assumption kills give 35 gold per soul charge, up to 105/140/175/210 gold. 15% gold from creeps. Enemy heroes killed within 3s of being affected by Soul Assumption also give gold",
+    ]))
     W(ability_change(
         old=dict(name="Gravekeeper's Cloak", slug="visage_gravekeepers_cloak", innate=True, desc=game_ability_desc("visage_gravekeepers_cloak", "7.36c")),
         new=dict(name="Lurker", slug="visage_lurker", innate=True, desc=game_ability_desc("visage_lurker", "7.37")),
@@ -1829,9 +1832,6 @@ def build():
     W(li("Visage's ability cooldown durations are reduced as long as he's not taking damage. Grants a stack every 2s that Visage does not take damage. Each stack grants 2% cooldown speed with a max of 10 stacks. Stacks fade after 2s upon taking any damage", t("NERF"), covered=True))
     W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
     W(ul_close())
-    W(new_facet("visage_gold_assumption", desc=[
-        "Soul Assumption: Soul Assumption kills give 35 gold per soul charge, up to 105/140/175/210 gold. 15% gold from creeps. Enemy heroes killed within 3s of being affected by Soul Assumption also give gold",
-    ]))
     W(ability("Gravekeeper's Cloak", slug="visage_gravekeepers_cloak"))
     W(ul_open())
     W(li("No longer an innate ability. Damage Reduction per layer rescaled from 4/8/12/16/20% to 8/12/16/20%", t("NERF"), extra=inline_note("Levels 1-4 unchanged; the 4 it had at level 0 as an innate is gone (now a basic ability)")))

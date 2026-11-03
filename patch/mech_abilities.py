@@ -83,6 +83,24 @@ def rune_row_chip(text, prefix="../"):
     return ability_chip(f"{m.group('name')} Rune", f"{prefix}icons/runes/{key}.png") + rest[:1].upper() + rest[1:]
 
 
+_RUNE_NAME = "|".join(sorted((re.escape(n) for n in RUNE_ICONS), key=len, reverse=True))
+_RUNE_LIST_RE = re.compile(rf"\b((?:{_RUNE_NAME})(?:(?:, | and )(?:{_RUNE_NAME}))*) Runes?\b")
+
+
+def rune_name_chips(text, prefix="../"):
+    """Runes named inside a card's row get their icons: "Level 3 - [i] Invisibility, [i] Arcane and [i] Haste Runes" (owner
+    2026-11-02, 7.38 Runed Replica). A "?" note's text stays as it is."""
+    head, sep, tips = text.partition("<!--TIP-->")
+
+    def chip(m):
+        key = RUNE_ICONS[m.group(0)]
+        if not _os.path.exists(_os.path.join(_RUNE_DIR, f"{key}.png")):
+            return m.group(0)
+        return ability_chip(f"{m.group(0)} Rune", f"{prefix}icons/runes/{key}.png") + m.group(0)
+
+    return _RUNE_LIST_RE.sub(lambda m: re.sub(_RUNE_NAME, chip, m.group(0)), head) + sep + tips
+
+
 # map objects a list may name among items (7.37 Teleport Classification "Twin Gates"): the Terrain page's own icon
 _MAP_OBJECT_ICONS = {"Twin Gates": "../icons/ui/gothic/tc_twingates.png"}
 
