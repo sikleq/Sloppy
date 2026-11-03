@@ -52,7 +52,7 @@ jobs:
 
       # after the build: eight tests read dist/ and skip themselves without it (audit 2026-10-26)
       - name: Run unit tests
-        run: python -m pytest tests/ -v
+        run: python -m pytest tests/ -v -n auto
 
       - name: Verify minification
         run: |

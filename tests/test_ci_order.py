@@ -69,6 +69,13 @@ def test_slow_tests_are_marked_and_ci_still_runs_them(pytestconfig):
         assert "not slow" not in f.read()
 
 
+def test_ci_runs_the_tests_in_parallel_with_the_declared_plugin():
+    with open(os.path.join(ROOT, ".github", "workflows", "build.yml"), encoding="utf-8") as f:
+        assert "python -m pytest tests/ -v -n auto" in f.read()
+    with open(os.path.join(ROOT, "requirements-dev.txt"), encoding="utf-8") as f:
+        assert "pytest-xdist" in f.read()
+
+
 def test_unit_tests_run_after_the_build():
     names = _step_names()
     assert names.index("Run unit tests") > names.index("Build site")
