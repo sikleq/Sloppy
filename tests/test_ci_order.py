@@ -76,6 +76,14 @@ def test_ci_runs_the_tests_in_parallel_with_the_declared_plugin():
         assert "pytest-xdist" in f.read()
 
 
+def test_a_hung_test_run_in_ci_is_stopped_by_a_time_limit():
+    # 2026-11-02: a local -n auto run hung all night holding 18.8 GB, the cause was not found
+    with open(os.path.join(ROOT, ".github", "workflows", "build.yml"), encoding="utf-8") as f:
+        src = f.read()
+    step = src[src.index("- name: Run unit tests"):src.index("- name: Verify minification")]
+    assert re.search(r"^\s+timeout-minutes: [1-9]\d*\b", step, re.M)
+
+
 def test_unit_tests_run_after_the_build():
     names = _step_names()
     assert names.index("Run unit tests") > names.index("Build site")

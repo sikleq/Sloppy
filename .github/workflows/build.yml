@@ -52,6 +52,7 @@ jobs:
 
       # after the build: eight tests read dist/ and skip themselves without it (audit 2026-10-26)
       - name: Run unit tests
+        timeout-minutes: 5      # 46 s in parallel, 86 s in a row: a hung run stops here, not after GitHub's 6 hours
         run: python -m pytest tests/ -v -n auto
 
       - name: Verify minification
