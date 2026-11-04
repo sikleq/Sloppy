@@ -120,8 +120,6 @@ Short version (full guide: [docs/workflow.md](docs/workflow.md)):
   `dist/` is published to GitHub Pages.
 - **`.github/workflows/audit-live.yml`** — daily (and on demand): checks display names against Valve's live datafeed.
   Kept out of the deploy path, so a Valve outage never blocks a deploy.
-- **`.github/workflows/game-build-watch.yml`** — daily: opens an issue when a new game build differs from the newest
-  snapshot (a new patch, or a build without notes).
 
 ## Contributing
 

@@ -48,7 +48,7 @@ chosen is in its own README (`dota-patch-files/README.md`) — not repeated here
 the store to GitHub — BEFORE pushing Sloppy: CI lays out the raw files of every patch from it.
 **Raw files in `data/stats/<v>/` are not in git** (2026-10-24): `heroes/npc_dota_hero_*.txt` (7.34e+), the root KV
 files (7.41c+) and `npc_dota_hero_base.txt` (7.41f+) are git-ignored and written from the store by
-`python tools/game_files.py materialize` (rules: `raw_plan`; ~20 s). CI (`build.yml`, `game-build-watch.yml`) checks the
+`python tools/game_files.py materialize` (rules: `raw_plan`; ~20 s). CI (`build.yml`) checks the
 store out with the read-only deploy key in the secret `DOTA_FILES_DEPLOY_KEY` and runs it before the tests. On a new PC:
 clone the store, then run `materialize`. Without them `build_site.py` stops at once (exit 2) and prints these two
 steps (`game_files.missing_raw`), instead of failing in three builders.
@@ -58,9 +58,6 @@ SHA-1 of the game's `maps/dota.vpk` against the previous patch's row in `data/ma
 no map file: then it says "not checked") — Terrain and Oldgrowth need the owner's PC (SFM render, Source2Viewer, Steam
 depots); the weights 2–3 weeks later (Step 2c). The steps below are what the command runs, for reading and for doing
 one by hand.
-
-`.github/workflows/game-build-watch.yml` checks GameTracking every day (`tools/check_game_build.py`) and opens an issue
-when a build's files differ from the newest snapshot — a new patch, or a build without notes (silent changes).
 
 ## Step 1 — Register patch metadata
 
