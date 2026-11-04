@@ -1,0 +1,334 @@
+/* ---- INFOGRAPHIC: patch-cadence strip under the calendar ----
+   A short horizontal band (≈1/3 the calendar's height) of small charts, not a
+   full card. Breaks out to the current-year block's width (same -140px). */
+.cal-infographic {
+  margin: 10px -140px 6px;
+  display: flex;
+  align-items: stretch;
+  padding: 12px 6px;
+  background:
+    linear-gradient(180deg, rgba(36, 35, 33, 0.5) 0%, rgba(24, 23, 22, 0.5) 100%);
+  /* Border + shadow matched to .cal-year-block.is-current. */
+  border: 1px solid rgba(213, 207, 195, 0.28);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 1px 0 var(--blue-cold-10),
+    0 4px 18px var(--shadow-35);
+}
+@media (max-width: 1400px) {
+  .cal-infographic { margin-left: 0; margin-right: 0; }
+}
+.cal-ig-panel {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.cal-ig-panel + .cal-ig-panel { border-left: 1px solid var(--bg-panel-4); }
+.cal-ig-lead { flex: 0 0 auto; gap: 1px; }
+.cal-ig-title { font-size: 15px; font-weight: 700; color: var(--text-bright); letter-spacing: 0.3px; }
+.cal-ig-sub {
+  font-size: 10.5px; color: var(--text-dimmer); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 9px;
+}
+.cal-ig-statline { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-dim); }
+.cal-ig-statline b {
+  color: var(--gold); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+/* Major-patch count in the calendar's blue (matches .cal-*.major cells + chart). */
+.cal-ig-statline b.cal-ig-major { color: var(--gold); }
+/* Faint horizontal divider between stat groups. */
+.cal-ig-rule {
+  height: 1px;
+  align-self: stretch;
+  margin: 4px 0;
+  background: rgba(213, 207, 195, 0.14);
+}
+.cal-ig-h {
+  font-size: 10.5px; font-weight: 600; color: var(--text-muted-blue); text-transform: uppercase;
+  letter-spacing: 0.6px; margin-bottom: 8px; text-align: center;
+}
+/* Sparkline (SVG) — smooth line + gradient area + point dots. */
+.cal-ig-spark {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.cal-ig-spark-lbl {
+  fill: var(--text-dimmer);
+  font-size: 11px;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.cal-ig-grid { stroke: rgba(213, 207, 195, 0.07); stroke-width: 1; }
+.cal-ig-grid-v { stroke: rgba(213, 207, 195, 0.045); }   /* minor vertical lines */
+.cal-ig-axis { stroke: var(--blue-18); stroke-width: 1; }
+.cal-ig-axis.is-base { stroke: var(--blue-30); }
+.cal-ig-ytick {
+  fill: var(--text-dimmer);
+  font-size: 9px;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+/* Point dots + hover-revealed value. The wide invisible hit rect makes the
+   whole column hoverable so the value is easy to surface. */
+.cal-ig-hit { fill: transparent; pointer-events: all; cursor: default; }
+.cal-ig-dot { r: 2.1; transition: r 0.12s; }
+.cal-ig-pt:hover .cal-ig-dot { r: 4; }
+.cal-ig-pt-val {
+  fill: var(--text-bright);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--bg-panel);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.cal-ig-pt:hover .cal-ig-pt-val { opacity: 1; }
+@media (max-width: 760px) {
+  .cal-infographic { flex-direction: column; gap: 14px; }
+  .cal-ig-panel + .cal-ig-panel { border-left: none; border-top: 1px solid var(--bg-panel-4); padding-top: 12px; }
+}
+
+/* MODE 2: COMPACT */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+}
+.cal-month {
+  display: flex;
+  flex-direction: column;
+}
+.cal-month-name {
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+.cal-month-cells {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 44px;
+  padding: 2px;
+  border-left: 1px solid var(--bg-panel-4);
+}
+.cal-patch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 2px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.13s ease;
+  border: 1px solid transparent;
+  position: relative;
+}
+.cal-patch:hover {
+  filter: brightness(1.35);
+  transform: scale(1.08);
+  z-index: 3;
+}
+.cal-patch .cal-version {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: #b8b8b8;
+  line-height: 1.1;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(255, 255, 255, 0.30);
+}
+.cal-patch .cal-day {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1;
+}
+.cal-patch.sub {
+  background: rgba(120, 117, 110, 0.22);
+}
+/* Major patches — unified solid blue (compact), matches the cadence chart */
+.cal-patch.major {
+  background: rgba(222, 150, 62, 0.50);
+  border-color: rgba(222, 150, 62, 0.65);
+}
+.cal-patch.major .cal-day {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 2px var(--shadow-35);
+}
+.cal-patch.major .cal-version {
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 500;
+  text-decoration-color: rgba(255, 255, 255, 0.40);
+}
+
+/* CURRENT patch (compact mode) — emphasised via shadow only, no scale */
+.cal-patch.current {
+  filter: brightness(1.20);
+  z-index: 2;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 205, 0.35),
+    /* pre-divided by the brightness(1.2) filter above so the ring renders
+       as the site gold var(--gold) on screen (filter brightens box-shadows too) */
+    0 0 0 2px rgba(189, 163, 88, 0.90),
+    0 2px 6px var(--shadow-40);
+}
+.cal-patch.current:hover {
+  z-index: 4;
+  filter: brightness(1.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 205, 0.50),
+    /* pre-divided by brightness(1.35) — renders as var(--gold) */
+    0 0 0 2.5px rgba(168, 145, 79, 1),
+    0 3px 10px var(--shadow-50);
+}
+span.cal-patch {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* MODE 1: FULL (every day) */
+.cal-full-grid {
+  display: grid;
+  grid-template-columns: 60px repeat(31, 1fr);
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.cal-full-month-name {
+  color: var(--text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+}
+.cal-full-day {
+  aspect-ratio: 1;
+  min-height: 22px;
+  max-height: 33px;          /* cap the square so the full grid fits the viewport */
+  border-radius: 3px;
+  background: rgba(120, 117, 110, 0.05);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5d5b55;
+  text-decoration: none;
+  position: relative;
+  transition: transform 0.13s ease, filter 0.13s, background 0.1s, z-index 0s;
+}
+.cal-full-day.no-day { background: transparent; }
+/* today (set by the calendar page's script from the visitor's clock): a light warm frame, the number brighter */
+.cal-full-day.is-today { box-shadow: inset 0 0 0 1px rgba(224, 189, 98, 0.6); color: var(--text-bright); }
+/* Cross-highlight: when hovering any day cell, JS marks all cells sharing the
+   same data-day (column) and data-month (row) so a vertical + horizontal band
+   lights up around the cursor. */
+.cal-full-grid .cross-row,
+.cal-full-grid .cross-col {
+  background: rgba(213, 207, 195, 0.07);
+}
+.cal-full-grid .cross-row.cross-col {
+  background: rgba(213, 207, 195, 0.16);
+}
+.cal-full-month-name.cross-row {
+  color: var(--text-bright);
+}
+
+/* Universal table cross-highlight — applies to every <table> on every page.
+   On hover of any cell, the entire row + entire column get an equal DARK
+   tint; the pivot cell (intersection) is darker still with a cyan rim.
+   Wired up in scripts.js → wireCrossHover(). TH cells are never tagged by
+   the JS so header rows stay clean.
+
+   IMPORTANT: the hovered row is BOTH .cross-row AND the :hover target, so a
+   table's row-hover background tint would otherwise lighten the horizontal
+   band and make it read paler than the vertical column. We zero out the
+   hover tint on .cross-row rows (below) so both axes darken equally. */
+table tr.cross-row > td,
+table td.cross-col {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.34),
+                                    rgba(0, 0, 0, 0.34));
+}
+table tr.cross-row > td.cross-col {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.50),
+                                    rgba(0, 0, 0, 0.50));
+  box-shadow: inset 0 0 0 1px rgba(213, 207, 195, 0.55);
+}
+/* Kill per-table row-hover tints on the cross-row so the horizontal band
+   darkens by the same amount as the vertical column. */
+.creeps-table tbody tr.cross-row:hover,
+.mr-table tbody tr.cross-row:hover {
+  background: transparent;
+}
+.cal-full-day.has-patch {
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+}
+.cal-full-day.has-patch:hover {
+  transform: scale(1.6);
+  z-index: 5;
+  filter: brightness(1.25);
+  box-shadow: 0 2px 8px var(--shadow-60);
+}
+.cal-full-day.has-patch.sub {
+  background: rgba(120, 117, 110, 0.4);
+  color: var(--text-main);
+}
+/* Major patches — unified solid blue (full grid), matches the cadence chart */
+.cal-full-day.has-patch.major {
+  background: rgba(222, 150, 62, 0.70);
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
+}
+
+/* CURRENT patch — emphasised without scaling so text never overflows the cell. */
+.cal-full-day.has-patch.current {
+  z-index: 4;
+  filter: brightness(1.20);
+  box-shadow:
+    /* pre-divided by brightness(1.2) — renders as var(--gold) */
+    0 0 0 2px rgba(189, 163, 88, 0.90),
+    0 2px 8px var(--shadow-55);
+}
+.cal-full-day.has-patch.current:hover {
+  z-index: 6;
+  filter: brightness(1.35);
+  box-shadow:
+    /* pre-divided by brightness(1.35) — renders as var(--gold) */
+    0 0 0 2.5px rgba(168, 145, 79, 1),
+    0 4px 12px var(--shadow-65);
+}
+
+span.cal-full-day.has-patch {
+  cursor: default;
+}
+
+/* Display toggling */
+.calendar.mode-compact .cal-mode-full { display: none; }
+.calendar.mode-full .cal-mode-compact { display: none; }
+

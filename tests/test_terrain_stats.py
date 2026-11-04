@@ -3,6 +3,7 @@ somewhere, carefully, not breaking the Terrain page visually or technically — 
 Terrain Stats, with more info"; then: no intro, nothing centred, the "65 map files" tile links to the repository,
 a better chart with faint axes and values on hover, the table full width, a Shrines icon, a little map square instead
 of "picture", dd-mm-yy dates, icons on Date / Map file, what moved shown in the cells in yellow)."""
+from patch.css_bundle import read_css
 from patch.js_bundle import read_js
 import glob
 import os
@@ -80,7 +81,7 @@ def test_terrain_pages_never_delete_the_stats_page_and_styles_stay_scoped():
     src = open(os.path.join(_ROOT, "builders", "terrain.py"), encoding="utf-8").read()
     assert '"terrain_[0-9]*.html"' in src and '"terrain_*.html"' not in src
     assert not [f for f in glob.glob(os.path.join(_ROOT, "dist", "terrain_[0-9]*.html")) if "stats" in f]
-    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     block = css.split("/* ---- Terrain Stats", 1)[1].split("a.ts-thumb:hover img", 1)[0]
     assert ".ts-table tbody tr.ts-row-selected > td" in css             # a clicked row is framed, like other tables
     js = read_js()

@@ -49,10 +49,9 @@ def favicon_links(prefix=""):
 
 def compute_asset_version():
     """Short SHA1 of shared CSS and JavaScript assets."""
-    with open(_os.path.join(_HERE, "styles.css"), encoding="utf-8") as _f:
-        css = _f.read()
+    from .css_bundle import read_css
     from .js_bundle import read_js
-    return _hashlib.sha1((css + read_js()).encode("utf-8")).hexdigest()[:10]
+    return _hashlib.sha1((read_css() + read_js()).encode("utf-8")).hexdigest()[:10]
 
 
 # Header tabs in the centre of the site nav. Tuple: (key, label, root_href).

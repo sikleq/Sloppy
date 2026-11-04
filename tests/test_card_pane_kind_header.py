@@ -1,6 +1,7 @@
 """Card header strip: the text's own "Passive, levels up with Duel." goes to the header as "Passive (Scales with Duel)",
 "No Mana Cost. Cooldown: 120s." in bold still goes to the header, and a "Radius: 1500." followed by a tag too
 (owner 2026-10-24, 7.41 Outfight Them! / Gravity Well / Distortion Field / Sacrifice / Death Charge)."""
+from patch.css_bundle import read_css
 import os
 import sys
 
@@ -134,8 +135,7 @@ def test_no_longer_levels_with_row_gets_a_header_card(monkeypatch):
 def test_highlighter_is_the_whole_site_not_a_preview():
     # owner 2026-10-25: the Dragon Knight preview became every card's look; no per-hero class is left
     assert "hl-marker" not in el.hero_header("Dragon Knight")
-    css = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "styles.css"),
-               encoding="utf-8").read()
+    css = read_css()
     assert ".hl-marker" not in css
     assert ".iab-hl-new { --hl-bg: rgba(224, 189, 98, 0.15); }" in css
 

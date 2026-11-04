@@ -1,4 +1,5 @@
 """Second proofread of 7.38 (2026-11-02), each tag rule in the generator so the next patch gets it too."""
+from patch.css_bundle import read_css
 import glob
 import os
 import re
@@ -182,13 +183,11 @@ def test_every_damage_at_level_30_range_row_shows_its_percent():
 
 def test_a_chips_hidden_name_takes_no_width():
     # opacity 0 keeps its width: in the Lifesteal tables by the right edge it widened a 375 px page to 401 px
-    with open(os.path.join(ROOT, "styles.css"), encoding="utf-8") as f:
-        css = f.read()
+    css = read_css()
     assert re.search(r"\.ability-chip\[data-tooltip\]:not\(:hover\)::after \{ display: none; \}", css)
 
 
 def test_a_long_card_header_wraps_on_a_phone():
     # 7.38 Demonic Cleanse "Active – granted by Shard, shares level with Demonic Purge" made a 375 px page 471 px wide
-    with open(os.path.join(ROOT, "styles.css"), encoding="utf-8") as f:
-        css = f.read()
+    css = read_css()
     assert re.search(r"@media \(max-width: 640px\) \{ \.iab-title \{ white-space: normal; \} \}", css)

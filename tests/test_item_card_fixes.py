@@ -1,6 +1,7 @@
 """Item card fixes (owner 2026-10-16, 7.41): 5+ level badges as "first … last" (Dagon), a "no longer …" row colours
 the one word the old text lost (Refresher Shard "items"), a value kept for one kind of unit is added to the new
 description (Crimson Guard "45 … on ranged heroes"), the ability a row starts with wins."""
+from patch.css_bundle import read_css
 import os
 import re
 import sys
@@ -84,7 +85,7 @@ def test_an_item_only_taken_out_says_so_in_its_label():
     seg = _block(_page("7.39"), "pig-pole")
     assert '<span class="entity-removed-type">Neutral Item cycled out</span>' in seg and 'data-tag="del' in seg
     assert '<span class="entity-removed-type">Item removed</span>' in _block(_page("7.41"), "cornucopia")
-    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     assert ".entity-block.is-removed ul.changes { display: none !important; }" in css
     assert "html.cb-mode .entity-name .entity-removed-type" in css
 

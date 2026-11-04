@@ -1,0 +1,179 @@
+/* ==========================================================================
+   10. HERO STATS
+   ========================================================================== */
+
+/* ───────────────────────── HERO STATS TABLE (heroes_stats.html) ───────────
+   mr-table skin (flat sort / heatmap / search / stat-hist tooltips reused
+   via the shared classes+ids) + hero-specific bits: sticky hero column,
+   Standard/Advanced column modes, per-attribute level-30 expanders. */
+/* Mode visibility. Expanded-only columns hide until the View dropdown adds
+   .show-adv to the table. */
+/* Extras hidden in Base & Starting; visible only in Expanded. */
+.hs-table .hs-extra { display: none; }
+.hs-table.hs-mode-expanded .hs-extra { display: table-cell; }
+/* Hero Stats uses the same two-row category header pattern as Neutral Creeps,
+   but stays on the mr-table sorter/heatmap stack. */
+.mr-table.hs-table thead tr.cat-row th.cat-head {
+  position: sticky;
+  top: 0;
+  z-index: 52;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted-blue);
+  font-weight: 700;
+  background: var(--bg-panel-3);
+  padding: 3px 4px;
+  box-shadow: 0 6px 0 0 var(--bg-panel-3);
+  cursor: default;
+  user-select: none;
+}
+.mr-table.hs-table thead tr.col-row th {
+  top: calc(var(--cat-row-h, 0px) - 2px);
+  z-index: 50;
+  border-bottom: none;
+  box-shadow:
+    inset 0 -2px 0 var(--blue-bright-85),
+    0 4px 10px var(--shadow-45),
+    0 -14px 0 0 var(--bg-panel-3);
+}
+.mr-table.hs-table thead tr.cat-row .cat-head + .cat-head {
+  border-left: 2px solid rgba(213, 207, 195, 0.22);
+}
+.mr-table.hs-table th.col-sep,
+.mr-table.hs-table td.col-sep {
+  border-left: 2px solid var(--blue-30);
+}
+.mr-table.hs-table thead th .th-sub {
+  display: inline-block;
+  position: relative;
+  top: 2px;
+  margin-left: 1px;
+  font-size: 8.5px;
+  line-height: 0;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+/* Sticky hero column (single frozen column → plain CSS sticky, no JS lefts).
+   Solid backgrounds so scrolled columns disappear under it; header corner
+   sits above both axes' pinned bars (z 51 > th 50). */
+.mr-table.hs-table td.hs-name {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--bg-panel-2);
+}
+/* The shared .mr-name rule sets display:grid on the <td>. A grid (or flex) <td>
+   drops out of the table's automatic ROW-HEIGHT equalisation, so the icon-tall
+   hero cell rendered a different height than the stat cells and the rows visibly
+   mis-aligned (a vertical shift down the Hero column). Keep the hero cell a real
+   table-cell and lay the icon + name out inline so it shares the row height with
+   every stat cell; vertical-align:middle centres all cells consistently. */
+.mr-table.hs-table td.hs-name {
+  display: table-cell;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.mr-table.hs-table td.hs-name .hs-ico {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 16px;
+}
+.mr-table.hs-table td.hs-name .mr-name-body { vertical-align: middle; }
+.mr-table.hs-table tbody td { vertical-align: middle; }
+/* table-layout:fixed derives column widths from the FIRST row (the thead) —
+   the body's .mr-name width rule doesn't reach the th, so without this the
+   Hero HEADER was narrower than the hero column. */
+.mr-table.hs-table th.hs-name { width: 230px; }
+.mr-table.hs-table th.hs-col-attr { width: 56px; }
+.mr-table.hs-table thead th.hs-name {
+  position: sticky;
+  left: 0;
+  z-index: 51;
+}
+.mr-table.hs-table thead tr.cat-row th.cat-head:first-child {
+  z-index: 53;
+}
+.mr-table.hs-table tbody tr:hover td.hs-name { background: #21201e; }
+/* Selected-row gold frame on the STICKY Hero cell.
+   The generic `.mr-row-selected > td(:first-child)` frame is an inset box-shadow,
+   and Chromium renders box-shadow OFFSET on `position:sticky` cells (the same
+   quirk the `.sticky-frame` overlay exists for) — so the gold top/bottom lines
+   stepped down at the Hero↔Attr seam. Draw the frame as background-gradient
+   layers instead (left + top + bottom bars + gold tint over the sticky base);
+   backgrounds paint correctly on sticky cells, so the lines align with the
+   non-sticky cells' box-shadow frame. The base `td.hs-name` background rule wins
+   over `.mr-row-selected > td`'s gradient via the `background` shorthand, so we
+   re-assert the whole stack here at higher specificity. */
+.mr-table.hs-table tbody tr.mr-row-selected td.hs-name {
+  box-shadow: none;
+  background:
+    linear-gradient(var(--gold-95), var(--gold-95)) left   / 2px 100% no-repeat,
+    linear-gradient(var(--gold-95), var(--gold-95)) top    / 100% 2px no-repeat,
+    linear-gradient(var(--gold-95), var(--gold-95)) bottom / 100% 2px no-repeat,
+    linear-gradient(rgba(231, 196, 106, 0.12), rgba(231, 196, 106, 0.12)),
+    var(--bg-panel-2);
+  /* MUST come AFTER the `background` shorthand (which resets origin to its
+     padding-box default). border-box origin puts the top/bottom bars on the
+     cell's full-height edges, matching the box-shadow frame on the other
+     columns — padding-box would inset them by the cell's vertical padding and
+     draw a SHORTER gold box than the rest of the row. */
+  background-origin: border-box;
+}
+.mr-table.hs-table tbody tr.mr-row-selected:hover td.hs-name {
+  background:
+    linear-gradient(var(--gold-95), var(--gold-95)) left   / 2px 100% no-repeat,
+    linear-gradient(var(--gold-95), var(--gold-95)) top    / 100% 2px no-repeat,
+    linear-gradient(var(--gold-95), var(--gold-95)) bottom / 100% 2px no-repeat,
+    linear-gradient(rgba(231, 196, 106, 0.16), rgba(231, 196, 106, 0.16)),
+    #21201e;
+  background-origin: border-box;
+}
+/* Hero portrait (16:9) in the name cell — same slot the item icon uses. */
+.hs-ico {
+  width: 40px;
+  height: 23px;
+  object-fit: cover;
+  border-radius: 3px;
+  display: block;
+}
+.hs-innate-mini {
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  vertical-align: -2px;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 2px rgba(12, 12, 11, 0.6));
+}
+.hs-innate-mini.is-hidden {
+  display: none;
+}
+/* Primary-attribute icon cell */
+.hs-attr-cell { padding: 4px 6px; }
+.hs-attr-ico {
+  width: 20px;
+  height: 20px;
+  display: block;
+  margin: 0 auto;
+}
+/* Expanded layout grows the table HORIZONTALLY (Neutral Creeps convention) —
+   auto layout + max-content width so extra columns add width and the
+   .creeps-scroll box scrolls sideways, instead of fixed-layout squeezing
+   every column narrower until headers clip. */
+.mr-table.hs-table {
+  table-layout: auto;
+  width: max-content;
+  min-width: 100%;
+}
+/* Even grid: every numeric column shares one width floor; headers never
+   wrap or clip — a longer header (Attack Range) widens its own column. */
+.mr-table.hs-table thead th {
+  white-space: nowrap;
+}
+.mr-table.hs-table thead th:not(.hs-name):not(.hs-col-attr) {
+  min-width: 68px;
+}
+.mr-table.hs-table tbody td {
+  white-space: nowrap;
+}
+

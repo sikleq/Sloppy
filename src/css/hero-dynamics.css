@@ -1,0 +1,101 @@
+/* ==========================================================================
+   11. HERO DYNAMICS
+   ========================================================================== */
+
+/* ===================== Hero Dynamics matrix (heroes_dyn.html) =====================
+   Reuses the .creeps-table shell (sticky header + sticky-col + sticky-frame) and
+   the global .dyn-cell pill. ROWS = heroes (frozen icon+name column on the left),
+   COLUMNS = patches (version; release date on hover), CELLS = the hero's dyn-cell
+   that patch. Untouched cells render a static glassy diamond via ::after (keeps the
+   ~14k-cell grid's HTML light); touched cells get a JS-built coloured pill.
+   Fixed table layout → every patch column is the SAME width so diamonds line up in
+   a clean vertical grid. Column widths (--hd-col-w) and the hero column width
+   (--hd-hero-w, sized to the longest name + icon + zoom clearance) are set live by
+   scripts.js dynLayoutMatrix(), which also keeps the latest patch flush right.
+   max-content width (NOT .creeps-table's min-width:100%, which would stretch the
+   columns unequally). */
+/* AUTO layout (not fixed): a fixed-layout table derives column widths from the
+   FIRST row, which here is the colspan'd super-category row — that would ignore
+   the per-column widths. Auto layout (like Neutral Creeps) honours the explicit
+   width + min/max-width on the leaf columns below AND lets the super-category
+   colspans span correctly. width:max-content + min-width:0 stops the inherited
+   .creeps-table min-width:100% from stretching the columns. */
+.heroes-dyn-table { table-layout: auto; width: max-content; min-width: 0; }
+/* Skip rendering off-screen rows of the big Dynamics matrices (Hero ~16k /
+   Item ~44k DOM nodes) — the browser lays out and paints only the rows near the
+   viewport. contain-intrinsic-size reserves each skipped row's height so the
+   scrollbar stays stable. Column widths are pinned by JS (pinDynColWidths) first
+   so auto table-layout can't reflow them as rows enter and leave. */
+.heroes-dyn-table.cv-rows tbody tr { content-visibility: auto; contain-intrinsic-size: auto 33px; }
+/* Hero identity column. The `.creeps-table` prefix raises specificity ABOVE the
+   shared `.creeps-table td:first-child` tier-dots rule (equal-specificity, later
+   in the file) which would otherwise force center-align + a symbol font +
+   white-space:normal onto this cell — making each row's icon+name land at a
+   different x (centred by name length) instead of one clean vertical line. */
+.creeps-table.heroes-dyn-table th.hd-hero,
+.creeps-table.heroes-dyn-table td.hd-hero {
+  width: var(--hd-hero-w, 210px);
+  min-width: var(--hd-hero-w, 210px);
+  max-width: var(--hd-hero-w, 210px);
+  text-align: left;
+  white-space: nowrap;
+  font-family: inherit;
+  letter-spacing: normal;
+  /* RULE (all tables): a vertical divider after the frozen identity column(s).
+     2px col-sep line at rest; the .sticky-frame overlay continues it during
+     horizontal scroll (Chrome drops borders on sticky cells mid-scroll). */
+  border-right: 2px solid var(--blue-30);
+}
+/* The identity-column HEADER ("Hero" / "Item") is centred; the body cells stay
+   left-aligned (icon + name). */
+.creeps-table.heroes-dyn-table thead th.hd-hero { text-align: center; }
+.heroes-dyn-table td.hd-hero { padding: 2px 12px 2px 6px; }
+/* Equal patch columns under auto layout: pin width + min + max so every column
+   is exactly --hd-col-w (the dyn-cell pill 28px sits centred inside). No
+   overflow:hidden on the cell — the 2.5× hover-pop must overflow it (the header
+   th below clips its own label separately). */
+.heroes-dyn-table th.hd-patch,
+.heroes-dyn-table td.hd-cell {
+  width: var(--hd-col-w, 40px);
+  min-width: var(--hd-col-w, 40px);
+  max-width: var(--hd-col-w, 40px);
+  box-sizing: border-box;
+}
+/* Icon + name baseline-aligned in one vertical rhythm across every row: fixed
+   icon box + fixed line-height so the text sits centred against the portrait,
+   and every name starts at the SAME x (icon width + gap). The 22px gap leaves
+   room for the hover-zoom (below) so the popped icon never reaches the name. */
+.hd-hero-inner { display: inline-flex; align-items: center; gap: 22px; line-height: 1; }
+.hd-hero-inner img {
+  width: 40px; height: 23px; object-fit: cover; border-radius: 3px;
+  border: 1px solid var(--blue-18); flex: 0 0 auto;
+  /* Anchor the zoom at the LEFT edge so it grows rightward only — never past the
+     box's left edge (which would clip it behind the frozen-column boundary). */
+  transform-origin: left center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+/* items_dyn: item/enchant icons are 88×64 (aspect 1.375), NOT the hero 16:9 — the
+   hero box (40×23) crops them top/bottom. Size the box to the item aspect (40×29)
+   so cover fills it without cropping (mirrors mana_items' .mr-ico approach). */
+.items-dyn-table .hd-hero-inner img { height: 29px; }
+.hd-hero-name { font-weight: 600; color: var(--text-bright); }
+/* matrix / Hero Stats row names link to the entity's Changes page */
+a.ec-name-link { color: inherit; text-decoration: none; }
+a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underline-offset: 3px; }
+/* main-attribute change row (attr_change): the attribute names in the row's own font,
+   bold, in the site attribute palette (--attr-*) */
+.attr-chip { font-weight: 700; }
+.attr-chip.is-str { color: var(--attr-str); }
+.attr-chip.is-agi { color: var(--attr-agi); }
+.attr-chip.is-int { color: var(--attr-int); }
+.attr-chip.is-uni { color: var(--attr-uni); }
+/* RULE (all tables): hovering a hero/unit portrait pops it out — like Neutral
+   Creeps. The 18px gap + name-fitted column width keep the 1.8× zoom from ever
+   covering the name. The icon's stacking sits under the sticky header (sticky-col
+   z:3 < header), so a top-row zoom slides BEHIND the header (matches creeps). */
+.heroes-dyn-table td.hd-hero:hover .hd-hero-inner img {
+  /* 1.5× from the left edge → grows 20px right, clearing the 22px gap so it
+     stops short of the name; z-index lifts it ABOVE the name text. */
+  transform: scale(1.5); position: relative; z-index: 41;
+  box-shadow: 0 3px 8px var(--shadow-60), 0 0 0 1px var(--blue-40);
+}

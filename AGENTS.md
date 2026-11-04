@@ -14,7 +14,8 @@
 ## ВАЖНО: source of truth
 
 `build_site.py` — **единственный entrypoint сборки**. Он запускает все builders (patches, creeps, mana items, hero lab, terrain, silent, …). `builders/build_patches.py` сам авто-обнаруживает `content/p*.py` — ручной регистрации нового патча в builders/ не требуется (только `patch/meta.py`).
-- `src/js/*.js` (34 части, порядок склейки и единый файл `dist/src/scripts.js` — `patch/js_bundle.py`) и `styles.css` — единственный источник правды для стилей и поведения всех страниц (включая `index.html` и `calendar.html`). Редактируй напрямую — IDE/linter работают нормально. `build_site.py` минифицирует их в `dist/` при сборке.
+- `src/js/*.js` (34 части, порядок склейки и единый файл `dist/src/scripts.js` — `patch/js_bundle.py`) и `src/css/*.css` (склеиваются в `dist/styles.css`, `patch/css_bundle.py`) — единственный источник правды для стилей и поведения всех страниц (включая `index.html` и `calendar.html`). Редактируй напрямую — IDE/linter работают нормально. `build_site.py` минифицирует их в `dist/` при сборке.
+- **Порядок частей `src/css` — это каскад, его не менять.** Правило добавлять в часть своего раздела. Чтобы изменить вид, править существующее объявление, а не дописывать новое ниже: `python tools/css_dead_rules.py` показывает объявления, которые уже ни на что не влияют. `colorblind.generated.css` пишет `scripts/gen/gen_colorblind_css.py`, руками не править.
 - Сгенерированные HTML (`dist/patches/7.41d.html` и т.д.) — результат запуска `python build_site.py`, не редактируй вручную.
 - Все патч-файлы лежат в `dist/patches/` (не в корне), поэтому их CSS/JS подключаются через `../styles.css`, `../src/scripts.js`.
 

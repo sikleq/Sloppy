@@ -315,10 +315,10 @@ matrix only draws the item's slots WITHIN its life:
     font-settle re-measure; `load`/`resize` should only re-FIT columns, not re-measure the name width.
 
 `site_common.py` reads `data/site_meta.json`, so `builders/build_patches.py` must run first.
-Generated HTML is **gitignored** and rebuilt by CI; only the `.py` / `styles.css` /
+Generated HTML is **gitignored** and rebuilt by CI; only the `.py` / `src/css` /
 `scripts.js` sources are committed.
 
-`styles.css` and `scripts.js` are **source files, hand-edited directly** — shared by
+`src/css/*.css` and `src/js/*.js` are **source files, hand-edited directly** — shared by
 every page including the patch notes.
 
 ## Data sources (tables)

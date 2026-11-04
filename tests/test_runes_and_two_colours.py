@@ -1,6 +1,7 @@
 """Owner 2026-10-28: a rune row shows the rune's icon (7.40 "Haste Rune: …"), and every map picture speaks in two
 colours only — red dashed = where it was and how, green solid = how it is (yellow "moved" and the green Trees layer
 read as a third meaning)."""
+from patch.css_bundle import read_css
 from patch.js_bundle import read_js
 import os
 import sys
@@ -72,7 +73,7 @@ def test_runes_share_the_terrain_page_icons():
 def test_a_transparent_icon_sits_on_a_dark_square():
     """7.40 Bounty Rune's icon is transparent: grown on hover, the text behind showed through (owner 2026-10-28)."""
     import re
-    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     assert re.search(r"\.ability-chip > img \{[^}]*background: var\(--bg-deep-97\)", css)
 
 

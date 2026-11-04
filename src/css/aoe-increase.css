@@ -1,0 +1,282 @@
+/* ============================================================================
+   AOE INCREASE  (aoe_increase.html — Heroes » AoE Increase)
+   One row per hero; each slot column = an ability whose radius is flagged
+   affected_by_aoe_increase. The item filter bar rewrites every .aoe-val to
+   "base > increased" live (see scripts.js AOE IIFE).
+   ========================================================================== */
+/* Exception to the usual rule (toolbar scrolls away): here the filter toolbar
+   STAYS pinned at the top of the scroll box so the AoE / Upgrade filters are
+   always reachable. The thead pins just below it (top offset set by JS to the
+   toolbar's height). */
+.aoe-toolbar.inbox-bar {
+  top: 0;
+  z-index: 60;
+  background: var(--bg-panel);
+  box-shadow: 0 1px 0 var(--line);
+}
+
+/* Item filter buttons reuse the .hs-attr-filter shell but are rectangular so
+   the (wide) item icon fills its box rather than being cropped to a circle. */
+.aoe-item-btn {
+  width: auto;
+  padding: 0;
+  overflow: hidden;
+}
+.aoe-item-btn img {
+  width: 40px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+/* Upgrade toggles (talent / scepter / shard) use the same rectangular shell
+   as the item buttons so their icons fill the box (Scepter/Shard art is wide). */
+.aoe-up-btn {
+  width: auto;
+  padding: 0;
+  overflow: hidden;
+}
+.aoe-up-btn img {
+  width: 40px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+/* The talent icon is a thin tree silhouette — `cover` would crop it. Keep it
+   centred and only as tall as the box allows. */
+.aoe-up-btn[data-aoe-upgrade="talent"] img {
+  object-fit: contain;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+/* ---- table cells: centered headers + content, narrow columns ---- */
+.mr-table.aoe-table thead th.aoe-slot-th {
+  min-width: 84px;
+  text-align: center;
+  color: var(--text-muted, #99958c);
+}
+.mr-table.aoe-table tbody td {
+  vertical-align: middle;
+}
+.mr-table.aoe-table td.aoe-cell {
+  /* table-cell keeps this TD in the browser's automatic row-height equalisation.
+     display:grid/flex on a <td> drops it out of that algorithm (same caveat as
+     .hs-name — see the hs-table comment at line ~7966). */
+  display: table-cell;
+  position: relative;
+  vertical-align: middle;
+  padding: 6px 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: none;
+  box-shadow: inset 0 -1px 0 rgba(54, 53, 50, 0.5);
+  white-space: normal;
+  text-align: left;   /* icons hug the left edge so they line up vertically */
+}
+/* Elevate the whole cell when its ability icon is hovered — same pattern as
+   dyn-cell-wrap:hover { z-index:7 }. The z-index on the TD's stacking context
+   beats the sticky header (z:35) so the scaled icon paints above it. */
+.mr-table.aoe-table td.aoe-cell:has(.aoe-ico-wrap:hover) {
+  position: relative;
+  z-index: 60;
+}
+/* On edge cases like a single filtered hero row, raising only the hovered TD is
+   not enough: neighbouring cells / the row painting order can still cover the
+   zoomed icon. Raise the whole row as one stacking context, then the wrapper
+   itself above that row. */
+.mr-table.aoe-table tbody tr:has(.aoe-ico-wrap:hover) {
+  position: relative;
+  z-index: 61;
+}
+.mr-table.aoe-table td.aoe-cell-empty {
+  background: rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+.mr-table.aoe-table td.aoe-cell .aoe-cell-dash {
+  position: absolute;
+  inset: 50% 10px auto 10px;
+  transform: translateY(-50%);
+  display: inline-block;
+  text-align: center;
+  z-index: 2;
+  pointer-events: none;
+}
+.mr-table.aoe-table td.aoe-cell.aoe-cell-placeholder .aoe-cell-dash {
+  display: block;
+}
+.mr-table.aoe-table td.aoe-cell:not(.aoe-cell-placeholder) .aoe-cell-dash {
+  display: none;
+}
+.mr-table.aoe-table td.aoe-cell.aoe-cell-placeholder .aoe-ability {
+  visibility: hidden;
+  pointer-events: none;
+}
+/* Sticky hero cell: opaque background fills the full row height so the column
+   doesn't look shorter than the ability columns (Chrome only paints a
+   transparent cell to content-height in the compositing layer). The 9999px
+   inset shadow is the same "fill the box" trick used in .creeps-table
+   .sticky-col — it covers any collapsed-border seam that bleeds through on
+   horizontal scroll.  The -1px inset draws the row separator at the bottom of
+   the FULL row (same as the non-sticky cells' border-bottom). */
+.mr-table.aoe-table td.aoe-name .hs-ico {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 16px;
+}
+.mr-table.aoe-table td.aoe-name .mr-name-body { vertical-align: middle; }
+.mr-table.aoe-table td.aoe-name {
+  /* Override .mr-table .mr-name {display:grid} — grid on a <td> drops it out
+     of the table's automatic row-height equalisation (same fix as td.hs-name). */
+  display: table-cell;
+  vertical-align: middle;
+  border-bottom: none;
+  background: var(--bg-panel-2);
+  box-shadow:
+    inset 0 -1px 0 rgba(54, 53, 50, 0.5),
+    inset 0 0 0 9999px var(--bg-panel-2);
+}
+/* Row-selection gold frame: Chromium renders box-shadow OFFSET incorrectly on
+   position:sticky cells (same quirk documented on .hs-name). Use background
+   gradients to draw the top/bottom/left gold lines — backgrounds paint
+   correctly on sticky cells. */
+.mr-table.aoe-table tbody tr.mr-row-selected td.aoe-name {
+  box-shadow: none;
+  background:
+    linear-gradient(var(--gold-95), var(--gold-95)) left   / 2px 100% no-repeat,
+    linear-gradient(var(--gold-95), var(--gold-95)) top    / 100% 2px no-repeat,
+    linear-gradient(var(--gold-95), var(--gold-95)) bottom / 100% 2px no-repeat,
+    linear-gradient(rgba(231, 196, 106, 0.10), rgba(231, 196, 106, 0.10)),
+    var(--bg-panel-2);
+  background-origin: border-box;
+}
+.mr-table.aoe-table tbody tr.mr-row-selected > td {
+  box-shadow:
+    inset 0  2px 0 var(--gold-95),
+    inset 0 -2px 0 var(--gold-95);
+  background-image: linear-gradient(rgba(231, 196, 106, 0.10),
+                                    rgba(231, 196, 106, 0.10));
+}
+.mr-table.aoe-table tbody tr.mr-row-selected > td:first-child {
+  box-shadow:
+    inset  2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95);
+}
+.mr-table.aoe-table tbody tr.mr-row-selected > td:last-child {
+  box-shadow:
+    inset -2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95);
+}
+/* "Other" column: Scepter / Shard grants and sub-abilities stacked one per line (2026-09-26) */
+.mr-table.aoe-table td.aoe-cell-other .aoe-ability { display: grid; margin: 3px 0; }
+.mr-table.aoe-table td.aoe-cell-other { min-width: 290px; }
+.aoe-ability {
+  /* inline-grid (not block grid) so the element participates in the inline
+     formatting context of its table cell. The TD uses vertical-align:middle,
+     which only centres INLINE content — a block-display child would start at
+     the content-area top regardless, misaligning the icon by 1-2px. */
+  display: inline-grid;
+  vertical-align: middle;
+  grid-template-columns: 30px auto;
+  align-items: center;
+  /* Wide gap so the hover-zoomed icon (scale 1.8 ≈ +12px each side) never
+     reaches the radius text — same room the hero-icon column leaves. */
+  column-gap: 18px;
+}
+/* Wrapper anchors the upgrade mini-markers AND is what scales on hover, so the
+   markers pop together with the icon (not left behind). */
+.aoe-ico-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  transform-origin: center center;
+  transition: transform 0.12s ease;
+}
+.aoe-ico {
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  /* Opaque panel backing so transparent innate icons aren't see-through when
+     zoomed. Blue ring matches the hero icon (.mr-ico) base exactly. */
+  background: var(--bg-panel-2, #1c1b19);
+  box-shadow: 0 0 0 1px var(--blue-18);
+  transition: box-shadow 0.12s ease;
+}
+/* Hover: scale the icon. z-index is handled by the parent td.aoe-cell
+   via :has(.aoe-ico-wrap:hover) — the TD's stacking context beats the header. */
+.aoe-ico-wrap:hover {
+  transform: scale(1.8);
+  z-index: 62;
+}
+/* Top/bottom edge steering is assigned from JS based on the VISIBLE rows after
+   search/filter, not raw DOM order. A single visible row gets both classes; the
+   bottom rule below wins, so the icon grows upward away from the scrollbar. */
+.mr-table.aoe-table tbody tr.aoe-visible-first .aoe-ico-wrap {
+  transform-origin: center top;
+}
+/* Last visible rows: zoom up so icon doesn't clip below the table edge. */
+.mr-table.aoe-table tbody tr.aoe-visible-last .aoe-ico-wrap {
+  transform-origin: center bottom;
+}
+.aoe-ico-wrap:hover .aoe-ico {
+  box-shadow: 0 3px 8px var(--shadow-60, rgba(0, 0, 0, 0.6)),
+              0 0 0 1px var(--blue-40);
+}
+/* Upgrade mini-markers: pinned to the bottom-centre of the ability icon, like
+   the innate markers on /patches/. */
+.aoe-marks {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  pointer-events: none;
+}
+.aoe-mark {
+  width: 14px;
+  height: 14px;
+  display: block;
+  object-fit: contain;
+  border-radius: 3px;
+  background: var(--bg-panel-2, #1c1b19);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+.aoe-mark-innate  { background-image: url('icons/misc/innate_icon.png'); }
+.aoe-mark-talent  { background-image: url('icons/misc/talents.svg'); }
+.aoe-mark-scepter { background-image: url('icons/items/ultimate_scepter.png'); }
+.aoe-mark-shard   { background-image: url('icons/items/aghanims_shard.png'); }
+.aoe-mark[hidden] { display: none; }
+.aoe-radii {
+  display: flex;
+  flex-direction: column;   /* one radius per line */
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  min-height: var(--aoe-radii-min, 16.25px);
+}
+.aoe-line {
+  font-size: 13px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.aoe-line[hidden] { display: none; }
+.aoe-val {
+  color: var(--text, #cfc9bd);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  margin-right: 4px;
+}
+.aoe-val.aoe-val-up { color: #e3c46a; }        /* boosted by any item — gold */
+.aoe-val[hidden] { display: none; }
+.aoe-slash { color: var(--text-muted, #99958c); margin: 0 1px; }
+.aoe-sep { color: var(--text-muted, #99958c); margin-right: 4px; }
+.aoe-lbl {
+  color: var(--text-muted, #99958c);
+  font-size: 10.5px;
+}
+

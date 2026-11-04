@@ -1,6 +1,7 @@
 """Perf guard: patch pages must not depend on CSS :has() (12-20k elements; each lazily
 inserted row re-matched every :has() -> 4-5 s of style recalc per scroll of 7.38/7.41).
 The facts are written as classes at build time by patch/static_has.py."""
+from patch.css_bundle import read_css
 import os
 import re
 
@@ -15,7 +16,7 @@ _ALLOWED = ("body:has(.creeps", "html:has(.main-page)", ".back-to-top:has(+ .dyn
 
 
 def test_no_has_selectors_on_patch_page_elements():
-    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     bad = [ln.strip()[:100] for ln in css.splitlines()
            if ":has(" in ln and not any(a in ln for a in _ALLOWED)]
     assert not bad, "move these :has() facts to patch/static_has.py classes: " + "; ".join(bad)

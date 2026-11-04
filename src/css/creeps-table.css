@@ -1,0 +1,437 @@
+/* ==========================================================================
+   08. NEUTRAL STATS / ABILITIES
+   ========================================================================== */
+
+/* ============================================================
+   CREEPS TABLE PAGE — verbatim render of the team's neutral-creep
+   stats sheet. Single wide table, sticky header, monospace numbers,
+   tier-row tinting from the unicode dot indicator in column 1.
+   ============================================================ */
+.creeps-page {
+  max-width: none;
+  /* Flush to BOTH page edges — no left/right indent; the .creeps-scroll box
+     spans the full width and its vertical scrollbar sits at the window's right
+     edge. (top/bottom are overridden to 12px below when a scroll box present.) */
+  padding: 16px 0 40px;
+}
+/* Pages with an inner scroller (Neutral Creeps / Unit Abilities) lock the
+   document to the viewport so ONLY the inner .creeps-scroll box scrolls —
+   no second, vestigial browser scrollbar. The box's max-height (below) is
+   sized to exactly fill the space, so nothing is clipped. Mana Items has no
+   .creeps-scroll, so it is untouched and keeps normal page scrolling.
+   Body-level tooltips/popups all use position:fixed, so overflow:hidden
+   here does not clip them. */
+/* CONTAINED SCROLL BOX. The Neutral Creeps / Unit Abilities tables are wide, so
+   THIS box is the scroller (capped height + sticky under the nav). The PAGE is
+   locked (body:has(.creeps-scroll){overflow:hidden}) so ONLY this box scrolls —
+   one vertical scrollbar, plus a horizontal one for the wide table. The <thead>
+   and identity columns stay sticky inside the box; the frozen-column divider is
+   an overlay (.sticky-frame) drawn in the non-scrolling .creeps-page so Chrome
+   keeps repainting it (box-shadow on position:sticky cells drops mid-scroll).
+   Mana Items has no .creeps-scroll → it page-scrolls normally. */
+body:has(.creeps-scroll) { overflow: hidden; }
+body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
+.creeps-scroll {
+  overflow: auto;
+  width: 100%;
+  position: sticky;
+  top: var(--site-nav-h, 96px);
+  max-height: calc(100vh - var(--site-nav-h, 96px) - 24px);
+  contain: paint;
+  will-change: scroll-position;
+  /* Always-visible scrollbars across every Materials table (Neutral Creeps,
+     Mana Items, Hero Stats, etc). Without this, Hero Stats' Expanded view
+     overflows horizontally but the native scrollbar can be hidden on
+     overlay-scroll setups (macOS, some Linux/Win configurations) — the
+     scroll line is then invisible. Custom thin scrollbar keeps the line
+     visible everywhere and matches the site's dark theme. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-45) var(--bg-deep-60);
+}
+.creeps-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.creeps-scroll::-webkit-scrollbar-track {
+  background: var(--bg-deep-60);
+}
+.creeps-scroll::-webkit-scrollbar-thumb {
+  background: var(--muted-45);
+  border-radius: 5px;
+  border: 2px solid var(--bg-deep-60);
+}
+.creeps-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(227, 196, 106, 0.7);
+}
+.creeps-scroll::-webkit-scrollbar-corner {
+  background: var(--bg-deep-60);
+}
+.creeps-table {
+  /* width:max-content + min-width:100% = stretch evenly to fill the container
+     when content is narrow (Standard view — no empty strip on the right), but
+     grow to content width and scroll horizontally when wide (Expanded view). */
+  width: max-content;
+  min-width: 100%;
+  /* table-layout: auto lets the browser size each column to the widest
+     content (header or cell) — no manual width hints. Every cell is
+     centered horizontally, so visual alignment stays clean across the
+     auto-sized columns. */
+  table-layout: auto;
+  /* `collapse` — significantly faster than `separate` on a wide table
+     (~1600 cells on Creeps page). The sticky-bleed regression `separate`
+     was meant to fix is handled below via a full-area `box-shadow: inset
+     0 0 0 9999px var(--sticky-bg)` on sticky cells: the inset draws on
+     the cell's paint layer (above the table's collapsed-border layer)
+     and fills the whole inner area, masking any seam during scroll. */
+  border-collapse: collapse;
+  font-size: 11.5px;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.creeps-table th,
+.creeps-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+/* Merged Ур. cell — when a level spans multiple rows via rowspan, the
+   single cell shows the level number vertically centered against the
+   group's full height. */
+.creeps-table .lvl-cell {
+  font-weight: 600;
+  color: var(--gold);
+  background: rgba(213, 207, 195, 0.05);
+  border-right: 1px solid var(--blue-18);
+}
+/* Identity columns (Ур. / icon / Юнит) pinned to the left on horizontal
+   scroll. scripts.js sets per-cell `left`; we provide position:sticky +
+   an opaque background so scrolled cells pass underneath cleanly. */
+.creeps-table .sticky-col {
+  position: sticky;
+  z-index: 3;
+  --sticky-bg: #111110;
+  background: var(--sticky-bg);
+  /* Full-area inset shadow paints over any collapsed-border seam that
+     would otherwise bleed through this cell during horizontal scroll. */
+  box-shadow: inset 0 0 0 9999px var(--sticky-bg);
+}
+.creeps-table thead .sticky-col {
+  z-index: 51;           /* corner cells: above both sticky axes + hover-zoom */
+}
+.creeps-table tbody tr:hover .sticky-col {
+  --sticky-bg: #1d1c1a;   /* match the row-hover tint, stay opaque */
+}
+.creeps-table .lvl-cell.sticky-col {
+  --sticky-bg: var(--bg-panel-2);   /* keep the level cell's faint blue-tint readable */
+}
+/* Overlay frame outlining the pinned identity block while scrolled.
+   Drawn as a separate absolutely-positioned element in .creeps-page
+   (which does NOT horizontally scroll), so it sidesteps the Chrome bug
+   where box-shadow/border on position:sticky cells stops repainting
+   mid-scroll. scripts.js sets left/top/width/height and toggles
+   .visible based on the scroll container's scrollLeft. */
+.creeps-page { position: relative; }
+/* Frozen-pane dividers (overlays in the non-scrolling .creeps-page so their
+   shadows keep repainting — Chrome drops box-shadow on position:sticky cells
+   mid-scroll). .sticky-frame = vertical edge at the RIGHT of the pinned
+   lvl/unit block (horizontal scroll); .sticky-frame-top = horizontal edge
+   under the header (vertical scroll). Neither boxes the pinned cells. */
+.sticky-frame, .sticky-frame-top {
+  /* Absolute inside the non-scrolling .creeps-page so the divider's box-shadow
+     keeps repainting (Chrome drops box-shadow on position:sticky cells
+     mid-scroll). scripts.js sets left/top/width/height from the box scroll. */
+  position: absolute;
+  display: none;
+  pointer-events: none;
+  z-index: 7;            /* above body + header sticky cells, below the
+                            hover-zoomed icon (z-index: 9) */
+}
+.sticky-frame {
+  border-left: 2px solid var(--blue-bright-85);
+  box-shadow: 6px 0 12px -2px rgba(0, 0, 0, 0.7);
+}
+.sticky-frame-top {
+  border-top: 2px solid var(--blue-bright-85);
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.7);
+}
+.sticky-frame.visible, .sticky-frame-top.visible { display: block; }
+/* Dedicated icon column — fixed-size portrait, centered. Vertical-align
+   middle on the parent <td> keeps the image baseline-aligned with the
+   sibling cells without flexbox (which previously made the wildkin row
+   look "split" because flex baselines diverged from table baselines). */
+.creeps-table .creep-icon-cell {
+  text-align: center;
+  padding: 2px 4px;
+  vertical-align: middle;
+}
+/* Raise the icon cell on hover so the zoomed portrait sits above the other
+   body cells (the cell is already position:sticky, which establishes a
+   stacking context — bump its z-index rather than the inner <img>). Stays
+   BELOW the pinned header (z 10/11) so a hovered top row never covers it. */
+.creeps-table .creep-icon-cell:hover {
+  z-index: 9;
+}
+/* Attack Range melee/ranged marker — a small frosted-glass rounded block
+   holding the icon, to the right of the number. */
+/* Attack Range cell: number in a fixed-width box so the icon badge always
+   lands at the same x regardless of digit count. */
+.creeps-table .col-attack_range,
+.mr-table.hs-table .hs-col-range {
+  white-space: nowrap;
+}
+.creeps-table .atk-num,
+.mr-table.hs-table .atk-num {
+  display: inline-block;
+  min-width: 30px;
+  text-align: right;
+  vertical-align: middle;
+}
+.creeps-table .atk-badge,
+.mr-table.hs-table .atk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;             /* fixed block — every badge is identical size */
+  height: 18px;
+  box-sizing: border-box;
+  margin-left: 6px;
+  border-radius: 5px;
+  /* Frosted glass without backdrop-filter (blur is GPU-heavy ×40 cells and
+     caused scroll jank) — a soft translucent gradient instead. */
+  background: linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  vertical-align: middle;
+}
+.creeps-table .atk-badge img,
+.mr-table.hs-table .atk-badge img {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  display: block;
+  opacity: 0.9;
+}
+/* Header centre tabs (Main / Patch Reader / Calendar / Materials) — laid out
+   in the middle grid column of .nav-inner, so they're always centred between
+   brand (left) and the picker / context block (right) without overlapping
+   either. Each tab is a 48px-tall pill matching the version picker height,
+   so the row sits on one baseline. Font matches the brand block. */
+.nav-tabs {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-self: center;
+}
+/* Nav tabs — same block style as the version picker button. */
+.nav-tab {
+  font-family: var(--font-j10);
+  font-size: 18px;
+  letter-spacing: 1px;
+  line-height: 1;
+  color: var(--text-main);
+  text-decoration: none;
+  height: 38px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--shadow-28);
+  box-shadow: inset 0 1px 2px var(--shadow-50);
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav-tab:hover {
+  background: var(--shadow-40);
+  color: #ffffff;
+}
+.nav-tab.active {
+  background: var(--shadow-45);
+  color: var(--gold);
+  text-shadow:
+    0 0 10px var(--gold-line),
+    0 0  3px rgba(227, 196, 106, 0.25);
+}
+
+/* Header "embers": the main buttons are plain labels (no plates); the active one glows gold
+   over a thin gold bar with a few sparks rising from it — the autocast embers. Only transform /
+   opacity animate (compositor). ONE gold rule under the nav (the toolbar lost its grey top border). */
+nav.top-nav { border-bottom: 0; }
+nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
+.toolbar { border-top: 0; }
+.nav-tab, .nav-tab:hover, .nav-tab.active {
+  background: none;
+  box-shadow: none;
+  clip-path: none;
+  border-color: transparent;
+}
+.nav-tab { position: relative; padding: 0 12px; color: #a6a197; }
+.nav-tab:hover { color: var(--text-bright); }
+.nav-tab.active { color: #ffe08a; text-shadow: 0 0 10px rgba(255, 170, 60, 0.25); }
+.nav-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 5px;
+  height: 2px;
+  background: var(--gold);
+  box-shadow: 0 0 6px #ff9a2a;
+}
+.nav-ember {
+  position: absolute;
+  bottom: 6px;
+  width: 2px;
+  height: 2px;
+  background: #ffcf6a;
+  box-shadow: 0 0 3px #ff8a1a;
+  opacity: 0;
+  pointer-events: none;
+  animation: nav-ember 1.6s linear infinite;
+}
+@keyframes nav-ember {
+  0%   { opacity: 0; transform: translateY(0); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-16px); }
+}
+@media (prefers-reduced-motion: reduce) { .nav-ember { display: none; } }
+
+/* Materials sub-tabs — flat row of three browser-tab pills, hung BELOW the
+   main header on a thin bar (so the header itself stays compact). */
+.materials-subnav {
+  background: var(--bg-panel-2);
+  border-bottom: 1px solid rgba(227, 196, 106, 0.14);
+  width: 100%;
+}
+.materials-subnav-inner {
+  padding: 0 10px;        /* flush-left, same left padding as the brand block */
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  min-height: 36px;
+}
+.materials-subnav-links {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  min-width: 0;
+}
+/* When the sub-tab bar sits INSIDE the table scroll box (Neutral Creeps /
+   Neutral Abilities), it scrolls away vertically with the table but stays
+   pinned to the left edge during horizontal scroll — same treatment as the
+   blurb + toolbar. On Mana Items it stays in the page header and scrolls away
+   via the page itself. */
+.creeps-scroll > .materials-subnav {
+  position: sticky;
+  left: 0;
+  /* Above sticky headers and hovered dynamics cells. The bar scrolls up out of
+     view before the header pins, so the higher z doesn't cause lasting overlap. */
+  z-index: 120;
+}
+.nav-subtab {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted-blue);
+  text-decoration: none;
+  padding: 7px 16px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 7px 7px 0 0;   /* rounded top — sits on the subnav's bottom border */
+  margin-bottom: -1px;          /* overlap the 1px bottom border */
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+.nav-subtab:hover { color: var(--text-bright); background: none; }
+.nav-subtab.active {
+  color: var(--gold);
+  /* warm glow from below — the coals under the main button's embers */
+  background: radial-gradient(ellipse 60% 75% at 50% 100%, rgba(255, 138, 26, 0.22), transparent 70%);
+  border-color: transparent;
+}
+/* plain labels, like the main buttons above (no tab pills / blue borders) */
+.nav-subtab { color: #9a968d; border-color: transparent; border-radius: 0; }
+.nav-subtab-label { color: inherit; }
+/* ---- Grouped sub-nav dropdowns (Creeps ▾ / Items ▾ / Heroes ▾) ---- */
+.nav-subgroup { position: relative; display: inline-flex; align-items: flex-end; }
+.nav-subtab-group { cursor: pointer; }
+.nav-caret { margin-left: 6px; font-size: 9px; opacity: 0.75; }
+.nav-submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 184px;
+  background: var(--bg-panel-2);
+  border: 1px solid rgba(213, 207, 195, 0.20);
+  border-radius: 0 8px 8px 8px;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Above the submenu's own stacking context; the bar is lifted so this paints
+     over the table, sticky header and dynamics cells. */
+  z-index: 125;
+  box-shadow: 0 10px 22px var(--shadow-55);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+  transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+}
+/* Child combinator `>` so a nested flyout (a .nav-submenu deeper inside) does
+   NOT open just because the outer group is hovered — only its OWN nested
+   subgroup hover opens it. `.is-open` is the touch-device tap-toggle class
+   that scripts.js adds when the user taps a group trigger (first tap = open,
+   second tap = follow link). */
+.nav-subgroup:hover > .nav-submenu,
+.nav-subgroup:focus-within > .nav-submenu,
+.nav-subgroup.is-open > .nav-submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.nav-subitem {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted-blue);
+  text-decoration: none;
+  padding: 7px 12px;
+  border-radius: 5px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.nav-subitem:hover { color: var(--text-bright); background: rgba(54, 53, 50, 0.55); }
+.nav-subitem.active {
+  color: var(--text-bright);
+  background: rgba(227, 196, 106, 0.18);
+}
+.nav-subitem-soon { color: #67645e; cursor: default; }
+.nav-subitem-soon:hover { background: none; }
+/* Top-level Materials tab with no page yet (e.g. Structures). */
+.nav-subtab-soon { color: #67645e; cursor: default; display: inline-flex; align-items: center; gap: 6px; }
+.nav-subtab-soon:hover { background: none; border-color: transparent; color: #67645e; }
+/* Nested flyout (Neutral Abilities under Neutral Stats): the parent item opens
+   a second menu to its RIGHT on hover — a classic cascading menu. */
+.nav-subgroup-nested { position: relative; display: block; }
+.nav-subitem-parent { cursor: pointer; }
+.nav-caret-side { font-size: 9px; opacity: 0.7; margin-left: 8px; }
+.nav-submenu-flyout {
+  top: -6px;                 /* align the flyout's first row with the parent */
+  left: 100%;
+  margin-left: 5px;
+  border-radius: 8px;
+}
+/* The nested parent stays visually "open" (highlighted) while its flyout shows. */
+.nav-subgroup-nested:hover > .nav-subitem-parent { color: var(--text-bright); background: rgba(54, 53, 50, 0.55); }
+.nav-soon-tag {
+  font-size: 8.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b59a48;
+  border: 1px solid rgba(227, 196, 106, 0.4);
+  border-radius: 4px;
+  padding: 0 4px;
+  line-height: 1.4;
+}

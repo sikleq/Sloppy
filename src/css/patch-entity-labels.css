@@ -1,0 +1,306 @@
+/* Type label after the item name — small, uppercased, NEW colour family.
+   vertical-align: middle so it sits on the item name's optical mid-line
+   instead of dropping to the baseline of the larger heading text. */
+.entity-name .entity-new-type,
+h4.subgroup .subgroup-new-type {
+  margin-left: 8px;
+  /* The entity name itself is pixel-font (Jersey 25); these add-on labels
+     ("NEW ARMAMENT ITEM", "Recipe changed") stay in the regular UI font. */
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #b08c5a;
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+/* An item only taken out of the game / the pool (owner 2026-10-17): "Neutral Item cycled out", "Item removed" in
+   the DEL tag's colour where "Returning Tier 2 Artifact" stands; its one DEL row stays in the page, hidden, so the
+   tag filters and counts still see it (like ul.changes li.iab-covered) */
+.entity-name .entity-removed-type {
+  margin-left: 8px;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #c55252;
+  vertical-align: middle;
+}
+.entity-block.is-removed ul.changes { display: none !important; }
+/* ... and its icon and name greyed out, as gone from the game (owner 2026-10-26); the label and the patch strip
+   (dyn-cells) keep their colours: they say what happened */
+.entity-block.is-removed .entity-icon img { filter: grayscale(1) brightness(0.7); opacity: 0.55; }
+.entity-block.is-removed .entity-name > .entity-link,
+.entity-block.is-removed .entity-name .ability-title-rename { color: #8a8478; opacity: 0.75; }
+
+/* Same position/style as new-type, but neutral colour — used for
+   'Recipe changed' on items whose components changed in this patch. */
+.entity-name .entity-changed-type {
+  margin-left: 8px;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text-main);
+  opacity: 0.65;
+  vertical-align: middle;
+}
+
+/* Recipe-changed visual: two SEPARATE component boxes (old and new), joined
+   by a bold arrow between them. Uses the same grid 1fr/auto/1fr layout as
+   properties-change so the two side-by-side blocks are exactly the same
+   width (pane edges line up vertically). */
+.components-change {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 12px;
+  align-items: stretch;
+  margin: 6px 0 4px;
+}
+.components-change .components-pane {
+  margin: 0;
+  min-width: 0;
+}
+.components-change .components-arrow,
+.properties-change .properties-arrow {
+  align-self: center;
+  justify-self: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+  opacity: 0.85;
+  padding: 0 2px;
+}
+/* added (gold) / removed (red) components: a 2px frame that reads at a glance (owner 2026-09-27: 1.5px was
+   barely visible); padding shrinks by the same amount so the chip keeps its size */
+.component.component-added {
+  border: 2px solid rgba(226, 178, 52, 0.95);
+  border-radius: 6px;
+  padding: 1px;
+  box-shadow: 0 0 8px rgba(218, 165, 32, 0.35);
+}
+.component.component-removed {
+  border: 2px solid rgba(226, 88, 88, 0.85);
+  border-radius: 6px;
+  padding: 1px;
+  opacity: 0.85;
+}
+
+/* ABILITY-CHANGE — two-pane swap visual (old ability removed → new ability
+   added). Same 1fr/auto/1fr grid + arrow as components-change, but each
+   pane is a card with [icon + name] header on top and a description body
+   below (multiple rows + optional scale_pill table). */
+.ability-change {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 12px;
+  align-items: stretch;
+  margin: 6px 0 8px;
+}
+.ability-change-arrow {
+  align-self: center;
+  justify-self: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+  opacity: 0.85;
+  padding: 0 2px;
+}
+.ability-change-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  --pt: 10px; --px: 14px;   /* the header strip (.pane-head) spans the pane edge to edge */
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  min-width: 0;
+}
+.ability-change-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(150, 146, 137, 0.22);
+}
+/* Placeholder head — same layout footprint (~47px) as a real head, but
+   visually hidden. Used in is-in-place mode on the new pane so the new
+   pane's body top-aligns with the old pane's body (which sits below
+   the real head) without needing a per-pane padding-top hack. */
+.ability-change-head.is-placeholder { visibility: hidden; }
+.ability-change-icon-wrap {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+.ability-change-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--shadow-50);
+  display: block;
+}
+/* Innate marker — matches `.ability-block > .ability-icon-wrap > .innate-marker`
+   style (dark circular pad + golden ring), scaled to the 40-px swap-pane icon. */
+.ability-change-icon-wrap .innate-marker {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bg-page);
+  padding: 1px;
+  box-shadow: 0 0 0 1px rgba(220, 175, 95, 0.45);
+  pointer-events: none;
+  box-sizing: border-box;
+}
+.ability-change-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text-main);
+}
+.ability-change-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;          /* as an item ability card's text (owner 2026-09-30: 13.5px "very small" next to them) */
+  line-height: 1.5;
+  color: var(--text-main);
+  min-width: 0;
+}
+.ability-change-row { padding: 4px 0; line-height: 1.45; }
+/* a text of named parts (Drunken Brawler's stances) folds: its first lines fade out, a click opens it (owner
+   2026-10-30: "нижняя часть блока полупрозрачная и если её нажать, то она развернётся") */
+.acr-fold-body { max-height: 4.4em; overflow: hidden; cursor: pointer;
+  -webkit-mask-image: linear-gradient(to bottom, #000 15%, transparent);
+  mask-image: linear-gradient(to bottom, #000 15%, transparent); }
+.acr-fold:not(.is-open) .acr-fold-body:hover { -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
+  mask-image: linear-gradient(to bottom, #000 35%, transparent); }
+/* open, nothing is cut: a hovered icon grows past the text's edge (owner 2026-10-30, 7.38 Mind of Tornarus' Wex) */
+.acr-fold.is-open .acr-fold-body { max-height: none; overflow: visible; cursor: auto; -webkit-mask-image: none;
+  mask-image: none; }
+/* the open / close control: a strip of soft glass over the faded text's bottom — a slight blur growing smoothly
+   downward, a faint warm tint and a thin highlight along its top (owner 2026-10-30: "эффект стекла снизу, но не
+   резкий, а плавный … чтобы не нагружало страницу"). Light on the page: no animation; the blur is one 22px strip,
+   only while folded (open, the strip is a plain tint); hover changes colours only */
+/* a bit more frosted (owner 2026-10-30: "чуть более мутный"), feathered on every side — the top and both sides fade
+   in gradually, not a cut-off band ("края постепенные, а не сразу обрывистые"): two masks intersected */
+.acr-fold-toggle { position: relative; display: block; width: 100%; height: 30px; margin: -30px 0 0; padding: 0;
+  border: 0; cursor: pointer;
+  background: linear-gradient(to bottom, rgba(227, 196, 106, 0), rgba(227, 196, 106, 0.13));
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.35) 35%, #000 85%),
+    linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.35) 35%, #000 85%),
+    linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  mask-composite: intersect;
+  transition: background-color 0.15s ease-out; }
+.acr-fold-toggle::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: 0; height: 1px;
+  pointer-events: none; background: linear-gradient(to right, transparent, rgba(240, 216, 150, 0.5), transparent); }
+/* more visible (owner 2026-10-30: "почти не видна … да, можно" заметнее) */
+.acr-fold-toggle:hover, .acr-fold:not(.is-open) .acr-fold-body:hover + .acr-fold-toggle {
+  background-color: rgba(227, 196, 106, 0.08); }
+.acr-fold-toggle:hover::after { background: linear-gradient(to right, transparent, rgba(240, 216, 150, 0.75), transparent); }
+/* open: no overlap and no blur — a thin tinted strip under the text that folds it back */
+.acr-fold.is-open .acr-fold-toggle { height: 12px; margin-top: 2px; -webkit-backdrop-filter: none; backdrop-filter: none;
+  -webkit-mask-image: none; mask-image: none;
+  background: linear-gradient(to bottom, rgba(227, 196, 106, 0), rgba(227, 196, 106, 0.09)); }
+.acr-fold-toggle:focus-visible { outline: 1px solid var(--gold-line); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .acr-fold-toggle { transition: none; } }
+/* Dense stat-list mode — used by per-unit comparison cards (e.g. Brewmaster
+   brewlings) where each row is a single short stat line. Tightens vertical
+   rhythm so the panes don't tower over the rest of the hero block. */
+/* Brewling parent-child connector — dashed line from Primal Split's ability
+   icon down to each Brewling block's icon. Same visual idiom as the dashed
+   ability_change-connector (e.g. Belligerent → Liquid Courage). The SVG is
+   injected by drawBrewlingConnectors() in scripts.js and lives in the
+   document body with position:absolute so it can overlay multiple ability
+   blocks. */
+.brewling-connector {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+.brewling-connector path {
+  fill: none;
+  stroke: rgba(150, 146, 137, 0.55);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  stroke-linecap: round;
+}
+/* Unified ability-change layout: renders as a regular ability-block (icon
+   + title + tag/summary row) with the swap panes inside the block body.
+   Title shows `Old → New` when names differ. The block visually matches
+   any other ability section on the page. */
+.ability-change-block .ability-title,
+.ability-title-rename {   /* a plain block renamed too: ability(old_title=…) (owner 2026-10-21) */
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.ability-title-old {
+  opacity: 0.55;
+}
+.ability-title-arrow {
+  font-weight: 700;
+  opacity: 0.7;
+  padding: 0 1px;
+}
+.ability-change-block .ability-title-new {
+  /* Inherits the normal title color/weight from .ability-title. */
+}
+.ability-change-summary-ul {
+  margin-bottom: 6px;
+}
+.ability-change-block {
+  position: relative;
+}
+/* an old -> new card under an ability's rows (Aghanim's upgrade, what it scales with; 2026-10-25): its caption row
+   and the dashed line from the ability's icon, as an ability_change block's */
+.ability-block { position: relative; }
+.ability-block > .under-rows-connector { position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; overflow: visible; }
+.ability-block > .under-rows-caption { margin: 10px 0 2px; position: relative; z-index: 1; }
+.ability-block > .under-rows-caption + .ability-change { position: relative; z-index: 1; margin-top: 14px; }
+/* a card with no caption of its own ("scales with" cards: the headers say it) */
+.ability-block > .under-rows-connector + .ability-change { position: relative; z-index: 1; margin-top: 14px; }
+/* The line from the icon's bottom down into the card: the panes belong to the icon above (owner 2026-11-04: solid,
+   instead of the dashed one round the icon). */
+.ability-change-connector path {
+  fill: none;
+  stroke: rgba(150, 146, 137, 0.6);
+  stroke-width: 1;
+}
+.ability-change-block > .ability-change-connector {
+  position: absolute;
+  /* Real position + size set by drawAbilityChangeConnectors() JS at load
+     and on resize so the curve tracks live layout. Defaults below cover
+     the whole block until JS fires; overflow:visible so any temporary
+     pre-JS render isn't clipped. */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+.ability-change-block .ability-change.unified-panes {
+  margin-top: 14px;           /* under the icon's edge now, the icon must not touch it (owner 2026-11-04: "слишком близко") */
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}

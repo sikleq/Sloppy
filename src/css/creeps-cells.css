@@ -1,0 +1,421 @@
+/* Ability-icon link on the Creeps Table — no underline, inherits layout. */
+.creeps-table .abil-link {
+  text-decoration: none;
+  display: inline-block;
+  line-height: 0;
+}
+/* Creep name → its Unit Changes page. Inherits the cell colour; gold on hover. */
+.creep-name-link { color: inherit; text-decoration: none; }
+.creep-name-link:hover { color: #e3c46a; text-decoration: underline; }
+/* Vertical divider after every column (both Tables — Neutral Creeps + Unit
+   Abilities). The heavier col-sep dividers (set on category starts) stay
+   visible over this lighter base. */
+.creeps-table th,
+.creeps-table td { border-left: 1px solid rgba(213, 207, 195, 0.12); }
+.creeps-table th:first-child,
+.creeps-table td:first-child { border-left: none; }
+/* Unit Abilities page table — reuses .creeps-table sticky/scroll machinery. */
+.unit-abilities-table .ua-ability { text-align: left; }
+.unit-abilities-table .ua-ability-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;            /* room so the hover-zoomed icon doesn't cover the name */
+  white-space: nowrap;
+}
+.unit-abilities-table .ua-ability-name { font-weight: 600; color: var(--text-bright); }
+/* Neutral Creeps "Unit" name cell matches the Neutral Abilities ability-name:
+   left-aligned, semibold, same colour, single line — so both Materials tables
+   share one look AND the same row height (no wrap-induced tall creep rows). */
+.creeps-table td.col-name {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-bright);
+  white-space: nowrap;
+}
+/* Type — plain coloured fills (no glass effect). */
+.unit-abilities-table td.ua-type-active  { background: rgba(80, 155, 230, 0.22); color: #d2e6ff; }
+.unit-abilities-table td.ua-type-passive { background: rgba(170, 110, 215, 0.22); color: #e8d3f5; }
+.unit-abilities-table td.ua-type-aura    { background: rgba(225, 180, 80, 0.22); color: #f4e3b3; }
+/* Damage Type — colour-coded text. */
+/* Damage-type colour paints ONLY the numeric runs (.dmg-num) inside the
+   Damage cell — words like "в сек." or "+ N% Int" keep the default text
+   colour. The standalone Damage Type column was replaced by this scheme. */
+.unit-abilities-table td.dt-magical   .dmg-num,
+.unit-abilities-table td.dt-magical   .lvl-toggle { color: #5fb1ff; }   /* blue */
+.unit-abilities-table td.dt-physical  .dmg-num,
+.unit-abilities-table td.dt-physical  .lvl-toggle { color: #e1716a; }   /* bordeaux */
+.unit-abilities-table td.dt-hpremoval .dmg-num,
+.unit-abilities-table td.dt-hpremoval .lvl-toggle { color: #8aab7a; }   /* dull green */
+.unit-abilities-table td.dt-pure      .dmg-num,
+.unit-abilities-table td.dt-pure      .lvl-toggle { color: #ead992; }
+/* Collapsed upgrade value ("40…26"): a clickable button that keeps the column
+   narrow; the full per-tier list opens in a floating popover (scripts.js
+   positions it as `fixed`, so the column width never changes). */
+.lvl-toggle {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: underline dotted rgba(213, 207, 195, 0.45);
+  text-underline-offset: 2px;
+}
+.lvl-toggle:hover,
+.lvl-toggle[aria-expanded="true"] { color: #e9e2d4; }
+.lvl-popover {
+  position: fixed;
+  z-index: 80;
+  display: none;
+  white-space: nowrap;
+  background: var(--bg-panel);
+  border: 1px solid var(--blue-40);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-bright);
+  box-shadow: 0 8px 22px var(--shadow-55);
+  pointer-events: none;
+}
+.lvl-popover.show { display: block; }
+/* Vertical category dividers (like Neutral Creeps): a left border on the first
+   visible column of each super-category, set by scripts.js markCatEdges() so it
+   tracks the column reorder in Auras view. Runs the full column height (header
+   col-row + every body cell). */
+.unit-abilities-table th.cat-edge,
+.unit-abilities-table td.cat-edge {
+  border-left: 2px solid var(--blue-30);
+}
+/* "Only Auras" view filter — hide non-aura rows + irrelevant columns. The
+   super-category header STAYS in Auras view (scripts.js reorders columns into
+   contiguous category groups + recomputes the cat colspans for what's visible). */
+.unit-abilities-table.filter-auras tbody tr:not(.ua-row-aura) { display: none; }
+.unit-abilities-table.filter-auras th[data-col="type"],
+.unit-abilities-table.filter-auras td[data-col="type"],
+.unit-abilities-table.filter-auras th[data-col="dmg_type"],
+.unit-abilities-table.filter-auras td[data-col="dmg_type"],
+.unit-abilities-table.filter-auras th[data-col="damage"],
+.unit-abilities-table.filter-auras td[data-col="damage"],
+.unit-abilities-table.filter-auras th[data-col="manacost"],
+.unit-abilities-table.filter-auras td[data-col="manacost"],
+.unit-abilities-table.filter-auras th[data-col="cooldown"],
+.unit-abilities-table.filter-auras td[data-col="cooldown"],
+.unit-abilities-table.filter-auras th[data-col="cast_range"],
+.unit-abilities-table.filter-auras td[data-col="cast_range"],
+.unit-abilities-table.filter-auras th[data-col="dispel"],
+.unit-abilities-table.filter-auras td[data-col="dispel"] { display: none; }
+/* Auras Only: the empty Effect 1-3 columns take up the slack so the Ability
+   column doesn't get over-wide with whitespace. */
+.unit-abilities-table.filter-auras th[data-col="effect"],
+.unit-abilities-table.filter-auras td[data-col="effect"],
+.unit-abilities-table.filter-auras th[data-col="effect2"],
+.unit-abilities-table.filter-auras td[data-col="effect2"],
+.unit-abilities-table.filter-auras th[data-col="effect3"],
+.unit-abilities-table.filter-auras td[data-col="effect3"] { min-width: 180px; }
+/* Flag glyphs (Stackable / Dispellable) — colours scoped to .ua-flag so the
+   column headers (th.ua-dispel etc.) stay default-coloured. */
+.unit-abilities-table .ua-flag { font-size: 15px; font-weight: 700; line-height: 1; display: inline-block; }
+.unit-abilities-table .ua-flag.ua-yes  { color: #56d364; }            /* green check */
+.unit-abilities-table .ua-flag.ua-no   { color: #f85149; }            /* red x */
+.unit-abilities-table .ua-flag.ua-dispel        { color: #e3c14a; text-shadow: 0 0 4px rgba(227,193,74,0.6); }  /* yellow star */
+/* Cell dashes — half size. */
+.unit-abilities-table .ua-dash,
+.creeps-table .ua-dash,
+.mr-table .ua-dash { color: var(--text-dimmer); font-size: 0.4em; }
+/* "Ability" header centred; Type values left-aligned so the words line up. */
+.unit-abilities-table th.ua-ability { text-align: center; }
+.unit-abilities-table th.ua-type,
+.unit-abilities-table td.ua-type { white-space: nowrap; }
+/* Coloured yes/no text for Aura, Aura Stack, Dispellable. */
+.unit-abilities-table .ua-yn { font-weight: 600; font-size: 11px; }
+.unit-abilities-table .ua-yn-yes    { color: #6aa775; }   /* muted green */
+.unit-abilities-table .ua-yn-no     { color: #c97f78; }   /* muted red */
+.unit-abilities-table .ua-yn-strong { color: #c4ad5e; }   /* muted yellow (strong dispel) */
+/* Continuation rows of a multi-ability unit: no top border so the Lvl + Unit
+   cells read as one merged cell (icon shown only on the first row). */
+.unit-abilities-table td.ua-merge { border-top: none; }
+/* Raise the hovered sticky identity cell so its zoomed icon sits above
+   neighbouring rows. Stays BELOW the pinned header (z 50/51/52) so a hovered
+   row near the top can't paint over the header. */
+.creeps-table .creep-icon-cell:hover,
+.unit-abilities-table td.ua-ability:hover { z-index: 40; }
+.unit-abilities-table td.ua-effect,
+.unit-abilities-table td.ua-effect2,
+.unit-abilities-table td.ua-effect3,
+.unit-abilities-table td.ua-as_effect,
+.unit-abilities-table td.ua-ms_effect { white-space: nowrap; color: var(--text-muted-blue); }
+/* Damage cell allows wrapping for long compound expressions (e.g. Mana Burn:
+   "20/25/30/35 + 200/250/350/400% Int"). */
+.unit-abilities-table td.ua-damage { white-space: normal; }
+.unit-abilities-table td.ua-damage .dmg-wrap,
+.unit-abilities-table .cell-wrap {
+  display: inline-flex; align-items: center; flex-wrap: wrap;
+  justify-content: center; gap: 2px; line-height: 1.2;
+}
+/* Multiline damage: stack the two halves vertically (Mana Burn's flat +
+   Int-multiplier tail) so the cell stays narrow. */
+.unit-abilities-table td.ua-damage .dmg-wrap.dmg-multiline {
+  flex-direction: column; gap: 1px;
+}
+.unit-abilities-table td.ua-damage .dmg-line2 {
+  display: inline-flex; align-items: center; gap: 2px;
+}
+.unit-abilities-table td.ua-damage .stat-ico {
+  height: 14px; width: 14px; vertical-align: -2px; margin-left: 2px;
+}
+/* Question-mark hint badge — appears inside a cell to surface an author note
+   without taking over the cell's hover (cell hover is reserved for patchnotes).
+   Used in the Damage cell ("от расстояния" for Tornado) and the Ability cell
+   ("identical for all frog units" for Riverborn Aura). */
+/* Hover affordance for ability icons that carry a body-level tooltip via
+   data-tooltip. No visual badge — the icon itself is the trigger. */
+.abil-ico-hint {
+  display: inline-flex;
+  cursor: help;
+  outline: none;
+}
+.abil-ico-hint:focus-visible {
+  outline: 2px solid rgba(227, 196, 106, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.qhint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  border: 1px solid #77746d;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+  user-select: none;
+  position: relative;
+  vertical-align: middle;
+}
+.qhint:hover,
+.qhint:focus-visible {
+  color: #f4e3b3;
+  border-color: var(--gold);
+  background: rgba(227, 196, 106, 0.15);
+  outline: none;
+}
+/* Tooltip body for `.qhint` is rendered at <body> level (fixed-position) by
+   scripts.js so it escapes the .creeps-scroll overflow clip — a pure CSS
+   `::after` would be hidden behind the sticky header / scroll boundary. */
+.qhint-tip {
+  position: fixed;
+  z-index: 1100;
+  pointer-events: none;
+  display: none;
+  max-width: 320px;
+  padding: 5px 9px;
+  background: #21201e;
+  color: var(--text-bright);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px var(--shadow-45);
+  white-space: normal;
+  text-align: center;
+}
+.qhint-tip.is-visible { display: block; }
+.qhint-tip .qh-line {
+  padding: 2px 0;
+  /* Wrap long lines within the tooltip's max-width instead of overflowing. */
+  white-space: normal;
+  text-align: left;
+  line-height: 1.35;
+}
+/* Keep the colored Yes/No glyph + dash on the same line as the start of the
+   description — only the trailing words flow onto a new line if needed. */
+.qhint-tip .qh-line .ua-yn { white-space: nowrap; }
+.qhint-tip .qh-line + .qh-line { border-top: 1px solid var(--line-soft); }
+.qhint-tip .ua-yn { font-weight: 600; font-size: 11px; }
+.qhint-tip .ua-yn-yes    { color: #6aa775; }
+.qhint-tip .ua-yn-no     { color: #c97f78; }
+.qhint-tip .ua-yn-strong { color: #c4ad5e; }
+/* Valve description variables (%hero_stun_duration% etc.) — values aren't
+   resolved here, so just colour the placeholder name to mark it as "variable". */
+.qhint-tip .abil-var { color: var(--blue); }
+/* Damage-type colour swatches inside the Damage header tooltip — mirror the
+   in-table `td.dt-*` palette so the words match the actual cell numbers. */
+.qhint-tip .dt-magical   { color: #5fb1ff; font-weight: 600; }
+.qhint-tip .dt-physical  { color: #e1716a; font-weight: 600; }
+.qhint-tip .dt-hpremoval { color: #8aab7a; font-weight: 600; }
+.qhint-tip .dt-pure      { color: #ead992; font-weight: 600; }
+/* "Aura" word inside the Through BKB header tooltip — same warm-yellow tone
+   as the Aura cell type tag (.ua-type-aura) so the legend reads at a glance. */
+.qhint-tip .hint-aura { color: #f4e3b3; font-weight: 600; }
+/* (Legacy `.show-upgrades` rule lived here — replaced by the segmented
+    tier control + table[data-tier="all"] selector further below.) */
+/* Unit Abilities: duplicate (same-unit continuation) rows hide the repeated
+   icon and drop the top border so the unit's rows read as one block. */
+.unit-abilities-table tr.ua-dup .ua-unit img { visibility: hidden; }
+/* The row jumped to from an ability link is marked via scripts.js with the
+   same `.row-marked` class as a manual click (gold frame) — see centerHash().
+   The old yellow `:target` flash was replaced so navigation and clicking
+   share one consistent selected style. */
+/* Camp-type marker (minimap creep-camp glyph: small/mid/big/ancient). */
+.creeps-table .camp-ico {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  vertical-align: middle;
+  max-width: none;
+}
+/* Keep both glyphs of a dual-camp creep on one line. */
+.creeps-table td.col-camp { white-space: nowrap; }
+.creeps-table .camp-ico + .camp-ico { margin-left: 2px; }
+/* Ability cell icon — changelog style (45px there), smaller here. */
+.creeps-table .abil-ico {
+  width: 26px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: inline-block;
+  vertical-align: middle;
+  border: 1px solid var(--blue-18);
+  transform-origin: center center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+/* Hover-zoom the ability icon, mirroring the unit-portrait pop-out. Bare
+   (non-autocast) icons scale directly; autocast icons scale via their wrapper
+   (below) so the snake ring zooms with the icon instead of doubling up. */
+.creeps-table .abil-ico:hover {
+  transform: scale(1.8);
+  position: relative;
+  z-index: 30;            /* above the sticky header (z 5/6) and neighbours */
+  background: #111110;    /* opaque so underlying text doesn't show through */
+  box-shadow:
+    0 3px 8px var(--shadow-60),
+    0 0 0 1px var(--blue-40);
+}
+/* Autocast marker — animated golden ring + pulsing glow around the ability
+   icon, mirroring the in-game autocast toggle. The wrapper is needed because
+   <img> cannot host ::before / ::after pseudo-elements. */
+.creeps-table .abil-ico-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 0;
+  transform-origin: center center;
+  transition: transform 0.12s ease;
+}
+/* Autocast icon zoom — scale the whole wrapper (icon + snake) as one, and
+   suppress the inner img's own :hover scale so it doesn't compound. */
+.creeps-table .abil-ico-wrap:hover {
+  transform: scale(1.8);
+  z-index: 30;
+}
+.creeps-table .abil-ico-wrap:hover .abil-ico {
+  transform: none;
+  z-index: auto;
+  box-shadow: none;
+}
+/* Autocast marker = the in-game effect (glow crackle + embers running round the square),
+   baked from Dota's particle files into one looping WebP (tools/autocast/build_autocast.py).
+   The 80-unit square is 56 of its 100 px, so the image is 100/56 of the icon, centred;
+   "screen" blends it additively like the game's sprites. */
+.creeps-table .autocast-fx {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(100% * 100 / 56);
+  height: calc(100% * 100 / 56);
+  max-width: none;               /* table img rules cap width at 100% — the overlay is larger */
+  max-height: none;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: screen;
+}
+@media (prefers-reduced-motion: reduce) {
+  .creeps-table .autocast-fx { display: none; }
+}
+/* Ability name header inside the changelog tooltip (centered). */
+.stat-hist-tip .abil-tip-name {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-bright);
+  padding-bottom: 3px;
+  margin-bottom: 3px;
+  border-bottom: 1px solid rgba(150, 146, 137, 0.25);
+}
+/* Hero Stats STR/AGI/INT/Attr header tip: today's values, one per line under the title. */
+.stat-hist-tip .abil-tip-name .tip-now {
+  display: block;
+  font-weight: 400;
+  color: var(--text-main);
+}
+/* Standard view hides Expanded-only columns. Super-category headers span all
+   their columns; the colspan shrinks automatically as hidden cells collapse. */
+.creeps-table.mode-standard .col-exp { display: none; }
+/* BOTH header rows stay pinned: the category row (Basic/Vitality/…) sticks at
+   top:0, and the column-name row pins directly beneath it at --cat-row-h
+   (set by scripts.js from the category row's rendered height). */
+.creeps-table thead tr.cat-row th.cat-head {
+  position: sticky;
+  top: 0;
+  z-index: 52;           /* above the column row so the col-row's gap-fill
+                            box-shadow tucks under it (see col-row below) */
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted-blue);
+  font-weight: 700;
+  /* Same colour as the column-name row below (base thead th = var(--bg-panel-3)). A
+     single uniform header colour means there's NO colour boundary between the
+     two rows, so the zoom-dependent seam/gap is gone at every scale. The
+     category labels stay distinct through their uppercase dim styling. */
+  background: var(--bg-panel-3);
+  padding: 3px 4px;
+  /* Opaque lip extending 6px down past the edge: covers any sub-pixel sticky
+     positioning gap with the SAME colour, so nothing ever shows through at
+     scroll time regardless of zoom level. */
+  box-shadow: 0 6px 0 0 var(--bg-panel-3);
+}
+/* Column-name row — pinned under the category row. The blue scrolled-edge line
+   is painted flush on this row's bottom via box-shadow (matches the Mana Items
+   table; no separate overlay, so no gap). border-bottom is dropped because
+   Chrome drops collapsed borders on sticky cells mid-scroll. */
+.creeps-table thead tr.col-row th {
+  /* -2px pull-up paired with the JS Math.floor on --cat-row-h: guarantees the
+     column row starts ≥2px BEFORE the category row's real bottom, so the two
+     pinned rows always overlap and nothing leaks through at scroll time. */
+  top: calc(var(--cat-row-h, 0px) - 2px);
+  border-bottom: none;
+  /* box-shadows, in order:
+     1. blue scrolled-edge line, flush on the bottom (like Mana Items);
+     2. soft drop shadow onto the body below;
+     3. a 14px-tall OPAQUE block extending UPWARD in the header colour — fills
+        any sub-pixel/rounding gap between this row and the category row above
+        (which sits at z-index 52 and paints over the overlapping part). This
+        kills the band where body content showed through, regardless of how
+        --cat-row-h rounds. */
+  box-shadow:
+    inset 0 -2px 0 var(--blue-bright-85),
+    0 4px 10px var(--shadow-45),
+    0 -14px 0 0 var(--bg-panel-3);
+}
+.creeps-table thead tr.cat-row .cat-head + .cat-head { border-left: 2px solid rgba(213, 207, 195, 0.22); }
+/* Freeze the FIRST category cell (Basic = the frozen identity columns) on the
+   LEFT too, so during horizontal scroll the other category cells slide UNDER it
+   instead of their left borders drifting across the category header over the
+   frozen block (the col-row already does this via .sticky-col). Its right edge
+   carries the Basic|rest divider permanently so the line stays put when scrolled
+   (the sibling's border-left slides away beneath it). */
+.creeps-table thead tr.cat-row th.cat-head:first-child {
+  left: 0;
+  z-index: 53;          /* above sibling cat-heads (52) so they pass beneath it */
+  border-right: 2px solid rgba(213, 207, 195, 0.22);
+}

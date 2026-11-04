@@ -1,0 +1,317 @@
+/* ==========================================================================
+   04. PATCH PAGES
+   ========================================================================== */
+
+/* TOOLBAR — full viewport-width strip below the site header. Holds the tag
+   filter row + categories + search box + patch-info block (date + age). */
+.toolbar {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-panel-3);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--text-dim);
+  position: sticky;
+  top: var(--site-nav-h, 44px);
+  z-index: 80;
+}
+.toolbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  row-gap: 8px;
+  /* Wrap (instead of overlapping) when zoomed in / narrow: the search box
+     shrinks first, then the columns drop to a second line. */
+  flex-wrap: wrap;
+  padding: 8px 28px;
+}
+/* Search sits in the MIDDLE column of the toolbar — always expanded (no
+   collapse/expand), a fixed-width pill centred between the legend (left)
+   and the patch info (right). The two side columns flex:1 so the middle
+   stays optically centred. */
+.toolbar .search-box {
+  /* Centred middle column. Shrinks first when the toolbar runs out of room
+     (zoom-in / narrow viewport) so it never overlaps the tag legend. */
+  flex: 0 1 320px;
+  width: 320px;
+  min-width: 0;
+}
+/* Patch info — three labelled facts on the right of the toolbar. No pill,
+   no border: plain inline text with bullet separators between the parts. */
+.toolbar-patch-info {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0;
+  white-space: nowrap;
+  line-height: 1.2;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  font-size: 12.5px;
+  color: #a5a197;
+}
+.toolbar-patch-info > span { padding: 0 10px; }
+.toolbar-patch-info > span:first-child { padding-left: 0; }
+.toolbar-patch-info > span:last-child { padding-right: 0; }
+.toolbar-patch-info > span + span {
+  border-left: 1px solid var(--blue-18);
+}
+.toolbar-patch-info b {
+  color: var(--text-bright);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.toolbar-patch-info .ti-released b {
+  font-size: 13px;
+  letter-spacing: 0.2px;
+}
+/* the release date links out to the official patch notes on dota2.com — subtle hint, gold on hover */
+.toolbar-patch-info .ti-official {
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px dashed rgba(213, 173, 95, 0.4);
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+.toolbar-patch-info .ti-official:hover,
+.toolbar-patch-info .ti-official:hover b {
+  color: #e3c46a;
+  border-bottom-color: rgba(227, 196, 106, 0.85);
+}
+/* On narrow viewports the patch meta-info (date / days live) competes with
+   the search box. Hide it below 640px — filters and search are the primary
+   tools; the date facts are secondary. */
+@media (max-width: 640px) {
+  .toolbar-patch-info { display: none; }
+  .toolbar .search-box { flex: 1 1 auto; width: auto; }
+}
+.legend-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;          /* keep all tag buttons on one line */
+  flex-shrink: 0;
+  white-space: nowrap;
+  /* Hidden until scripts.js computes which tags are actually present in
+     this patch and hides the absent filter buttons (e.g. QoL on 7.41).
+     Prevents a "flash of all 7 buttons" before the absent ones get
+     style.display = 'none' applied. */
+  visibility: hidden;
+}
+.legend-tags strong {
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-right: 4px;
+  /* Equal-width label column so the BUFF/NERF/… badges line up vertically
+     with the Group category badges in the row below (matched in
+     .legend-categories strong). */
+  flex: 0 0 auto;
+  width: 46px;
+}
+
+/* SEARCH BOX */
+.search-box {
+  position: relative;
+  flex: 0 1 280px;
+  min-width: 180px;            /* shrinks so categories/tags fit on one line each */
+}
+.search-box input {
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+.search-box input::placeholder { color: var(--text-dimmer); }
+.search-box input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(227, 196, 106, 0.2);
+}
+/* Inside the patch toolbar the search is ALWAYS expanded — a full-width
+   pill with the magnifier icon on the left and the placeholder visible. */
+.toolbar .search-box input {
+  width: 100%;
+  padding: 6px 12px 6px 34px;
+  cursor: text;
+  color: var(--text-main);
+  text-align: center;
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="%2398a2b0" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 L13.6 13.6" stroke-linecap="round"/></svg>');
+  background-repeat: no-repeat;
+  background-position: 11px center;
+  background-size: 15px 15px;
+}
+.toolbar .search-box input::placeholder { color: var(--text-dimmer); }
+.toolbar .search-box input:focus { text-align: left; }
+.search-results {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-panel-3);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-top: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 50;
+  box-shadow: 0 6px 18px var(--shadow-50);
+}
+.search-results.show { display: block; }
+.search-results .result-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--bg-panel-4);
+}
+.search-results .result-item:last-child { border-bottom: none; }
+.search-results .result-item:hover,
+.search-results .result-item.active {
+  background: rgba(227, 196, 106, 0.1);
+  color: #fff;
+}
+.search-results .result-item img {
+  width: 32px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--bg-panel-4);
+  flex-shrink: 0;
+}
+.search-results .result-item .kind {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.search-results .empty {
+  padding: 10px 12px;
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 12.5px;
+}
+.search-results mark {
+  background: rgba(240, 198, 116, 0.25);
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
+/* MAJOR SECTION */
+h2.section {
+  background:
+    linear-gradient(90deg, var(--shadow-45) 0%, transparent 18%, transparent 82%, var(--shadow-45) 100%),
+    linear-gradient(180deg, #b53528 0%, #4a120c 100%);
+  color: #fff;
+  font-family: var(--font-j25);
+  font-size: 25px;
+  font-weight: 400;
+  padding: 12px 18px;
+  margin: 36px 0 20px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 var(--shadow-40),
+    0 2px 8px var(--shadow-40);
+  text-shadow:
+    1px 1px 0 var(--shadow-55),
+    -1px 0 0 var(--shadow-35),
+    0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 0 8px var(--shadow-50);
+}
+
+/* ENTITY (HERO/ITEM HEADER WITH ICON) */
+.entity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(90deg, #201f1d 0%, var(--bg-panel-3) 100%);
+  border-radius: 4px;
+  padding: 8px 14px;
+  margin: 20px 0 8px;
+}
+.entity-name {
+  color: #f0c674;
+  /* Site pixel font (same family as the brand/nav). Jersey renders narrow
+     and has a single weight — bigger size + slight tracking compensate. */
+  font-family: var(--font-j25);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+.entity-icon img {
+  display: block;
+  border-radius: 3px;
+}
+.hero-icon img {
+  width: 80px;
+  height: 45px;
+  object-fit: cover;
+}
+/* items / enchantments: the same 45px height as a hero icon (80x45), the item
+   art's own 88:64 ratio -> 62x45 */
+.item-icon img {
+  width: 62px;
+  height: 45px;
+  object-fit: cover;
+}
+.ability-icon img {
+  width: 45px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.plain-entity .entity-name {
+  color: var(--gold);
+}
+/* "View on map" jump button on the Terrain Changes header → terrain.html with
+   this patch preselected. Gold-leather pill matching the site nav-arrow skin. */
+.terrain-jump-btn {
+  margin-left: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--bg-warm-dark), var(--bg-warm-darker));
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+.terrain-jump-btn img {
+  display: block;
+  image-rendering: pixelated;
+}
+.terrain-jump-btn:hover {
+  filter: brightness(1.18);
+  box-shadow: 0 0 10px var(--gold-glow);
+}
+.terrain-jump-btn:active {
+  transform: translateY(1px);
+}
+

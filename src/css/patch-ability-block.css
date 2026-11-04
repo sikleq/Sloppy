@@ -1,0 +1,282 @@
+/* Innate-icon overlay: bottom-center of the ability icon */
+.ability-block > .ability-icon-wrap > .innate-marker {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-page);
+  padding: 1px;
+  box-shadow: 0 0 0 1px rgba(220, 175, 95, 0.45);
+}
+.ability-block > .ability-title {
+  grid-column: 2;
+  margin: -3px 0 0 0;        /* compensate for font cap-height offset (~3px below box top) */
+  padding: 0 0 4px 0;
+  color: var(--text-main);            /* same as body text — not coloured */
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  align-self: start;
+}
+/* Header-only block (empty changes ul, no li) — center title vertically against the icon */
+.ability-block.ab-empty {
+  grid-template-rows: minmax(48px, auto);
+}
+.ability-block.ab-empty > .ability-title {
+  align-self: center;
+  margin: 0;
+}
+.ability-block > ul.changes {
+  grid-column: 2;
+  margin-top: 0;
+}
+/* ... nothing stands beside the icon but the name (no tag row: Riverborn Aura): the name is centred on the icon
+   (owner 2026-11-04). */
+.ability-block.ab-card-only > .ability-icon-wrap { grid-row: 1; }
+.ability-block.ab-card-only > .ability-title { grid-row: 1; align-self: center; margin: 0; padding: 0; }
+/* An ability described only by its boxes (a new creep's, 7.38 Boglet): the boxes are its card, under the icon's left
+   edge and below the icon (the box itself keeps its 14px from the row above). */
+.ability-block > ul.ability-card-rows {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
+}
+.ability-block > ul.subnotes {
+  grid-column: 2;
+  /* margin-left: 76px (inherited from base ul.subnotes) shifts it under the
+     row-text column inside ul.changes — same alignment as subnotes outside
+     ability-block. Do NOT override to 0; that puts the ↳ under the tag. */
+}
+/* Talents-block: same .ability-block layout, but talents.svg gets translucent framing */
+.ability-block.talents-block > .ability-icon-wrap > .ability-icon-img {
+  background: rgba(121, 192, 255, 0.05);
+  padding: 6px;
+  box-shadow: 0 0 0 1px rgba(121, 192, 255, 0.18), 0 2px 6px var(--shadow-40);
+}
+/* Other-block: neutral grey framing for the inline-SVG sliders icon */
+.ability-block.other-block > .ability-icon-wrap > .ability-icon-img {
+  background: rgba(150, 146, 137, 0.05);
+  padding: 6px;
+  box-shadow: 0 0 0 1px var(--line-soft), 0 2px 6px var(--shadow-40);
+}
+/* Formula tables INSIDE .ability-block — extend back to entity-block left edge,
+   not just within content column (else they look right-aligned past the icon). */
+.ability-block ul.changes li > .formula-table {
+  margin-left: -60px;          /* counter ability-block icon column (48 + 12 gap) */
+  width: calc(100% + 60px);
+}
+/* Raw <li> (no .row-text wrapper) inside ability-block — TWO offsets stack:
+   76px to cancel the raw-li padding, plus 60px to clear the ability-block icon. */
+.ability-block ul.changes li.li-notext > .formula-table {
+  margin-left: -136px;
+  width: calc(100% + 136px);
+}
+
+/* CHANGES LIST — grid layout: [tag] [text] [percentages] */
+ul.changes {
+  list-style: none;
+  margin: 3px 0 3px 0;
+  padding-left: 0;          /* per-context indent applied via .entity-block,
+                               .ability-block etc. (14px to align with icon) */
+  padding-right: 6px;       /* right-edge % bands sit 6px in from container
+                               border so their right edge lines up with the
+                               last cell of the .patch-dynamics row (which
+                               itself uses margin-right:-8px against the
+                               entity header's 14px padding → also 6px in). */
+}
+/* A terrain note's micro-screenshots (patch/elements.py terrain_note): old | new map around the change, only the
+   note's objects outlined; a full-width row of the li's grid under the text (the owner 2026-10-03: terrain rows were
+   "all under one tag, mush"). The words naming the note's object open them — "tier 1 safe lane towers", "several
+   trees" (the owner 2026-10-03: "no Show buttons in the tags' place, the screenshot opens from the name of the
+   objective that moved; the rows are just numbered") — dotted underline and a small caret that flips when open; the
+   pictures open below in their own rounded box, centred, framed like the item ability cards, each with a minimap of
+   where it is; a click on a picture opens its large copy (scripts.js "Terrain note pictures"). */
+.tshots-btn {
+  appearance: none; display: inline; margin: 0; padding: 0; border: 0; background: none; font: inherit;
+  letter-spacing: inherit; text-transform: inherit; text-align: inherit; color: #efe3c6; cursor: pointer;
+  text-decoration: underline dotted rgba(226, 216, 196, 0.6); text-decoration-thickness: 1px;
+  text-underline-offset: 3px; transition: color 0.15s ease;
+}
+.tshots-btn::after {
+  content: ""; display: inline-block; margin-left: 4px; vertical-align: 2px; border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent; border-top: 4px solid currentColor; opacity: 0.75;
+  transition: transform 0.15s ease;
+}
+.tshots-btn:hover, .tshots-btn:focus-visible { color: #fff6e6; text-decoration-style: solid; }
+.tshots-btn:focus-visible { outline: 1px dotted rgba(240, 232, 216, 0.7); outline-offset: 2px; }
+.tshots-btn[aria-expanded="true"] { color: #fff6e6; text-decoration-style: solid; }
+.tshots-btn[aria-expanded="true"]::after { transform: rotate(180deg); }
+ul.changes li > .tshots {
+  grid-column: 1 / -1; justify-self: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+  margin: 6px 0 6px; padding: 8px; background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px;
+}
+ul.changes li > .tshots[hidden] { display: none; }
+.tshots img {
+  width: 480px; max-width: 100%; height: auto; border-radius: 3px;
+  border: 1px solid rgba(227, 196, 106, 0.22); background: #080b06; cursor: zoom-in;
+  transition: border-color 0.15s ease;
+}
+.tshots img:hover { border-color: rgba(227, 196, 106, 0.6); }
+ul.changes li {
+  display: grid;
+  /* 2-column grid (text | badge). The text-tag is absolutely positioned over
+     the top-left of the text area, with row-text using text-indent to push
+     the first line past the tag. When the text wraps, subsequent lines flow
+     full-width — reusing the empty space below the tag instead of leaving an
+     awkward visual gap on the left. */
+  grid-template-columns: 1fr auto;
+  column-gap: 12px;
+  row-gap: 0;
+  align-items: baseline;
+  padding: 1px 0;
+  line-height: 1.5;
+  color: var(--text-main);
+  position: relative;
+}
+/* Hover ruler: dashed line spanning from text toward the % so the eye can
+   trace the row. Anchored at the bottom of the FIRST grid row (i.e. just
+   under the change-text baseline), not at the bottom of the whole li —
+   that way it stays put even when correction-notes/formula-tables span
+   full-width below. */
+ul.changes li.li-bg:hover::after {
+  content: "";
+  position: absolute;
+  left: 76px;
+  right: 0;
+  top: calc(1px + 1.5em);     /* li padding-top + line-height of first row */
+  border-bottom: 1px dashed rgba(150, 146, 137, 0.32);
+  pointer-events: none;
+}
+/* Text-tag: absolutely positioned over the top-left of the row, taking it
+   out of grid flow so the wrapped text of .row-text can flow under it.
+   Fixed 64px width keeps every tag aligned to the same column visually. */
+ul.changes li > .badge:first-child,
+ul.changes li > .row-tag-empty {
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 64px;
+  min-width: 64px;
+}
+ul.changes li > .row-tag-empty {
+  visibility: hidden;
+  display: inline-block;
+  padding: 3px 7px;
+  font-size: 11px;
+  line-height: 1;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+}
+/* Description column. A float pseudo reserves the 76px tag area at the start
+   of the first line; text wraps AROUND it, with line 2+ flowing under the
+   reserved area. Cleaner than text-indent because inline-block triggers like
+   .formula-trigger don't get artificially pushed past the indent column. */
+ul.changes li > .row-text {
+  grid-column: 1;
+}
+/* The change that sums up a patch (li(major=True), 7.41 "Facets removed from the game"): only bolder and brighter —
+   same size, padding and line as the other rows, so its tag stays in line (owner 2026-10-16: the rule and the
+   bigger text put it out of line); its tag stays (filters, weights). */
+ul.changes li.li-major > .row-text { font-weight: 700; color: var(--text-bright); }
+ul.changes li > .row-text::before {
+  content: "";
+  float: left;
+  width: 76px;
+  height: 1.4em;
+}
+/* Right column: numeric percentages — sits in the second grid column. */
+ul.changes li > .badge-group {
+  grid-column: 2;
+  margin-left: 0;
+}
+/* extras (correction-note, formula-table, NOTE box) span all columns */
+/* correction-note + formula-table span the full li width (under the tag
+   column too) — for hero-stat rows there's a lot of empty space on the
+   left, and stretching the note across uses it instead of leaving an
+   awkward gap. The note's own padding-left (12px) keeps the text from
+   running flush against the entity-block edge. */
+ul.changes li > .formula-table {
+  grid-column: 1 / -1;
+}
+/* Raw <li> without .row-text wrapper (rare special-case manual rows) — block layout
+   with auto-generated left tag from data-tag attribute via ::before. */
+ul.changes li.li-notext {
+  display: block;
+  padding-left: 76px;
+  position: relative;
+  min-height: 22px;
+}
+ul.changes li.li-notext::before {
+  /* matches .badge:first-child dimensions exactly (width: 64px) */
+  position: absolute;
+  left: 0;
+  top: 2px;
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  line-height: 1;
+  width: 64px;
+  text-align: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+  /* default = nerf-text colors (same as .badge.nerf-text) */
+  content: "";
+  background: rgba(199, 101, 115, 0.10);
+  color: #9a666d;
+  border: 1px solid rgba(199, 101, 115, 0.28);
+}
+/* Extras inside raw rows (formula-table, correction-note) — extend to left edge */
+ul.changes li.li-notext > .formula-table {
+  margin-left: -76px;
+  width: calc(100% + 76px);
+}
+/* Tag content (most-specific wins by source order; rework beats buff/nerf for hybrid rows) */
+ul.changes li.li-notext[data-tag*="buff"]::before  { content: "BUFF"; background: rgba(85,205,115,0.10); color: #6da375; border-color: rgba(85,205,115,0.28); }
+ul.changes li.li-notext[data-tag*="nerf"]::before  { content: "NERF"; }
+ul.changes li.li-notext[data-tag*="qol"]::before   { content: "QoL"; background: rgba(121,192,255,0.06); color: #87a3bf; border-color: rgba(121,192,255,0.20); }
+ul.changes li.li-notext[data-tag*="misc"]::before  { content: "MISC"; background: rgba(150, 146, 137,0.06); color: var(--text-dimmer); border-color: rgba(150, 146, 137,0.18); }
+ul.changes li.li-notext[data-tag*="new"]::before   { content: "NEW"; background: rgba(220,175,95,0.06); color: #9a7f4d; border-color: rgba(220,175,95,0.22); }
+ul.changes li.li-notext[data-tag*="del"]::before   { content: "DEL"; background: rgba(179, 56, 56, 0.07); color: #a85151; border-color: rgba(179, 56, 56, 0.25); }
+ul.changes li.li-notext[data-tag*="rework"]::before { content: "REWORK"; background: rgba(180,145,220,0.05); color: #7d6e93; border-color: rgba(180,145,220,0.15); }
+ul.changes li.li-notext[data-tag*="swap"]::before { content: "SWAP"; background: rgba(95,176,164,0.05); color: #5b8f87; border-color: rgba(95,176,164,0.18); }
+/* Hide redundant inline tag spans (since ::before shows them) */
+ul.changes li.li-notext > .badge.rework,
+ul.changes li.li-notext > .badge.swap,
+ul.changes li.li-notext > .badge.misc,
+ul.changes li.li-notext > .badge.qol,
+ul.changes li.li-notext > .badge.new,
+ul.changes li.li-notext > .badge.del,
+ul.changes li.li-notext > .badge.buff-text,
+ul.changes li.li-notext > .badge.nerf-text {
+  display: none;
+}
+
+ul.subnotes {
+  list-style: none;
+  margin: -2px 0 4px 0;        /* flush with parent left edge (was 76px under
+                                  text column — but pairs better with the
+                                  full-width correction-note that lives just
+                                  above it in the same hero row). */
+}
+ul.subnotes li {
+  color: var(--text-dim);
+  font-size: 13.5px;
+  padding: 1px 0;
+  line-height: 1.4;
+}
+ul.subnotes li::before { content: "↳ "; color: var(--text-dimmer); }
+/* When the subnote is collapsible, drop the ↳ arrow — the rotating ▶ chevron
+   on <summary> already serves as the indicator, putting both side-by-side
+   reads as visual noise. */
+ul.subnotes li.li-collapse::before { content: ""; }
+

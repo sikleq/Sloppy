@@ -1,0 +1,591 @@
+/* Dota 2 Reborn HUD inventory — visual model from the actual HUD screenshot:
+     • the 3×2 main grid is a single piece — slots are very dark almost-black
+       wells separated by thin light-gray dividers, achieved with the classic
+       "container with a light bg + dark slots + gap" trick (the bg shows
+       through the gaps as the dividers — no per-slot borders needed);
+     • the round neutral slot sits on its OWN dark backdrop outside the main
+       grid, with just a thin dark ring border — NOT the silver `circle_frame`
+       texture (that one has a decorative right-side tab and is used elsewhere
+       in the HUD, not for inventory slots);
+     • backpack/courier slots (the 3 angled ones in Valve's screenshot) are
+       NOT modelled — Hero Lab has only 6 + 1 neutral.
+   Why I dropped the extracted plate texture (`inventory_bg.png`): on close
+   inspection its diagonal lines are random stone scratches, not the slot grid,
+   so using it as a background under CSS slots gave a noisy look that didn't
+   match the screenshot's clean grid. The HUD's actual visible "slot well"
+   look IS the CSS gap/divider trick — Valve's panorama renderer composites a
+   subtle slate onto the page behind the slots, then draws the slots as flat
+   colour boxes; here we just use the page's own dark colour for the divider
+   tone and skip the texture entirely. */
+/* Authoritative values from Valve's HUD_Inventory.res + HUD_InventoryStash.res:
+   • InventoryButton wide=48 tall=36 → slot is 48×36 px (native).
+   • InventoryBackground1 fillcolor "0 0 0"   → outer plate fill = pure black.
+   • InventoryBackground2 fillcolor "36 36 36" → inner panel fill = #242424
+     (this is what shows through the gaps between slots as the "divider"
+     colour — NOT the light gray I had before).
+   • Each slot also gets `materials/vgui/hud/item_bg.vmat` as its own image
+     (per-slot texture). When the user provides the extracted item_bg PNG it
+     will become each slot's background; until then we approximate with a flat
+     near-black fill that matches the slot interior in the HUD screenshot. */
+/* ── Hero Lab inventory — Valve Reborn HUD accurate ──────────────────────
+   Layout: [ 3×2 slot grid ] [ neutral circle ]
+                              [ enchant circle ]
+   Source assets: icons/inventory/
+   ──────────────────────────────────────────────────────────────────────── */
+.hl-inventory {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  justify-self: end;
+  margin-left: auto;
+}
+/* 6-slot grid — inventory_bg_bg_psd.png clipped to exact slot area.
+   The source PNG is 296×216 (includes backpack region below).
+   Slots: 60×45. Margins 3px each side H, 2px each side V → column-gap 6px,
+   row-gap 4px. Fixed height = 2×45 + 1×4 + 2×2 = 98px. */
+.hl-inv-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  grid-template-rows: repeat(2, 45px);
+  column-gap: 6px;
+  row-gap: 4px;
+  padding: 2px 3px;
+  height: 98px;
+  box-sizing: border-box;
+  overflow: visible;
+  background-image: url('icons/inventory/inventory_bg_bg_psd.png');
+  background-size: 100% auto;
+  background-position: top left;
+  background-repeat: no-repeat;
+}
+/* Each slot: 60×45, inventory_item_well_psd.png well texture over dark bg */
+.hl-inv-grid .hl-inv-slot {
+  position: relative;
+  width: 60px;
+  height: 45px;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  background-image: url('icons/inventory/inventory_item_well_psd.png');
+  background-size: 100% 100%;
+  background-color: #1a1c1d88;
+  box-shadow: inset 0 0 2px rgba(0,0,0,.67);
+  padding: 0;
+  margin: 0;
+  transition: filter 0.12s ease;
+  box-sizing: border-box;
+  z-index: 0;
+}
+/* Item icon fills the slot completely */
+.hl-inv-grid .hl-inv-slot img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hl-inv-grid .hl-inv-slot:hover { filter: brightness(1.5); z-index: 2; }
+.hl-inv-grid .hl-inv-slot:focus-visible {
+  outline: 1px solid rgba(213, 173, 95, 0.85);
+  outline-offset: -2px;
+}
+/* Right column: enchant + bauble, fixed height matching .hl-inv-grid */
+.hl-neutral-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  height: 98px;
+}
+/* No connector pseudo-element */
+.hl-neutral-stack::after { content: none; }
+/* Enchant slot — 34×34 circle, metallic, no bg_neutral texture */
+.hl-enchant-slot {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #5b5853;
+  background: radial-gradient(circle at 40% 35%, #403e3a, #1d1c1a 70%);
+  box-shadow:
+    inset 0 2px 8px -2px rgba(0,0,0,0.9),
+    inset 0 -1px 2px rgba(255,255,255,0.06);
+  padding: 0;
+  overflow: visible;
+  transition: filter 0.12s ease;
+  flex-shrink: 0;
+}
+.hl-enchant-slot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.hl-enchant-slot:hover { filter: brightness(1.5); z-index: 2; }
+/* Disabled enchant when no neutral present */
+.hl-enchant-slot:disabled,
+.hl-enchant-slot[disabled] {
+  opacity: 0.35;
+  cursor: default;
+  filter: none;
+}
+/* Enchanter's Bauble connector + slot
+   .hl-neutral-stack is 98px (set above, matches .hl-inv-grid height).
+   Enchant slot (34px) at top; connector grows to fill middle space;
+   bauble-wrap (34px slot + 3px gap + 16px input = 53px) at bottom. */
+.hl-bauble-connector {
+  flex: 1 0 4px;
+  width: 1px;
+  background: rgba(255,255,255,0.18);
+  align-self: center;
+}
+.hl-bauble-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.hl-bauble-slot {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #3a3a3a 0%, #1a1a1a 70%);
+  border: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.hl-bauble-slot img {
+  display: block;
+  width: 110%;
+  height: 110%;
+  margin: -5%;
+  object-fit: cover;
+  filter: grayscale(1) brightness(0.6);
+  transition: filter .2s;
+}
+.hl-bauble-slot.is-active img {
+  filter: none;
+}
+.hl-inv-slot.hl-enchant-bauble-mismatch {
+  opacity: 0.35;
+  filter: grayscale(0.8);
+}
+.hl-item-tile.hl-enchant-bauble-dim {
+  opacity: 0.3;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+.hl-bauble-slot:hover { filter: brightness(1.3); z-index: 2; }
+.hl-bauble-level {
+  width: 34px;
+  height: 16px;
+  text-align: center;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 4px;
+  color: #ccc;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+.hl-bauble-level::-webkit-inner-spin-button,
+.hl-bauble-level::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.hl-bauble-level:focus { outline: none; border-color: rgba(255,200,80,0.5); color: #e3c46a; }
+/* Hide N/E labels — no text markers */
+.hl-enchant-mark {
+  display: none;
+}
+/* Bevel/glow spans — make invisible */
+.hl-slot-bevel,
+.hl-slot-glow {
+  display: none;
+}
+/* Remove-item × button */
+.hl-slot-clear {
+  position: absolute; top: -5px; right: -5px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: rgba(0,0,0,0.80);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: #ccc; font-size: 11px; line-height: 14px; text-align: center;
+  cursor: pointer; padding: 0; z-index: 10;
+  opacity: 0; transition: opacity .15s;
+}
+.hl-inv-slot:hover .hl-slot-clear,
+.hl-enchant-slot:hover .hl-slot-clear { opacity: 1; }
+.hl-slot-clear:hover { background: rgba(180,40,40,0.88); color: #fff; }
+.hl-cost-badge {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 124px;
+  box-sizing: border-box;
+  min-height: 22px;
+  padding: 2px 8px 2px 6px;
+  border: 1px solid rgba(117, 108, 87, 0.68);
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(38, 37, 34, 0.96), rgba(13, 13, 12, 0.98)),
+    #0d0d0c;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 241, 200, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+  color: #e3c46a;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.hl-cost-badge.is-empty {
+  opacity: 0.72;
+}
+.hl-quickstats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 8px;
+  align-self: start;
+}
+.hl-qs-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.hl-qs-label {
+  color: rgba(200, 180, 140, 0.55);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.hl-qs-value {
+  color: #ddd;
+  font-weight: 700;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.hl-slot-mode {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  min-width: 26px;
+  height: 14px;
+  padding: 0 4px;
+  border: 1px solid rgba(117, 108, 87, 0.66);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(36, 39, 44, 0.95), rgba(12, 14, 17, 0.98));
+  color: #d8c67d;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 12px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 10;
+}
+.hl-slot-mode[data-mode-accent="arcane"],
+.hl-inv-slot[data-mode-accent="arcane"] .hl-slot-mode {
+  border-color: rgba(94, 145, 224, 0.88);
+  background: linear-gradient(180deg, rgba(23, 45, 86, 0.96), rgba(8, 19, 40, 0.98));
+  color: #8ec4ff;
+}
+.hl-inv-slot[data-mode-accent="str"] .hl-slot-mode {
+  border-color: rgba(231, 60, 6, 0.78);
+  background: linear-gradient(180deg, rgba(80, 20, 6, 0.96), rgba(30, 8, 2, 0.98));
+  color: #e73c06;
+}
+.hl-inv-slot[data-mode-accent="agi"] .hl-slot-mode {
+  border-color: rgba(61, 203, 55, 0.78);
+  background: linear-gradient(180deg, rgba(16, 56, 14, 0.96), rgba(6, 22, 5, 0.98));
+  color: #3dcb37;
+}
+.hl-inv-slot[data-mode-accent="int"] .hl-slot-mode {
+  border-color: rgba(0, 211, 231, 0.78);
+  background: linear-gradient(180deg, rgba(4, 48, 56, 0.96), rgba(2, 18, 22, 0.98));
+  color: #00d3e7;
+}
+.hl-slot-mode:hover {
+  border-color: rgba(214, 190, 110, 0.88);
+  color: #f4dfa0;
+}
+.hl-inv-slot[data-mode-accent="arcane"] .hl-slot-mode:hover {
+  border-color: rgba(126, 176, 255, 0.96);
+  color: #d2ebff;
+}
+.hl-slot-dragging {
+  opacity: 0.55;
+  filter: brightness(1.08);
+}
+.hl-slot-drop-target {
+  box-shadow:
+    inset 0 0 0 1px rgba(241, 210, 123, 0.5),
+    0 0 0 1px rgba(241, 210, 123, 0.34),
+    0 0 10px rgba(241, 210, 123, 0.18);
+}
+.hl-cost-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  display: block;
+  flex: 0 0 14px;
+  filter: drop-shadow(0 0 2px rgba(227, 196, 106, 0.18));
+}
+.hl-cost-value {
+  display: inline-block;
+  min-width: 18px;
+  line-height: 1;
+}
+.hl-bars {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.hl-bar {
+  position: relative;
+  height: 26px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--shadow-55);
+  background: #040608;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(0,0,0,0.6);
+}
+.hl-bar-fill {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 3px;
+}
+.hl-bar-hp .hl-bar-fill {
+  background: linear-gradient(180deg, #425d25 0%, #5ba539 20%, #4d9030 50%, #425d25 100%);
+}
+.hl-bar-mp .hl-bar-fill {
+  background: linear-gradient(180deg, #2b4287 0%, #4165ce 20%, #4a73ea 50%, #2b4287 100%);
+}
+.hl-bar-fill::before,
+.hl-bar-fill::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -45% -22%;
+  opacity: 0.38;
+  mix-blend-mode: screen;
+}
+.hl-bar-fill::before {
+  background:
+    radial-gradient(70px 28px at 18% 52%, rgba(255, 255, 255, 0.32), transparent 68%),
+    radial-gradient(92px 30px at 76% 48%, rgba(255, 255, 255, 0.20), transparent 72%),
+    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.14) 42%, transparent 68%);
+  transform: translateX(-28%);
+  animation: hl-bar-flow 8.5s ease-in-out infinite;
+}
+.hl-bar-fill::after {
+  inset: -28% -10%;
+  opacity: 0.24;
+  background:
+    radial-gradient(34px 70px at 0% 50%, rgba(255, 255, 255, 0.26), transparent 72%),
+    radial-gradient(42px 80px at 100% 50%, var(--white-22), transparent 72%);
+  animation: hl-bar-edge-flow 5.8s ease-in-out infinite alternate;
+}
+.hl-bar-hp .hl-bar-fill::before,
+.hl-bar-hp .hl-bar-fill::after {
+  filter: sepia(0.25) saturate(1.15) hue-rotate(38deg);
+}
+.hl-bar-hp .hl-bar-fill::after {
+  opacity: 0.30;
+}
+.hl-bar-mp .hl-bar-fill::before,
+.hl-bar-mp .hl-bar-fill::after {
+  filter: saturate(1.22) hue-rotate(7deg);
+}
+@keyframes hl-bar-flow {
+  0% { transform: translateX(-34%) scaleX(0.94); opacity: 0.18; }
+  42% { transform: translateX(6%) scaleX(1.05); opacity: 0.42; }
+  100% { transform: translateX(32%) scaleX(0.98); opacity: 0.20; }
+}
+@keyframes hl-bar-edge-flow {
+  from { transform: translateX(-2%); opacity: 0.16; }
+  to { transform: translateX(2%); opacity: 0.30; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hl-bar-fill::before,
+  .hl-bar-fill::after {
+    animation: none;
+  }
+}
+.hl-bar-value,
+.hl-bar-regen {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 0 3px rgba(0, 0, 0, 0.95);
+}
+.hl-bar-value {
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fdf6e7;
+  padding: 0 8px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.34), rgba(0,0,0,0));
+}
+.hl-bar-regen {
+  right: 10px;
+  color: #9df189;
+}
+.hl-bar-mp .hl-bar-regen {
+  color: #a9d2ff;
+}
+.hl-custom {
+  border-top: 1px solid rgba(190, 177, 134, 0.16);
+  border-bottom: 1px solid rgba(190, 177, 134, 0.16);
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+.hl-custom summary {
+  cursor: pointer;
+  color: #d7c276;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+}
+.hl-diff-list {
+  display: grid;
+  gap: 1px;
+  flex: 1 1 auto;
+  align-content: start;
+  margin-left: -8px;
+  margin-right: -8px;
+  margin-bottom: -8px;
+}
+.hl-diff-row {
+  min-height: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e2dcce;
+}
+.hl-diff-row span {
+  color: #a9a49a;
+  font-size: 12px;
+}
+.hl-diff-row strong {
+  color: #fbf4e5;
+  font-variant-numeric: tabular-nums;
+}
+.hl-cost strong,
+.hl-kicker {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.hl-diff-head {
+  margin: 0 0 5px;
+}
+.hl-diff-row.diff-cat-hidden {
+  display: none;
+}
+.hl-diff-head strong {
+  display: block;
+  color: #656565;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: var(--font-dota);
+}
+.hl-diff-row {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(72px, 1fr) minmax(92px, auto) minmax(72px, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 2px 16px;
+}
+.hl-diff-row::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+.hl-diff-row[data-adv="left"]::before {
+  opacity: 1;
+  background: linear-gradient(90deg,
+    rgba(62, 208, 56, 0.26) 0%,
+    rgba(62, 208, 56, 0.14) 16%,
+    rgba(62, 208, 56, 0.06) 30%,
+    rgba(62, 208, 56, 0.02) 44%,
+    rgba(62, 208, 56, 0) 100%);
+}
+.hl-diff-row[data-adv="right"]::before {
+  opacity: 1;
+  background: linear-gradient(90deg,
+    rgba(62, 208, 56, 0) 0%,
+    rgba(62, 208, 56, 0.02) 56%,
+    rgba(62, 208, 56, 0.06) 70%,
+    rgba(62, 208, 56, 0.14) 84%,
+    rgba(62, 208, 56, 0.26) 100%);
+}
+.hl-diff-row > * {
+  position: relative;
+  z-index: 1;
+}
+.hl-diff-label {
+  display: block;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  line-height: 1;
+}
+.hl-diff-center {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 1px;
+  min-width: 0;
+}
+.hl-diff-side,
+.hl-diff-mid {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.hl-diff-left {
+  text-align: left;
+  color: #eae3d5;
+}
+.hl-diff-right {
+  text-align: right;
+  color: #eae3d5;
+}
+.hl-diff-mid {
+  text-align: center;
+  font-size: 10px;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hl-diff-row strong.pos { color: #7ee787; }
+.hl-diff-row strong.neg { color: #ff7b72; }
+.hl-diff-row strong.zero { color: var(--text-dimmer); }
+

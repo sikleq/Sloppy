@@ -1,0 +1,434 @@
+/* When one pane is meaningfully shorter than the other, vertically center
+   its content against the taller pane instead of stretching empty space
+   below it. `align-items: center` on the grid (above) achieves this by
+   default; the shorter pane sizes to its content. */
+.ability-change-block .ability-change.unified-panes > .ability-change-pane {
+  align-self: center;
+  padding: 0 4px;
+  --pt: 0px; --px: 4px;
+}
+.facet-block .ability-change.unified-panes > .ability-change-pane {
+  padding: 8px 10px 4px;
+  --pt: 8px; --px: 10px;
+}
+/* When a pane carries an expandable formula table (scale_pill), TOP-anchor
+   both panes. Otherwise `align-items: center` re-centers the shorter pane
+   every time the <details> table toggles open — visibly shoving the old
+   ability block down. Top-anchoring makes the table grow downward only. */
+.ability-change-block .ability-change.unified-panes.has-formula-wrap {
+  align-items: start;
+}
+.ability-change-block .ability-change.unified-panes.has-formula-wrap > .ability-change-pane {
+  align-self: start;
+}
+/* Arrow also top-anchored when a formula table can expand — otherwise
+   `align-self: center` re-aligns to the grid-row centre, which moves
+   downward as the table grows, visibly drifting the arrow below the
+   old pane's body. */
+.ability-change-block .ability-change.unified-panes.has-formula-wrap > .ability-change-arrow {
+  align-self: start;
+  padding-top: 6px;
+}
+/* Single-pane "New ability" card (ability_change old=None): one full-width,
+   top-anchored pane — no old side, no arrow. */
+.ability-change.unified-panes.is-single-new {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+.ability-change.unified-panes.is-single-new > .ability-change-pane {
+  align-self: start;
+  justify-self: stretch;
+  padding: 0 4px;
+  --pt: 0px; --px: 4px;
+}
+/* Aghanim's cards keep the even inner padding wherever they stand: inside an
+   ability_change block the rule above would leave them padded on the left only
+   (the Aghanim's row has no header strip to fill the pane). */
+.ability-change.unified-panes.aghs-change > .ability-change-pane,
+.ability-change-block .ability-change.unified-panes.aghs-change > .ability-change-pane {
+  padding: 10px 14px;
+  --pt: 10px; --px: 14px;
+  /* top-anchored: centred against a taller side, the shorter pane left its caption hanging in the air (owner
+     2026-10-26, 7.41 Techies Reactive Tazer -> M.A.D. + Squee's Scope) */
+  align-self: start;
+}
+/* ... and the arrow from the top too: scripts.js drawAbilityChangeConnectors moves it to the old pane's middle */
+.ability-change.unified-panes.aghs-change > .ability-change-arrow,
+.ability-change-block .ability-change.unified-panes.aghs-change > .ability-change-arrow { align-self: start; }
+/* Old-icon underlay: when an ability_change unified block has a different
+   icon for old vs new, both icons fully overlap inside the same 48px wrap.
+   New is on top by default. Hovering the wrap shuffles them — old comes
+   to front, new drops behind — solitaire-style. Innate-marker on each
+   side follows its own icon's z-order. */
+.ability-icon-wrap.has-old-underlay {
+  position: relative;
+  cursor: pointer;
+  perspective: 600px;
+}
+.ability-icon-wrap.has-old-underlay > .ability-icon-old-underlay,
+.ability-icon-wrap.has-old-underlay > .ability-icon-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  /* Solid backing so transparent PNGs (e.g. generic innate_icon.png used
+     as an underlay when the old ability had no real icon) still render as
+     a proper square with border instead of looking see-through. */
+  background: #111110;
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
+  display: block;
+  transition: transform 0.32s cubic-bezier(0.42, 0, 0.16, 1.1),
+              opacity 0.22s ease,
+              z-index 0s linear 0.16s;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
+.ability-icon-wrap.has-old-underlay > .ability-icon-old-underlay {
+  z-index: 1;
+}
+.ability-icon-wrap.has-old-underlay > .ability-icon-img {
+  z-index: 2;
+}
+/* PERF: will-change was static on the rule above, permanently promoting
+   BOTH icons of every old/new pair to their own compositor layer for the
+   whole page lifetime (30+ pairs on a big patch page = 60+ always-on
+   layers, inflating per-frame layer updates while scrolling — measured via
+   tools/perf_probe.py). The shuffle only runs on :hover, so only hint the
+   browser to promote a layer right when that's about to happen; identical
+   animation, no permanent layer cost while merely scrolling past. */
+.ability-icon-wrap.has-old-underlay:hover > .ability-icon-old-underlay,
+.ability-icon-wrap.has-old-underlay:hover > .ability-icon-img {
+  will-change: transform;
+}
+/* Solitaire shuffle on hover: front icon glides out to the right and tilts
+   slightly while the back icon emerges from the left, tilts the opposite
+   way, and lands on top. */
+.ability-icon-wrap.has-old-underlay:hover > .ability-icon-img {
+  transform: translateX(7px) rotate(6deg);
+  z-index: 1;
+}
+.ability-icon-wrap.has-old-underlay:hover > .ability-icon-old-underlay {
+  transform: translateX(-3px) rotate(-3deg);
+  z-index: 3;
+}
+/* Innate-marker swap: new's marker visible by default, hidden on hover;
+   old's marker hidden by default, visible on hover. Z-index pinned above
+   both icons so the golden marker never hides behind a card. */
+.ability-block > .ability-icon-wrap.has-old-underlay > .innate-marker {
+  z-index: 5;
+  transition: opacity 0.18s ease;
+}
+.ability-block > .ability-icon-wrap.has-old-underlay > .innate-marker-old {
+  opacity: 0;
+  pointer-events: none;
+}
+.ability-block > .ability-icon-wrap.has-old-underlay:hover > .innate-marker-new {
+  opacity: 0;
+}
+.ability-block > .ability-icon-wrap.has-old-underlay:hover > .innate-marker-old {
+  opacity: 1;
+}
+/* In-place rework (same name + icon on both sides): right pane skips the
+   header and only shows the description body — so the box should also be
+   visually smaller and centered (vertically + horizontally) relative to
+   the full-height left card, not stretched to match it. */
+.ability-change.is-in-place {
+  grid-template-columns: 1fr auto minmax(0, 1fr);
+}
+.ability-change.is-in-place .ability-change-new {
+  align-self: center;
+  justify-self: center;
+  width: fit-content;
+  max-width: 100%;
+  justify-content: center;
+  padding: 8px 14px;
+  --pt: 8px; --px: 14px;   /* the header strip spans this padding too (it stood inset, owner 2026-10-24) */
+}
+/* In-place rework where NEW outgrew OLD: centering puts new's first row
+   at the Y-level of old's HEADER (since new pane has no head). Switch to
+   top-anchored, full-width layout for the new pane, with padding-top
+   matching the old head's vertical footprint (47px head + ~8px gap) so
+   the new body's first row top-aligns with old's body first row. */
+.ability-change.is-in-place.is-new-taller .ability-change-new {
+  align-self: start;
+  justify-self: stretch;
+  width: auto;
+  max-width: none;
+  justify-content: flex-start;
+  padding: 8px 14px;
+  --pt: 8px; --px: 14px;
+}
+/* Asymmetric content: the pane with fewer description rows shrinks and
+   centers in its column, instead of stretching to mirror the taller pane
+   and leaving visible empty space below its text. */
+.ability-change.compact-old .ability-change-old,
+.ability-change.compact-new .ability-change-new {
+  align-self: center;
+  justify-self: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 8px 14px;
+  --pt: 8px; --px: 14px;
+}
+/* Aghanim's Scepter upgrade row inside an ability-change pane — same blue
+   gradient stripe + scepter glyph as the canonical `ul.changes li.aghanim-
+   scepter` rows, but stretched edge-to-edge of the pane (no tag column to
+   skip past inside a swap card). */
+.ability-change-row.aghanim-scepter,
+.ability-change-row.aghanim-shard {
+  position: relative;
+  /* Stripe is narrower than its `ul.changes li.aghanim-*` cousin (no tag
+     column to skip), so the fade starts earlier — solid head, decays by
+     30% across, fully transparent before the right edge. */
+  background: linear-gradient(90deg,
+    rgba(72, 148, 255, 0.26) 0,
+    rgba(72, 148, 255, 0.18) 30%,
+    rgba(72, 148, 255, 0.06) 70%,
+    rgba(72, 148, 255, 0) 100%);
+  border-radius: 3px;
+  padding: 4px 8px 4px 6px;
+}
+.ability-change-row.aghanim-scepter .aghanim-marker,
+.ability-change-row.aghanim-shard .aghanim-marker {
+  margin-left: 0;
+  margin-right: 6px;
+  vertical-align: -3px;
+}
+/* Formula table inside a pane: compact + horizontally scrollable when it
+   overflows the pane width. */
+/* The gap belongs to an OPEN table: a wrap of a closed (hidden) table used to
+   leave empty space under the last row (7.41 Sacrifice, two tables: the body's
+   6px flex gap per wrap = 12px). The wrap cancels its gap; an open table puts
+   back the old 6px gap + 6px margin. */
+.ability-change-body .formula-table-wrap {
+  margin-top: -6px;
+}
+/* Formula tables inside ability_change panes show only 7 key levels
+   (L1/5/10/15/20/25/30) — columns 3-5, 7-10, 12-15 are the intermediate
+   L2-L4, L6-L9, L11-L14 columns (col 1 = label, col 2 = L1, col 6 = L5…).
+   Only the DEFAULT grid (.lvl-default): a "per 3 levels" table has its own
+   step grid (L1/3/6/…/30, badges.step_levels) and shows every column. */
+.ability-change-body .formula-table {
+  font-size: 10.5px;
+  margin: 0;
+  width: 100%;
+  table-layout: fixed;
+  font-variant-numeric: tabular-nums;
+}
+.ability-change-body .formula-table:not([hidden]) {
+  margin-top: 12px;
+}
+.ability-change-body .formula-table.lvl-default th:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)),
+.ability-change-body .formula-table.lvl-default td:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)) {
+  display: none;
+}
+.ability-change-body .formula-table th,
+.ability-change-body .formula-table td {
+  padding: 2px 2px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Row labels (first column: "old" / "new" / "Δ %" / "value") still need
+   room for the text — force them just-wide-enough so the level cells share
+   the rest. 44px fits "value" without ellipsis truncation. Centered to
+   match the level cells' centered alignment (was right-aligned, which
+   looked off-axis next to the centered numbers). */
+.ability-change-body .formula-table th:first-child,
+.ability-change-body .formula-table td:first-child {
+  width: 44px;
+  text-align: center;
+  overflow: visible;
+}
+@media (max-width: 720px) {
+  .ability-change { grid-template-columns: 1fr; row-gap: 6px; }
+  .ability-change-arrow { transform: rotate(90deg); }
+}
+/* When discrete change rows follow an ability_change card (numerical
+   tweaks that complement the prose swap), give the ul.changes the same
+   left indent the ability-block's content column would have — otherwise
+   its tag column sits flush with the entity-block edge, visually
+   detached from the swap card above. Higher specificity than the generic
+   `.entity-block > ul.changes { padding-left: 0 }` rule. */
+.entity-block > .ability-change + ul.changes {
+  padding-left: 60px;
+}
+/* (is-changed visual blocks inherit the +14px indent from the generic
+   .entity-block > * rules above — no special override needed.) */
+/* (removed: is-changed ul.changes padding-left: 0 — that made the tag column
+   shift 40px left of the default ul padding, misaligning is-changed item tags
+   relative to regular items below them. Now is-changed inherits default
+   ul.changes padding so tags line up vertically across the whole page.) */
+
+/* Two-pane property diff (old grant set → new grant set).
+   ONE grid for both panes so row N on the left lines up with row N on the
+   right. Pane "boxes" are drawn by two background divs that span cols 1-3
+   and 5-7 respectively, sitting behind content via z-index. */
+/* Two equal-width panes joined by a centred bold arrow. Each pane is a
+   subgrid for ROWS, so row N on the left vertically aligns with row N on
+   the right — no matter which side has taller cells. Each pane has its own
+   3-col grid inside (tag | text 1fr | badge auto-pinned right). */
+.properties-change {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 12px;
+  margin: 6px 0 4px;
+}
+.properties-change .properties-pane {
+  display: grid;
+  /* the tag column is always the chip's width: a pane without tags (Gleipnir 7.38 old side, Bloodstone
+     7.38 new side) starts its text where the other pane does (owner 2026-09-27) */
+  grid-template-columns: 64px 1fr auto;
+  grid-template-rows: subgrid;
+  grid-row: 1 / -1;
+  column-gap: 8px;
+  row-gap: 4px;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+/* Chips inside the panes = the page's chips: same 64px width. */
+.properties-change .property-tag .badge {
+  display: inline-block;
+  width: 64px;
+  min-width: 64px;
+  box-sizing: border-box;
+  text-align: center;
+}
+/* Every card of the site starts under the icon's left edge (owner 2026-11-04: "нет единого положения карточек"; they
+   hung 15px left of it since 2026-09-27). 15px right stays: the cards' % bands end on the change rows' % column (owner
+   2026-09-27, Battle Fury 7.38: -23% in the card vs -14% in the row) */
+body.patch-page .entity-block > .components-change,
+body.patch-page .entity-block > .properties-change,
+body.patch-page .entity-block > .ench-change { margin-left: 0; margin-right: -15px; }   /* the tiers table too (2026-10-27) */
+/* a new item's cost box and a full-width item ability box (no chip column) the same way, so every item box starts on
+   one line (owner 2026-09-27: Orb of Frost 7.38 sat 15px right of Block of Cheese and Orb of Venom) */
+body.patch-page .entity-block.item-block > .item-cost-box,
+body.patch-page .entity-block.item-block > .components-box,
+body.patch-page .entity-block.item-block > .provides-box,
+body.patch-page .entity-block.item-block ul.changes li.ability-row:not(.ability-box-tagged),
+body.patch-page .entity-block.item-block ul.changes li.ability-row-cont:not(.ability-box-tagged),
+body.patch-page .entity-block.item-block.is-new ul.changes li.ability-box-tagged { margin-left: 0; margin-right: -15px; }
+/* ... every line of a multi-line box (7.41 Stonefeather Satchel: the "Pound of Feathers" lines sat 15px in)
+   — and a box with its chip column keeps the chip, but its right edge joins the others */
+body.patch-page .entity-block.item-block:not(.is-new) ul.changes li.ability-box-tagged { margin-right: -15px; }
+.properties-change .pane-old { grid-column: 1; }
+.properties-change .pane-new { grid-column: 3; }
+.properties-change .properties-arrow {
+  grid-column: 2;
+  grid-row: 1 / -1;
+}
+/* Single-pane mode: only one side changed → render just that pane in its
+   column position from the 2-pane layout (left = col 1, right = col 3) so
+   the visible pane lands in the same horizontal area as it would when both
+   panes are present. */
+.properties-change.new-only,
+.properties-change.old-only {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+}
+.properties-change.new-only .pane-new { grid-column: 3; }
+.properties-change.old-only .pane-old { grid-column: 1; }
+/* A unit's numbers as the game shows them (owner 2026-11-04, patch/unit_numbers.py): no tag chips, short health and mana bars
+   in the game's colours under the icon's left edge, the rest as tiles. A changed number is its tag's colour and dotted (the
+   rules with .iab-num.iab-buff). */
+ul.changes li.unit-sheet {
+  display: grid; grid-template-columns: 130px minmax(0, 1fr); column-gap: 12px; align-items: stretch;
+  margin: 10px 0 14px; padding: 0;
+}
+ul.changes li.unit-sheet::before { content: none; display: none; }
+.us-bars { display: grid; grid-auto-rows: minmax(26px, 1fr); row-gap: 4px; }     /* level with the two rows of tiles */
+.us-bar {
+  position: relative; display: flex; align-items: center; justify-content: center; min-height: 26px;
+  padding: 2px 30px 2px 8px; border: 1px solid rgba(0, 0, 0, 0.6); border-radius: 2px;
+  color: #fff; font-size: 13.5px; text-shadow: 0 1px 1px #000; font-variant-numeric: tabular-nums;
+}
+.us-hp { background: linear-gradient(#3f8f3a, #2a6a27); }
+.us-mp { background: linear-gradient(#3a6fc0, #27518f); }
+.us-regen { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 12px; opacity: 0.85; }
+.us-bar .us-v { color: #fff; }
+.us-bar .us-v.iab-buff, .us-bar .us-v.iab-nerf { padding: 0 6px; background: rgba(0, 0, 0, 0.6); border-radius: 2px; text-shadow: none; }
+.us-tiles { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.us-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; row-gap: 3px; min-width: 0;
+  padding: 5px 2px; text-align: center; line-height: 1.25;
+  background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line-soft); border-radius: 3px;
+}
+.us-k { color: var(--text-dim, #969289); font-size: 12px; }
+.us-v { color: var(--text-main); font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  ul.changes li.unit-sheet { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+  .us-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+/* CHIP-LESS DESCRIPTION ROWS — a li with no tag (Flooded Camps / Map Objectives
+   mechanics, new-entity notes). Drop the 76px phantom tag column the change
+   grid reserves and mark each line with a small bullet so it reads as a list,
+   not a tag row whose tag was deleted. Ability-rows (Passive:/Active: boxes)
+   keep their own layout. */
+ul.changes li.li-notag:not([class*="ability-row"]) > .row-text::before,
+.entity-block.is-new ul.changes li:not([class*="ability-row"]) > .row-text::before {
+  content: "\2022";
+  float: none;
+  display: inline;
+  width: auto;
+  height: auto;
+  margin-right: 8px;
+  color: var(--text-dim, #969289);
+}
+/* NEW MECHANIC description (plain_header/subgroup new="New mechanic"): how the new thing
+   works, as prose in one soft box — no tag column, no chip, no bullet (patch/page.py
+   _new_mech_rows). Rows with other tags (MISC, DEL…) follow as normal change rows. */
+ul.changes li.mech-desc {
+  grid-template-columns: 1fr auto;
+  padding: 3px 14px;
+  background: var(--muted-04);
+  border-left: 1px solid var(--line-soft);
+  border-right: 1px solid var(--line-soft);
+}
+ul.changes li.mech-desc > .row-tag-empty { display: none; }
+ul.changes li.mech-desc > .row-text { grid-column: 1; text-align: left; }
+ul.changes li.li-notag.mech-desc:not([class*="ability-row"]) > .row-text::before { content: none; display: none; }
+ul.changes li.mech-desc.mech-first {
+  border-top: 1px solid var(--line-soft);
+  border-top-left-radius: 6px; border-top-right-radius: 6px;
+  padding-top: 9px; margin-top: 4px;
+}
+ul.changes li.mech-desc.mech-last {
+  border-bottom: 1px solid var(--line-soft);
+  border-bottom-left-radius: 6px; border-bottom-right-radius: 6px;
+  padding-bottom: 9px; margin-bottom: 8px;
+}
+/* A mechanic as one paragraph with its map in sight (owner 2026-11-04, patch/mech_abilities.mech_story): one picture
+   beside the text, more under it; the pictures a word in the text opens stay in the usual box under the row. */
+ul.changes li.mech-story { line-height: 1.6; grid-template-columns: minmax(0, 1fr); }
+ul.changes li.mech-story .mech-story-p { display: block; }
+ul.changes li.mech-story .mech-story-p + .mech-story-p { margin-top: 6px; }
+ul.changes li.mech-story > .mech-story-table { display: block; grid-column: 1 / -1; min-width: 0; }
+/* one picture beside the text: its width (mech_abilities.story_side_width) makes the two fill the block; if the text
+   runs taller on a narrower screen the picture's dark panel still fills the height, the sheet's own black round it */
+ul.changes li.mech-story.mech-story-side {
+  grid-template-columns: minmax(0, 1fr) var(--story-side, 300px); column-gap: 16px; align-items: center;
+}
+ul.changes li.mech-story > .mech-story-maps {
+  grid-column: 1 / -1; justify-self: stretch; justify-content: space-between; flex-wrap: nowrap;
+  margin: 8px 0 2px; padding: 0; background: none; border: 0; border-radius: 0;
+}
+ul.changes li.mech-story.mech-story-side > .mech-story-maps {
+  grid-column: 2; grid-row: 1; align-self: stretch; align-items: center; margin: 2px 0;
+  background: #080b06; border-radius: 3px;
+}
+ul.changes li.mech-story > .mech-story-maps img,
+ul.changes li.mech-story > .tshots[data-part] img { width: calc(50% - 3px); }   /* two pictures fill the block's width */
+ul.changes li.mech-story.mech-story-side > .mech-story-maps img { width: 100%; }
+@media (max-width: 760px) {
+  ul.changes li.mech-story.mech-story-side { grid-template-columns: minmax(0, 1fr); }
+  ul.changes li.mech-story.mech-story-side > .mech-story-maps { grid-column: 1; grid-row: auto; margin-top: 8px; }
+  ul.changes li.mech-story > .mech-story-maps { flex-wrap: wrap; }
+  ul.changes li.mech-story > .mech-story-maps img,
+  ul.changes li.mech-story > .tshots[data-part] img { width: 100%; }
+}

@@ -1,0 +1,277 @@
+/* When a formula table is inside the li, strip the second gradient layer so it
+   doesn't bleed over the table rows. The first-line stripe is kept. */
+ul.changes li.aghanim-scepter.li-formula,
+ul.changes li.aghanim-shard.li-formula {
+  background:
+    linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 22px;
+}
+/* Aghanim marker — inline icon appended to the change-text inside .row-text,
+   so it sits right after the last character of the change description and
+   before the % badge column. */
+.aghanim-marker {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  vertical-align: -2px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.aghanim-marker.scepter {
+  background-image: url('icons/stats/aghs_scepter_icon.png');
+}
+.aghanim-marker.shard {
+  background-image: url('icons/stats/aghs_shard_icon.png');
+}
+
+/* WRONG-WORD HIGHLIGHT — subtle, neutral marker (no strikethrough) */
+.wrong-word {
+  background: rgba(150, 146, 137, 0.08);
+  color: var(--text-dim);
+  padding: 1px;
+  border-radius: 3px;
+}
+
+/* FORMULA TRIGGER — same neutral, squared-off look as .wrong-word, clickable */
+.formula-trigger {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 1px;
+  border-radius: 3px;
+  background: rgba(150, 146, 137, 0.08);
+  color: var(--text-dim);
+  border: 1px solid rgba(150, 146, 137, 0.30);
+  font-size: inherit;
+  cursor: pointer;
+  transition: all 0.14s;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+/* Small "start" / "end" labels next to per-level formula badges
+   (Δ% at L1 vs Δ% at L30) — visually subtle, sits inline after each
+   badge to clarify which hero-level its number represents. */
+.formula-endpoint-label {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text-dimmer);
+  margin: 0 4px 0 -2px;
+  font-weight: 500;
+}
+/* Trailing 'end' label sits flush with the right edge of the badge column —
+   the inherited 4px right margin would otherwise push the whole start/end
+   pair leftward and visually misalign with adjacent single-badge rows. */
+.badge-group .formula-endpoint-label:last-child {
+  margin-right: 0;
+}
+.formula-trigger:hover {
+  background: rgba(150, 146, 137, 0.16);
+  border-color: rgba(150, 146, 137, 0.50);
+  color: var(--text-main);
+}
+.formula-trigger.active {
+  background: rgba(150, 146, 137, 0.22);
+  border-color: rgba(150, 146, 137, 0.60);
+  color: var(--text-main);
+}
+/* OLD FORMULA — just a subtle dotted underline so it stands out as "the old one" */
+.formula-old {
+  text-decoration: underline dotted var(--muted-45);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+/* FORMULA COMPARISON TABLE */
+.formula-table {
+  margin: 8px 0 6px;
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: 11px;
+  width: 100%;
+  /* fixed → every level column is the SAME width (auto sized each cell to its
+     own content, making short labels like "L7" narrow). */
+  table-layout: fixed;
+  font-variant-numeric: tabular-nums;
+}
+/* Label column (first): fixed width so the level columns share the rest evenly. */
+.formula-table th:first-child,
+.formula-table td:first-child {
+  width: 42px;
+}
+.formula-table[hidden] { display: none; }
+.formula-table thead th {
+  background: rgba(54, 53, 50, 0.55);
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 10.5px;
+  padding: 4px 0;
+  text-align: center;
+  border-radius: 3px;
+}
+.formula-table tbody th {
+  width: 42px;
+  text-align: left;
+  padding: 4px 8px;
+  background: rgba(54, 53, 50, 0.5);
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 10.5px;
+  border-radius: 3px;
+  letter-spacing: 0.3px;
+}
+.formula-table tbody td {
+  padding: 4px 4px;
+  text-align: center;
+  background: rgba(54, 53, 50, 0.30);
+  color: var(--text-main);
+  border-radius: 3px;
+  font-size: 11px;
+}
+.formula-table tbody td .badge {
+  margin-left: 0;
+  padding: 0;
+  font-size: 11px;
+  border-radius: 0;
+  background: none !important;
+  border: none !important;
+  text-shadow: none !important;
+  display: inline;
+  min-width: 0;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.formula-table .row-label-old { color: #ff9a8c; }
+.formula-table .row-label-new { color: #92c89e; }
+/* Visual gap before L20 (after L1-15 sequential block) */
+.formula-table .lvl-jump {
+  border-left: 6px solid transparent;
+  background-clip: padding-box !important;
+}
+
+/* Tags row + Categories row stacked vertically inside the toolbar; both rows
+   share the same horizontal-button rhythm so labels align under each other. */
+.legend-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* Symmetric with .toolbar-patch-info (both flex:1 1 0) so the search box in
+     the middle stays optically centred. NO min-width:0 → the implicit
+     min-width:auto floors the column at its badges' width, so the tag rows can
+     never be shrunk/overlapped by the search box when space gets tight. */
+  flex: 1 1 0;
+}
+.legend-categories {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.legend-categories strong {
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-right: 4px;
+  /* Matches .legend-tags strong so Group badges align with the Tags row. */
+  flex: 0 0 auto;
+  width: 46px;
+}
+.cat-filter-btn {
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 3px;
+  background: rgba(227, 196, 106, 0.05);
+  color: #a29e94;
+  border: 1px solid rgba(227, 196, 106, 0.22);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  transition: filter 0.12s, background 0.12s, border-color 0.12s;
+}
+.cat-filter-btn:hover {
+  background: rgba(227, 196, 106, 0.10);
+  border-color: rgba(227, 196, 106, 0.40);
+  color: var(--text-main);
+}
+.cat-filter-btn.active {
+  background: rgba(227, 196, 106, 0.22);
+  border-color: rgba(227, 196, 106, 0.60);
+  color: var(--text-main);
+}
+body.cat-filter-active .cat-hide { display: none !important; }
+
+/* FILTER BUTTONS in legend — make tags clickable */
+.legend-tags .badge.filter-btn {
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 2px 9px;
+  transition: filter 0.12s, transform 0.12s;
+}
+.legend-tags .badge.filter-btn:hover {
+  filter: brightness(1.18);
+  transform: translateY(-1px);
+}
+.legend-tags .badge.filter-btn.active {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  filter: brightness(1.35);
+  box-shadow: 0 0 0 1px var(--shadow-40) inset;
+}
+
+/* ENTITY-BLOCK wrapper (used for filtering hide/show). NOTE: we tried
+   `content-visibility: auto` here for scroll-perf, but its implicit
+   `contain: paint` clipped the hover-scaled dyn-cells at the block edge
+   (last cell on the right got sliced). The lazy-tooltip rebuild in
+   scripts.js already removed the bulk of the per-cell DOM weight, so
+   leaving CV off is the better trade — visual freedom > the last bit
+   of paint-skip. */
+.entity-block { margin-bottom: 6px; }
+/* All entity-block children flush against the entity-block left edge (margin
+   not padding — padding-left controls INTERNAL content inset, which the
+   visual boxes need to keep at 14px so their content aligns with the entity
+   icon above). */
+.entity-block > h4.subgroup,
+.entity-block > ul.changes,
+.entity-block > .ability-block,
+.entity-block > .components-box,
+.entity-block > .components-change,
+.entity-block > .provides-box,
+.entity-block > .properties-change {
+  margin-left: 0;
+}
+/* Tag column inside ul.changes also flush at entity-block left edge — these
+   lists have no inner box border to inset from. */
+.entity-block > ul.changes,
+.entity-block > .ability-block {
+  padding-left: 0;
+}
+/* ul.subnotes is NOT touched here — it keeps its base margin-left: 76px so
+   the ↳ arrow lines up under the row text column (after the 64px tag column
+   + 12px gap). Resetting it to 0 here would flush subnotes against the
+   entity-block left edge, misaligning every "Damage at level 1 ..." note. */
+.entity-block.is-new > ul.changes {
+  padding-left: 0;
+}
+
+/* === FILTER MODE === */
+/* Keep the category header (h2.section: General/Item/Neutral Item/Hero Updates)
+   VISIBLE while filtering so each surviving group is labelled with its category.
+   Empty sections are collapsed wholesale by refreshPatchFilterLayout()
+   (section.cat-panel → f-hide), so only non-empty sections keep their header. */
+body.filter-active h4.subgroup { display: none; }
+body.filter-active ul.subnotes { display: none; }
+/* Hide filtered elements via .f-hide class set by JS */
+.f-hide { display: none !important; }
+
+/* MOBILE: stack legend label above strip so 10 segments fit */
+
+
+

@@ -1,5 +1,6 @@
 """A reworked mechanic's list of abilities is rows of icons under the row, not a "?" (owner 2026-10-28: 7.40
 Invulnerability Targeting, 7.38 Lifesteal, 7.41 Health Restoration / Lifesteal)."""
+from patch.css_bundle import read_css
 import os
 import re
 
@@ -73,8 +74,7 @@ def test_names_alone_are_one_row_of_icons_and_with_scepter_its_own():
     assert '<span class="mech-cell">Items and abilities</span>' in row
     always = row.split('<span class="mech-cell mech-label">Always</span>')[1].split('class="mech-abil-row"')[0]
     assert "items/skadi.png" in always and "pudge_rot.png" not in always
-    css = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "styles.css"),
-               encoding="utf-8").read()
+    css = read_css()
     assert re.search(r"\.mech-abils\.mech-cols-icons \{ grid-template-columns: fit-content", css)
 
 
@@ -134,8 +134,7 @@ def test_before_and_after_the_patch_is_a_table():
             '<span class="mech-cell">After</span>') in html
     assert '<span class="mech-cell mech-label">Health Restoration</span>' in html
     assert 'class="mech-abils mech-cols-3 mech-ba"' in html             # Before and After one width
-    css = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "styles.css"),
-               encoding="utf-8").read()
+    css = read_css()
     assert re.search(r"\.mech-cols-3\.mech-ba \{ grid-template-columns: fit-content\(30%\) minmax\(0, 1fr\) "
                      r"minmax\(0, 1fr\)", css)
 
@@ -229,8 +228,7 @@ def test_clarifications_stay_behind_the_question_mark():
 
 
 def test_icons_grow_on_hover():
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    css = open(os.path.join(root, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     assert re.search(r"\.ability-chip:hover > img \{[^}]*transform: scale\(", css)
 
 

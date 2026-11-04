@@ -1,0 +1,363 @@
+/* ==========================================================================
+   06. CALENDAR
+   ========================================================================== */
+
+/* CALENDAR PAGE */
+.calendar { margin: 4px 0 24px; }
+.cal-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Fixed height (not min-height) so the toolbar occupies the EXACT same
+     vertical slot on every page. All child controls are 32px tall + border-
+     box (rules below) so the bar measures identically whether a page shows
+     a select, toggles, or the price range. */
+  height: 32px;
+  margin-bottom: 8px;
+  padding-left: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+/* One height for every toolbar control so the bar never measures differently
+   between Neutral Creeps / Unit Abilities / Mana Items. */
+.cal-toggle-bar .cal-mode-select,
+.cal-toggle-bar .ua-upgrades-toggle,
+.cal-toggle-bar .mr-price-range {
+  height: 32px;
+  box-sizing: border-box;
+}
+/* Blurb + toolbar now live INSIDE the .creeps-scroll box (above the table) so
+   they scroll away with it, exactly like the Mana Items page — only the site
+   nav + sticky table headers stay pinned. They're sticky-left so they don't
+   slide off when the table scrolls horizontally, with an opaque background so
+   the table never shows through them. */
+.creeps-scroll > .inbox-bar {
+  position: sticky;
+  left: 0;
+  z-index: 6;
+  background: var(--bg-page);
+  /* As block children of the scroll box, these are already the box's VISIBLE
+     width (percentages/auto resolve against the padding box, not the wide
+     table's scroll width), so sticky-left keeps them filling the viewport. */
+  box-sizing: border-box;
+}
+.creeps-scroll > .mr-blurb.inbox-bar {
+  margin: 0;
+  padding: 22px 28px 0;
+}
+.creeps-scroll > .cal-toggle-bar.inbox-bar {
+  height: auto;
+  margin: 0;
+  padding: 14px 28px 16px;
+}
+/* The View group (label + select) is wrapped in its own inline-flex so its
+   width is independent of whatever follows in the toolbar. Same width on
+   every page → the "View" label sits at the same X regardless of context. */
+.cal-toggle-bar .view-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.cal-toggle-bar strong {
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.cal-mode-select {
+  background: var(--bg-panel-3);
+  border: 1px solid var(--line);
+  color: var(--text-main);
+  padding: 5px 28px 5px 12px;
+  /* Fixed width so the View select on every page is the same size regardless
+     of which option label is longest (Expanded vs. Auras vs. Standard). */
+  min-width: 130px;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238b949e' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.cal-mode-select:hover {
+  border-color: var(--gold);
+}
+/* "Upgrades" binary switch — iOS-style toggle, defaults ON. When ON, the
+   table gains .show-upgrades and each <span class="upg-val"> inside a
+   leveled cell renders with a subtle dotted underline so the per-tier
+   numbers self-identify without an outline around the cell. */
+.ua-upgrades-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: var(--bg-panel-3);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-size: 12.5px;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+}
+.ua-upgrades-toggle:hover { border-color: var(--gold); }
+.ua-upgrades-toggle .ua-switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+.ua-upgrades-toggle .ua-switch {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 16px;
+  background: var(--line);
+  border-radius: 999px;
+  transition: background 150ms ease;
+  flex-shrink: 0;
+}
+.ua-upgrades-toggle .ua-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--text-main);
+  border-radius: 50%;
+  transition: transform 150ms ease, background 150ms ease;
+}
+/* ON state = the site-wide gold accent (var(--gold) — the "sikle" wordmark gold, same
+   as the active terrain-toolbar buttons). Unifies every toggle's on-colour. */
+.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch { background: var(--gold); }
+.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch::after {
+  transform: translateX(14px);
+  background: #fff;
+}
+.ua-upgrades-toggle .ua-switch-input:focus-visible + .ua-switch {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+/* Inline link inside an Effect cell — used when an effect mentions another
+   ability or unit by name (Hurl Boulder, Rally, Skeleton Warrior, …) and
+   should jump to its row. Subtle cyan tone + dotted underline so it reads
+   as interactive without screaming. */
+.unit-abilities-table .ua-inline-link {
+  color: #79d6cf;
+  text-decoration: underline dotted rgba(121, 214, 207, 0.55);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.unit-abilities-table .ua-inline-link:hover {
+  color: #a6f2ec;
+  text-decoration-color: #a6f2ec;
+}
+/* Marker for leveled cells when Upgrades is ON:
+   - faint sky-blue fill (almost translucent) so the cell stands out from the
+     row without looking heavy;
+   - soft rounded outline (1.5px) inset so the corners pull in slightly from
+     the cell edge — reads as a "highlighted" tile rather than a hard frame.
+   The native `border-left` from the column divider stays underneath; the
+   inset shadow sits on top and visually "owns" the cell. */
+.unit-abilities-table.show-upgrades td.leveled {
+  background: rgba(227, 196, 106, 0.08);
+  position: relative;
+}
+/* Frame drawn as an inset pseudo-element (3px in from every edge) instead of
+   an edge-flush box-shadow, so the row-select gold frame at the cell border
+   has clearance and doesn't sit half-hidden behind this blue outline. */
+.unit-abilities-table.show-upgrades td.leveled::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1.5px solid rgba(227, 196, 106, 0.55);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* YEAR BLOCK (shared between modes, collapsible) */
+.cal-year-block {
+  margin-bottom: 6px;
+  background: #191817;
+  border: 1px solid var(--bg-panel-4);
+  border-radius: 6px;
+  overflow: hidden;
+}
+/* While the year dropdown is open, let it escape the block's overflow:hidden
+   (which is there to clip the grid to the rounded corners). Without this the
+   menu is cut off below the block — most visibly in COMPACT mode, where the
+   block is only as tall as its header so the dropdown has nowhere to show. */
+.cal-year-block:has(.cal-year-picker.is-open) { overflow: visible; }
+.cal-year-label {
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.12s;
+}
+/* The custom .cal-year-picker button carries its own caret now, so the label
+   wrapper no longer paints a chevron and isn't itself clickable. */
+.cal-year-label { cursor: default; }
+/* Current year breaks out of the .container width to give it visual prominence
+   over collapsed past years. Negative side margins extend it beyond the 1080px
+   cap; inner padding stays so contents don't hit the edge. */
+.cal-year-block.is-current {
+  margin-left: -140px;
+  margin-right: -140px;
+  border-color: rgba(213, 207, 195, 0.28);
+  box-shadow:
+    inset 0 1px 0 var(--blue-cold-10),
+    0 4px 18px var(--shadow-35);
+}
+.cal-year-block.is-current .cal-year-label {
+  font-size: 20px;
+  padding: 11px 20px;
+  /* Year picker on the left, Compact toggle on the right (top-right corner of
+     the calendar block). */
+  justify-content: space-between;
+}
+.cal-year-block.is-current .cal-mode-full,
+.cal-year-block.is-current .cal-mode-compact {
+  padding: 0 20px 10px;
+}
+/* Compact toggle restyled to match the year-picker button (gradient pill,
+   cool-blue border) instead of the default dark toolbar pill. It now lives in
+   the year block's header row (top-right), not a separate bar above. */
+.cal-compact-toggle.ua-upgrades-toggle {
+  background:
+    linear-gradient(180deg, rgba(46, 45, 42, 0.95) 0%, rgba(34, 33, 29, 0.95) 100%);
+  border: 1px solid var(--blue-35);
+  border-radius: 6px;
+  color: var(--text-bright);
+  padding: 6px 12px;
+  gap: 9px;
+  box-shadow:
+    inset 0 1px 0 var(--blue-cold-10),
+    0 2px 6px var(--shadow-35);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.cal-compact-toggle.ua-upgrades-toggle:hover { border-color: rgba(213, 207, 195, 0.6); }
+.cal-compact-toggle .ua-upgrades-label {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+}
+@media (max-width: 1400px) {
+  /* Stop the breakout when the viewport can't comfortably host it. */
+  .cal-year-block.is-current { margin-left: 0; margin-right: 0; }
+}
+
+/* Year selector — a fully custom dropdown (replaces the native <select> so
+   the value and every option are perfectly centred and themed; the native
+   popup left-aligned its numbers and reserved arrow space). */
+.cal-year-picker { position: relative; display: inline-block; }
+.cal-year-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 90px;             /* symmetric slot keeps the value optically centred */
+  background:
+    linear-gradient(180deg, rgba(46, 45, 42, 0.95) 0%, rgba(34, 33, 29, 0.95) 100%);
+  border: 1px solid var(--blue-35);
+  border-radius: 6px;
+  color: var(--text-bright);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  padding: 5px 11px;
+  box-shadow:
+    inset 0 1px 0 var(--blue-cold-10),
+    0 2px 6px var(--shadow-35);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.cal-year-current-val { font-variant-numeric: tabular-nums; }
+.cal-year-caret {
+  font-size: 10px;
+  color: var(--text-muted-blue-2);
+  line-height: 1;
+  transition: transform 0.15s;
+}
+.cal-year-current:hover { border-color: rgba(213, 207, 195, 0.6); }
+.cal-year-picker.is-open .cal-year-current,
+.cal-year-current:focus-visible {
+  outline: none;
+  border-color: rgba(213, 207, 195, 0.75);
+  box-shadow:
+    inset 0 1px 0 rgba(222, 216, 203, 0.14),
+    0 0 0 3px rgba(227, 196, 106, 0.18);
+}
+.cal-year-picker.is-open .cal-year-caret { transform: rotate(180deg); }
+.cal-year-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  min-width: 100%;
+  /* No max-height / overflow → the full year list shows without a scrollbar
+     (there are only ~9–15 years). */
+  background: var(--bg-panel-2);
+  border: 1px solid var(--blue-30);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px var(--shadow-55);
+}
+.cal-year-menu[hidden] { display: none; }
+.cal-year-opt {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  padding: 7px 22px;
+  border-radius: 5px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.1s, color 0.1s;
+}
+.cal-year-opt:hover { background: rgba(227, 196, 106, 0.12); color: #fff; }
+.cal-year-opt.is-selected {
+  background: rgba(227, 196, 106, 0.18);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.35);
+}
+.cal-year-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px 0;
+  margin-top: -8px;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  border-top: 1px solid var(--bg-panel-4);
+  margin-bottom: 8px;
+}
+.cal-year-summary-key { color: var(--text-dimmer); text-transform: uppercase; letter-spacing: 0.4px; font-size: 10.5px; }
+.cal-year-summary-val { color: var(--text-main); font-weight: 600; }
+.cal-year-summary-meta { color: var(--text-dimmer); font-size: 11px; }
+.cal-year-block[data-collapsed="true"] .cal-year-summary { display: none; }
+.cal-year-block[data-collapsed="true"] .cal-mode-full,
+.cal-year-block[data-collapsed="true"] .cal-mode-compact {
+  display: none;
+}
+.cal-mode-full, .cal-mode-compact {
+  padding: 0 16px 14px;
+}
+

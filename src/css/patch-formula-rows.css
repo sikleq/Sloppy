@@ -1,0 +1,295 @@
+/* Thin connector from the number to its slot — starts right at the number (the
+   narrow num column keeps it almost touching the digits) and reaches the slot. */
+.cm-vnum.cm-to-left::before,
+.cm-vnum.cm-to-right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 1px;
+  background: rgba(163, 159, 149, 0.4);
+}
+.cm-vnum.cm-to-left::before  { right: 100%; }
+.cm-vnum.cm-to-right::after  { left: 100%; }
+/* Neutral slots — dark fill + faint border, no team colour. Bans = narrow boxes
+   (1 row) hugging the centre; picks fill the lane and span a 2-row band so the
+   left & right pick of a pair sit FACING each other (like the in-game board). */
+.cm-token {
+  position: relative;
+  align-self: stretch;            /* fill the row(s) the slot spans */
+  border-radius: 4px;
+  border: 1.5px solid rgba(154, 150, 141, 0.42);
+  background: rgba(17, 16, 16, 0.85);
+}
+.cm-token.ban  { width: 42px; }
+.cm-token.ban.cm-left  { justify-self: end; }    /* left lane → inner (right) edge by the number */
+.cm-token.ban.cm-right { justify-self: start; }  /* right lane → inner (left) edge by the number */
+/* Faint bordeaux crosshair in the centre of ban slots (a "banned" mark). Barely
+   visible by design. */
+.cm-token.ban::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, -50%);
+  background-image:
+    linear-gradient(45deg,  transparent 42%, rgba(150, 46, 58, 0.5) 42%, rgba(150, 46, 58, 0.5) 58%, transparent 58%),
+    linear-gradient(-45deg, transparent 42%, rgba(150, 46, 58, 0.5) 42%, rgba(150, 46, 58, 0.5) 58%, transparent 58%);
+}
+.cm-token.pick {
+  border-color: rgba(175, 170, 160, 0.55);   /* picks span 2 rows → naturally taller than bans */
+  background: rgba(28, 27, 25, 0.92);
+}
+
+/* Tarot-card sub-list entries (Oracle Diviner's Deck): small icon + bold card
+   name + effect. Each entry is its own inline-flex row so wrapping reads as
+   a checklist instead of a wall of text. */
+.tarot-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tarot-card-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+/* (ability-row li no longer needs a special override — base rule already
+   spans col 1 / -1, which is the full width in both layouts.) */
+
+/* BADGES — flat rectangular tag boxes */
+.badge {
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  line-height: 1;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+  text-align: center;
+  box-sizing: border-box;
+}
+/* Facet pill — replicates the dota2.com patch-page facet header:
+     - Background: 2-stop linear-gradient(to right, light, dark) in the
+       facet's themed color (injected inline from FACETS table).
+     - Text placement: right-aligned with extra LEFT padding, so the
+       facet name lands on the DARK end of the gradient where white text
+       reads cleanly even when the light end is bright (Yellow1, etc).
+   No overlay needed — Valve's gradient already does the contrast work. */
+.badge.facet-badge {
+  position: relative;
+  display: inline-block;
+  padding: 3px 7px 3px 14px;     /* more left pad pushes text toward dark side */
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  line-height: 1;
+  vertical-align: middle;
+  white-space: nowrap;
+  min-width: 0;
+  text-align: right;
+  color: #ffffff;
+  text-shadow: 0 1px 1px var(--shadow-60);
+  /* Transparent 1px border keeps total height (19px) matching the
+     adjacent tag-badges which carry their own 1px colored border.
+     `background-origin: border-box` makes the gradient span the FULL
+     box including the border area — without this default would be
+     `padding-box`, and the gradient would end 1px short of the right
+     edge, exposing a thin strip of the LIGHT (left) end of the gradient
+     via the default `background-repeat: repeat` wrap. */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-origin: border-box;
+  background-repeat: no-repeat;
+  box-shadow: 0 1px 1px var(--shadow-35);
+  margin-right: 4px;
+  box-sizing: border-box;
+  /* Nudge up to share horizontal line of tag-badges. row-text inline
+     baseline vs li-grid centering yields a 2px offset otherwise. */
+  top: -2px;
+}
+/* When inside .badge-group → strip the box, become plain colored text.
+   `display: inline` ensures baseline-alignment with surrounding text (was inline-flex
+   which sat below the text baseline in raw rows like Bloodstone wrong-line). */
+.badge-group {
+  display: inline;
+  vertical-align: baseline;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 13px;
+}
+/* Inside a li's right grid cell, the badge-group becomes a grid item (column 2).
+   Keep it as an inline-block so its content (start/end pairs, % chips) doesn't
+   wrap across multiple lines and pad the row height. */
+ul.changes li > .badge-group {
+  display: inline-block;
+  white-space: nowrap;
+}
+.badge-group .badge {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  text-shadow: none !important;
+  margin: 0;
+  min-width: 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: inherit;
+  display: inline;            /* override .badge's inline-block — proper baseline align */
+  vertical-align: baseline;   /* override .badge's middle */
+}
+/* Comma separator between multi-level badges */
+.badge-group .badge:not(:last-child)::after {
+  content: ", ";
+  color: var(--text-dimmer);
+  font-weight: 400;
+}
+/* Slash separator for paired dimensions (e.g. daytime / nighttime). */
+.badge-group.slash-sep .badge:not(:last-child)::after { content: " / "; }
+/* 5+ levels shown as "first … last" (patch/badges.py RANGE_FROM_LEVELS): no comma before the ellipsis */
+.badge-group .badge.rng-start::after { content: none; }
+.badge-group .badge-range { color: var(--text-dimmer); font-weight: 400; margin: 0 0.3em; }
+/* Extra leading space before 0% (neutral) — without +/- prefix it visually crowds the comma */
+.badge-group .badge.neutral:not(:first-child) {
+  margin-left: 0.25em;
+}
+
+/* NEUTRAL & TEXT TAGS */
+.badge.neutral {
+  background: rgba(150, 146, 137, 0.06);
+  color: var(--text-dimmer);
+  border: 1px solid var(--line-soft);
+}
+.badge.rework {
+  background: rgba(180, 145, 220, 0.05);
+  color: #7d6e93;
+  border: 1px solid rgba(180, 145, 220, 0.15);
+}
+/* SWAP (2026-09-26): a talent replaced by another in the same slot — teal, apart from REWORK purple */
+.badge.swap {
+  background: rgba(95, 176, 164, 0.05);
+  color: #5b8f87;
+  border: 1px solid rgba(95, 176, 164, 0.18);
+}
+.badge.misc {
+  background: rgba(150, 146, 137, 0.06);
+  color: var(--text-dimmer);
+  border: 1px solid var(--line-soft);
+}
+.badge.qol {
+  background: rgba(121, 192, 255, 0.06);
+  color: #87a3bf;
+  border: 1px solid rgba(121, 192, 255, 0.20);
+}
+.badge.new {
+  background: rgba(220, 175, 95, 0.06);
+  color: #9a7f4d;
+  border: 1px solid rgba(220, 175, 95, 0.22);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.badge.del {
+  background: rgba(179, 56, 56, 0.07);
+  color: #a85151;
+  border: 1px solid rgba(179, 56, 56, 0.25);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* BUFF GRADIENT (10 tiers, soft-saturated greens) */
+.badge.buff1  { background: rgba(120, 215, 145, 0.10); color: #b2d8b8; border: 1px solid rgba(120, 215, 145, 0.26); }
+.badge.buff2  { background: rgba(115, 215, 140, 0.13); color: #b4dab6; border: 1px solid rgba(115, 215, 140, 0.32); }
+.badge.buff3  { background: rgba(110, 215, 135, 0.17); color: #b2dab2; border: 1px solid rgba(110, 215, 135, 0.38); }
+.badge.buff4  { background: rgba(105, 215, 130, 0.22); color: #aedaa8; border: 1px solid rgba(105, 215, 130, 0.44); }
+.badge.buff5  { background: rgba(95, 210, 125, 0.27);  color: #a8d6a0; border: 1px solid rgba(95, 210, 125, 0.50); }
+.badge.buff6  { background: rgba(85, 205, 115, 0.32);  color: #a4d496; border: 1px solid rgba(85, 205, 115, 0.55); }
+.badge.buff7  { background: rgba(75, 200, 105, 0.36);  color: #9cd28a; border: 1px solid rgba(75, 200, 105, 0.60); }
+.badge.buff8  { background: rgba(65, 195, 95, 0.40);   color: #94d07c; border: 1px solid rgba(65, 195, 95, 0.65); }
+.badge.buff9  { background: rgba(55, 190, 85, 0.45);   color: #88cc6e; border: 1px solid rgba(55, 190, 85, 0.70); }
+.badge.buff10 { background: rgba(50, 175, 80, 0.34);   color: #b8e2a4; border: 1px solid rgba(50, 175, 80, 0.55); }
+
+/* NERF GRADIENT (10 tiers, soft-saturated reds) */
+.badge.nerf1  { background: rgba(211, 139, 149, 0.10); color: #d0b4b8; border: 1px solid rgba(211, 139, 149, 0.24); }
+.badge.nerf2  { background: rgba(208, 130, 141, 0.13); color: #d3b1b6; border: 1px solid rgba(208, 130, 141, 0.30); }
+.badge.nerf3  { background: rgba(203, 122, 134, 0.16); color: #d2aab0; border: 1px solid rgba(203, 122, 134, 0.36); }
+.badge.nerf4  { background: rgba(202, 115, 127, 0.20);  color: #d0a4aa; border: 1px solid rgba(202, 115, 127, 0.42); }
+.badge.nerf5  { background: rgba(201, 109, 122, 0.25);  color: #d09ca3; border: 1px solid rgba(201, 109, 122, 0.50); }
+.badge.nerf6  { background: rgba(199, 101, 115, 0.30);   color: #d0949d; border: 1px solid rgba(199, 101, 115, 0.56); }
+.badge.nerf7  { background: rgba(197, 93, 107, 0.34);   color: #ce8a94; border: 1px solid rgba(197, 93, 107, 0.62); }
+.badge.nerf8  { background: rgba(196, 84, 100, 0.38);   color: #cd838e; border: 1px solid rgba(196, 84, 100, 0.68); }
+.badge.nerf9  { background: rgba(194, 76, 93, 0.42);   color: #cb7b86; border: 1px solid rgba(194, 76, 93, 0.74); }
+.badge.nerf10 { background: rgba(192, 83, 99, 0.32);   color: #e6bbc2; border: 1px solid rgba(192, 83, 99, 0.55); }
+
+/* Make digits readable on saturated backgrounds */
+.badge.buff1, .badge.buff2, .badge.buff3, .badge.buff4, .badge.buff5,
+.badge.buff6, .badge.buff7, .badge.buff8, .badge.buff9, .badge.buff10,
+.badge.nerf1, .badge.nerf2, .badge.nerf3, .badge.nerf4, .badge.nerf5,
+.badge.nerf6, .badge.nerf7, .badge.nerf8, .badge.nerf9, .badge.nerf10 {
+  text-shadow: 0 1px 2px var(--shadow-55);
+}
+
+/* Text-tag versions of BUFF/NERF (used by t() for non-numeric changes; pick mid tier) */
+.badge.buff-text { background: rgba(85, 205, 115, 0.10); color: #6da375; border: 1px solid rgba(85, 205, 115, 0.28); }
+.badge.nerf-text { background: rgba(199, 101, 115, 0.10);  color: #9a666d; border: 1px solid rgba(199, 101, 115, 0.28); }
+
+/* TYPO NOTE */
+/* WRONG-CHANGE LINE + CORRECTION NOTE — subtle gray */
+.wrong-line {
+  text-decoration: line-through;
+  text-decoration-color: rgba(214, 208, 195, 0.5);
+  text-decoration-thickness: 1px;
+  opacity: 0.55;
+}
+/* Bold values inside the note (prev value, prev patch) — same size as surrounding
+/* "(N days ago)" annotation — fainter so it reads as a side-note. */
+/* Patch version chip-link inside correction-note ("changed in <ver>"). */
+/* Patch version reference inside a note_box (i)-popup — plain solid underline,
+   not a link (popups aren't clickable). */
+.patch-ref {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* Badge-group inside correction-note: float to the right edge of the note
+   so it visually mirrors the row's main % (which sits in the right grid column). */
+/* IMAGE FALLBACK STYLE */
+.entity-icon img[alt]:not([src*="//"]) { background: var(--bg-panel-4); }
+img { max-width: 100%; }
+
+/* BACK TO TOP — fixed bottom-right */
+/* .back-to-top is styled together with .nav-back-arrow near the top of this file
+   (shared pixel-chevron gold/leather buttons). */
+
+/* AGHANIM'S SCEPTER / SHARD ROWS — light blue stripe (begins AT the icon, never
+   covers the tag column) + small icon prefix sitting in the gap between tag
+   and text columns (absolutely positioned so the row's text stays aligned
+   with all other rows in the list). */
+ul.changes li.aghanim-scepter,
+ul.changes li.aghanim-shard {
+  /* Two-layer stripe so it never sits behind the first-line tag yet still
+     covers wrapped lines (which flow full-width under the tag column):
+       1) FIRST line (~19px band): blue starts at 70px, clearing the tag.
+       2) lines 2+ (from 22px down): blue starts at the left edge.
+     For single-line rows layer 2 collapses to zero height (nothing below). */
+  background:
+    linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 22px,
+    linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 25px / 100% calc(100% - 28px);
+  border-radius: 3px;
+}
+/* Chip-less rows (bulleted description rows, rows of a NEW entity card) have no
+   tag column to clear — the stripe starts at the left edge on every line. */
+ul.changes li.aghanim-scepter.li-notag:not([class*="ability-row"]),
+ul.changes li.aghanim-shard.li-notag:not([class*="ability-row"]),
+.entity-block.is-new ul.changes li.aghanim-scepter:not([class*="ability-row"]),
+.entity-block.is-new ul.changes li.aghanim-shard:not([class*="ability-row"]) {
+  background: linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%);
+}

@@ -1,4 +1,5 @@
 """Warm pixel skin: controls use the pixel icons and the shared --px-* tokens, not the old cold ones."""
+from patch.css_bundle import read_css
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,7 +19,7 @@ def test_attack_and_talent_icons_are_the_game_ones():
 
 
 def test_skin_covers_menus_and_toolbar_controls():
-    css = _read("styles.css")
+    css = read_css()
     skin = css[css.index("WARM PIXEL SKIN"):]
     for sel in (".nav-submenu", ".hd-dd-menu", ".toolbar-panel", ".hs-attack-filter", ".cal-mode-select",
                 ".search-box input", ".ua-switch", ".cat-filter-btn"):

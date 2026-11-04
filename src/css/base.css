@@ -1,0 +1,202 @@
+/* ==========================================================================
+   02. RESET / BASE
+   ========================================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Always reserve scrollbar space so content doesn't shift when filtering reduces page height */
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-45) var(--bg-deep-60);
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-deep-60); }
+::-webkit-scrollbar-thumb {
+  background: var(--muted-45);
+  border-radius: 5px;
+  border: 2px solid var(--bg-deep-60);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(227, 196, 106, 0.7); }
+::-webkit-scrollbar-corner { background: var(--bg-deep-60); }
+/* …except pages that don't scroll at the page level, where the reserved gutter
+   just looks like an empty gap on the right:
+   - .main-page    single-screen index
+   - .calendar-page calendar (fits the screen)
+   - .creeps-page   Neutral Creeps / Neutral Abilities — the page is locked
+                    (body:has(.creeps-scroll){overflow:hidden}); the real
+                    scrollbar lives INSIDE the .creeps-scroll box, not here. */
+html:has(.main-page) { scrollbar-gutter: auto; }
+
+body {
+  background: var(--bg-page);
+  background-image:
+    radial-gradient(at 20% 0%, rgba(179, 45, 35, 0.08) 0, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(255, 100, 50, 0.05) 0, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  line-height: 1.55;
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+/* ── Patch pages: Valve-style featured.jpg texture behind a translucent
+   content "stage". The faceted texture shows at the page margins; the
+   centered content column sits on a dimmed dark panel so text stays readable.
+   (First pass — tune the alpha / borders / margin reveal to taste.) ── */
+body.patch-page {
+  /* Shorthand on purpose: also WIPES the base body rule's radial gradients
+     and their background-attachment:fixed (same repaint-on-scroll issue). */
+  background: #10100f;
+}
+/* Valve's patch-page texture (featured.jpg) as a FIXED UNDERLAY element, not
+   `background-attachment: fixed` on body. A fixed-attachment background can't
+   be scroll-blitted — with the translucent .cat-panels above it the browser
+   repainted the ENTIRE viewport every scroll frame (the "heavy scroll" on the
+   huge 7.41 page). A position:fixed pseudo gets its own compositor layer:
+   scrolling just re-composites on the GPU, zero repaints. Visual result is
+   identical (texture stays pinned while content scrolls over it). */
+body.patch-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  /* Valve's dota2.com "featured" texture, self-hosted as a progressive q80 JPEG: 108 KB instead of 437 KB from
+     the Steam CDN on every patch page; the grain survives (WebP smoothed it away) — audit 2026-10-05 */
+  background: #10100f url('icons/ui/bg/patch_bg.jpg') center top / cover no-repeat;
+}
+/* Container is transparent; patch-page depth comes from Valve-style section
+   bars and per-entity changelog slabs rather than one large outer card. */
+body.patch-page .container {
+  background: none;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 4px;
+}
+/* Category wrapper = one continuous Valve-style changelog slab below the
+   section title. This avoids "gaps" between neighbouring items/entities while
+   still letting the orange section bar sit on its own seam. */
+body.patch-page .cat-panel {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.38) 3.07%, rgba(32, 31, 29, 0.35) 88.06%);
+  border: 0;
+  border-left: 2px solid rgba(255, 255, 255, 0.065);
+  border-radius: 0;
+  box-shadow: 0 0 50px #000;
+  padding: 0 18px 20px;
+  margin: 0 0 34px;
+}
+/* Category header: flat orange-to-transparent strip, like Valve's section
+   title layer. No rounded card edge; the strip floats over the page texture. */
+body.patch-page h2.section {
+  margin: 0 -18px 12px;
+  padding: 12px 20px;
+  border-radius: 0;
+  border-left: 2px solid #ff5005;
+  background: linear-gradient(to right, #833312, rgba(131, 51, 18, 0));
+  box-shadow: 0 0 30px #000;
+  font-family: var(--font-j25);
+  font-size: 28px;
+  letter-spacing: 1.5px;
+}
+/* Entity blocks are rows inside the continuous category slab: no separate
+   background, only a very faint top seam like Valve's entity rows. */
+body.patch-page .entity-block {
+  background: none;
+  border-left: 0;
+  box-shadow: none;
+  padding: 0 22px 16px;
+  margin: 0;
+  border-top: 1px solid;
+  border-image: linear-gradient(to right, var(--line-bright), rgba(254, 247, 232, 0.09) 62%, rgba(254, 247, 232, 0.055)) 1;
+}
+body.patch-page h2.section + .entity-block {
+  border-top: 0;
+}
+/* While filtering, the first SURVIVING block in a section (marked by
+   refreshPatchFilterLayout) drops its top hairline too, so no orphan line sits
+   between the category header and the first kept entry. */
+body.patch-page .entity-block.first-visible {
+  border-top: 0;
+}
+/* Sub-section label (e.g. "Artifact Changes", "Enchantment Changes") inside
+   an item/neutral section. Keeps the top hairline but removes the bottom gap
+   so the first item under it isn't pushed far down. The first item block under
+   the sublabel also drops its hairline (mirrors the h2.section + .entity-block
+   rule so there's no orphan separator between the label and first entry). */
+body.patch-page .entity-block.label-only {
+  padding-bottom: 0;
+  /* the sub-category strip is its own coloured band now: the hairline above it was one line too many
+     (owner 2026-09-27, 7.38 "List of Neutral Enchantments") */
+  border-top: 0;
+}
+body.patch-page .entity-block.label-only + .entity-block {
+  border-top: 0;
+}
+body.patch-page .entity-block.label-only .plain-entity {
+  margin-bottom: 0;
+}
+body.patch-page .entity {
+  margin: 0 -22px 10px;
+  padding: 10px 22px 9px;
+  border-radius: 0;
+  background: transparent;
+  border-top: 0;
+  border-image: none;
+}
+/* Sub-category headers (plain_header: Major Mechanics, Wandering Waters, Map Objectives,
+   Terrain Changes, Artifact Changes …): a smaller, thinner version of the category strip
+   (h2.section) — orange left edge + fading band — so the sub-categories read as such. */
+body.patch-page .entity.plain-entity {
+  /* same left / right edges as the category strip (h2.section sits 18px further out) */
+  margin: 6px -40px 10px;
+  padding: 6px 20px 5px;
+  border-left: 2px solid rgba(255, 80, 5, 0.7);
+  background: linear-gradient(to right, rgba(131, 51, 18, 0.45), rgba(131, 51, 18, 0) 55%);
+}
+body.patch-page .entity.plain-entity .entity-name {
+  color: #f1e3d2;
+  font-size: 20px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+body.patch-page .entity-block > h4.subgroup,
+body.patch-page .entity-block > ul.changes,
+body.patch-page .entity-block > .ability-block,
+body.patch-page .entity-block > .components-box,
+body.patch-page .entity-block > .components-change,
+body.patch-page .entity-block > .provides-box,
+body.patch-page .entity-block > .properties-change {
+  margin-left: 0;
+  margin-right: 0;
+}
+/* Align the dynamics-cell row's right edge to the content edge (no overhang),
+   so the cells, the change-row %s, and every bordered block (build / cost /
+   provides / properties / ability-change) all share one right edge — uniform
+   widths, no per-box nudge needed. */
+body.patch-page .dyn-row-wrap {
+  margin-left: 0;
+  /* -19px = .patch-dynamics' own 4px side padding + the cards' 15px right overhang: the LAST CELL ends on
+     the item cards' right border (owner 2026-09-27) */
+  margin-right: -19px;
+}
+/* ul.changes carried a 6px right padding to compensate the old cell-row
+   overhang. The row now ends at the content edge, so drop it — otherwise the
+   change rows and the ability-row boxes (inside ul.changes) sit 6px narrower
+   than the components / provides / cost boxes. */
+body.patch-page ul.changes {
+  padding-right: 0;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 28px 80px;       /* flush top — content starts right under toolbar */
+}
+.container.calendar-page {
+  /* A clear gap below the nav, and a trimmed bottom padding so the calendar +
+     infographic still fit the viewport without a page scrollbar. */
+  padding-top: 20px;
+  padding-bottom: 12px;
+}
+

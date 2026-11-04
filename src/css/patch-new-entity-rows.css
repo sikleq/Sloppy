@@ -1,0 +1,457 @@
+/* A NEW entity is already flagged by its header label ("New Tier 3 Artifact");
+   an ability-row inside it must not repeat a folded NEW chip mid-description. */
+.entity-block.is-new ul.changes li[class*="ability-row"] > .row-text > .badge:first-child {
+  display: none;
+}
+.properties-change .property-text {
+  min-width: 0;
+  color: var(--text-main);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+/* ABILITY ORDER FLOW (Spirit Bear 7.40): bare square ability icons in one
+   horizontal row, old group → arrow → new group. Hover an icon for its name
+   (data-tooltip popup shared with .enchant-chip). Spans the full li width
+   below the row text (extras grid-column 1/-1). */
+.ability-order-flow {
+  /* Mirror .properties-change geometry (1fr | arrow | 1fr, 12px gap) so the
+     two icon panes line up flush with the stat-comparison panes above. */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+  /* full li width — same lane as correction-note/formula-table extras,
+     otherwise the row auto-places into the badge column (right edge)
+     and shoves the left tag off its row */
+  grid-column: 1 / -1;
+}
+.ability-order-flow .ao-arrow {
+  justify-self: center;
+}
+/* Each order group (old set / new set) sits in its own pane box —
+   same skin as .properties-pane. */
+.ability-order-flow .ao-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 8px 10px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+.ability-order-flow .ao-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(150, 146, 137, 0.4);
+  border-radius: 4px;
+  background: var(--bg-panel-2);
+  overflow: visible;          /* tooltip must escape the box */
+}
+.ability-order-flow .ao-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  display: block;
+  object-fit: cover;
+}
+/* New-in-this-patch ability — purple NEW ring */
+.ability-order-flow .ao-icon.is-new {
+  border-color: rgba(184, 127, 255, 0.85);
+  box-shadow: 0 0 6px rgba(184, 127, 255, 0.35);
+}
+/* Hidden/innate slot — dimmed icon, tooltip stays full-strength */
+.ability-order-flow .ao-icon.is-dim img {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+.ability-order-flow .ao-arrow {
+  color: var(--gold);
+  font-size: 18px;
+  margin: 0 4px;
+  flex: 0 0 auto;
+}
+/* Tooltip popup — same recipe as .enchant-chip[data-tooltip] */
+.ao-icon[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--bg-deep-97);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 400;
+  padding: 6px 10px;
+  border: 1px solid var(--muted-35);
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+  transition: opacity 0.12s 0.05s;
+  box-shadow: 0 4px 18px var(--shadow-45);
+}
+.ao-icon[data-tooltip]:hover::after {
+  opacity: 1;
+}
+.properties-change .property-badge {
+  justify-self: end;
+  white-space: nowrap;
+  /* Pane has padding-right: 14px: the b() % bands keep it, as far from the right border as the tags are
+     from the left one (owner 2026-09-27: 2px from the border looked cramped). */
+  margin-right: 0;
+}
+.properties-change .property-row-empty {
+  min-height: 1.5em;
+}
+.properties-change .property-extra {
+  margin-top: -2px;             /* sit close to the row above; subgrid row-gap
+                                   already provides a small natural separation */
+}
+
+/* SUBGROUPS — same colour as body text / ability titles, not blue.
+   Tormentor / Roshan / Wisdom Shrines / Health Restoration / Lifesteal /
+   Miscellaneous / Talents etc. all read as section dividers, not links. */
+h4.subgroup {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 16px 0 4px 0;      /* aligned with entity-block left edge */
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid;
+  border-image: linear-gradient(to right, var(--bg-panel-4) 0%, var(--bg-panel-4) 61%, transparent 71%) 1;
+  padding-bottom: 4px;
+}
+/* ABILITY BLOCK — icon (left, full-height) + title (top-right) + changes (below title) */
+.ability-block {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  column-gap: 12px;
+  align-items: start;
+  margin: 12px 0 8px 0;
+}
+/* A card under an ability starts at the icon's left edge, on the vertical of the block's other boxes, the width of the
+   icon column its own (owner 2026-11-04). A thin line goes from the icon down into it: drawAbilityChangeConnectors */
+.ability-block > .ability-change,
+.ability-block > .properties-change {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.ability-block > .ability-icon-wrap {
+  grid-column: 1;
+  grid-row: 1 / span 99;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  align-self: start;
+}
+.ability-block > .ability-icon-wrap > .ability-icon-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
+}
+/* Several abilities with the same change in one block (owner 2026-10-30, 7.37b Quas/Wex/Exort/Invoke): the icons
+   share the usual 48px square (positions inline, patch/ability_group.py) so the rows keep their place; each grows on
+   hover with its name above it, as .ability-chip */
+.ability-icon-stack > .stack-icon { position: absolute; display: block; border-radius: 4px; }
+.ability-icon-stack > .stack-icon > .ability-icon-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  object-fit: cover;
+  background: #111110;
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 1px 4px var(--shadow-40);
+  transition: transform 0.12s ease;
+  transform-origin: center;
+}
+.ability-icon-stack > .stack-icon:hover { z-index: 101 !important; }
+.ability-icon-stack > .stack-icon:hover > .ability-icon-img {
+  transform: scale(2);
+  box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
+}
+.ability-icon-stack > .stack-icon[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(150% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--bg-deep-97);
+  color: var(--text-main);
+  font-size: 12px;
+  padding: 5px 9px;
+  border: 1px solid var(--muted-35);
+  border-radius: 6px;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s 0.05s;
+  box-shadow: 0 4px 18px var(--shadow-45);
+  display: none;              /* not visibility: a hidden box near the right edge still widens the page */
+}
+.ability-icon-stack > .stack-icon[data-tooltip]:hover::after { display: block; visibility: visible; opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .ability-icon-stack > .stack-icon > .ability-icon-img { transition: none; } }
+/* A facet's ability without art of its own (7.38b Venomous Volley): the facet's gradient + icon, as a facet block's */
+.ability-block > .ability-icon-wrap > .facet-ability-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background-size: cover;
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
+}
+.facet-ability-icon > img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px var(--shadow-55));
+}
+/* Facet block — same 48px geometry as ability(), but the icon-wrap renders
+   the facet's gradient color + the generic facet icon (extracted from
+   pak01_dir.vpk, white silhouette on transparent) overlaid on top.
+   Hero h4 column is shared with .ability-title so facet names align with
+   ability names. */
+.ability-block.facet-block > .facet-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* A facet's talent row (li(facet=…)): the facet as a small square before the text, as its header's icon; the name
+   shows on hover (owner 2026-10-27). */
+.facet-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  margin-right: 4px;
+  border-radius: 3px;
+  background-size: cover;
+  vertical-align: -2px;               /* the same top and height as the row's tag chip (owner 2026-10-27) */
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18);
+}
+.facet-chip > img {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px var(--shadow-55));
+}
+.facet-chip[data-tooltip]::after,
+.ability-chip[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--bg-deep-97);
+  color: var(--text-main);
+  font-size: 12px;
+  padding: 5px 9px;
+  border: 1px solid var(--muted-35);
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+  transition: opacity 0.12s 0.05s;
+  box-shadow: 0 4px 18px var(--shadow-45);
+}
+.facet-chip[data-tooltip]:hover::after,
+.ability-chip[data-tooltip]:hover::after {
+  opacity: 1;
+}
+/* a transparent name still has width: by the right edge it widened the phone page (7.38, 7.40, 7.41 Lifesteal tables) */
+.facet-chip[data-tooltip]:not(:hover)::after,
+.ability-chip[data-tooltip]:not(:hover)::after { display: none; }
+/* a facet row's ability ("Defense Matrix: …"): its icon as a square the size of the facet chip in place of the
+   name, the name on hover (owner 2026-10-27) */
+.ability-chip {
+  position: relative;
+  display: inline-flex;
+  width: 19px;
+  height: 19px;
+  margin-right: 5px;
+  vertical-align: -4px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--muted-35);
+}
+.ability-chip > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  object-fit: cover;
+  /* an icon with a transparent background (7.40 Bounty Rune, Water, Wisdom, Illusion) sits on a dark square of its
+     own: grown on hover, the text behind no longer shows through it (owner 2026-10-28) */
+  background: var(--bg-deep-97);
+}
+/* a reworked mechanic's list of abilities: rows under the text, icons in place of the names, the abilities with the
+   same sentence in one row (owner 2026-10-28, 7.40 Invulnerability Targeting) */
+/* a table like every table of the site: thin translucent lines between the rows and between icons | sentence; the
+   icons centred in their cell, the sentence reads from the left like a label */
+.mech-abils {
+  display: grid;
+  grid-template-columns: fit-content(45%) 1fr;
+  margin: 6px 0 2px;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+.mech-abil-row { display: contents; }
+.mech-abil-row > span { padding: 5px 10px; border-top: 1px solid var(--line-soft); }
+.mech-abil-row:first-child > span { border-top: 0; }
+.mech-abil-icons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  gap: 4px;
+  border-right: 1px solid var(--line-soft);
+}
+.mech-abil-text { display: flex; align-items: center; flex-wrap: wrap; column-gap: 5px; line-height: 21px; }
+.mech-abil-only > .mech-abil-icons,                     /* the names alone (7.41 "Affected spells") */
+.mech-abil-line { grid-column: 1 / -1; border-right: 0; line-height: 1.45; }  /* a list without abilities */
+.mech-abil-icons .ability-chip,
+.mech-icons .ability-chip { margin-right: 0; vertical-align: 0; }
+/* a list of abilities in columns: the sentence or the condition ("Always", "With Aghanim's Scepter") as the label,
+   the icons centred after it (owner 2026-10-28) */
+.mech-abils.mech-cols-icons { grid-template-columns: fit-content(50%) minmax(0, 1fr); }
+/* Valve's "Hero: Ability (how)" lists (7.37 Breakability, Teleport Classification): the hero | the ability (icon or the
+   facet's coloured chip + its name) | how — many 7.37 innates have only the general innate icon (owner 2026-10-30) */
+.mech-abils.mech-cols-hero2 { grid-template-columns: fit-content(40%) minmax(0, 1fr); }
+/* a short list with Valve's words on how: hero | ability | details (owner 2026-10-30, 7.37 "Partially Disabled") */
+.mech-abils.mech-cols-hero3 { grid-template-columns: fit-content(30%) fit-content(35%) minmax(0, 1fr); }/* a long list in two pairs of columns (owner 2026-10-30: "в 2 столбца можно, а то длинный список") */
+.mech-abils.mech-cols-hero4 { grid-template-columns: fit-content(25%) minmax(0, 1fr) fit-content(25%) minmax(0, 1fr); }
+.mech-cols-hero4 > .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(2) { border-right: 2px solid var(--line-soft); }
+.mech-cols-hero > .mech-abil-row > .mech-cell { justify-content: flex-start; text-align: left; min-width: 0; }
+/* the row's own words lead the table; its items one line, then the heroes (owner 2026-10-30) */
+.mech-cols-hero > .mech-abil-row > .mech-table-lead { color: var(--text-main); }
+.mech-abil-set { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
+.mech-hero-item > img { object-fit: contain; }    /* an item / Twin Gates in the hero column (owner 2026-10-30) */
+.mech-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+/* a facet's chip grows on hover with its name above, as an ability's (owner 2026-10-30) */
+.mech-abils .facet-chip { position: relative; transition: transform 0.12s ease; }
+.mech-abils .facet-chip:hover { z-index: 101; transform: scale(2.6);
+  box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55); }
+.mech-abils .facet-chip[data-tooltip]:hover::after { transform: translateX(-50%) scale(0.385); transform-origin: bottom center; }
+@media (prefers-reduced-motion: reduce) { .mech-abils .facet-chip { transition: none; } }
+.mech-hero { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.mech-hero > img { width: 32px; height: 18px; object-fit: cover; border-radius: 2px; }
+.mech-cols-hero .mech-abil-name { white-space: nowrap; }
+.mech-none { color: var(--text-dim); }
+.mech-cols-hero .ability-chip, .mech-cols-hero .facet-chip { margin-right: 2px; flex: none; }
+.mech-cols-hero > .mech-abil-row > .mech-table-note { justify-content: flex-start; text-align: left; color: var(--text-dim, #969289); }
+/* a phone: one pair of columns, long names wrap inside their cell (7.37 "Fortune Favors the Bold" ran past it) — after
+   the rules above, which keep names on one line on a wide screen */
+@media (max-width: 700px) {
+  .mech-abils.mech-cols-hero2, .mech-abils.mech-cols-hero4 { grid-template-columns: fit-content(45%) minmax(0, 1fr); }
+  /* hero | ability, the details on a line of their own under them: three columns at 375px squeezed the names into
+     each other and broke "Phantas-magoria" (visual check 2026-10-30) */
+  .mech-abils.mech-cols-hero3 { grid-template-columns: fit-content(50%) minmax(0, 1fr); }
+  .mech-cols-hero3 > .mech-head > .mech-cell:nth-child(3) { display: none; }
+  .mech-cols-hero3 > .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(3) { grid-column: 1 / -1; border-top: 0;
+    padding-top: 0; }
+  .mech-cols-hero3 > .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(3):empty { display: none; }
+  .mech-abils.mech-cols-hero3 .mech-abil-name, .mech-abils.mech-cols-hero3 .mech-hero { overflow-wrap: normal; }
+  .mech-cols-hero4 > .mech-head > .mech-cell:nth-child(n+3) { display: none; }
+  .mech-cols-hero .mech-abil-name, .mech-cols-hero .mech-hero, .mech-cols-hero .mech-item {
+    white-space: normal; min-width: 0; overflow-wrap: anywhere; }
+  .mech-cols-hero .mech-abil-set, .mech-cols-hero .mech-item { min-width: 0; max-width: 100%; }
+  .mech-cols-hero .mech-hero > img { flex: none; width: 24px; height: 14px; }
+  .mech-cols-hero .mech-hero { overflow-wrap: normal; gap: 4px; }   /* a hero's name wraps at spaces only ("Bloodseeker") */
+}
+/* a list's closing note, in the row's own line and its colour (owner 2026-10-28: "не надо серым") */
+.mech-row-note { color: inherit; }
+/* cells of a table with columns: a list with its examples (7.38 Lifesteal sources), mech_table (Lifesteal rules) */
+.mech-abils.mech-cols-ex { grid-template-columns: 1fr fit-content(40%); }
+.mech-abils.mech-cols-3 { grid-template-columns: fit-content(28%) minmax(0, 1fr) fit-content(28%); }
+/* before / after the patch (mech_before_after): the two columns one width (7.41 Health Restoration) */
+.mech-abils.mech-cols-3.mech-wide-last { grid-template-columns: fit-content(28%) fit-content(20%) minmax(0, 1fr); }
+.mech-abils.mech-cols-3.mech-ba { grid-template-columns: fit-content(30%) minmax(0, 1fr) minmax(0, 1fr); }
+/* two tables side by side, their rows level (subgrid): 7.38 Lifesteal damage types | Against non-heroes */
+.mech-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) fit-content(30%);
+  grid-template-rows: repeat(var(--mech-rows), auto);
+  column-gap: 12px;
+  margin: 6px 0 2px;
+}
+.mech-pair > .mech-abils { grid-row: 1 / -1; grid-template-rows: subgrid; margin: 0; }
+.mech-abils.mech-cols-1 { grid-template-columns: auto; }
+.mech-abils.mech-cols-4 { grid-template-columns: fit-content(22%) minmax(0, 1fr) fit-content(20%) fit-content(22%); }
+.mech-abils.mech-cols-2 { grid-template-columns: fit-content(35%) minmax(0, 1fr); }
+.mech-abils.mech-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }   /* a line of values (7.38 Lotus Pools) */
+.mech-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  line-height: 1.45;
+  border-right: 1px solid var(--line-soft);
+}
+.mech-cell:last-child { border-right: 0; }
+.mech-cell.mech-label { justify-content: flex-start; text-align: left; column-gap: 5px; }
+/* the header row a shade darker than the table, to stand out from it (owner 2026-10-28) */
+.mech-head > .mech-cell {
+  color: var(--text-dim, #969289);
+  font-size: 12px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  background: var(--shadow-28);
+}
+.mech-head:first-child > .mech-cell:first-child { border-top-left-radius: 5px; }
+.mech-head:first-child > .mech-cell:last-child { border-top-right-radius: 5px; }
+.mech-ex-name { white-space: nowrap; }
+@media (max-width: 600px) { .mech-abil-row > span { padding-left: 6px; padding-right: 6px; } }
+/* a row with its table stands as a box of its own (page.py), with air above it */
+ul.changes li.mech-desc.mech-first + li.mech-desc.mech-first,
+ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; }
+/* an ability's square grows on hover to be made out (owner 2026-10-28); its name moves up above the grown icon */
+.ability-chip > img { transition: transform 0.12s ease; transform-origin: center; }
+.ability-chip:hover { z-index: 101; }
+.ability-chip:hover > img {
+  position: relative;
+  z-index: 1;
+  transform: scale(2.6);
+  box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
+}
+.ability-chip[data-tooltip]::after { bottom: calc(100% + 22px); }
+/* "[Wex] – …" in a card row; several abilities saying one thing stand side by side (owner 2026-10-30) */
+.acr-lead-chips .ability-chip + .ability-chip { margin-left: -2px; }
+/* a card text row about an Aghanim's upgrade: its stripe reaches a little left of the text, the text and icon start
+   where the plain rows' do, the glyph closes the text (owner 2026-10-30: "в конце строки … и выровнять строки") */
+.ability-change-row.acr-aghs { margin-left: -6px; padding-left: 6px; }
+.ability-change-row.acr-aghs .aghanim-marker { margin: 0 0 0 6px; vertical-align: -2px; }
+/* a folded text's icons don't grow: the fold would cut the grown icon and its name (owner 2026-10-30); a click opens
+   the text, and there they grow */
+.acr-fold:not(.is-open) .acr-fold-body .ability-chip:hover > img { transform: none; box-shadow: none; }
+.acr-fold:not(.is-open) .acr-fold-body .ability-chip[data-tooltip]::after,
+.acr-fold:not(.is-open) .acr-fold-body .ability-chip[data-tooltip]::before { display: none; }
+@media (prefers-reduced-motion: reduce) { .ability-chip > img { transition: none; } }
+.facet-icon-overlay {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px var(--shadow-55));
+  opacity: 0.95;
+}

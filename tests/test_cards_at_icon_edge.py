@@ -1,6 +1,7 @@
 """Owner 2026-11-04: a card under an ability starts at the icon's left edge, on the vertical of the block's other boxes
 ("There is only a single Tormentor…"), clear of the icon; a thin solid line goes from the icon's bottom down into it
 (variant 1 of the mock, instead of a dashed line round the icon)."""
+from patch.css_bundle import read_css
 from patch.js_bundle import read_js
 import os
 import re
@@ -14,20 +15,20 @@ def _read(*path):
 
 
 def test_cards_span_the_icon_column():
-    css = _read("styles.css")
+    css = read_css()
     rule = re.search(r"\.ability-block > \.ability-change,\s*\.ability-block > \.properties-change \{([^}]*)\}", css)
     assert rule and "grid-column: 1 / -1" in rule.group(1)
 
 
 def test_rows_of_the_block_stay_in_their_column():
     # after a card the grid would put a row without a column under the icon
-    css = _read("styles.css")
+    css = read_css()
     for selector in (r"\.ability-block > ul\.changes", r"\.ability-block > ul\.subnotes"):
         assert re.search(selector + r" \{\s*grid-column: 2;", css), selector
 
 
 def test_the_card_keeps_clear_of_the_icon():
-    css = _read("styles.css")
+    css = read_css()
     for selector in (r"\.ability-change-block \.ability-change\.unified-panes \{",
                      r"\.ability-block > \.under-rows-caption \+ \.ability-change \{[^}]*",
                      r"\.ability-block > \.under-rows-connector \+ \.ability-change \{[^}]*"):
@@ -44,7 +45,7 @@ def test_the_line_goes_straight_from_the_icon_into_the_card():
 
 
 def test_the_line_is_solid_and_styled_in_one_place():
-    rule = re.search(r"\.ability-change-connector path \{([^}]*)\}", _read("styles.css"))
+    rule = re.search(r"\.ability-change-connector path \{([^}]*)\}", read_css())
     assert rule and "stroke:" in rule.group(1) and "dash" not in rule.group(1)
     for path in (("patch", "cards_ability_change.py"), ("patch", "elements.py"), ("patch", "cards_aghs.py")):
         source = _read(*path)
@@ -53,12 +54,12 @@ def test_the_line_is_solid_and_styled_in_one_place():
 
 
 def test_the_brewling_tree_keeps_its_own_dashed_line():
-    assert "stroke-dasharray: 4 3" in re.search(r"\.brewling-connector path \{([^}]*)\}", _read("styles.css")).group(1)
+    assert "stroke-dasharray: 4 3" in re.search(r"\.brewling-connector path \{([^}]*)\}", read_css()).group(1)
 
 
 def test_no_card_hangs_left_of_the_icon():
     # item cards hung 15px left of the item's icon (owner 2026-11-04: "нет единого положения карточек")
-    css = _read("styles.css")
+    css = read_css()
     assert not re.search(r"(?:components-change|properties-change|ench-change|ability-box-tagged)[^{}]*\{[^}]*margin-left: -15px", css)
     assert not re.search(r"(?:ability-row|item-cost-box|provides-box|components-box)[^{}]*\{[^}]*margin-left: -15px", css)
 
@@ -97,7 +98,7 @@ def test_boxes_under_an_item_or_beside_rows_stay_as_they_are():
 
 
 def test_the_boxes_span_the_icon_column_and_the_line_reaches_them():
-    rule = re.search(r"\.ability-block > ul\.ability-card-rows \{([^}]*)\}", _read("styles.css"))
+    rule = re.search(r"\.ability-block > ul\.ability-card-rows \{([^}]*)\}", read_css())
     assert rule and "grid-column: 1 / -1" in rule.group(1)
     assert "'ability-card-rows'" in read_js()
 

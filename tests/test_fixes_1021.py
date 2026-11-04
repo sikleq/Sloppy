@@ -1,4 +1,5 @@
 """Generator fixes of 2026-10-21 (owner's 7.41 review)."""
+from patch.css_bundle import read_css
 from patch.js_bundle import read_js
 from patch import elements as el
 from patch import cards_ability_change
@@ -86,7 +87,7 @@ def test_bug_note_is_a_bug_box_not_a_question_mark():
     from pathlib import Path
     root = Path(__file__).resolve().parents[1]
     assert (root / "icons" / "ui" / "bug.png").exists()
-    assert "url('icons/ui/bug.png')" in (root / "styles.css").read_text(encoding="utf-8")
+    assert "url('icons/ui/bug.png')" in read_css()
 
 
 def test_a_brand_new_talent_is_gold_but_the_row_stays_swap():

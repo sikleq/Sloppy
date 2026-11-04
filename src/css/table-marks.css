@@ -1,0 +1,431 @@
+/* In a marked row the n/a dots STAY visible — they carry meaning (the item
+   didn't exist in those patches), unlike the decorative empty diamonds (below)
+   which drop out. Bump the alpha a touch so the faint dot reads on the gold band. */
+.heroes-dyn-table tbody tr.row-marked td.hd-cell.hd-absent::after,
+.heroes-dyn-table tbody tr.row-marked td.ha::after { background: rgba(164, 159, 149, 0.42); }
+/* Short-alias sizing: td.he / td.ha need the same width/box-sizing as td.hd-cell
+   (defined earlier at ~5963) so the column grid stays consistent. */
+.heroes-dyn-table th.hd-patch,
+.heroes-dyn-table td.he,
+.heroes-dyn-table td.ha {
+  width: var(--hd-col-w, 40px);
+  min-width: var(--hd-col-w, 40px);
+  max-width: var(--hd-col-w, 40px);
+  box-sizing: border-box;
+}
+.heroes-dyn-table td.he,
+.heroes-dyn-table td.ha { text-align: center; vertical-align: middle; padding: 2px; line-height: 0; }
+/* Buff/nerf-only: a touched cell with no buff/nerf reads as an EMPTY cell —
+   flat fill, no glassy pill, no hover pop. Hover still fires the tooltip. */
+.heroes-dyn-table .dyn-cell-wrap.bn-empty .dyn-cell,
+.heroes-dyn-table .dyn-cell-wrap.bn-empty:hover .dyn-cell {
+  background: rgba(14, 14, 13, 0.72);
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+/* RULE (all tables): the gold row-mark must read as ONE uniform band + frame
+   (like Neutral Creeps / Abilities), not per-cell boxes. The decorative empty
+   diamonds otherwise sit on the gold tint as separate squares — drop their fill
+   inside a marked row so the tint shows through uniformly (coloured pills stay,
+   like icons do on the creeps marked row). */
+.heroes-dyn-table tbody tr.row-marked td.hd-cell.hd-empty::after,
+.heroes-dyn-table tbody tr.row-marked td.he::after { background: transparent; }
+/* RULE (all tables): a hovered/zoomed dyn-cell must sit ABOVE the sticky header,
+   never behind it. The wrap is position:relative; bumping its z-index over the
+   header (z:50) inside the .creeps-scroll stacking context lifts the 2.5× pop and
+   its tooltip clear of the pinned header for top rows. */
+.heroes-dyn-table .dyn-cell-wrap:hover { z-index: 60; }
+/* Reserve room below the grid for the bottom row's 2.5× hover-pop. A scaled
+   element's box counts toward the scroll container's scrollable overflow, so
+   when the list is filtered short (no scrollbar) the bottom-row pop extends
+   past the content and spawns a spurious vertical scrollbar on hover. The pop
+   grows into this padding instead of past the scrollable edge. (~21px pop
+   overflow for the 28px→70px cell.) */
+.creeps-scroll:has(.heroes-dyn-table) { padding-bottom: 24px; }
+/* Same hover-pop room for AoE Increase: with a short filtered roster the last
+   visible ability icon must grow upward inside the scroll box instead of into
+   the horizontal scrollbar / bottom clip edge. */
+.creeps-scroll:has(.aoe-table) { padding-bottom: 24px; }
+/* RULE (all tables): use the shared .creeps-scroll shell AS-IS — NO per-page
+   left gutter. The subnav (10px), blurb/toolbar (28px) and table (flush) keep
+   the SAME left positions as Neutral Creeps / Abilities so every Materials page
+   lines up identically. (An earlier .hd-page padding-left shifted this page's
+   subnav + table right of the others — removed.) */
+.creeps-table .creep-icon-cell img {
+  width: 48px;
+  height: 27px;
+  /* Override the global `img { max-width: 100% }` rule — otherwise the
+     auto-sized icon column (its <th> is empty, so it starts ~0px wide)
+     caps the image width to the collapsed cell, leaving a 3px-wide
+     vertical sliver. max-width: none lets the explicit 48px win and the
+     column then grows to fit. */
+  max-width: none;
+  object-fit: cover;
+  border-radius: 4px;
+  background: rgba(150, 146, 137, 0.15);
+  display: inline-block;
+  vertical-align: middle;
+  /* Depth treatment — the bare crops read as flat rectangles otherwise.
+     A 1px cool rim + soft drop shadow + inner top highlight give the
+     portrait a "card" dimensionality matching the dark-glass nav. */
+  border: 1px solid var(--blue-18);
+  box-shadow:
+    0 1px 3px var(--shadow-45),
+    inset 0 1px 0 var(--white-12);
+  /* Scale symmetrically about the exact center so the zoomed portrait
+     stays vertically aligned with the unit name beside it. */
+  transform-origin: center center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.creeps-table .creep-icon-cell img:hover {
+  transform: scale(1.6);
+  position: relative;
+  z-index: 30;            /* above sticky header + neighbours */
+  background: #111110;    /* opaque under the portrait */
+  box-shadow:
+    0 3px 8px var(--shadow-60),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px var(--blue-40);
+}
+/* Last row: grow the zoom UPWARD so the enlarged portrait isn't clipped by the
+   scroll box / hidden under the horizontal scrollbar at the bottom edge.
+   (The .creeps-scroll overflow context can't be widened without breaking the
+   sticky header, so we steer the transform instead.) */
+.creeps-table tbody tr:last-child .creep-icon-cell img,
+.creeps-table tbody tr:last-child .abil-ico,
+.creeps-table tbody tr:last-child .abil-ico-wrap {
+  transform-origin: center bottom;
+}
+/* Vertical section separators — a brighter right border grouping the
+   table into identity | survivability | offense | economy | utility. */
+/* Category boundary — left border on the first column of each super-category
+   (always a Standard column, so it shows in both views). */
+.creeps-table th.col-sep,
+.creeps-table td.col-sep {
+  border-left: 2px solid var(--blue-30);
+}
+/* Sortable headers — click to sort. The ▾ indicator brightens to ▲/▼ on
+   the active column. */
+.creeps-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.creeps-table th.sortable:hover {
+  background: #252422;
+}
+/* Sort indicator — thin line arrows (↕ / ↑ / ↓) instead of heavy filled
+   triangles, for a more refined look. Dim until the column is active. */
+/* Sort indicator centering — shared by Neutral Creeps, Unit Abilities and
+   Mana Items so all three behave identically. The bare ↕/↑/↓ glyphs hang
+   low on the baseline; vertical-align: middle + a small upward nudge pulls
+   them onto the header text's optical centre. */
+/* Label + arrow both vertical-align:middle so they share ONE midline —
+   otherwise the uppercase label aligns to its baseline while the arrow
+   centres on x-height, dropping it below the letters. */
+.creeps-table th.sortable .th-label,
+.mr-table thead th.sortable .th-label {
+  vertical-align: middle;
+}
+.creeps-table th.sortable .sort-ind,
+.mr-table thead th.sortable .sort-ind {
+  margin-left: 4px;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  position: relative;
+  /* Centered against the cap-height of large table headers. */
+  top: -0.04em;
+  width: 11px;
+  height: 11px;
+  /* Coloured via background-color through a PNG mask — neutral default
+     greyish, gold when the column is actively sorted (site accent var(--gold)). */
+  background-color: rgba(214, 208, 195, 0.55);
+  -webkit-mask: url('icons/sort/sort.png') center / contain no-repeat;
+  mask: url('icons/sort/sort.png') center / contain no-repeat;
+}
+.creeps-table th.sortable .sort-ind::after,
+.mr-table thead th.sortable .sort-ind::after { content: none; }
+.creeps-table th.sort-desc .sort-ind,
+.creeps-table th.sort-asc .sort-ind,
+.mr-table thead th.sort-desc .sort-ind,
+.mr-table thead th.sort-asc .sort-ind {
+  background-color: var(--gold);
+}
+.creeps-table th.sort-desc .th-label,
+.creeps-table th.sort-asc .th-label,
+.mr-table thead th.sort-desc .th-label,
+.mr-table thead th.sort-asc .th-label {
+  color: var(--gold);
+}
+.creeps-table th.sort-desc .sort-ind,
+.mr-table thead th.sort-desc .sort-ind {
+  -webkit-mask-image: url('icons/sort/sort-down.png');
+  mask-image: url('icons/sort/sort-down.png');
+}
+.creeps-table th.sort-asc .sort-ind,
+.mr-table thead th.sort-asc .sort-ind {
+  -webkit-mask-image: url('icons/sort/sort-up.png');
+  mask-image: url('icons/sort/sort-up.png');
+}
+/* Stat cells with a recorded change history get a dotted underline cue +
+   help cursor, hinting that hover shows the changelog. */
+.creeps-table td.has-history,
+.mr-table td.has-history {
+  cursor: help;
+  text-decoration: underline dotted rgba(213, 207, 195, 0.5);
+  text-underline-offset: 3px;
+}
+/* Hero Stats STR / AGI / INT / Attr headers: the same cue on the label (the header stays click-to-sort) */
+.mr-table thead th.has-history .th-label {
+  text-decoration: underline dotted rgba(213, 207, 195, 0.5);
+  text-underline-offset: 3px;
+}
+/* Per-stat changelog tooltip — body-level (escapes the .creeps-scroll
+   overflow clip), positioned by scripts.js above the hovered cell.
+   font-size matches the table cells (11.5px). */
+.stat-hist-tip {
+  position: fixed;
+  z-index: 1100;
+  pointer-events: none;
+  display: none;
+  min-width: 180px;
+  padding: 7px 11px;
+  background: var(--bg-deep-97);
+  border: 1px solid var(--blue-35);
+  border-radius: 6px;
+  box-shadow: 0 4px 18px var(--shadow-50);
+  font-size: 11.5px;
+  color: var(--text-main);
+  text-align: center;
+  /* Tall histories (e.g. Guardian Greaves) would overflow the viewport.
+     Cap height and let the tooltip scroll internally; JS clamps the top so
+     the box never runs off-screen. pointer-events stays none so the wheel
+     scrolls the page, not the tip — fine, the cap keeps it readable. */
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+}
+.stat-hist-tip.is-visible { display: block; }
+/* Net first→today summary pinned at the top of the tooltip, divider below. */
+.stat-hist-tip .stat-net {
+  padding: 1px 0 6px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid var(--blue-30);
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.stat-hist-tip .stat-net-label {
+  color: var(--text-dim);
+  font-size: 0.82em;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-right: 5px;
+}
+.stat-hist-tip .chg-patch { font-weight: 600; color: var(--gold); }
+.stat-hist-tip .chg-date { color: var(--text-dim); font-size: 10px; }
+.stat-hist-tip .stat-chg-line {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: left;
+  margin-top: 1px;
+}
+/* one row per change (2026-10-25): patch | old → new % | date in aligned columns; a thin line between patches and
+   faint see-through vertical lines between the columns (owner: "слабенькие полупрозрачные вертикальные линии") */
+.stat-hist-tip .stat-chg-grid { display: grid; grid-template-columns: auto 1fr auto;
+  align-items: stretch; font-variant-numeric: tabular-nums; }
+.stat-hist-tip .stat-chg-grid > span { padding: 2px 7px; }
+.stat-hist-tip .stat-chg-grid > .chg-patch { padding-left: 0; }
+.stat-hist-tip .stat-chg-grid > .chg-date { padding-right: 0; line-height: 1.6; }
+.stat-hist-tip .stat-chg-grid > .stat-chg-line,
+.stat-hist-tip .stat-chg-grid > .chg-date { border-left: 1px solid rgba(150, 146, 137, 0.12); }
+.stat-hist-tip .stat-chg-grid > .grp-start { border-top: 1px solid rgba(150, 146, 137, 0.14); }
+.stat-hist-tip .stat-chg-grid > .chg-patch { text-align: left; }
+.stat-hist-tip .stat-chg-grid > .chg-date { text-align: right; }
+.stat-hist-tip .stat-chg-grid > .stat-chg-line { margin-top: 0; }
+.stat-hist-tip .chg-label { color: #bdb8ad; }
+.stat-hist-tip .chg-cycle { color: var(--text-main); padding: 0 3px; }
+/* Ability tags — same palette as the changelog NEW/DEL badges. */
+.stat-hist-tip .chg-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid;
+  border-radius: 4px;
+  vertical-align: 1px;
+}
+.stat-hist-tip .chg-tag.added    { color: #9a7f4d; background: rgba(220,175,95,0.06); border-color: rgba(220,175,95,0.22); }
+.stat-hist-tip .chg-tag.removed  { color: #a86060; background: rgba(180,70,70,0.07); border-color: rgba(180,70,70,0.25); }
+.stat-hist-tip .chg-tag.replaced { color: #7f9cc4; background: rgba(120,150,200,0.07); border-color: rgba(120,150,200,0.25); }
+/* % delta — muted green for an increase (stat up = buff), muted red for
+   a decrease. Less saturated than the changelog badges to read softer in
+   the tooltip. */
+.stat-hist-tip .stat-pct { font-weight: 600; margin-left: 7px; }
+.stat-hist-tip .stat-pct.up   { color: #7fb88c; }
+.stat-hist-tip .stat-pct.down { color: #cf8b8b; }
+.stat-hist-tip .stat-pct.flat { color: var(--text-dim); }
+/* Per-column value tints. */
+.creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
+.creeps-table td.col-mp_regen { color: #6fc3ec; }   /* light blue (голубоватый) */
+.mr-table.hs-table td.hs-col-hpr { color: #9ae66e; }
+.mr-table.hs-table td.hs-col-mpr { color: #6fc3ec; }
+.creeps-table td.col-hp_regen.regen-zero,
+.mr-table.hs-table td.hs-col-hpr.regen-zero { color: rgba(154, 230, 110, 0.42); }
+.creeps-table td.col-mp_regen.regen-zero,
+.mr-table.hs-table td.hs-col-mpr.regen-zero { color: rgba(111, 195, 236, 0.42); }
+.creeps-table td.col-gold, .us-gold .us-v, .camp-table .camp-gold { color: #e3b341; }   /* gold (золотой) */
+.creeps-table td.col-xp, .us-xp .us-v, .camp-table .camp-xp { color: #8bb8d6; }   /* dusty blue (пыльно-голубой) */
+/* Attack-type value colors. */
+.creeps-table td.atk-basic    { color: #56d364; }   /* "Обычный" — green */
+.creeps-table td.atk-pierce   { color: #b18cd9; }   /* "Проникающий" — muted purple */
+/* Tier-break: thicker top border between level groups (Ур. changes). */
+.creeps-table tr.tier-break td {
+  border-top: 2px solid rgba(213, 207, 195, 0.55);
+}
+/* "Copied" toast — fixed-positioned near the clicked icon, fades in
+   quickly then drifts up and out. JS positions it and toggles
+   .is-visible; the transition handles the fade + lift. */
+.copy-toast {
+  position: fixed;
+  transform: translate(-50%, -100%) translateY(4px);
+  z-index: 1100;
+  pointer-events: none;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-bright);
+  background: rgba(17, 16, 16, 0.92);
+  border: 1px solid var(--blue-35);
+  border-radius: 5px;
+  box-shadow: 0 4px 14px var(--shadow-50);
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.35s ease;
+}
+.copy-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -100%) translateY(-4px);
+}
+.creeps-table thead th {
+  position: sticky;
+  top: 0;                /* sticky to the scroll box (which pins under the nav) */
+  z-index: 50;           /* above body cells AND the hover-zoomed icon/ability
+                            (z 30/40 below), so a hovered row near the top never
+                            paints over the pinned header */
+  background: var(--bg-panel-3);
+  color: var(--text-bright);
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 6px;
+  border-bottom: 1px solid var(--muted-35);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+/* Subscript header sub-label (EHP "phys"/"mag") — small dim text set to
+   the bottom-right of the main word, like a formula subscript, so the
+   column stays narrow without a full second line. */
+.creeps-table thead th .th-sub {
+  font-size: 8.5px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-left: 1px;
+  /* Nudge down like a subscript via relative offset + zero line-height so the
+     sub-label does NOT grow the header's line box. vertical-align:sub would
+     enlarge the row only where EHP columns appear (Expanded), making the whole
+     header taller than in Standard — the cause of the height "jump" on toggle. */
+  display: inline-block;
+  position: relative;
+  top: 2px;
+  line-height: 0;
+}
+.creeps-table tbody td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(150, 146, 137, 0.12);
+  /* Single-line cells: every value is short (numbers, %, "Ближняя (100)",
+     ability dnames like "Envenomed Weapon"). nowrap lets table-layout:
+     auto size each column to the widest single-line content, so the
+     browser picks ideal widths and nothing wraps awkwardly. */
+  white-space: nowrap;
+  vertical-align: middle;
+  line-height: 1.3;
+}
+/* Row hover tint on the <tr> (not the <td>) so cell-specific colours — Damage
+   Type tints, etc. — paint on top and stay visible; the hover shows through
+   transparent cells and underneath the semi-transparent coloured ones. */
+.creeps-table tbody tr:hover {
+  background: rgba(227, 196, 106, 0.08);
+}
+/* Click-toggled row mark — matches the Mana Items style: gold inset frame
+   around the whole row + soft tint, no fade animation. Single-select
+   (clicking another row moves the mark). */
+.creeps-table tbody tr.row-marked > td {
+  box-shadow:
+    inset 0  2px 0 var(--gold-95),
+    inset 0 -2px 0 var(--gold-95);
+  background-image: linear-gradient(rgba(231, 196, 106, 0.12),
+                                    rgba(231, 196, 106, 0.12));
+}
+.creeps-table tbody tr.row-marked > td:first-child {
+  box-shadow:
+    inset  2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95);
+}
+.creeps-table tbody tr.row-marked > td:last-child {
+  box-shadow:
+    inset -2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95);
+}
+/* Sticky identity cells inside a marked row pick up the same tint without
+   the inset frame (the frame would double-paint through the sticky cell). */
+.creeps-table tbody tr.row-marked .sticky-col { --sticky-bg: #2b251a; }
+.creeps-table tbody tr.row-marked:hover .sticky-col { --sticky-bg: #34291e; }
+/* A marked row's sticky identity cell must keep its opaque fill UNDERNEATH the
+   gold frame. The generic `.row-marked > td:first-child/:last-child` frame is a
+   box-shadow, and box-shadow is a single property — so it REPLACES the sticky
+   cell's `inset 0 0 0 9999px var(--sticky-bg)` fill that normally covers the
+   collapsed-border seam. Without the fill, the seam bled at the column junction
+   (looked like a small gap between Hero and the next column). Re-add the fill as
+   the LAST shadow (painted beneath the earlier gold frame lines). */
+.creeps-table tbody tr.row-marked > td.sticky-col {
+  box-shadow:
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95),
+    inset  0    0   0 9999px var(--sticky-bg);
+}
+.creeps-table tbody tr.row-marked > td.sticky-col:first-child {
+  box-shadow:
+    inset  2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95),
+    inset  0    0   0 9999px var(--sticky-bg);
+}
+.creeps-table tbody tr.row-marked > td.sticky-col:last-child {
+  box-shadow:
+    inset -2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95),
+    inset  0    0   0 9999px var(--sticky-bg);
+}
+/* Legacy .row-flash class (one-shot fade) is no longer applied by JS but
+   the keyframes still live below — harmless dead CSS, retained so any
+   third-party styling doesn't break. */
+/* First column (unicode tier dots) — centered glyph, smaller letter-spacing. */
+.creeps-table th:first-child,
+.creeps-table td:first-child {
+  text-align: center;
+  font-family: 'Segoe UI Symbol', 'Apple Color Emoji', monospace;
+  letter-spacing: 1px;
+  white-space: normal;
+}
+/* Per-tier row tint — lighter for top picks, darker for fallback. */
+.creeps-table tr.tier-1 td:first-child { color: #56d364; }   /* best pick — green */
+.creeps-table tr.tier-2 td:first-child { color: #d29922; }   /* situational — amber */
+.creeps-table tr.tier-3 td:first-child { color: #db6d28; }   /* rare/early — orange */
+.creeps-table tr.tier-4 td:first-child { color: #f85149; }   /* worst — red */
+/* Tier legend footer rows (no data, just label in column 3). */
+

@@ -1,0 +1,292 @@
+/* Wraps the previous-arrow + version-dropdown + next-arrow into a single
+   horizontal control so all three sit on one baseline and the arrows
+   are clearly attached to the version button. */
+.version-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+/* Nav button: soft rounded-rect "tablet" with a thin SVG chevron drawn
+   precisely in the centre. No font glyph (font baselines vary across
+   systems) — the chevron is a CSS background-image data URI rendered
+   crisp at any size. Direction modifier class swaps the SVG. */
+.version-nav-arrow {
+  display: inline-block;
+  width: 26px;
+  height: 38px;
+  background: var(--shadow-28);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 14px 18px;
+  image-rendering: pixelated;
+  border-radius: 0;
+  box-shadow: inset 0 1px 2px var(--shadow-50);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, filter 0.15s, transform 0.12s;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
+}
+/* Pixel-art chunky arrows — drawn as a staircase of 2×2 cells (shape-rendering
+   keeps the edges crisp at any scale). Yellow accent matches the "sikle" tag
+   in the header brand. */
+.version-nav-arrow.is-prev {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="10" y="0" width="2" height="2"/><rect x="8" y="2" width="4" height="2"/><rect x="6" y="4" width="6" height="2"/><rect x="4" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="4" y="10" width="8" height="2"/><rect x="6" y="12" width="6" height="2"/><rect x="8" y="14" width="4" height="2"/><rect x="10" y="16" width="2" height="2"/></g></svg>');
+}
+.version-nav-arrow.is-next {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="2" y="0" width="2" height="2"/><rect x="2" y="2" width="4" height="2"/><rect x="2" y="4" width="6" height="2"/><rect x="2" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="2" y="10" width="8" height="2"/><rect x="2" y="12" width="6" height="2"/><rect x="2" y="14" width="4" height="2"/><rect x="2" y="16" width="2" height="2"/></g></svg>');
+}
+.version-nav-arrow:hover {
+  background-color: var(--shadow-45);
+  filter: brightness(1.2);
+}
+/* Tactile nudge: the chevron drifts a hair in the arrow's own direction
+   on hover, suggesting where the click will take you. */
+.version-nav-arrow.is-prev:hover { background-position: 45% center; }
+.version-nav-arrow.is-next:hover { background-position: 55% center; }
+.version-nav-arrow.is-disabled {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* RELEASE INFO + VERSION — одна высота */
+.nav-context .release-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1px;
+  background: var(--shadow-28);
+  box-shadow: inset 0 1px 2px var(--shadow-50);
+  border: 1px solid transparent;
+  padding: 0 12px;
+  height: 38px;
+  border-radius: 0;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
+}
+/* Universal rule: every non-patch tab (calendar, creeps, anything added
+   later) reserves the same vertical space as the patch-page version
+   picker via .nav-context-flat. New tabs only need to use this class —
+   no per-tab CSS — so the header height stays identical across pages
+   and switching tabs doesn't make the toolbar jump. */
+.nav-context-flat {
+  /* Reserve picker height on non-patch pages so all tabs sit on one baseline,
+     even when the right side has no content. Grid layout handles horizontal
+     placement — no `margin-left: auto` needed. */
+  justify-self: end;
+  min-height: 38px;
+}
+.nav-context-picker { justify-self: end; }
+/* Calendar variant — no dropdown; .release-info takes its place on the right, its height set by its lines. */
+.nav-context-calendar .release-info {
+  align-items: center;
+  padding: 6px 18px;
+  min-width: 110px;
+  height: auto;
+}
+.nav-context .version {
+  color: var(--text-main);
+  font-family: var(--font-j10);
+  font-size: 18px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.8px;
+  background: var(--shadow-28);
+  box-shadow: inset 0 1px 2px var(--shadow-50);
+  border: 1px solid transparent;
+  padding: 0 14px;
+  height: 38px;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
+}
+.nav-context .version:hover {
+  background: var(--shadow-40);
+}
+/* Non-clickable version display on non-patch pages. Same look as the dropdown
+   button on patch pages, but no chevron, no hover, no cursor. */
+.nav-context .version.version-static {
+  cursor: default;
+}
+.nav-context .version.version-static:hover {
+  background: var(--shadow-28);
+}
+.nav-context .version.version-materials {
+  color: var(--text-main);
+  font-size: 18px;
+  letter-spacing: 1px;
+  padding: 0 16px;
+}
+/* Materials sub-nav context: the nav-inner grid is align-items:center, but
+   .nav-context carries margin-bottom:8px to nudge the patch-page picker up
+   against the tab row. On Materials (and other flat pages) that margin
+   shifts the static label ABOVE the main-nav buttons' baseline. Cancel it
+   so the version-static box sits at the same vertical centre as .nav-tab. */
+.nav-context.nav-context-materials { }
+
+.nav-context .version-chev {
+  font-size: 14px;
+  color: var(--text-muted-blue-2);
+  line-height: 1;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+/* VERSION DROPDOWN MENU */
+.version-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.version-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px var(--shadow-40);
+  padding: 6px;
+  display: none;
+  z-index: 100;
+  max-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.version-menu.open {
+  display: block;
+}
+.version-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 14px;
+  transition: background 0.12s ease;
+}
+.version-item:hover {
+  background: var(--bg-panel-4);
+}
+.version-item.current {
+  background: rgba(227, 196, 106, 0.10);
+  color: var(--gold);
+  cursor: default;
+  pointer-events: none;
+}
+.version-item .vi-name {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.version-item .vi-date {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  margin-left: 14px;
+}
+.version-item.current .vi-date {
+  color: rgba(227, 196, 106, 0.6);
+}
+.nav-context-terrain .version-menu {
+  min-width: auto;
+}
+
+/* NAV BACK ARROW + BACK-TO-TOP — pixel-art chevrons on an index-style gold /
+   leather circle (matches the inventory landing page). Arrows are gold (var(--gold))
+   PNGs at icons/ui/gothic/arrow_left|up.png. Both float in the BOTTOM corners so
+   neither overlaps the toolbar tags (the back arrow used to sit at top-left, over
+   the tag block). url() is relative to styles.css (repo root) → works on every
+   page regardless of depth. */
+.nav-back-arrow,
+.back-to-top,
+.dyn-w-fab {
+  position: fixed;
+  bottom: 22px;
+  width: 42px;
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  box-shadow:
+    inset 0 1px 0 var(--blue-cold-10),
+    0 5px 16px var(--shadow-55);
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated;
+  display: none;
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-back-arrow {
+  left: 22px;
+  /* Solid pixel triangle (same chunky style as the patch-picker prev arrow). */
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="10" y="0" width="2" height="2"/><rect x="8" y="2" width="4" height="2"/><rect x="6" y="4" width="6" height="2"/><rect x="4" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="4" y="10" width="8" height="2"/><rect x="6" y="12" width="6" height="2"/><rect x="8" y="14" width="4" height="2"/><rect x="10" y="16" width="2" height="2"/></g></svg>'),
+    linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  background-size: auto 18px, cover;
+}
+.back-to-top {
+  right: 22px;
+  /* Solid pixel triangle pointing up. */
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="8" y="0" width="2" height="2"/><rect x="6" y="2" width="6" height="2"/><rect x="4" y="4" width="10" height="2"/><rect x="2" y="6" width="14" height="2"/><rect x="0" y="8" width="18" height="2"/></g></svg>'),
+    linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  background-size: 18px auto, cover;
+}
+.nav-back-arrow.visible,
+.back-to-top.visible { display: block; }
+/* Weights toggle: same round gold button as back-to-top, sits above it and is
+   ALWAYS shown (it is a mode switch, not a scroll helper). Icon = pixel balance
+   scale. Active = filled gold disc with a dark icon. */
+/* the weights toggle owns the corner; "back to top" sits above it (only on pages that have both) */
+.back-to-top:has(+ .dyn-w-fab) { bottom: 74px; }
+.dyn-w-fab {
+  right: 22px;
+  bottom: 22px;
+  display: block;
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="9" y="0" width="2" height="14"/><rect x="2" y="3" width="16" height="2"/><rect x="2" y="5" width="2" height="4"/><rect x="16" y="5" width="2" height="4"/><rect x="0" y="9" width="6" height="2"/><rect x="14" y="9" width="6" height="2"/><rect x="6" y="14" width="8" height="2"/><rect x="4" y="16" width="12" height="2"/></g></svg>'),
+    linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  background-size: 20px auto, cover;
+}
+.dyn-w-fab.active {
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" shape-rendering="crispEdges"><g fill="%231a1408"><rect x="9" y="0" width="2" height="14"/><rect x="2" y="3" width="16" height="2"/><rect x="2" y="5" width="2" height="4"/><rect x="16" y="5" width="2" height="4"/><rect x="0" y="9" width="6" height="2"/><rect x="14" y="9" width="6" height="2"/><rect x="6" y="14" width="8" height="2"/><rect x="4" y="16" width="12" height="2"/></g></svg>'),
+    linear-gradient(180deg, #e9cd74 0%, #c9a648 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 5px 16px var(--shadow-55),
+    0 0 0 3px rgba(227, 196, 106, 0.22);
+}
+.nav-back-arrow:hover,
+.back-to-top:hover,
+.dyn-w-fab:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.18);
+  box-shadow:
+    inset 0 1px 0 rgba(222, 216, 203, 0.14),
+    0 8px 20px var(--shadow-60);
+}
+

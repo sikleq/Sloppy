@@ -1,0 +1,437 @@
+/* ==========================================================================
+   WARM PIXEL SKIN — menus, toolbars and their controls (header "embers", variant A)
+   One look for every control: warm dark fields, a 2px pixel frame with notched
+   corners (border-image, so it never clips popups inside), the Jersey 10 pixel
+   font, chunky "game" buttons (dark bottom lip; pressed = gold). No blue anywhere.
+   The frame is a 6x6 SVG: 2px edges, empty 2x2 corners -> the classic stepped corner.
+   RULE: a new toolbar control joins the selector lists below instead of its own colours.
+   ========================================================================== */
+:root {
+  --px-panel: #141210;
+  --px-menu: #161311;
+  --px-field: #201b17;
+  --px-text: #c6bba3;
+  --px-text-soft: #b2a893;
+  --px-text-dim: #877b65;
+  --px-hi: #ffe08a;
+  --px-press: #0d0b09;
+  --px-on: #d9b25a;
+  --px-on-text: #191410;
+  --px-on-press: #9a7424;
+  --px-line: #393127;
+  --px-ember: linear-gradient(90deg, rgba(255, 138, 26, 0.22), transparent 85%);
+  --px-edge:      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23524532' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+  --px-edge-dim:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23393127' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+  --px-edge-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23e3c46a' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+  --px-edge-on:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23f0d58c' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+}
+
+/* ---- pixel font on every control label ---- */
+.nav-subtab, .nav-subitem, .hd-dd-opt, .hd-dd-label,
+.hs-attack-filter, .cal-mode-select, .ua-upgrades-label,
+.cal-toggle-bar strong, .toolbar-panel strong, .mr-price-label {
+  font-family: var(--font-j10);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+.nav-subtab { font-size: 18px; }
+.nav-subitem, .hd-dd-opt { font-size: 18px; }
+.hs-attack-filter, .cal-mode-select, .ua-upgrades-label, .hd-dd-label { font-size: 18px; }
+.cal-toggle-bar strong, .toolbar-panel strong, .mr-price-label {
+  font-size: 18px; letter-spacing: 1px; color: var(--px-text-dim);
+}
+/* one size for every control in a row: same font size, same 28px box, same text colour */
+.cal-toggle-bar .cal-mode-select, .cal-mode-select { height: 28px; }
+
+/* ---- framed surfaces: panels + popup menus ---- */
+.toolbar-panel,
+.nav-submenu, .hd-dd-menu, .search-results {
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background-clip: padding-box;
+}
+.toolbar-panel { background-color: var(--px-panel); border-image-source: var(--px-edge-dim); }
+.toolbar-panel > *:not(:first-child)::before { background: var(--px-line); }
+.nav-submenu, .hd-dd-menu, .search-results {
+  background-color: var(--px-menu);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.6);
+}
+.nav-submenu { border-radius: 0; }
+
+/* ---- menu rows: soft gold text; hover lights it, the current one smoulders ---- */
+.nav-subitem, .hd-dd-opt { color: var(--px-text-soft); border-radius: 0; }
+.nav-subitem:hover, .hd-dd-opt:hover,
+.nav-subgroup-nested:hover > .nav-subitem-parent,
+.search-results .result-item:hover {
+  color: var(--px-hi);
+  background: rgba(255, 138, 26, 0.08);
+}
+.nav-subitem.active, .search-results .result-item.active {
+  color: var(--px-hi);
+  background: var(--px-ember);
+  box-shadow: inset 2px 0 0 var(--gold);
+}
+.nav-subitem-soon, .nav-subitem-soon:hover { color: #5a5248; background: none; }
+.hd-dd-sep { background: var(--px-line); }
+.search-results .result-item { border-bottom-color: var(--px-line); }
+
+/* ---- leaf controls: framed "game" fields/buttons ---- */
+.hs-attack-filter, .hs-attr-filter, .cal-mode-select, .search-box input {
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background-color: var(--px-field);
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.hs-attack-filter { color: var(--px-text); padding: 0 9px 2px 5px; }
+.hs-attack-filter:hover, .hs-attr-filter:hover, .cal-mode-select:hover {
+  border-image-source: var(--px-edge-gold);
+  color: var(--px-hi);
+  filter: none;
+}
+.hs-attack-filter:active, .hs-attr-filter:active { box-shadow: inset 0 2px 0 var(--px-press); }
+.hs-attack-filter.active, .hs-attack-filter[aria-pressed="true"],
+.hs-attr-filter.active, .hs-attr-filter[aria-pressed="true"] {
+  background-color: var(--px-on);
+  border-image-source: var(--px-edge-on);
+  color: var(--px-on-text);
+  box-shadow: inset 0 -3px 0 var(--px-on-press);
+}
+.hs-attack-filter .atk-badge {
+  width: 18px; height: 18px;
+  border: 0; border-radius: 0;
+  background: var(--px-press);
+}
+.hs-attack-filter .atk-badge img { opacity: 1; }
+.aoe-up-btn img { border-radius: 0; }
+
+/* View select: warm field + a stepped gold caret; the native list follows */
+.cal-mode-select {
+  color: var(--px-text);
+  padding: 0 28px 2px 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23e3c46a' d='M0 0h10v2H0zM2 2h6v2H2zM4 4h2v2H4z'/%3E%3C/svg%3E");
+}
+.cal-mode-select option { background: var(--px-menu); color: #e2d9c4; }
+
+/* Search: warm field, gold loupe, a gold frame instead of the blue focus ring */
+.search-box input { color: #e2d9c4; }
+.search-box input::placeholder { color: #766b58; }
+.search-box input:focus {
+  border-image-source: var(--px-edge-gold);
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.toolbar .search-box input {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="%23b09a64" stroke-width="1.8"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 L13.6 13.6"/></svg>');
+}
+
+/* Switches: a square pixel track, square knob; ON = gold */
+.ua-upgrades-toggle { border-radius: 0; background-color: var(--px-field); }
+.ua-upgrades-toggle:hover { border-color: var(--gold-line); }
+.toolbar-panel .ua-upgrades-toggle { background-color: transparent; }
+.toolbar-panel .ua-upgrades-toggle:hover { border-color: transparent; }
+.ua-upgrades-toggle:hover .ua-upgrades-label { color: var(--px-hi); }
+.ua-upgrades-label { color: var(--px-text); }
+.ua-upgrades-toggle .ua-switch {
+  border-radius: 0;
+  background: var(--px-press);
+  box-shadow: inset 0 0 0 2px #524532;
+}
+.ua-upgrades-toggle .ua-switch::after {
+  top: 4px; left: 4px; width: 8px; height: 8px;
+  border-radius: 0;
+  background: var(--px-text-dim);
+}
+.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch {
+  background: var(--px-on);
+  box-shadow: inset 0 0 0 2px #f0d58c;
+}
+.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch::after { background: var(--px-on-text); }
+
+/* Multi-select dropdown button + price fields */
+.hd-dd-label { color: var(--px-text); }
+.hd-dd-caret { color: var(--px-text-dim); }
+.hd-dd-btn:hover .hd-dd-label, .hd-dd-btn[aria-expanded="true"] .hd-dd-label { color: var(--px-hi); }
+.toolbar-panel .mr-price-input { border-bottom-color: var(--px-line); color: #e2d9c4; }
+.toolbar-panel .mr-price-input:focus { border-bottom-color: var(--gold); }
+
+/* Level field (Hero Stats), calendar year picker — same skin */
+.hs-level-group input, .cal-year-current {
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background: var(--px-field);
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.hs-level-group input { color: #e2d9c4; }
+.hs-level-group input:focus, .cal-year-current:hover, .cal-year-picker.is-open .cal-year-current,
+.cal-year-current:focus-visible {
+  border-image-source: var(--px-edge-gold);
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.hs-level-group > span { font-family: var(--font-j10); font-size: 18px; letter-spacing: 1px; color: var(--px-text-dim); }
+.cal-year-current { font-family: var(--font-j10); font-size: 20px; font-weight: 400; color: #e2d9c4; }
+.cal-year-caret { color: var(--gold-dim); }
+.cal-year-menu {
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background-color: var(--px-menu);
+  background-clip: padding-box;
+}
+.cal-year-opt { font-family: var(--font-j10); font-size: 19px; font-weight: 400; color: var(--px-text-soft); border-radius: 0; }
+.cal-year-opt:hover { background: rgba(255, 138, 26, 0.08); color: var(--px-hi); }
+.cal-year-opt.is-selected { background: var(--px-ember); color: var(--px-hi); box-shadow: inset 2px 0 0 var(--gold); }
+/* Group / scope filter chips (patch pages, entity pages): same size as the TAG badges next to
+   them (1px border, regular font), warm instead of blue */
+.cat-filter-btn, .ec-scope-btn {
+  background: var(--px-field);
+  color: var(--px-text-soft);
+  border-color: #524532;
+  border-radius: 0;
+}
+.cat-filter-btn:hover, .ec-scope-btn:hover { background: var(--px-field); border-color: var(--gold-dim); color: var(--px-hi); }
+.cat-filter-btn.active, .ec-scope-btn.active {
+  background: rgba(227, 196, 106, 0.18);
+  border-color: var(--gold);
+  color: var(--px-hi);
+}
+/* Calendar "Compact" switch: a framed pixel button like the year picker */
+.cal-compact-toggle.ua-upgrades-toggle {
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background: var(--px-field);
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.cal-compact-toggle.ua-upgrades-toggle:hover { border-image-source: var(--px-edge-gold); }
+.cal-compact-toggle .ua-upgrades-label { font-weight: 400; font-size: 18px; letter-spacing: 0.3px; }
+/* Upgrade values ("40…26") and their per-tier popover */
+.lvl-toggle { text-decoration-color: rgba(227, 196, 106, 0.45); }
+.lvl-toggle:hover, .lvl-toggle[aria-expanded="true"] { color: var(--px-hi); }
+.lvl-popover { background: var(--px-menu); border-color: #524532; border-radius: 0; }
+/* Checkboxes in the dropdown menus: square pixel boxes, gold when ticked */
+.hd-dd-opt input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 14px; height: 14px; margin: 0;
+  background: var(--px-press);
+  box-shadow: inset 0 0 0 2px #524532;
+  border-radius: 0;
+}
+.hd-dd-opt input[type="checkbox"]:checked {
+  background: var(--px-on) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cpath fill='%23191410' d='M3 7h2v2H3zM5 9h2v2H5zM7 7h2v2H7zM9 5h2v2H9z'/%3E%3C/svg%3E") center / 14px no-repeat;
+  box-shadow: inset 0 0 0 2px #f0d58c;
+}
+.hd-dd-opt input[type="checkbox"]:indeterminate {
+  background: var(--px-on) linear-gradient(var(--px-on-text), var(--px-on-text)) center / 6px 2px no-repeat;
+  box-shadow: inset 0 0 0 2px #f0d58c;
+}
+/* Tag chips (BUFF / NERF / NEW / DEL / REWORK / MISC / QOL, the GROUP / scope chips) in the pixel font.
+   Same box as before (11px line box + 3px padding) so rows and toolbars don't grow; value badges
+   (+50, 0%) keep the regular font for legibility. */
+.badge.buff-text, .badge.nerf-text, .badge.rework, .badge.swap, .badge.new, .badge.del, .badge.misc, .badge.qol,
+.cat-filter-btn, .ec-scope-btn {
+  font-family: var(--font-j10);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 11px;
+  letter-spacing: 0.8px;
+}
+/* Terrain toolbar (Zoom / Fullscreen / layer toggles): framed pixel buttons. ON keeps a gold-tinted
+   fill (not solid gold — the layer icons are gold themselves), OFF = dim frame + greyed icon. */
+.tc-btn {
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background: var(--px-field);
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+  font-family: var(--font-j10);
+  font-size: 18px;
+  color: var(--px-text);
+}
+.tc-btn:hover { filter: none; border-image-source: var(--px-edge-gold); color: var(--px-hi); }
+.tc-btn[aria-pressed="true"] {
+  background: rgba(227, 196, 106, 0.22);
+  border-image-source: var(--px-edge-on);
+  color: var(--px-hi);
+}
+.tc-btn[aria-pressed="false"] { background: var(--px-field); border-image-source: var(--px-edge-dim); color: var(--px-text-dim); }
+/* Mana Items: "Per Int" constants block at the right end of the toolbar's first row */
+.toolbar-panel > .mr-int-group { margin-left: auto; }
+.mr-int-group { display: inline-flex; align-items: center; gap: 10px; height: 28px; }
+.mr-int-ico { width: 18px; height: 18px; display: block; }
+.mr-int-group .mr-const {
+  font-family: var(--font-j10); font-size: 18px; font-weight: 400; letter-spacing: 0.3px;
+  color: var(--px-text);
+  text-decoration-color: rgba(227, 196, 106, 0.5);
+}
+.mr-int-group .mr-const:hover { color: var(--px-hi); }
+/* Typed text and placeholders in search / price / level fields: the pixel font too */
+.search-box input, .mr-price-input, .hs-level-group input {
+  font-family: var(--font-j10); font-size: 18px; letter-spacing: 0.4px;
+}
+.search-box input::placeholder, .mr-price-input::placeholder { font-family: var(--font-j10); }
+/* Hero Lab "Difference" stat picker: the 28 stats as a 4-column table (rows read left to right:
+   HP MP regen… / attributes + armor / resists…), "All" across the top, thin gold lines between the
+   cells (the 1px grid gap shows the menu's OPAQUE line colour) — fits without scrolling, and any
+   number of stats still lays out (row-major flow). */
+.hd-dd-menu[data-dd="diffstat"] {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 1px;
+  padding: 0;
+  max-height: none;
+  overflow: visible;
+  background-color: #2e2619;
+}
+.hd-dd-menu[data-dd="diffstat"][hidden] { display: none; }
+.hd-dd-menu[data-dd="diffstat"] > .hd-dd-all { grid-column: 1 / -1; }
+.hd-dd-menu[data-dd="diffstat"] > .hd-dd-sep { display: none; }
+.hd-dd-menu[data-dd="diffstat"] > .hd-dd-opt { background: var(--px-menu); padding: 5px 10px; }
+.hd-dd-menu[data-dd="diffstat"] > .hd-dd-opt:hover { background: #1f1a15; }
+/* Icon-only toggle buttons (attributes, AoE items / talent, Dynamics weights): ON = dark field with a
+   bright gold frame and a warm glow — NOT a solid gold fill, which swallowed the gold pixel icons
+   (weights, talent). Text buttons (Melee / Ranged) keep the solid gold "pressed" look. */
+.hs-attr-filter.active, .hs-attr-filter[aria-pressed="true"] {
+  background-color: var(--px-field);
+  background-image: radial-gradient(ellipse 70% 70% at 50% 60%, rgba(255, 150, 40, 0.28), transparent 75%);
+  border-image-source: var(--px-edge-on);
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+/* While a table box scrolls (scripts.js adds .is-scrolling) the table ignores the pointer:
+   no hover repaints of cells passing under the cursor. */
+.creeps-scroll.is-scrolling table { pointer-events: none; }
+/* Hero / Item Dynamics matrices (~3000 diamonds): the cells themselves never pop — a single
+   .dyn-lens (scripts.js "DYNAMICS MATRICES") holding a copy of the hovered pill grows over it and
+   glides between cells (owner 2026-09-26: the instant pop felt jerky; a per-cell transition
+   repainted every passing cell). Patch pages keep the per-cell pop. */
+.heroes-dyn-table .dyn-cell,
+.heroes-dyn-table .dyn-cell-wrap:not(.empty):hover .dyn-cell { transition: none; transform: none; }
+.dyn-lens {
+  position: fixed; left: 0; top: 0; z-index: 900; width: 28px; height: 28px;
+  pointer-events: none; opacity: 0; transform-origin: 50% 50%;
+  transition: transform 0.12s cubic-bezier(.2, .7, .3, 1), opacity 0.12s ease;
+}
+.dyn-lens.is-on { opacity: 1; }
+.dyn-lens.no-anim { transition: none; }
+.dyn-lens .dyn-cell {
+  width: 28px; height: 28px; transition: none; transform: none;
+  background-color: rgb(28, 27, 25);
+  box-shadow: 0 2px 4px var(--shadow-60), inset 0 0 0 1px var(--white-12), 0 0 8px var(--white-22);
+}
+.dyn-lens.current .dyn-cell {
+  box-shadow: 0 2px 4px var(--shadow-60), inset 0 0 0 1px var(--white-12), 0 0 8px var(--white-22),
+    0 0 0 1.5px rgba(227, 196, 106, 0.95), 0 0 0 2.5px rgba(0, 0, 0, 0.85);
+}
+/* Patch-page toolbar: tags and group chips in ONE row, no "Tags:" / "Group:" labels — a thin
+   vertical line parts them, like the hero / item / unit pages. */
+.legend-stack { flex-direction: row; align-items: center; gap: 6px; }
+.legend-categories:empty { display: none; }
+.ec-vsep { background: rgba(227, 196, 106, 0.28); margin: 0 6px; }
+/* Tag colours: NEW and REWORK were too dim, DEL was nearly NERF's colour. NEW = warm gold,
+   REWORK = clear violet, DEL = wine (rose-red, apart from NERF's orange-red). */
+.badge.new    { color: #d4ae55; background: rgba(220, 175, 95, 0.10);  border-color: rgba(220, 175, 95, 0.38); }
+.badge.rework { color: #a58ad2; background: rgba(170, 135, 220, 0.09); border-color: rgba(170, 135, 220, 0.34); }
+.badge.swap   { color: #6fbfb2; background: rgba(95, 176, 164, 0.09);  border-color: rgba(95, 176, 164, 0.34); }
+.badge.del    { color: #c55252; background: rgba(197, 63, 63, 0.09);  border-color: rgba(197, 63, 63, 0.34); }
+/* A terrain row's number in its category, in the tag chip's frame (the owner 2026-10-03: no rework / buff tags on
+   terrain notes, just numbers from 1 in each category) */
+.badge.tnum   { font-family: var(--font-j10); font-size: 15px; font-weight: 400; line-height: 11px; text-align: center;
+  color: var(--gold-dim); background: rgba(227, 196, 106, 0.06); border-color: rgba(227, 196, 106, 0.30); }
+/* ... a row with a % lightly in its colour, as the text BUFF / NERF chips (owner 2026-10-27, 7.40 Watcher rows) */
+.badge.tnum.tnum-buff { color: #6da375; background: rgba(85, 205, 115, 0.10); border-color: rgba(85, 205, 115, 0.28); }
+.badge.tnum.tnum-nerf { color: #9a666d; background: rgba(199, 101, 115, 0.10); border-color: rgba(199, 101, 115, 0.28); }
+/* Pressed filter chip = a neon sign: the letters glow in the chip's own colour and the frame
+   lights up with a soft halo of the same colour (no plain outline ring). */
+.legend-tags .badge.filter-btn.active,
+.cat-filter-btn.active, .ec-scope-btn.active, .ec-ab-btn.active {
+  outline: none;
+  filter: brightness(1.3);
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  box-shadow: 0 0 6px color-mix(in srgb, currentColor 55%, transparent),
+              inset 0 0 6px color-mix(in srgb, currentColor 22%, transparent);
+  text-shadow: 0 0 2px currentColor, 0 0 8px color-mix(in srgb, currentColor 75%, transparent);
+}
+/* The one-row tags + groups are wider: on narrower screens the patch facts give way first
+   (then only "Released" stays) so the search box never covers them. */
+@media (max-width: 1760px) { .toolbar-patch-info .ti-after { display: none; } }
+@media (max-width: 1560px) { .toolbar-patch-info .ti-live { display: none; } }
+@media (max-width: 1400px) { .toolbar-patch-info { display: none; } }
+/* Patch-page search: the same height as the tag / group chips beside it (19px) so the toolbar
+   reads as one row of equal pieces (it was a 35px field towering over the chips). */
+.toolbar .search-box input {
+  height: 19px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 15px;
+  line-height: 15px;
+  background-size: 12px 12px;
+  background-position: 10px center;
+  box-shadow: inset 0 -2px 0 var(--px-press);
+}
+/* Item page with no annotated change yet */
+.ec-nochange-note { margin: 0; padding: 18px 22px; color: var(--text-dim); font-size: 14px; }
+/* Patch pages: search lives in the corner stack — a round loupe button above the weights
+   (bottom -> top: weights 22px, search 74px, back-to-top 126px when it shows). The field
+   slides out to the LEFT of the button; results open upward. */
+.search-fab {
+  position: fixed; right: 22px; bottom: 74px;
+  width: 42px; height: 42px; box-sizing: border-box; padding: 0;
+  appearance: none; -webkit-appearance: none;
+  border-radius: 50%; border: 2px solid var(--gold);
+  box-shadow: 0 5px 16px var(--shadow-55);
+  background: url('icons/ui/gothic/icon_loupe.png') center / 22px 22px no-repeat,
+              linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  image-rendering: pixelated;
+  cursor: pointer; z-index: 100;
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+.search-fab:hover { transform: translateY(-2px); filter: brightness(1.12); }
+.search-fab[aria-expanded="true"] { box-shadow: 0 0 10px rgba(255, 150, 40, 0.45), 0 5px 16px var(--shadow-55); }
+.back-to-top.has-search { bottom: 126px; }
+.search-pop {
+  position: fixed; right: 74px; bottom: 76px; width: min(360px, calc(100vw - 110px));
+  z-index: 101;
+}
+.search-pop[hidden] { display: none; }
+.search-pop .search-box { flex: none; min-width: 0; width: 100%; }
+.search-pop .search-box input {
+  height: 38px; padding: 0 12px 0 36px; text-align: left; font-size: 18px;
+  background: var(--px-field) url('icons/ui/gothic/icon_loupe.png') 10px center / 16px 16px no-repeat;
+  image-rendering: auto;
+  box-shadow: inset 0 -3px 0 var(--px-press), 0 8px 24px rgba(0, 0, 0, 0.6);
+  border-image-source: var(--px-edge-gold);
+}
+.search-pop .search-results { top: auto; bottom: calc(100% + 6px); max-height: min(60vh, 520px); overflow: auto; }
+/* Ability chips on hero / item / unit pages: the same pixel font as the tag and scope chips */
+.ec-ab-btn {
+  font-family: var(--font-j10);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 11px;
+  letter-spacing: 0.8px;
+}
+
+/* Hero Lab / Hero Changes pickers: title and search in the pixel skin */
+.hl-picker-head strong {
+  font-family: var(--font-j10); font-size: 24px; font-weight: 400;
+  color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px;
+}
+.hl-picker-search {
+  height: 34px; box-sizing: border-box; padding: 0 12px 0 34px;
+  border: 2px solid transparent; border-image: var(--px-edge) 2 stretch; border-radius: 0;
+  background: var(--px-field) url('icons/ui/gothic/icon_loupe.png') 10px center / 16px 16px no-repeat;
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+  font-family: var(--font-j10); font-size: 19px; letter-spacing: 0.4px; color: #e8d9b5;
+}
+.hl-picker-search::placeholder { color: #7d6a4a; }
+.hl-picker-search:focus { border-image-source: var(--px-edge-gold); box-shadow: inset 0 -3px 0 var(--px-press); }
+

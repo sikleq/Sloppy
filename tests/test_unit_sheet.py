@@ -1,5 +1,6 @@
 """Owner 2026-11-04, 7.38: new and returning units as the game shows them (variant 3 of the mock), their numbers from the
 game's files; a returning unit's changes in the tiles."""
+from patch.css_bundle import read_css
 import html as _html
 import os
 import re
@@ -114,7 +115,7 @@ def test_the_sheet_has_no_tag_chips_but_keeps_its_tags_for_filters():
     for html in (us.render(nums), us.render(nums, changes={"Health": (600, b(600, 700)), "Gold": ("52-58", br(52, 58, 25, 29))})):
         assert 'class="badge' not in html and "us-chips" not in html
     assert 'data-tag="buff new"' in us.render(nums)
-    assert re.search(r"ul\.changes li\.unit-sheet \{\s*display: grid; grid-template-columns: 130px", _read("styles.css"))  # short bars
+    assert re.search(r"ul\.changes li\.unit-sheet \{\s*display: grid; grid-template-columns: 130px", read_css())  # short bars
 
 
 def test_the_rows_under_the_sheet_keep_the_patch_cells_counted():
@@ -130,7 +131,7 @@ def test_a_tile_that_does_not_exist_stops_the_build():
 
 
 def test_gold_and_xp_have_the_colours_of_the_creeps_table():
-    css = _read("styles.css")
+    css = read_css()
     gold = re.search(r"([^{}]*\.creeps-table td\.col-gold[^{]*)\{ color: #e3b341; \}", css).group(1)
     xp = re.search(r"([^{}]*\.creeps-table td\.col-xp[^{]*)\{ color: #8bb8d6; \}", css).group(1)
     assert ".us-gold .us-v" in gold and ".camp-table .camp-gold" in gold
@@ -138,7 +139,7 @@ def test_gold_and_xp_have_the_colours_of_the_creeps_table():
 
 
 def test_the_name_is_centred_on_the_icon_when_nothing_else_stands_beside_it():
-    css = _read("styles.css")
+    css = read_css()
     rule = re.search(r"\.ability-block\.ab-card-only > \.ability-title \{([^}]*)\}", css).group(1)
     assert "align-self: center" in rule and "grid-row: 1" in rule
     assert ".ability-block.ab-card-only > .ability-icon-wrap { grid-row: 1; }" in css

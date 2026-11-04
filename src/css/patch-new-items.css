@@ -1,0 +1,305 @@
+/* NEW-ITEM BLOCK — keeps the standard grid (tag column / text / %).
+   Only the FIRST row of the block gets a NEW tag (or RETURNING) in the tag
+   column; the original per-row tag is hidden. Subsequent rows show an empty
+   placeholder so the text column stays aligned with the rest of the page.
+   The tag text comes from data-new-tag on the .entity-block. */
+/* Hide the original first-child tag completely (not visibility:hidden) so
+   it doesn't occupy cell (1,1) of the grid — otherwise the ::before tag
+   gets auto-placed to row 2 and appears below the row content. */
+.entity-block.is-new ul.changes li > .badge:first-child,
+.entity-block.is-new ul.changes li > .row-tag-empty {
+  display: none;
+}
+/* Per-row NEW tag was removed: the item is now signalled by the type label
+   after the name + the components/provides blocks below the header. The
+   block-level filter still works because each <li> inside .is-new carries
+   data-tag="new" (via t("NEW") on the original li()). */
+/* Ability description box — spans one Passive:/Active: starter row plus any
+   continuation rows until the next ability starter or end of ul. Post-process
+   classifies each li with one of -solo / -start / -cont / -cont-end. */
+/* Box hugs the ul width (no overflow). Inside a new-item block the tag column
+   is gone, so collapse the grid to [text 1fr][badge auto] and add left padding
+   so text sits a few px in from the box border. */
+ul.changes li.ability-row-solo,
+ul.changes li.ability-row-start,
+ul.changes li.ability-row-cont,
+ul.changes li.ability-row-end {
+  background: var(--muted-04);
+  border-left:  1px solid var(--line-soft);
+  border-right: 1px solid var(--line-soft);
+}
+/* Apply Hydras-Breath-style layout (no tag column, text flush-left with 12px
+   padding) to ALL ability-row li, not just inside .is-new blocks. Tag column
+   collapses; only ability-rows that EXPLICITLY have a non-empty tag will
+   show one inline at the front of the row text. */
+ul.changes li.ability-row-solo,
+ul.changes li.ability-row-start,
+ul.changes li.ability-row-cont,
+ul.changes li.ability-row-end {
+  grid-template-columns: 1fr auto;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+ul.changes li.ability-row-solo > .row-tag-empty,
+ul.changes li.ability-row-start > .row-tag-empty,
+ul.changes li.ability-row-cont > .row-tag-empty,
+ul.changes li.ability-row-end > .row-tag-empty {
+  display: none;
+}
+ul.changes li.ability-row-solo > .row-text,
+ul.changes li.ability-row-start > .row-text,
+ul.changes li.ability-row-cont > .row-text,
+ul.changes li.ability-row-end > .row-text {
+  grid-column: 1;
+  text-align: left;
+}
+/* Ability-row layout has no left tag — suppress the float-pseudo that
+   reserves the tag column. */
+ul.changes li.ability-row-solo > .row-text::before,
+ul.changes li.ability-row-start > .row-text::before,
+ul.changes li.ability-row-cont > .row-text::before,
+ul.changes li.ability-row-end > .row-text::before {
+  display: none;
+}
+ul.changes li.ability-row-solo,
+ul.changes li.ability-row-start {
+  border-top: 1px solid var(--line-soft);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  padding-top: 6px;
+  margin-top: 10px;          /* gap between adjacent ability boxes */
+}
+/* A box whose ability row has its own change chip (7.38 Heaven's Halberd "NEW Passive:
+   Damage Block"): the box starts after the 76px tag column and the chip hangs in that
+   column — same x, width and height as the chips of the ordinary rows around it.
+   (New-entity cards hide per-row chips, so their boxes stay full width.) */
+ul.changes li.ability-box-tagged { margin-left: 76px; }
+ul.changes li.ability-box-tagged > .badge:first-child { left: -77px; top: 3px; }
+ul.changes li.ability-row-solo.ability-box-tagged > .badge:first-child,
+ul.changes li.ability-row-start.ability-box-tagged > .badge:first-child { top: 8px; }
+.entity-block.is-new ul.changes li.ability-box-tagged { margin-left: 0; }
+ul.changes li.ability-row-solo,
+ul.changes li.ability-row-end {
+  border-bottom: 1px solid var(--line-soft);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+/* COMPONENTS BOX — visual assembly recipe shown under a new item's header.
+   Layout: [icon1 + icon2 + ... + recipe] = TOTAL — total sits IMMEDIATELY
+   after the last component (not pushed to the right edge). */
+.components-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  margin: 6px 0 4px;
+  padding: 8px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.components-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.component {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.component img {
+  width: 48px;
+  height: 36px;
+  border-radius: 3px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(150, 146, 137, 0.25);
+}
+.component-price {
+  font-size: 11px;
+  color: var(--text-main);
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.30);
+  padding: 1px 6px;
+  border-radius: 2px;
+  min-width: 32px;
+  text-align: center;
+}
+.components-plus {
+  color: var(--text-dimmer);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 2px;
+}
+.components-total {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.components-total span {
+  font-weight: 700;
+  color: #f0c674;
+}
+
+/* ENCHANT-BY-ATTRIBUTE GRID — 7.41 Tier-X enchantment selection box.
+   Layout: rows of [attr icon][attr name] | [enchant chip] [enchant chip]...
+   Shares the muted bordered look of components-box / provides-box. */
+/* LIST OF ENCHANTMENTS AS ONE TABLE (owner 2026-09-28, 7.38 "List of Neutral Enchantments"): every
+   enchantment is still its own entity block (patch squares, its Changes page), drawn as a row of one framed
+   table — icon | name | its bonuses with a value per tier (empty = not offered at that tier) | patch squares.
+   The .entity box itself is display:contents so its icon, name and the squares JS adds become grid cells. */
+body.patch-page .entity-block.enchant-list-head,
+body.patch-page .entity-block.enchant-list-row {
+  display: grid;
+  grid-template-columns: 34px 150px minmax(0, 1fr) 344px;
+  column-gap: 12px;
+  align-items: center;
+  margin: -1px -15px 0;
+  padding: 6px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-image: none;
+}
+body.patch-page .entity-block.enchant-list-head {
+  margin-top: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 6px 6px 0 0;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+body.patch-page .entity-block.enchant-list-row + :not(.enchant-list-row) { margin-top: 10px; }
+.enchant-list-head .ench-name-h { grid-column: 1 / 3; }
+.enchant-list-head .ench-dyn-h { grid-column: 4; text-align: right; }
+.enchant-list-row > .entity { display: contents; }
+.enchant-list-row .entity-icon { grid-column: 1; grid-row: 1; }
+.enchant-list-row .entity-icon img { width: 34px; height: auto; display: block; border-radius: 3px; }
+.enchant-list-row .entity-name { grid-column: 2; grid-row: 1; font-size: 16px; }
+.enchant-list-row .ench-tiers { grid-column: 3; grid-row: 1; }
+.enchant-list-row .dyn-row-wrap { grid-column: 4; grid-row: 1; justify-self: end; margin: 0 !important; }
+.ench-tiers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(5, 56px);
+  column-gap: 0;
+  row-gap: 2px;
+  align-items: center;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+/* thin column lines before every tier column, through the whole table (owner 2026-09-28): the tier columns
+   are the last 5 x 56px, so a line every 56px from the right; the grid stretches over its row's padding so
+   the lines meet the next row's */
+body.patch-page .enchant-list-row .ench-tiers,
+body.patch-page .enchant-list-head .ench-tiers {
+  align-self: stretch;
+  align-content: center;
+  margin: -6px 0;
+  padding: 6px 0;
+  background: repeating-linear-gradient(to left, transparent 0 55px, rgba(254, 247, 232, 0.08) 55px 56px)
+              right top / 280px 100% no-repeat;
+}
+body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0; }
+.ench-tiers-h { grid-column: 3; }
+.ench-tier-h, .ench-v { text-align: center; }
+.ench-stat { color: var(--text-main); overflow-wrap: anywhere; }
+.ench-v { color: var(--text-bright); font-weight: 600; }
+.ench-v.ench-zero { color: var(--text-dimmer); font-weight: 400; }
+.ench-v.ench-off { align-self: stretch; background: rgba(0, 0, 0, 0.12); border-radius: 2px; }
+.ench-stat.ench-neg, .ench-v.ench-neg { color: #e3806e; }
+.ench-row-h { display: contents; }
+.ench-row-h .ench-tier-h { color: var(--text-dim); font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
+.enchant-list-head ~ .enchant-list-row .ench-row-h { display: none; }   /* the table's own head row says it */
+/* AN ENCHANTMENT'S TIERS, BEFORE -> AFTER (owner 2026-10-17, 7.41 variant A): the 7.38 table under the block's
+   header, framed like the item cards; a changed cell "was → now" (the new value coloured by what it does to the
+   owner), a tier it has only now gold, one it lost struck in the DEL colour. Wider tier columns for "+10% → +8%". */
+.ench-tiers.ench-change {
+  grid-template-columns: minmax(150px, 1fr) repeat(5, 96px);
+  margin: 6px 0 10px;
+  padding: 8px 12px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  row-gap: 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+/* every table: thin semi-transparent lines between the cells, values centred (owner 2026-10-01 / 2026-10-17:
+   "все таблицы оформляются с вертикальными линиями-разделителями между ячейками") — a vertical line before every
+   tier column (so also between the bonus and Tier 1), a horizontal one between the rows; no row gap, so the
+   vertical lines run through */
+.ench-change .ench-stat, .ench-change .ench-v, .ench-change .ench-tier-h, .ench-change .ench-stat-h {
+  padding: 4px 6px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid rgba(254, 247, 232, 0.06);
+}
+/* a flex cell drops the space before the game's grey "(Melee & Ranged)" (owner 2026-10-27, 7.38c Vast) */
+.ench-change .ench-stat > font { margin-left: 0.3em; }
+.ench-change .ench-v, .ench-change .ench-tier-h { justify-content: center; border-left: 1px solid rgba(254, 247, 232, 0.10); }
+.ench-change .ench-row-h > * { border-top: none; }
+.ench-change .ench-chg { white-space: nowrap; }
+/* "was" and "now" the size and weight of every other cell — only "was" dimmer (owner 2026-10-26: "+35 → +31" read
+   as two sizes) */
+.ench-change .ench-was { color: var(--text-dimmer); font-weight: inherit; font-size: inherit; }
+.ench-change .ench-chg .iab-lv, .ench-change .ench-chg .iab-hint { font-weight: inherit; font-size: inherit; }
+.ench-change .ench-arrow { color: var(--text-dimmer); font-weight: 400; margin: 0 3px; }
+/* the head row and the stats column a shade darker; "Stats" heads the column (owner 2026-10-21) */
+.ench-change .ench-row-h > *, .ench-change .ench-stat { background: rgba(0, 0, 0, 0.18); }
+.ench-change .ench-stat-h { color: var(--text-dim); font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
+/* a removed bonus: grey (red read as a penalty, owner 2026-10-21), its name and old value struck through — no cross
+   before the name, no "→ —" (owner 2026-10-26, 7.41 Mystical Cast Range, 7.39 Crude Slow Resistance) */
+.ench-change .ench-stat.ench-gone {
+  color: var(--text-dimmer);
+  text-decoration: line-through; text-decoration-color: rgba(197, 82, 82, 0.85); text-decoration-thickness: 1.5px;
+}
+.ench-tiers.ench-change .iab-lv.iab-del {      /* beats the colour-blind DEL rule */
+  color: var(--text-dimmer); font-weight: 400;
+  text-decoration: line-through; text-decoration-color: rgba(197, 82, 82, 0.85); text-decoration-thickness: 1.5px;
+}
+.iab-lv.iab-del { color: #c55252; text-decoration: line-through; }
+
+.enchant-attr-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 8px 0 10px;
+  padding: 8px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+.enchant-attr-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 3px 0;
+}
+.enchant-attr-row + .enchant-attr-row {
+  border-top: 1px dashed var(--line-soft);
+}
+.enchant-attr-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.enchant-attr-ico {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}

@@ -5,6 +5,7 @@
   which is a separate creep-hero block on the patch page.
 - Hero Changes (a top-level page) used "../icons/..." for the record-holder faces: 15 broken images live.
 """
+from patch.css_bundle import read_css
 import sys
 from pathlib import Path
 
@@ -171,7 +172,7 @@ def test_every_page_head_has_the_phone_viewport_and_local_fonts():
 
 
 def test_no_page_builder_loads_google_fonts_or_the_steam_background():
-    srcs = list((ROOT / "builders").glob("*.py")) + list((ROOT / "patch").glob("*.py")) + [ROOT / "styles.css"]
+    srcs = list((ROOT / "builders").glob("*.py")) + list((ROOT / "patch").glob("*.py")) + list((ROOT / "src" / "css").glob("*.css"))
     needles = ("fonts.googleapis", "fonts.gstatic", "dota_react/backgrounds/featured.jpg")
     hits = [f.name for f in srcs if any(n in f.read_text(encoding="utf-8") for n in needles)]
     assert hits == []
@@ -179,7 +180,7 @@ def test_no_page_builder_loads_google_fonts_or_the_steam_background():
 
 def test_self_hosted_font_files_exist():
     import re
-    css = (ROOT / "styles.css").read_text(encoding="utf-8")
+    css = read_css()
     for path in set(re.findall(r"url\('(src/fonts/[^']+)'\)", css)):
         assert (ROOT / path).exists(), path
     assert (ROOT / "icons" / "ui" / "bg" / "patch_bg.jpg").exists()

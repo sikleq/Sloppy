@@ -2,6 +2,7 @@
 be killed by abilities that instantly kill creeps otherwise", which the card didn't mark, so the two boxes read the same;
 the row "Dominated creep is now considered a creep-hero" says it (owner 2026-10-27). Not a rule for every appended
 clause: Harpoon 7.41's card marks its added sentence and stays (owner 2026-10-17)."""
+from patch.css_bundle import read_css
 import ast
 import os
 
@@ -30,8 +31,7 @@ def test_dominator_and_overlord_738c_have_no_abilities_card():
 
 def test_the_enchant_cells_grey_note_keeps_its_space():
     """7.38c Vast: "Attack Range(Melee & Ranged)" — a flex cell drops the space before the game's <font> note."""
-    with open(os.path.join(ROOT, "styles.css"), encoding="utf-8") as f:
-        assert ".ench-change .ench-stat > font { margin-left: 0.3em; }" in f.read()
+    assert ".ench-change .ench-stat > font { margin-left: 0.3em; }" in read_css()
 
 
 def test_harpoon_741_keeps_its_card():

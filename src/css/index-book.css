@@ -1,0 +1,316 @@
+/* ==========================================================================
+   05. INDEX / HUB
+   ========================================================================== */
+
+/* ---- MAIN PAGE: inventory book ----
+   Landing page styled as a game inventory opened in a leather-bound book. An
+   ornate parchment panel holds square slots; filled slots are the sections
+   (gothic pixel-art icons), the rest are empty inventory cells. Pixel art is
+   scaled up with image-rendering:pixelated so it stays crisp.
+   Assets: icons/ui/gothic/ (Gothic Pixel UI FREE). */
+.main-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 46px;
+}
+.inv-book {
+  position: relative;
+  z-index: 2;                          /* above the signature wall (z 1) */
+  padding: 26px 38px 36px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(120, 92, 48, 0.20), rgba(0, 0, 0, 0) 60%),
+    linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  border: 3px solid var(--gold);          /* "sikle" gold */
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 0 2px #7a5c28,
+    inset 0 0 40px var(--shadow-45),
+    0 12px 44px var(--shadow-55);
+}
+.inv-head { text-align: center; }
+/* open category name replaces the book heading (same font / gold) */
+.inv-title-cat { display: none; }
+.inv-book.creeps-open .inv-title-main, .inv-book.items-open .inv-title-main,
+.inv-book.heroes-open .inv-title-main, .inv-book.support-open .inv-title-main { display: none; }
+.inv-book.creeps-open .inv-title-cat[data-cat="creeps"],
+.inv-book.items-open .inv-title-cat[data-cat="items"],
+.inv-book.heroes-open .inv-title-cat[data-cat="heroes"],
+.inv-book.support-open .inv-title-cat[data-cat="support"] { display: inline; animation: supportIn 0.28s ease both; }
+.inv-title {
+  margin: 0;
+  font-family: var(--font-j25);
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: 2px;
+  color: var(--gold);                     /* "sikle" gold */
+  text-shadow: 2px 2px 0 #1a1206, 0 0 14px rgba(227, 196, 106, 0.25);
+}
+
+/* WALL OF SIGNATURES — faint pixel-font usernames scattered around the book,
+   like graffiti on a wall. Positioned by scripts.js (no overlap with book /
+   nav / each other). Fixed full-viewport layer behind the book. */
+.inv-signatures {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: visible;
+  pointer-events: none;          /* layer transparent to clicks… */
+  /* The whole wall fades in once scripts.js has positioned every name, so it
+     never flashes in "from emptiness" mid-layout. JS flips opacity to 1. */
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.inv-sig {
+  position: absolute;
+  top: 0;
+  left: 0;                       /* base origin; JS positions via transform: translate() */
+  visibility: hidden;            /* hidden until a beam reveals it */
+  opacity: 0;
+  white-space: nowrap;
+  /* Handjet first: a pixel/dot-matrix font WITH Cyrillic, so Russian member
+     names render in-style (Jersey 10 has no Cyrillic → it falls through). */
+  font-family: "Handjet", var(--font-j10);
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  color: rgba(243, 220, 150, 0.72);   /* glowing gold — only seen once revealed */
+  pointer-events: auto;
+  cursor: default;
+  user-select: none;
+  transition: opacity 0.7s ease, color 0.15s ease, text-shadow 0.15s ease;
+}
+.inv-sig.is-lit {                /* revealed by the laser — fades in and stays */
+  visibility: visible;
+  opacity: 1;
+  text-shadow: 0 0 8px var(--gold-line);
+}
+/* Colour emoji inside a signature (Telegram names sometimes carry a gold star,
+   blue check, party popper, etc.) → flatten to the sig's own colour. Classic
+   transparent-text + zero-offset text-shadow trick: the glyph silhouette is
+   painted in the shadow colour, which we tie to currentColor so VIP/regular/
+   lit/hidden variants all inherit the right tone. Wider 0-radius shadows
+   sharpen the silhouette without bleeding into surrounding text. */
+.inv-emo {
+  color: transparent !important;
+  text-shadow: 0 0 0 currentColor;
+}
+/* The .is-lit gold glow above sets a non-zero text-shadow on the whole sig —
+   override on the emoji wrapper so its silhouette stays sharp and the glow
+   doesn't double up around the emoji shape. */
+.inv-sig.is-lit .inv-emo { text-shadow: 0 0 0 currentColor; }
+/* Laser the Premium star fires at a name as it lights up (JS positions/animates
+   each beam). Thin gold ray with a soft glow, drawn over everything. */
+.sig-beam-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+.sig-beam {
+  position: absolute;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg,
+    rgba(255, 240, 190, 0) 0%,
+    rgba(255, 226, 150, 0.6) 45%,
+    rgba(255, 243, 205, 0.8) 100%);
+  box-shadow:
+    0 0 6px 1px rgba(255, 225, 150, 0.6),
+    0 0 13px 2px var(--gold-glow);
+  will-change: transform, opacity;
+}
+@media (prefers-reduced-motion: reduce) { .sig-beam-layer { display: none; } }
+/* Pixel gold dust a name bursts into when clicked — crisp 1–2px squares (like the
+   stars), no blur. JS sets size/position and animates each speck. */
+.sig-dust {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--gold);                 /* "sikle" gold */
+  image-rendering: pixelated;
+  will-change: transform, opacity;
+}
+/* VIP names — azure instead of gold, with a touch more weight + a stronger glow
+   once lit, so they read as "special / legendary" against the gold wall. */
+.inv-sig-vip {
+  color: rgba(140, 224, 255, 0.85);   /* azure */
+  font-weight: 600;
+}
+.inv-sig-vip.is-lit {
+  text-shadow:
+    0 0 8px rgba(120, 214, 255, 0.6),
+    0 0 16px rgba(90, 190, 255, 0.35);
+}
+/* Pixel "forge spark" thrown off a VIP name as a beam lights it — same azure as
+   the name, crisp little squares like the stars/dust. JS sizes/positions/animates. */
+.sig-spark {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #8ce0ff;                  /* azure (matches .inv-sig-vip) */
+  box-shadow: 0 0 4px 1px rgba(120, 214, 255, 0.7);
+  image-rendering: pixelated;
+  will-change: transform, opacity;
+}
+/* Azure dust when a VIP name is clicked apart (overrides the gold .sig-dust). */
+.sig-dust.sig-dust-vip {
+  background: #8ce0ff;
+  box-shadow: 0 0 3px 1px rgba(120, 214, 255, 0.5);
+}
+/* Collapsed sign for members without a public @username. */
+.inv-sig-hidden {
+  font-style: italic;
+  letter-spacing: 1px;
+  color: rgba(211, 205, 193, 0.6);    /* cool-grey, not gold (shown only once lit) */
+}
+.inv-sig-hidden.is-lit {
+  text-shadow: 0 0 8px rgba(168, 163, 153, 0.4);
+}
+/* Star sky: a few dim pixel stars behind everything; each twinkles on its own
+   slow cadence (JS sets per-star duration/delay). They never overlap names. */
+.star-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  background: rgba(232, 224, 200, 0.85);   /* dim warm-white */
+  opacity: 0.28;                            /* very faint at rest */
+  image-rendering: pixelated;
+}
+@keyframes starTwinkle {
+  0%, 100% { opacity: var(--lo, 0.12); }
+  50%      { opacity: var(--hi, 0.42); }
+}
+@media (prefers-reduced-motion: reduce) { .star { animation: none !important; } }
+.star-sky.paused .star { animation-play-state: paused; }
+.inv-divider {
+  display: block;
+  width: 76%;
+  height: auto;
+  margin: 14px auto 24px;
+  image-rendering: pixelated;
+  opacity: 0.9;
+}
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(5, auto);   /* max 5 tiles per row */
+  gap: 9px 12px;
+  justify-content: center;
+}
+.inv-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+}
+.inv-slot {
+  width: 76px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('icons/ui/gothic/slot.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+.inv-slot.is-empty { background-image: url('icons/ui/gothic/slot_empty.png'); opacity: 0.65; }
+.inv-icon {
+  width: 50px;
+  height: 50px;
+  image-rendering: pixelated;
+  /* Warm the pack's gold toward the brighter "sikle" gold. */
+  filter: brightness(1.12) saturate(1.06);
+}
+/* Creeps beetle: on hover (the tile lifts/slides out) swap the static PNG for
+   an animated GIF so its legs crawl in place. `content: url()` replaces the
+   <img>'s rendered image in Chromium/WebKit and reverts to the PNG on mouse-out;
+   the GIF restarts each time it's applied. */
+.inv-cell-creeps:hover .inv-icon {
+  content: url('icons/ui/gothic/icon_creeps.gif');
+}
+.inv-cell-patch:hover .inv-icon {
+  content: url('icons/ui/gothic/icon_patch.gif');
+}
+/* Dynamics: on hover the bar-chart bars grow/shrink in random order (GIF). */
+.inv-cell-dynamics-heroes:hover .inv-icon { content: url('icons/ui/gothic/icon_dynamics_heroes.gif'); }
+.inv-cell-dynamics-items:hover .inv-icon { content: url('icons/ui/gothic/icon_dynamics_items.gif'); }
+/* Items: closed chest at rest; on hover a chest-open APNG plays once — a key
+   flies in, inserts and turns, the lid pops open (chest squashes wider) and a
+   gold light beam + treasure spill out. Driven from scripts.js (JS src-swap
+   with a ?v= cache-bust) — NOT CSS content:url — so the APNG replays from the
+   first frame on EVERY hover instead of holding its last frame. Reverts to the
+   closed PNG on mouse-out. APNG (not GIF) for the translucent beam glow. */
+/* Calendar: on hover the date page burns away (gold pixel fire) and a new date
+   appears, looping 1→31. Driven from scripts.js (JS src-swap with a cache-bust)
+   instead of `content: url()` — the calendar GIF filename predates the others, so
+   browsers had a stale copy cached; the cache-bust forces the new burning GIF. */
+/* Special star: no spin — on hover it gently PULSES (grows/shrinks) and the
+   tile throws off a lot more magic dust. */
+.inv-cell-star:hover .inv-icon {
+  animation: starPulse 0.85s ease-in-out infinite;
+}
+@keyframes starPulse {
+  0%, 100% { transform: translateY(-3px) scale(1.00); }
+  50%      { transform: translateY(-3px) scale(1.17); }
+}
+/* The "special" tile's slot always emits a soft pixel-gold glow (not tied to
+   hover) so it reads as set-apart; it slowly pulses to feel alive. */
+.inv-special .inv-slot {
+  box-shadow:
+    0 0 17px 4px rgba(227, 196, 106, 0.55),
+    inset 0 0 11px rgba(227, 196, 106, 0.34);
+  animation: starGlow 2.6s ease-in-out infinite;
+}
+@keyframes starGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 14px 3px rgba(227, 196, 106, 0.47),
+      inset 0 0 10px rgba(227, 196, 106, 0.30);
+  }
+  50% {
+    box-shadow:
+      0 0 24px 7px rgba(227, 196, 106, 0.72),
+      inset 0 0 14px rgba(227, 196, 106, 0.44);
+  }
+}
+.inv-special .inv-slot { position: relative; overflow: visible; }
+/* Magic dust: small pale (low-saturation, "magical" not colourful) pixel sparks.
+   Two groups so mouse-out fades cleanly:
+     .dust-base  — 6 always drift, slow & sparse (independent of hover, so the
+                   resting animation never jumps or breaks);
+     .dust-burst — 8 extras that ignite on hover. The whole burst LAYER fades its
+                   opacity out on mouse-out, so residual particles drift-fade away
+                   gradually instead of snapping off. */
+.inv-sparks, .dust-base, .dust-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.inv-sparks { z-index: 1; }
+.dust-burst { opacity: 0; transition: opacity 0.55s ease; }
+.inv-cell-star:hover .dust-burst { opacity: 1; }
+.spark {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #e8e0cc;                 /* pale warm white — soft, not bright/colourful */
+  box-shadow: 0 0 3px 1px rgba(232, 224, 200, 0.6);
+  opacity: 0;
+  animation-name: sparkDrift;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+@keyframes sparkDrift {
+  0%   { opacity: 0; transform: translate(0, 0) scale(1); }
+  5%   { opacity: 0; }
+  12%  { opacity: 0.9; }
+  42%  { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.4); }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.4); }
+}

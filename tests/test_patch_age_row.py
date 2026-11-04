@@ -26,8 +26,9 @@ def test_the_newest_patch_says_it_is_live():
 
 def test_the_unused_second_copy_stays_gone():
     from patch.js_bundle import read_js
-    assert "patch-age" not in read_js()
-    for rel in ("styles.css", os.path.join("patch", "meta.py")):
+    from patch.css_bundle import read_css
+    assert "patch-age" not in read_js() and "patch-age" not in read_css()
+    for rel in (os.path.join("patch", "meta.py"),):
         with open(os.path.join(ROOT, rel), encoding="utf-8") as f:
             text = f.read()
         assert "patch-age" not in text and "_patch_age_line" not in text, rel

@@ -1,0 +1,90 @@
+/* ==========================================================================
+   01. DESIGN TOKENS
+   ========================================================================== */
+
+:root {
+  /* Site attribute palette (the Hero Changes column titles): attribute names and labels
+     everywhere use these — not the harsher in-game hexes. Universal is purple. */
+  --attr-str: #d9534f;
+  --attr-agi: #5cb85c;
+  --attr-int: #5bc0de;
+  --attr-uni: #b39ddb;
+  /* -- Backgrounds -- */
+  --bg-page:          #0d0d0c;
+  --bg-panel:         #111010;
+  --bg-panel-2:       #161514;
+  --bg-panel-3:       #1b1a18;
+  --bg-panel-4:       #262523;
+
+  /* -- Text -- */
+  --text-main:        #d6d0c3;
+  --text-bright:      #f3ecdd;
+  --text-dim:         #969289;
+  --text-dimmer:      #78756e;
+
+  /* -- Accent gold -- */
+  --gold:             #e3c46a;
+  --gold-strong:      #f0d896;
+  --gold-dim:         #d6b764;
+  --gold-line:        rgba(227, 196, 106, 0.45);
+  --gold-line-soft:   rgba(227, 196, 106, 0.28);
+  --gold-glow:        rgba(227, 196, 106, 0.35);
+
+  /* -- Accent blue -- */
+  --blue:             #79c0ff;
+  --blue-bright:      #58a6ff;
+
+  /* -- Borders / lines -- */
+  --line:             #363532;
+  --line-soft:        rgba(150, 146, 137, 0.18);
+  --line-bright:      rgba(254, 247, 232, 0.14);
+
+  /* -- Typography -- */
+  --font-ui:          'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-j25:         'Jersey 25', 'Courier New', monospace;
+  --font-j10:         'Jersey 10', 'Courier New', monospace;
+  /* Dota 2 UI font (Radiance) — used by the in-game-style item tooltip. */
+  --font-dota:        'Radiance', 'Segoe UI', sans-serif;
+
+  /* -- Z-index ladder --
+     Keep every z-index in the file anchored to one of these layers.     */
+  --z-content:        1;      /* regular stacked content                 */
+  --z-tooltip:        30;     /* floating tooltips, history popups       */
+  --z-subnav:         50;     /* subnav dropdown panels                  */
+  --z-picker:         60;     /* version/date pickers                    */
+  --z-toolbar:        80;     /* sticky toolbars, .tc-picker.is-open     */
+  --z-nav:            100;    /* top nav bar                             */
+  --z-modal:          1000;   /* modal overlays                          */
+  --z-modal-top:      1100;   /* above modal (e.g. inner dropdowns)      */
+
+  /* -- Alpha overlays & tints -- */
+  --gold-95:          rgba(231, 196, 106, 0.95);
+  --gold-14:          rgba(227, 196, 106, 0.14);
+  --gold-0:           rgba(227, 196, 106, 0);
+  --blue-18:          rgba(213, 207, 195, 0.18);
+  --blue-30:          rgba(213, 207, 195, 0.30);
+  --blue-35:          rgba(213, 207, 195, 0.35);
+  --blue-40:          rgba(213, 207, 195, 0.4);
+  --blue-cold-10:     rgba(222, 216, 203, 0.10);
+  --blue-bright-85:   rgba(227, 196, 106, 0.85);
+  --muted-04:         rgba(150, 146, 137, 0.04);
+  --muted-35:         rgba(150, 146, 137, 0.35);
+  --muted-45:         rgba(150, 146, 137, 0.45);
+  --bg-deep-60:       rgba(17, 16, 16, 0.6);
+  --bg-deep-97:       rgba(17, 16, 16, 0.97);
+  --shadow-28:        rgba(0, 0, 0, 0.28);
+  --shadow-35:        rgba(0, 0, 0, 0.35);
+  --shadow-40:        rgba(0, 0, 0, 0.4);
+  --shadow-45:        rgba(0, 0, 0, 0.45);
+  --shadow-50:        rgba(0, 0, 0, 0.5);
+  --shadow-55:        rgba(0, 0, 0, 0.55);
+  --shadow-60:        rgba(0, 0, 0, 0.6);
+  --shadow-65:        rgba(0, 0, 0, 0.65);
+  --white-12:         rgba(255, 255, 255, 0.12);
+  --white-22:         rgba(255, 255, 255, 0.22);
+  --bg-warm-dark:     #3b2e1d;
+  --bg-warm-darker:   #2a2014;
+  --text-muted-blue:  #b2ada2;
+  --text-muted-blue-2: #b6b1a6;
+}
+

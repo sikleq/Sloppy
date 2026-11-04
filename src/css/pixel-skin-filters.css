@@ -1,0 +1,207 @@
+/* ---- Hero / item / unit Changes pages: icon filters (2026-09-26) ----
+   Ability chips = the ability's own icon, the same 19px box as the tag badges, so the filter row keeps
+   its height; a removed ability stays visible, greyed and half transparent. Shard / Scepter chips sit
+   after Innate in the Aghanim blue. The name is a tooltip below the chip. */
+.ec-ab-btn.ec-ab-icon, .ec-scope-btn.ec-aghs-btn {
+  position: relative; box-sizing: border-box; width: 19px; min-width: 0; height: 17px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; vertical-align: middle;
+}
+.ec-ab-btn.ec-ab-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ec-ab-btn.ec-ab-icon.ec-ab-old { border-style: dashed; opacity: 1; }
+.ec-ab-btn.ec-ab-icon.ec-ab-old img { filter: grayscale(1) brightness(0.8); opacity: 0.45; }
+.ec-ab-btn.ec-ab-icon.ec-ab-old:hover img, .ec-ab-btn.ec-ab-icon.ec-ab-old.active img { opacity: 0.8; }
+/* Shard / Scepter chips: the Aghanim blue (owner 2026-09-26 — tried gold, asked for the blue back) */
+.ec-scope-btn.ec-aghs-btn {
+  color: #8fc3ff; background: rgba(80, 150, 235, 0.14); border-color: rgba(110, 170, 240, 0.5);
+}
+.ec-scope-btn.ec-aghs-btn:hover { background: rgba(80, 150, 235, 0.24); border-color: rgba(140, 190, 250, 0.8); }
+.ec-scope-btn.ec-aghs-btn img { width: 13px; height: 13px; object-fit: contain; display: block; }
+.ec-ab-icon[data-tooltip]::after, .ec-aghs-btn[data-tooltip]::after {
+  content: attr(data-tooltip); position: absolute; top: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%); white-space: nowrap; pointer-events: none; opacity: 0; z-index: 100;
+  background: var(--bg-deep-97); color: var(--text-main); border: 1px solid var(--muted-35);
+  font: 400 12px/1.3 "Segoe UI", Arial, sans-serif; letter-spacing: 0.1px; text-shadow: none; text-transform: none;
+  padding: 4px 8px; box-shadow: 0 4px 18px var(--shadow-45); transition: opacity 0.12s 0.05s;
+}
+.ec-ab-icon[data-tooltip]:hover::after, .ec-aghs-btn[data-tooltip]:hover::after { opacity: 1; }
+.ec-aghs-hide { display: none !important; }
+/* Talent tree: the changed twigs (patch/talent_tree.py) glow a little, like the lit branch in game */
+.ability-block.talents-block svg.ttree.ttree-lit .ttree-base { opacity: .42; }   /* unlit twigs recede */
+/* each twig in its row's tag colour (owner 2026-10-22); twigs whose rows disagree stay gold */
+.ability-block.talents-block svg.ttree .ttree-on { --tt: #ffd23c; fill: var(--tt); filter: drop-shadow(0 0 1.6px var(--tt)); }
+.ability-block.talents-block svg.ttree .ttree-on[data-tag="buff"]   { --tt: #5ccf5c; }
+.ability-block.talents-block svg.ttree .ttree-on[data-tag="nerf"]   { --tt: #e0707e; }
+.ability-block.talents-block svg.ttree .ttree-on[data-tag="del"]    { --tt: #e05555; }
+.ability-block.talents-block svg.ttree .ttree-on[data-tag="swap"]   { --tt: #48d0e8; }
+.ability-block.talents-block svg.ttree .ttree-on[data-tag="rework"] { --tt: #b89be8; }
+.ability-block.talents-block svg.ttree .ttree-on[data-tag="misc"]   { --tt: #c8c8c8; }
+.ability-block.talents-block svg.ttree .ttree-on[data-tag="qol"]    { --tt: #7a9ce4; }
+html.cb-mode .ability-block.talents-block svg.ttree .ttree-on[data-tag="buff"] { --tt: #5ab8ee; }
+html.cb-mode .ability-block.talents-block svg.ttree .ttree-on[data-tag="nerf"] { --tt: #f08a3c; }
+html.cb-mode .ability-block.talents-block svg.ttree .ttree-on[data-tag="swap"] { --tt: #31b994; }
+/* Item before/after card: stats the patch did not change (patch/elements.py _prop_layout) — shown on
+   both sides, a step dimmer so the eye goes to the changes */
+.properties-change .property-text.property-same { color: var(--text-dim); }
+/* Item ability row as a small game-tooltip card (patch/elements.py _item_ability_html, owner 2026-09-27):
+   a low header strip — "Active: Name" left, cast range / mana / health cost / cooldown right with the
+   game's own icons — then the description with every number bold and a step brighter. */
+ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
+.iab-head { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin: -6px -12px 5px; padding: 2px 12px; min-height: 22px; box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.035); border-bottom: 1px solid var(--line-soft);
+  border-radius: 6px 6px 0 0; line-height: 18px; flex-wrap: wrap; row-gap: 0; }
+/* the name stays on one line; long values (Dagon's 5 levels) wrap below it, still on the right */
+.iab-title { white-space: nowrap; }
+/* a long header wraps on a phone, or it widens the whole page (7.38 Demonic Cleanse: 471 px on a 375 px screen) */
+@media (max-width: 640px) { .iab-title { white-space: normal; } }
+.iab-name { color: var(--text-bright); font-weight: 600; }
+/* "Passive (Scales with Duel)": what the ability levels with, moved out of the text (owner 2026-10-24) */
+.iab-scale { color: var(--text-dim); font-weight: 400; font-size: 0.92em; }
+.iab-scale .aghanim-marker { margin: 0 2px 0 3px; width: 13px; height: 13px; }
+.iab-meta { display: flex; align-items: center; gap: 9px; flex: none; font-weight: 600; margin-left: auto;
+  color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.iab-m { display: inline-flex; align-items: center; gap: 4px; }
+.iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; }
+.iab-desc { display: block; }
+.iab-num { font-weight: 700; color: var(--text-bright); }
+/* An ability / facet card has no header strip (its name is the title above), so its radius / range / cost /
+   cooldown sit in the pane's top-right corner, the text flowing round them (owner 2026-09-30, 7.38 Alleviation) */
+/* ...so the pane gets the item card's own header strip: "Passive" / "Active" left (game files), values right; edge
+   to edge whatever the pane's padding (--pt / --px, set with each padding rule) */
+.ability-change-pane > .pane-head { margin: calc(-1 * var(--pt, 0px)) calc(-1 * var(--px, 0px)) 0;
+  padding: 2px var(--px, 12px); border-radius: 5px 5px 0 0; }
+.ability-change-head + .pane-head { margin-top: 0; border-radius: 0; }   /* under a pane's own icon + name head */
+/* a card row's own % badges (a facet's "Path Duration increased from 3/3.5/4/4.5s to 6s") sit at the row's right edge,
+   as on every list row — not right after the text (owner 2026-10-29, 7.38 Ice Breaker) */
+.ability-change-row > .badge-group { float: right; margin-left: 10px; white-space: nowrap; }
+/* ...with the list rows' hover ruler: a dashed line under the row's first line, text to % (owner 2026-10-29) */
+.ability-change-row.acr-bg { position: relative; }   /* acr-bg: patch/static_has.py */
+.ability-change-row.acr-bg:hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(4px + 1.45em);     /* row padding-top + line-height of its first line */
+  border-bottom: 1px dashed rgba(150, 146, 137, 0.32);
+  pointer-events: none;
+}
+.formula-trigger .iab-num { color: inherit; }     /* a number inside a formula button keeps the button's colour */
+/* Item abilities before -> after (item_abilities_change): one row per ability, old left / new right paired
+   by name (render_iab_card); a pair's two cards share the row height; an arrow only between a pair, an
+   ability without a counterpart sits next to an empty cell (owner 2026-09-27, Heaven's Halberd 7.38) */
+.properties-change.iab-change { align-items: stretch; row-gap: 8px; }
+.properties-change.iab-change .properties-pane { display: grid; grid-template-columns: 1fr; grid-template-rows: subgrid;
+  grid-row: 1 / -1; row-gap: 8px; padding: 0; background: none; border: 0; align-items: stretch; }
+.properties-change.iab-change .properties-arrow { align-self: center; }
+/* the empty place opposite an ability only one side has: a barely visible dashed frame (owner 2026-09-27) */
+/* ...and no frame at all since 2026-09-30: the ability that is alone says it itself — added: a light green dashed
+   frame on the new side, removed: a light red one on the old side (Heaven's Halberd / Gleipnir 7.38) */
+.iab-none { border: 0; }
+.iab-card.iab-added { border: 1px dashed rgba(110, 170, 118, 0.42); }   /* a step darker (owner 2026-09-30) */
+.iab-card.iab-removed { border: 1px dashed rgba(227, 128, 110, 0.5); }
+/* another ability named inside a card's text: a small icon + its name (sub_ability, 7.41 Overclocking) */
+.ac-sub { display: inline-flex; align-items: center; gap: 5px; vertical-align: -5px; margin-right: 2px; }
+.ac-sub-ico { width: 20px; height: 20px; border-radius: 3px; border: 1px solid var(--line-soft); }
+.ac-sub-name { color: var(--text-bright); font-weight: 600; }
+/* changed words in a card's text: the change's colour as a light highlighter under the text, the text keeps its
+   own colour (owner: preview on Dragon Knight 2026-10-24, the whole site 10-25 at ~0.15). The colour is the side
+   of the change, not the row's tag: removed = del, added = new, rewritten = rework; the % of a changed number sits
+   in its hover tip */
+.iab-hl { padding: 0 3px; margin: 0 -1px; border-radius: 3px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; background: var(--hl-bg); }
+.iab-hl-new { --hl-bg: rgba(224, 189, 98, 0.15); }
+.iab-hl-buff { --hl-bg: rgba(127, 208, 140, 0.14); }
+.iab-hl-nerf { --hl-bg: rgba(207, 130, 141, 0.15); }
+.iab-hl-del { --hl-bg: rgba(207, 107, 107, 0.16); }
+.iab-hl-rework,
+.iab-hl-swap { --hl-bg: rgba(128, 84, 214, 0.26); }   /* a darker, deeper purple (owner 2026-10-24) */
+.iab-hl-qol,
+.iab-hl-misc { --hl-bg: rgba(160, 150, 130, 0.12); }
+.iab-hl .iab-num { color: inherit; }          /* a number inside the highlighted phrase: the phrase's text colour */
+/* a changed NUMBER (patch/elements.py mark_number_highlights): the text's colour and a dotted underline, as the item
+   cards' values (its % on hover where the pair is known) — words keep the strip (owner 2026-10-25) */
+.iab-hl.iab-hl-num {
+  background: none; padding: 0; margin: 0; border-radius: 0; font-weight: 700;
+  border-bottom: 1px dotted currentColor; }
+.iab-hl.iab-hl-num .iab-hint { border-bottom: 0; }
+.iab-hl-num.iab-hl-new { color: #e0bd62; }
+.iab-hl-num.iab-hl-buff { color: #7fd08c; }
+.iab-hl-num.iab-hl-nerf { color: #cf828d; }
+.iab-hl-num.iab-hl-del { color: #cf6b6b; }
+.iab-hl-num.iab-hl-rework, .iab-hl-num.iab-hl-swap { color: #b99ae6; }
+.iab-hl-num.iab-hl-qol, .iab-hl-num.iab-hl-misc { color: var(--text-dimmer); }
+/* on an Aghanim line's blue strip the same see-through highlighter as anywhere (owner 2026-10-25: "не разграничивать
+   правила"; the three-layer one on the card's dark colour of 10-24 is gone) */
+/* the colour-blind variants come from scripts/gen/gen_colorblind_css.py */
+.iab-tip-pct .badge-group { display: inline-flex; }
+.iab-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 12px; }
+.iab-card .iab-desc { line-height: 1.45; }
+/* Tagged item-ability box: the chip's top edge on the header's top edge (owner 2026-09-27) */
+ul.changes li.item-ability.ability-box-tagged > .badge:first-child { top: 0; }
+/* A bit more air around ability boxes and the abilities before/after card (owner 2026-09-27) */
+ul.changes li.ability-row-solo, ul.changes li.ability-row-start { margin-top: 14px; }
+ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8px; }
+.properties-change.iab-change { margin-bottom: 12px; }
+/* Header numbers as in the game's tooltip: Radiance bold, proportional digits (tabular "1 1 0 0" looked
+   spaced out — owner 2026-09-27) */
+.iab-meta { font-family: 'Radiance', 'Segoe UI', Arial, sans-serif; font-weight: 700;
+  font-variant-numeric: proportional-nums; letter-spacing: 0; font-size: 14px; gap: 7px; }
+.iab-m { gap: 3px; }
+/* Rows the abilities card already shows (_iab_covered_change / duplicate descriptions): kept in the page,
+   hidden, so tag filters and counts still see their tags (owner 2026-09-27) */
+ul.changes li.iab-covered { display: none !important; }
+/* the numbers those rows change, coloured by the row's tag */
+.iab-num.iab-buff, .iab-m.iab-buff, .iab-lv.iab-buff, .us-v.iab-buff, .us-bar .us-v.iab-buff, .camp-v.iab-buff { color: #7fd08c; }
+.iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf, .us-v.iab-nerf, .us-bar .us-v.iab-nerf, .camp-v.iab-nerf { color: #cf828d; }
+.iab-num.iab-new, .iab-m.iab-new, .iab-lv.iab-new { color: #e0bd62; }
+.iab-num.iab-misc, .iab-m.iab-misc, .iab-lv.iab-misc { color: var(--text-dimmer); }
+.iab-num.iab-rework, .iab-m.iab-rework, .iab-lv.iab-rework { color: #b99ae6; }   /* Orb of Venom 7.38: a cooldown where there was none */
+/* A changed value painted with its %'s own shade class ("badge nerf3 tone", _tone_cls): the colour of the
+   .badge.nerfN rule, none of the chip's box (owner 2026-09-28: "1000" and "+14%" in two different reds) */
+.badge.tone { background: none !important; border: none !important; padding: 0 !important; text-shadow: none !important;
+  margin: 0; min-width: 0; text-transform: none; letter-spacing: inherit; font-size: inherit; line-height: inherit;
+  display: inline; vertical-align: baseline; text-align: inherit; white-space: inherit; }
+.iab-m.badge.tone { display: inline-flex; }
+/* Components card with its cost rows folded in (owner 2026-09-27): the new recipe price and total coloured
+   by direction, the total's % at the end of the block on the rows' % column */
+.components-change .components-pct { margin-left: auto; white-space: nowrap; }
+.components-change .component-price.cost-buff, .components-change .components-total span.cost-buff { color: #7fd08c; }
+.components-change .component-price.cost-nerf, .components-change .components-total span.cost-nerf { color: #cf828d; }
+/* a value with a note (the row's "(…)" / (?)): light dotted underline, the note on hover — no (?) icon in
+   the header (owner 2026-09-27, Gleipnir 7.38 radius) */
+.iab-hint { display: inline; border-bottom: 1px dotted currentColor; padding-bottom: 0; line-height: 1.1; }
+
+/* ---- Silent Changes (dist/patches/silent/<ver>.html, builders/silent.py) ----
+   moved here from the page's inline <style> (audit 2026-10-04) */
+.sc-page { max-width: 1080px; margin: 0 auto; padding: 24px 28px 80px; }
+.sc-page h1 { font-family: 'Jersey 10', monospace; font-size: 38px;
+              letter-spacing: 1px; color: #f3ecdd; margin-bottom: 4px; }
+.sc-page .sc-sub { color: #969289; font-size: 13px; margin-bottom: 24px; }
+.sc-hero { margin: 28px 0; }
+.sc-hero h2 { font-size: 18px; color: #e3c46a; font-weight: 700;
+              border-bottom: 1px solid #262523; padding-bottom: 6px; }
+.sc-ability { margin: 14px 0 14px 0; }
+.sc-ability-name { font-size: 13px; color: #d6d0c3; font-weight: 600;
+                    font-family: 'Courier New', monospace; margin-bottom: 6px; }
+.sc-table { border-collapse: collapse; width: 100%; font-size: 12px;
+            font-variant-numeric: tabular-nums; }
+.sc-table th, .sc-table td { padding: 5px 10px; border: 1px solid #363532;
+                              text-align: left; vertical-align: top; }
+.sc-table th { background: #1b1a18; color: #d6d0c3; font-weight: 600;
+                font-size: 11px; text-transform: uppercase;
+                letter-spacing: 0.5px; }
+.sc-field { font-family: 'Courier New', monospace; color: #969289;
+             max-width: 280px; word-break: break-all; }
+.sc-old { background: rgba(248, 81, 73, 0.08); color: #f8a39e; }
+.sc-new { background: rgba(86, 211, 100, 0.08); color: #92e3a3; }
+.sc-absent { color: #78756e; font-style: italic; }
+.sc-flag { display: inline-block; padding: 1px 6px; margin: 2px 4px 2px 0;
+            background: rgba(227, 196, 106, 0.12); color: #e3c46a;
+            border-radius: 3px; font-size: 10.5px;
+            font-family: 'Courier New', monospace; }
+.sc-empty { color: #969289; font-style: italic; padding: 40px 0;
+             text-align: center; }
+.sc-back { display: inline-block; margin-bottom: 16px; color: #e3c46a;
+            text-decoration: none; font-size: 13px; }
+.sc-back:hover { text-decoration: underline; }
+

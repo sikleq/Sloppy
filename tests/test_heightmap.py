@@ -1,5 +1,6 @@
 """maps/dota.vhcg — the map's height grid (scripts/gen/heightmap.py) and the Terrain page's Heights layer.
 The owner 2026-10-05: "decode dota.vhcg and make a height layer" — from our own files only."""
+from patch.css_bundle import read_css
 from patch.js_bundle import read_js
 import os
 import struct
@@ -116,7 +117,7 @@ def test_fullscreen_chips_are_icon_and_number_with_the_word_kept_for_the_tooltip
     import builders.terrain as terrain
     chip = terrain._chip("camps", "moved", 7, 0, 28)
     assert '<b>7/28</b> <span class="tf-chip-word">moved</span>' in chip and 'data-tooltip="Camps: 7/28 moved"' in chip
-    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     assert ".tc-fsp-chips .tf-chip-word { display: none; }" in css
     js = read_js()
     assert ".tc-fsp-chips .tf-chip[data-tooltip]" in js and "function initHeightBands()" in js
@@ -125,6 +126,6 @@ def test_fullscreen_chips_are_icon_and_number_with_the_word_kept_for_the_tooltip
 def test_the_control_bar_keeps_one_row_with_the_heights_button():
     """16 layer toggles + Zoom + Full wrapped at a 6px gap once Heights was added (the owner 2026-10-05: "the new
     filter doesn't fit in one line"); a 2px minimum fits a 1280-px window's 685-px bar (628 px of buttons)."""
-    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     bar = css.replace("\r\n", "\n").split("\n.tc-controls-bar {", 1)[1].split("}", 1)[0]   # the bar's own rule
     assert "gap: 2px;" in bar and "justify-content: space-between;" in bar

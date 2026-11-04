@@ -1,4 +1,5 @@
 """Proofread of 7.37 (2026-10-30) — the innate rework patch; each rule in the generator so the next patch gets it too."""
+from patch.css_bundle import read_css
 import pytest
 
 import tools.generate_patch_code_v2 as g
@@ -452,8 +453,7 @@ def test_the_fold_glass_is_light_on_the_page():
     """Owner 2026-10-30: "озаботься, чтобы не нагружало страницу" — the fold control has no animation and blurs only
     while folded."""
     import re
-    from pathlib import Path
-    css = (Path(g._HERE) / "styles.css").read_text(encoding="utf-8")
+    css = read_css()
     block = css[css.index("/* the open / close control"):]
     block = block[:block.index("@media (prefers-reduced-motion: reduce) { .acr-fold-toggle")]
     assert not re.search(r"\banimation(?:-name)?\s*:", block) and "@keyframes" not in block
@@ -527,8 +527,7 @@ def test_a_card_rows_closing_tip_never_wraps_alone():
 def test_a_folded_texts_icons_do_not_grow():
     import re
     """Owner 2026-10-30: a hovered icon in a folded text was cut with the text (7.38 Mind of Tornarus' Wex)."""
-    import os
-    css = open(os.path.join(os.path.dirname(__file__), "..", "styles.css"), encoding="utf-8").read()
+    css = read_css()
     assert ".acr-fold:not(.is-open) .acr-fold-body .ability-chip:hover > img { transform: none;" in css
     # open, nothing cuts it (owner: "wex тут всё ещё обрезается при наведении")
     assert re.search(r"\.acr-fold\.is-open \.acr-fold-body \{[^}]*overflow: visible", css)

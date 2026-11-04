@@ -1,6 +1,7 @@
 """The header strip of a card pane spans the pane edge to edge through --pt / --px: every rule that sets a pane's
 padding sets them too (the new pane of an in-place card had padding 8px 14px but kept 0 / 4px, so its header stood
 inset while the old one didn't — owner 2026-10-24, 7.41 Elder Dragon Form)."""
+from patch.css_bundle import read_css
 import os
 import re
 
@@ -9,7 +10,7 @@ PANE_RE = re.compile(r"\.ability-change-(?:pane|new|old)\s*$")
 
 
 def test_every_pane_padding_rule_sets_the_header_vars():
-    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
     bad = []
     for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):

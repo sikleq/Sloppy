@@ -1,0 +1,275 @@
+/* ==========================================================================
+   09. MANA ITEMS
+   ========================================================================== */
+
+/* Notes section below the creeps table — long prose cells the spreadsheet
+/* ───────────────────────── MANA REGEN TABLE ───────────────────────────── */
+.mr-blurb {
+  /* Spans the full page width on every table page (Neutral Creeps /
+     Neutral Abilities / Mana Items) — no max-width clamp. The toolbar's
+     padding-top below handles the gap to the View / Price controls. */
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.mr-blurb strong { color: var(--text-main); font-weight: 600; }
+.mr-blurb code {
+  background: rgba(120, 117, 110, 0.12);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--text-main);
+}
+.mr-table {
+  width: 100%;
+  border-collapse: collapse;
+  /* Match the Neutral Creeps / Unit Abilities tables exactly (11.5px). */
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  /* Fixed layout: the Item column gets a set width, every numeric column then
+     splits the remaining page width EQUALLY (no auto-sized narrow/wide mix). */
+  table-layout: fixed;
+}
+/* Item column — wide enough for the icon + longest item name. */
+.mr-table .mr-col-name,
+.mr-table .mr-name {
+  width: 230px;
+}
+/* The seven numeric columns share the rest equally (table-layout: fixed gives
+   every width-less column an equal slice). Keep their text centred + clipped
+   cleanly if a header would otherwise overflow its equal slice. */
+.mr-table thead th:not(.mr-col-name) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.mr-table thead th,
+.mr-table tbody td {
+  /* Faint vertical separator on the left edge — matches Neutral Creeps /
+     Unit Abilities table convention. Skipped on the first column below. */
+  border-left: 1px solid rgba(213, 207, 195, 0.12);
+}
+.mr-table thead th:first-child,
+.mr-table tbody td:first-child {
+  border-left: none;
+}
+.mr-table thead th {
+  /* Typography matched 1:1 to .creeps-table thead th — inherits the 11.5px
+     table font size (no override), same weight, colour, padding, casing,
+     line-height so all three tables share one header design. */
+  background: var(--bg-panel-3);
+  color: var(--text-bright);
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 6px;
+  line-height: 1.2;
+  /* Cyan bottom rim + drop shadow drawn via box-shadow, NOT border-bottom:
+     Chrome drops collapsed borders on sticky cells mid-scroll (the line
+     vanished). An inset box-shadow repaints reliably while stuck. */
+  box-shadow:
+    inset 0 -2px 0 var(--blue-bright-85),
+    0 4px 10px var(--shadow-45);
+  cursor: pointer;
+  user-select: none;
+  position: sticky;
+  /* Mana Items now lives in the same .creeps-scroll box as Neutral Creeps:
+     the box is the scroll container, so the header pins at the box's top.
+     The subnav, blurb and toolbar scroll away above it (they're in-flow /
+     sticky-left only). */
+  top: 0;
+  z-index: 35;           /* above the hover-zoomed item icon (z 30) so a
+                            top-row icon pop-out never paints over the header,
+                            but below toolbar/subnav/nav (z 80/90/100) */
+  white-space: nowrap;
+}
+/* Toolbar pins right under the site nav. The painted background extends a
+   bit BELOW the buttons (padding-bottom) so that when the headers pin under
+   it there's a visible gap — not the buttons sitting flush on the table.
+   JS measures the toolbar's full height (incl. this padding) into
+   --mr-thead-top, so the headers pin exactly at the painted bottom edge. */
+.mr-toolbar {
+  /* Was position:sticky — user wants only the site nav and the table category
+     headers to stay pinned while scrolling. The Price filter + Hide Active
+     toggle now scroll away with the page. The table thead still sticks at
+     var(--mr-thead-top) so column names remain visible. */
+  position: relative;
+  z-index: 5;
+  background: var(--bg-page);
+  box-sizing: content-box;
+  /* Unified breathing room: 28px above the toolbar + 14px below, matching
+     the Neutral Creeps / Neutral Abilities / Calendar pages. JS reads the
+     resulting total height into --mr-thead-top automatically. */
+  margin-bottom: 0;
+  padding: 28px 0 14px;
+}
+/* OPAQUE hover background — a translucent one let table rows scrolling
+   beneath the sticky header bleed through. This is the var(--bg-panel-3) base blended
+   with the old rgba(48,54,61,0.5) tint, fully opaque. */
+.mr-table thead th:hover { background: #292825; }
+/* Sort indicator — identical glyph + dim/active logic to the creeps-table
+   convention: ↕ (neutral, dim), ↓ (desc, active), ↑ (asc, active). */
+/* (sort-ind centering is defined once in the shared rule above.) */
+/* Denser divider splitting raw stats (Price…Mana regen) from the computed
+   columns (Cost per regen onward). */
+.mr-table thead th.mr-col-cost_per_regen,
+.mr-table tbody td.mr-sep {
+  border-left: 2px solid rgba(213, 207, 195, 0.40);
+}
+/* sort-ind look (mask + colour) is defined once in the shared rule above. */
+.mr-table tbody td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(54, 53, 50, 0.5);
+  text-align: center;
+  color: var(--text-main);
+}
+.mr-table tbody tr:hover { background: rgba(54, 53, 50, 0.3); }
+/* Item-name cell: icon stays in a fixed-width left column so every icon
+   lines up vertically. Name + dropdown arrow share the right region as
+   an inline flex group — the arrow sits flush against the name so it
+   reads as "expand THIS item" rather than floating at the cell edge. */
+.mr-table .mr-name {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  /* Room so the hover-zoomed icon (.mr-ico scales 1.8) doesn't cover the name
+     — same fix as Neutral Abilities' .ua-ability-inner gap. */
+  gap: 16px;
+  text-align: left;
+  min-width: 230px;
+}
+.mr-name-body {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mr-name-text {
+  text-align: left;
+  white-space: nowrap;
+}
+.mr-name-text { color: var(--text-bright); font-weight: 500; }
+
+/* Engine-constant inline chip (+12 max mana, +0.05 mana regen per Int).
+   Visually it's just a bold value with the same dotted-underline cue used
+   by `.has-history` table cells — hover triggers the stat-hist-tip popup
+   driven by data-hist. Per-patch source: Liquipedia's
+   /Intelligence/Changelogs (hardcoded engine constants are not in our
+   scraped patchnotes_english.txt). */
+.mr-const {
+  font-weight: 600;
+  color: var(--text-main);
+}
+.mr-const.has-history {
+  cursor: help;
+  text-decoration: underline dotted rgba(213, 207, 195, 0.5);
+  text-underline-offset: 3px;
+}
+/* Match the patch-page convention for item icons (rectangular 50×36 cover) */
+.mr-ico {
+  width: 36px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px var(--blue-18);
+  transform-origin: center center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+/* Hover-zoom the item icon, mirroring the ability-icon pop-out (same scale +
+   centre origin as .abil-ico in the other tables) — symmetric expansion so it
+   doesn't dump itself onto the item name to the right. */
+.mr-ico:hover {
+  transform: scale(1.8);
+  position: relative;
+  z-index: 30;
+  box-shadow:
+    0 3px 8px var(--shadow-60),
+    0 0 0 1px var(--blue-40);
+}
+.mr-ico-blank {
+  background: rgba(120, 117, 110, 0.15);
+  border: 1px solid rgba(120, 117, 110, 0.3);
+  box-shadow: none;
+}
+/* Mana-regen multiplier chip (Kaya = +30%, etc). Sits inline next to the
+/* "Hide Active" toolbar toggle uses the existing ua-upgrades-toggle pill
+   styling; rows tagged .mr-active-row collapse via display: none. */
+.mr-table tbody tr.mr-active-row.mr-hide-active { display: none; }
+.mr-active-row .mr-name-text { color: var(--text-muted-blue-2); font-style: italic; }
+
+/* Price range combo — one bordered container holds both inputs + the
+   clear-X so they read as a single control. Inputs are borderless inside
+   (focus ring is drawn on the parent). */
+.mr-price-range {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-panel-3);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  transition: border-color 0.12s;
+}
+.mr-price-range:focus-within { border-color: var(--gold); }
+.mr-price-input {
+  width: 56px;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  padding: 4px 6px;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  outline: none;
+}
+.mr-price-input::placeholder { color: var(--text-dimmer); }
+.mr-price-input::-webkit-outer-spin-button,
+.mr-price-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mr-price-input { -moz-appearance: textfield; }
+.mr-price-sep { color: var(--text-dimmer); font-size: 12px; padding: 0 2px; user-select: none; }
+/* X button — flush against the right edge of the combo, no own border.
+   `hidden` attr on render hides it until at least one bound is set; JS
+   un-hides on input. */
+.mr-price-clear {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.12s;
+  border-left: 1px solid var(--line);
+}
+.mr-price-clear:hover { color: #f85149; }
+.mr-price-clear[hidden] { display: none; }
+.mr-table tbody tr.mr-filtered-out { display: none; }
+.mr-table tbody tr.mr-search-out { display: none; }
+.mr-table tbody tr.mr-attack-out,
+.creeps-table tbody tr.mr-attack-out {
+  display: none;
+}
+
+/* Clicked-row highlight — yellow outline around the ENTIRE row, not each
+   cell. Achieved with inset box-shadows on the TDs: top / bottom on all
+   cells, left edge on the first cell, right edge on the last cell —
+   together they form one continuous gold frame around the row. */
+.mr-table tbody tr.mr-row-selected > td {
+  box-shadow:
+    inset 0  2px 0 var(--gold-95),
+    inset 0 -2px 0 var(--gold-95);
+  background-image: linear-gradient(rgba(231, 196, 106, 0.10),
+                                    rgba(231, 196, 106, 0.10));
+}
+.mr-table tbody tr.mr-row-selected > td:first-child {
+  box-shadow:
+    inset  2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95);
+}
+.mr-table tbody tr.mr-row-selected > td:last-child {
+  box-shadow:
+    inset -2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95);
+}
+.mr-table tbody tr.mr-row-selected .mr-name-text { color: #fff8e0; }
+

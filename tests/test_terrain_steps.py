@@ -1,5 +1,6 @@
 """One Terrain page per patch whose map file changed (the owner 2026-10-02: "the difference between the letter
 patches has to be shown too, not just two major versions" — 7.39b's own changes were folded into 7.39 -> 7.40)."""
+from patch.css_bundle import read_css
 from patch.js_bundle import read_js
 import json
 import os
@@ -282,7 +283,7 @@ def test_no_ward_cells_added_are_green_and_removed_red_filled():
 def test_the_old_map_is_left_of_the_handle_under_its_chip():
     """The owner 2026-10-03 read a change outlined on 7.41c as "drawn on 7.41d": the new map was revealed from the
     left while the corner chips said "← OLD" left, "NEW →" right. Now the sides match the chips."""
-    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     assert ".tm-old { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }" in css
     assert ".tm-new { clip-path: inset(0 0 0 var(--pos)); }" in css
     assert ".tc-lens-new { clip-path: inset(0 0 0 var(--pos)); }" in css
@@ -471,7 +472,7 @@ def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
     assert 'class="tm-hl-g tm-hl-g-moved tm-hl-ghost"' in new_camps and "stroke-dasharray" in new_camps
     assert 'opacity="0.6"' in new_camps
     assert "tm-hl-ghost" not in old_camps
-    js_css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    js_css = read_css()
     assert ".terrain-compare.hl-hide-moved .tm-hl-g-moved" in js_css
     sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
     import terrain_shots as ts
@@ -560,7 +561,7 @@ def test_the_patch_label_opens_its_notes_and_the_tiles_pop_out():
     assert "document.createElement('a')" in picker and "'patches/' + ver + '.html'" in picker
     assert "'?from=' + here" in picker and "'#terrain'" in picker and "linkTo(groups[i].ver)" in picker
     assert "/^terrain_[0-9a-z]+$/.test(fromParam)" in js and "back.href = '../' + fromParam + '.html'" in js
-    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     hover = css.split(".tf-tile:hover {", 1)[1].split("}", 1)[0]
     assert "transform: scale(1.12)" in hover and "z-index: 2" in hover
     assert "a.tsp-label {" in css
@@ -598,7 +599,7 @@ def test_note_pictures_open_large_and_fold_under_the_button():
     js = read_js()
     block = js.split("Terrain note pictures", 1)[1][:3000]
     assert ".tshots-btn" in block and "pics.hidden = !open" in block and "img.dataset.large" in block
-    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     assert ".tshots[hidden] { display: none; }" in css and "cursor: zoom-in" in css
 
 

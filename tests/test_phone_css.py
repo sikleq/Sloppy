@@ -1,8 +1,8 @@
-"""The phone block of styles.css (2026-10-05): last in the file and entirely inside one narrow-screen media query,
+"""The phone block of the stylesheet (2026-10-05): last in the file and entirely inside one narrow-screen media query,
 so nothing in it can reach the desktop layout (docs/agent-rules/ui-style.md "Телефоны")."""
-from pathlib import Path
+from patch.css_bundle import read_css
 
-CSS = (Path(__file__).resolve().parent.parent / "styles.css").read_text(encoding="utf-8")
+CSS = read_css()
 
 
 def _phone_block():

@@ -11,6 +11,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts", "gen"))
 
 import gen_colorblind_css as cb  # noqa: E402
+from patch.css_bundle import read_css  # noqa: E402
 from patch import site_common  # noqa: E402
 
 # Machado, Oliveira & Fernandes 2009, severity 1.0, on linear RGB
@@ -21,8 +22,7 @@ _SIM = {
 
 
 def _css():
-    with open(cb.CSS, encoding="utf-8") as f:
-        return f.read()
+    return read_css()
 
 
 def _js():
@@ -57,7 +57,7 @@ def _min_de(pal, m):
 def test_block_is_up_to_date():
     """A new tag rule without its twin fails here: run python scripts/gen/gen_colorblind_css.py."""
     text = _css()
-    assert cb.build(text)[0] == text
+    assert cb.block_of(cb.build(text)[0]) == cb.block_of(text)
     assert text.index(cb.END) < text.index(cb.PHONES)          # the phone block stays last
 
 

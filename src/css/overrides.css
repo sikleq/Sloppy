@@ -1,0 +1,383 @@
+/* ==========================================================================
+   14. UTILITIES / OVERRIDES / LEGACY
+   (Nothing yet — overrides and one-off fixes will migrate here)
+   ========================================================================== */
+
+
+/* ---- Dynamics "Weights" mode ---- */
+/* Patch pages: the cell shows the patch's weighted score as a number (site font). */
+.dyn-cell-wrap.w-mode .dyn-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Radiance, "Segoe UI", Arial, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  /* dark halo so the digits stay readable on bright green/red/gold fills */
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.9), 0 1px 1px rgba(0, 0, 0, 0.8);
+}
+.dyn-cell-wrap.w-mode:not(.empty):hover .dyn-cell {
+  font-size: 5px;   /* hover scale(2.5) blows the digits up - keep them legible, not huge */
+}
+/* Matrices: every row is a line chart on its own axis (see dynDrawRowLines).
+   Touched cells hold an SVG segment; untouched cells draw just the baseline. */
+.heroes-dyn-table.w-mode td.hd-cell { padding: 0; }          /* no gaps: segments meet at cell edges */
+.heroes-dyn-table .dyn-cell-wrap.w-line { width: 100%; height: 28px; display: block; }
+.heroes-dyn-table .dyn-cell-wrap.w-line .dyn-cell {
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}
+.heroes-dyn-table .dyn-cell-wrap.w-line:not(.empty):hover .dyn-cell {
+  transform: none;                                             /* a chart segment must not pop out */
+  box-shadow: none;
+}
+.heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
+.heroes-dyn-table.w-mode td.he::after { width: 100%; }
+/* line chart pieces */
+.dyn-wl .seg { stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.dyn-wl .seg.up, .dyn-wl .pt.up { stroke: rgb(62, 178, 96); fill: rgb(62, 178, 96); }
+.dyn-wl .seg.down, .dyn-wl .pt.down { stroke: rgb(188, 92, 120); fill: rgb(188, 92, 120); }
+.dyn-wl .seg.flat, .dyn-wl .pt.flat { stroke: rgb(170, 165, 155); fill: rgb(170, 165, 155); }
+/* untouched cell that carries the tail of a neighbour's segment */
+.heroes-dyn-table.w-mode td.he { padding: 0; }
+.heroes-dyn-table.w-mode td.he.he-seg::after { display: none; }
+.heroes-dyn-table.w-mode td.he.he-seg > svg.dyn-wl { display: block; width: 100%; height: 28px; }
+.dyn-wl polyline { vector-effect: non-scaling-stroke; }
+.hs-attr-filter.hd-weights-btn img { width: 18px; height: 16px; display: block; image-rendering: pixelated; }
+.hd-weights-group { margin-left: 2px; }
+.heroes-dyn-table .dyn-cell-wrap.w-line .dyn-wl {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.dyn-wl .axis { stroke: rgba(205, 199, 187, 0.35); stroke-width: 1; }
+.dyn-wl polyline { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.dyn-wl.up polyline, .dyn-wl.up circle { stroke: rgb(62, 178, 96); fill: rgb(62, 178, 96); }
+.dyn-wl.down polyline, .dyn-wl.down circle { stroke: rgb(188, 92, 120); fill: rgb(188, 92, 120); }
+.dyn-wl.flat polyline, .dyn-wl.flat circle { stroke: rgb(170, 165, 155); fill: rgb(170, 165, 155); }
+.dyn-wl polyline { fill: none !important; }
+.heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
+.heroes-dyn-table.w-mode td.he::after {
+  height: 1px;
+  border-radius: 0;
+  background: rgba(205, 199, 187, 0.35);
+  vertical-align: middle;
+}
+/* Tooltip header: version on the left, weighted score on the right. */
+.dyn-tip-header.has-score {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dyn-tip-score {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.dyn-tip-score.pos { color: rgb(88, 200, 118); }
+.dyn-tip-score.neg { color: rgb(232, 96, 88); }
+.dyn-tip-score.zero { color: rgba(211, 205, 192, 0.8); }
+
+/* ---- Hero / Item Changes pages (builders/entity_changes.py) ---- */
+.entity-link { color: inherit; text-decoration: none; }
+/* an item named in a row's text: a link to its Changes page (owner 2026-10-30, 7.37 Roshan's drops) */
+/* a thin solid line, half-transparent: the dotted one drew crooked (owner 2026-10-30) */
+a.item-mention { color: var(--gold); text-decoration: underline; text-decoration-thickness: 1px;
+  text-underline-offset: 3px; text-decoration-color: rgba(227, 196, 106, 0.45); }
+a.item-mention:hover { text-decoration-color: var(--gold); }
+.entity-name .entity-link:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+.entity-icon .entity-link { display: block; line-height: 0; }
+.entity-icon .entity-link:hover img { filter: brightness(1.15); }
+/* head of a Changes page: its own look — no section accent line, a gold hairline under it,
+   big centred icon + pixel title, dynamics row stretched over the free width */
+body.patch-page .cat-panel.ec-head-panel {
+  margin-top: 18px; padding: 14px 22px; border-left: 0;
+  border-bottom: 1px solid var(--gold-line);
+  background: linear-gradient(90deg, rgba(227, 196, 106, 0.07) 0%, rgba(32, 31, 29, 0.30) 60%, rgba(0, 0, 0, 0.30) 100%);
+}
+body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
+/* the panel's own 14px padding is the only gap, the same above and below the head row */
+body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head { padding: 0; margin: 0; }
+body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { padding: 0; margin: 0; }
+.ec-head-panel .entity { margin: 0; align-items: center; gap: 18px; }
+.ec-head-panel .entity-icon { display: flex; align-items: center; }
+.ec-head-panel .entity-icon img { display: block; border-radius: 4px; box-shadow: 0 2px 10px var(--shadow-55); }
+.ec-head-panel .hero-icon img { width: 128px; height: auto; }
+.ec-head-panel .item-icon img { width: 88px; height: auto; }
+.ec-head-panel .entity-name { font-family: var(--font-j25); font-size: 34px; letter-spacing: 1.2px; text-transform: uppercase; line-height: 1; }
+.ec-head-panel .dyn-row-wrap { margin-right: 0; }
+/* hero page: 6 small item slots between the name and the patch-dynamics row,
+   the same 24px glassy pill as a .dyn-cell (4:3 so the item art reads) */
+/* 9 slots in two rows (5 + 4): the patch squares keep their room (owner 2026-09-28) */
+.ec-islots { display: grid; grid-template-columns: repeat(5, 32px); gap: 2px; padding: 2px 4px; flex: none; }
+.ec-islots + .dyn-row-wrap { margin-left: 14px; }
+/* the name takes only its own width (it used to stretch: "Io" held ~290px the patch squares need; owner
+   2026-09-28); a long one wraps */
+.ec-head-panel .entity-name.ec-name-slots { font-size: 28px; flex: 0 1 auto; max-width: 180px; }
+.ec-islot {
+  position: relative; width: 32px; height: 24px; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
+  background: rgba(5, 6, 9, 0.92); overflow: visible;
+  box-shadow: inset 0 1px 0 var(--shadow-45), inset 0 -1px 0 rgba(255, 255, 255, 0.05), inset 0 0 0 1px rgba(227, 196, 106, 0.18);
+  transition: box-shadow 0.14s ease, filter 0.14s ease;
+}
+.ec-islot:hover { box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.6); filter: brightness(1.25); }
+.ec-islot:focus-visible { outline: 1px solid rgba(213, 173, 95, 0.85); outline-offset: 1px; }
+/* empty slot: a small solid plus drawn from two 2px bars (crisp at any zoom, no font) */
+.ec-islot.is-empty::before, .ec-islot.is-empty::after {
+  content: ""; position: absolute; left: 50%; top: 50%; background: rgba(227, 196, 106, 0.55); border-radius: 1px;
+  transform: translate(-50%, -50%);
+}
+.ec-islot.is-empty::before { width: 8px; height: 2px; }
+.ec-islot.is-empty::after { width: 2px; height: 8px; }
+.ec-islot.is-empty:hover::before, .ec-islot.is-empty:hover::after { background: #f0dfa6; }
+.ec-islot img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 4px;
+  box-shadow: 0 1px 2px var(--shadow-55), inset 0 1px 0 var(--white-22);
+}
+.ec-islot .hl-slot-clear { top: -6px; right: -6px; width: 13px; height: 13px; font-size: 9px; line-height: 11px; }
+.ec-islot:hover .hl-slot-clear { opacity: 1; }
+/* Picker close = the site's round gold / leather button (back-to-top family) with a pixel X;
+   every Hero Lab / Hero Changes picker. The old inline SVG cross is hidden. */
+.hl-picker-close {
+  width: 32px; height: 32px; flex: none; padding: 0; border-radius: 50%; border: 2px solid var(--gold);
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="0" y="0" width="2" height="2"/><rect x="8" y="0" width="2" height="2"/><rect x="2" y="2" width="2" height="2"/><rect x="6" y="2" width="2" height="2"/><rect x="4" y="4" width="2" height="2"/><rect x="2" y="6" width="2" height="2"/><rect x="6" y="6" width="2" height="2"/><rect x="0" y="8" width="2" height="2"/><rect x="8" y="8" width="2" height="2"/></g></svg>'),
+    linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  background-repeat: no-repeat; background-position: center; background-size: 10px 10px, cover;
+  image-rendering: pixelated; box-shadow: inset 0 1px 0 var(--blue-cold-10), 0 3px 10px var(--shadow-55);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.hl-picker-close:hover { transform: translateY(-2px); filter: brightness(1.18); border-color: var(--gold); }
+.hl-picker-close svg { display: none; }
+/* search box + close share one top row (no "Shop" / "Items" title) */
+.ec-picker-top { display: flex; align-items: center; gap: 12px; padding: 14px 14px 4px; }
+.ec-picker-top .hl-picker-search { flex: 1 1 auto; }
+.ec-shop-card { position: relative; }
+.ec-picker-top.is-bare { position: absolute; top: 14px; right: 24px; padding: 0; z-index: 2; }
+.ec-picker-top.is-bare ~ .hl-shop-body { padding-top: 10px; }
+/* wide shop card (Hero Lab shop, hero-page picker): three categories per row in the Hero Lab
+   shop → far less scrolling; the hero-page picker gets the Item Changes page width */
+.ec-shop-card.is-wide { width: min(1580px, calc(100vw - 40px)); max-height: calc(100vh - 40px); }
+.ec-shop[data-panels="2"] .ec-ipanel-body { grid-template-columns: repeat(3, 1fr); }
+/* Pickers (hero-page item slots, Hero Lab shop + enchantments) = the Item Changes index:
+   same panels, Jersey titles and icon cards. Tiles keep .hl-item-tile for the pickers'
+   search / keyboard code, so its fixed Hero Lab size is reset to the card look here. */
+.ec-shop-card .hl-shop-body { padding: 4px 14px 12px; }
+.ec-shop.ec-igrid { margin-top: 6px; }
+.ec-shop[data-panels="2"] { grid-template-columns: 1fr 1fr; }
+.ec-shop[data-panels="1"] { grid-template-columns: 1fr; }
+.hl-enchant-picker.ec-shop-card { width: min(460px, calc(100vw - 56px)); }
+.ec-shop .hl-item-tile {
+  width: auto; height: auto; aspect-ratio: 88 / 64; padding: 0; border: 1px solid rgba(0, 0, 0, 0.55);
+  border-radius: 3px; background: var(--bg-panel-3); box-shadow: none; overflow: hidden;
+}
+.ec-shop .hl-item-tile img { transform: none; }
+.ec-shop .hl-item-tile.is-selected { border-color: #ffe08a; box-shadow: 0 0 0 2px #f1d27b, 0 0 10px 2px rgba(241, 210, 123, 0.55); }
+/* an item's changes inside a hero patch section: separated from the hero's own block */
+section.ec-patch .entity-block.ec-item-inject { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(227, 196, 106, 0.18); }
+/* one filter row: Tags | Show | Ability */
+.legend-tags.ec-filters { flex-wrap: wrap; row-gap: 5px; }
+.ec-vsep { width: 1px; height: 16px; margin: 0 8px; background: var(--line-bright, rgba(255,255,255,0.18)); flex: 0 0 auto; }
+/* ability chips: gold, so they do not blend with the blue Show filters */
+.ec-ab-btn {
+  cursor: pointer; user-select: none; font-family: inherit; font-size: 11px; padding: 3px 9px; border-radius: 3px;
+  background: rgba(227, 196, 106, 0.06); color: #c9b57a; border: 1px solid rgba(227, 196, 106, 0.28);
+  text-transform: uppercase; letter-spacing: 0.4px; transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.ec-ab-btn:hover { background: rgba(227, 196, 106, 0.13); border-color: rgba(227, 196, 106, 0.5); color: #f0dfa6; }
+.ec-ab-btn.active { background: rgba(227, 196, 106, 0.26); border-color: rgba(227, 196, 106, 0.75); color: #fff; }
+.ec-ab-btn.ec-ab-old { border-style: dashed; opacity: 0.85; }
+.ec-ab-btn[hidden] { display: none; }
+/* the patch banner = the same red section banner as "ITEM UPDATES" on a patch page */
+h2.section.ec-ver { display: flex; align-items: baseline; gap: 16px; }
+h2.section.ec-ver a { color: #fff; text-decoration: none; }
+h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.ec-date { font-family: var(--font-j25); font-size: 17px; letter-spacing: 1px; color: rgba(255, 255, 255, 0.72); }
+.ec-score {
+  margin-left: auto; padding: 3px 9px; border-radius: 3px; background: rgba(0, 0, 0, 0.42);
+  font: 600 13px/1 Radiance, "Segoe UI", Arial, sans-serif; letter-spacing: 0; text-shadow: none;
+  font-variant-numeric: tabular-nums; text-transform: none;
+}
+/* an item's score on a hero page (item slots): at the right of the item name line */
+.ec-item-inject > .entity > .ec-score { align-self: center; margin-left: auto; }
+.ec-score i { font-style: normal; font-weight: 400; color: rgba(255, 255, 255, 0.6); }
+.ec-score.pos { color: rgb(110, 220, 140); } .ec-score.neg { color: rgb(232, 143, 169); } .ec-score.zero { color: rgba(235, 228, 214, 0.85); }
+/* scope filter row (same look as the Group row on patch pages) */
+.ec-scope-btn {
+  cursor: pointer; user-select: none; font-family: inherit; font-size: 11px; padding: 3px 9px; border-radius: 3px;
+  background: rgba(227, 196, 106, 0.05); color: #a29e94; border: 1px solid rgba(227, 196, 106, 0.22);
+  text-transform: uppercase; letter-spacing: 0.4px; transition: filter 0.12s, background 0.12s, border-color 0.12s;
+}
+.ec-scope-btn:hover { background: rgba(227, 196, 106, 0.10); border-color: rgba(227, 196, 106, 0.40); color: var(--text-main); }
+.ec-scope-btn.active { background: rgba(227, 196, 106, 0.22); border-color: rgba(227, 196, 106, 0.60); color: var(--text-main); }
+.ec-scope-hide { display: none !important; }
+.ec-entity-note { margin: 0 0 6px; }
+/* a creep-hero folded into its hero's section (Spirit Bear under Lone Druid), as on the patch page */
+.ec-sub-entity { display: flex; align-items: center; gap: 6px; margin: 10px 0 4px; font-weight: 700;
+  color: var(--gold); font-size: 13px; }
+.ec-sub-entity img { width: 20px; height: 20px; border-radius: 3px; }
+.ec-ver .ec-ver-label .entity-new-type, .ec-ver .ec-ver-label .entity-changed-type {
+  margin-left: 12px; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.4px;
+  text-transform: uppercase; color: #b08c5a; opacity: 0.85; vertical-align: middle;
+}
+/* index pages: in-game order — a titled block per attribute / shop category, heroes flow
+   alphabetically TOP-TO-BOTTOM through CSS columns; no extra info on the tiles */
+.ec-index-body { padding: 12px 18px 28px; }
+.ec-index .toolbar-panel { display: flex; align-items: center; gap: 12px; }
+.ec-index .toolbar-panel .search-box { flex: 1 1 auto; }
+.ec-group { margin: 18px 0 6px; }
+.ec-group[hidden] { display: none; }
+.ec-group-title {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 8px; padding-bottom: 5px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-j25); font-weight: 400; font-size: 22px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-bright);
+}
+.ec-group-icon { width: 20px; height: 20px; }
+/* Index cards = plain icons, like the in-game hero picker / shop */
+.ec-card {
+  display: block; border: 1px solid rgba(0, 0, 0, 0.55); border-radius: 3px; background: var(--bg-panel-3);
+  overflow: hidden; color: inherit; text-decoration: none; transition: filter 0.12s ease, transform 0.12s ease, border-color 0.12s ease;
+}
+.ec-card[hidden] { display: none; }
+.ec-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Greyed via opacity only — NOT a `filter`. A CSS filter on the ~70 visible
+   roster cards (Item Changes) forced a compositing layer + per-pixel work on
+   every card and made the page janky to scroll; opacity is composited cheaply. */
+.ec-card.ec-old { opacity: 0.5; }
+.ec-card.ec-old:hover { opacity: 1; }
+/* item in the roster with no annotated change yet: greyed out, not a link */
+.ec-card.ec-nopage { opacity: 0.3; cursor: default; }
+.ec-card.ec-nopage:hover { border-color: rgba(0, 0, 0, 0.55); transform: none; }
+/* hover: the icon comes forward a little (same move as the Hero Lab inventory) */
+.ec-card:hover { border-color: var(--gold-line); filter: brightness(1.18);
+  transform: translateY(-3px) scale(1.06); position: relative; z-index: 5;
+  box-shadow: 0 4px 10px var(--shadow-60); }
+/* Heroes: Strength | Agility | Intelligence | Universal columns (4/4/4/3 icons per row) */
+.ec-hgrid { display: grid; grid-template-columns: 4fr 4fr 4fr 3fr; gap: 0 22px; margin-top: 14px; }
+.ec-hcol[hidden], .ec-igroup[hidden] { display: none; }
+.ec-hcards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.ec-hcol-universal .ec-hcards { grid-template-columns: repeat(3, 1fr); }
+.ec-card-hero { aspect-ratio: 256 / 144; }
+.ec-hcol { display: flex; flex-direction: column; }
+.ec-hstats { margin-top: auto; padding-top: 14px; }               /* pinned to the bottom → all four line up */
+/* Group summary: plain rows; small icons and colour make the numbers readable (2026-09-26) */
+.ec-hs-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; line-height: 1.35; }
+.ec-hs-table col.ec-hs-lab { width: 22.5%; }
+.ec-hs-table th, .ec-hs-table td { border: 1px solid rgba(255, 255, 255, 0.07); padding: 4px 5px; height: 26px;
+  box-sizing: border-box; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ec-hs-table tbody th { text-align: left; font-weight: 400; color: var(--text-dim); }
+.ec-hs-table td { text-align: center; color: var(--text-bright); }
+.ec-hs-table td b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.ec-hs-table td.ec-hs-hp b { color: #6fce5c; }
+.ec-hs-table td.ec-hs-mp b { color: #6aa6f0; }
+.ec-hs-table td.ec-hs-str b { color: var(--attr-str); }
+.ec-hs-table td.ec-hs-agi b { color: var(--attr-agi); }
+.ec-hs-table td.ec-hs-int b { color: var(--attr-int); }
+.ec-hs-table tr.ec-hs-cap th { font-family: var(--font-j25); font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-bright); background: rgba(255, 255, 255, 0.025); }
+.ec-hs-table tr.ec-hs-cap th + th { text-align: center; font-family: inherit; letter-spacing: 0.4px; font-size: 10px;
+  color: var(--text-dim); }
+.ec-hs-ico { width: 14px; height: 14px; object-fit: contain; vertical-align: -2px; margin-right: 4px; opacity: 0.9; }
+.ec-hs-table a.ec-hstat-who { display: flex; align-items: center; justify-content: flex-start; gap: 4px; min-width: 0;
+  color: var(--text-dim); }
+.ec-hs-table a.ec-hstat-who b { color: var(--text-bright); }
+.ec-hs-table a.ec-hstat-who span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+.ec-hs-table td.ec-hs-hero { text-align: left; }                     /* hero cell | value cell */
+.ec-hs-table td.ec-hs-val { text-align: center; }
+a.ec-hstat-who { text-decoration: none; }
+a.ec-hstat-who:hover { color: var(--gold); }
+.ec-hs-face { flex: none; width: 22px; height: 12px; object-fit: cover; }
+.ec-hstat-who { color: var(--text-dim); font-weight: 400; }
+.ec-hcol-strength .ec-group-title { color: var(--attr-str); }
+.ec-hcol-agility .ec-group-title { color: var(--attr-agi); }
+.ec-hcol-intelligence .ec-group-title { color: var(--attr-int); }
+.ec-hcol-universal .ec-group-title { color: var(--attr-uni); }
+/* Items: Basics | Upgrades | Neutral Items panels, 4 icons per row inside a category */
+.ec-igrid { display: grid; grid-template-columns: 4fr 4fr 3fr; gap: 0 16px; margin-top: 14px; }
+.ec-ipanel { border: 1px solid var(--line); border-radius: 6px; background: rgba(0, 0, 0, 0.18); padding: 10px 12px 6px; }
+.ec-ipanel-title { justify-content: center; }
+.ec-ipanel-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; align-content: start; }
+.ec-ipanel-body-1 { grid-template-columns: 1fr; }
+.ec-igroup { margin: 8px 0 4px; }
+.ec-igroup-title {
+  display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 6px;
+  font-family: var(--font-j25); font-weight: 400; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+}
+.ec-tier-time { font-family: inherit; font-size: 12px; letter-spacing: 0.5px; text-transform: none; color: var(--text-dim); }
+.ec-icards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.ec-ipanel-neutral .ec-icards { grid-template-columns: repeat(6, 1fr); }
+.ec-card-item { aspect-ratio: 88 / 64; }
+/* Unit Changes index — neutral-camp difficulty columns (Easy/Medium/Hard/
+   Ancient/Other), icon-only cards like the hero picker; a hover title names the
+   creep. Roster creeps with no change this cycle render greyed and unclickable. */
+/* Flush-left (no max-width/centering) so the first column aligns with the
+   toolbar panel and with the Hero/Item index grids — the shared ec-index-body
+   left inset is the single source of truth; new index kinds inherit it.
+   Columns GROW to fill the row (flex: 1) so there is no empty right gutter at
+   any page zoom, on the full row and on any wrapped row; cards inside auto-fill
+   at a fixed width so they stay hero-sized as the column widens. The column gap
+   is wide so the categories read as clearly separated groups. */
+/* Column gap grows with the viewport (clamped) so that 2 cards per column keep
+   pace with the Hero Changes cards, which scale with width — a fixed gap made
+   unit cards drift bigger on wide monitors. Columns flex-grow to fill the row;
+   a small basis avoids mid-width wrapping. */
+.ec-ugrid { display: flex; flex-wrap: wrap; gap: 18px clamp(34px, 4vw + 12px, 150px); margin-top: 14px; align-items: flex-start; }
+.ec-ucol { flex: 1 1 110px; min-width: 0; }
+/* Unit column titles inherit the shared .ec-group-title look (same font + size
+   as Hero attribute / Item panel headers); only keep them on one line. */
+.ec-ucol .ec-group-title { white-space: nowrap; }
+.ec-camp-ico { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; opacity: 0.9; }
+/* 2 cards per column-row, each 1fr so it SCALES with the viewport like the Hero
+   Changes cards do (a fixed px width stayed small on wide monitors while hero
+   cards grew). The wide column gap tunes the width so a unit card ≈ a hero card
+   at common widths; columns flex-grow to fill the row. */
+.ec-ucards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.ec-card-unit { aspect-ratio: 128 / 72; border-radius: 4px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--muted-04); transition: transform 0.12s, border-color 0.12s; }
+.ec-card-unit img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ec-card-unit:not(.ec-nopage):not(.ec-static):hover { transform: translateY(-2px); border-color: rgba(227, 196, 106, 0.5); }
+.ec-card-unit.ec-nopage { opacity: 0.38; }
+.ec-card-unit.ec-nopage:hover { opacity: 0.62; }
+/* Structures catalogue: full-colour but non-clickable — no hover lift. */
+.ec-card-unit.ec-static { cursor: default; }
+@media (max-width: 900px) { .ec-ucol { flex: 1 1 44%; } }
+@media (max-width: 1100px) {
+  .ec-hgrid { grid-template-columns: 1fr 1fr; }
+  .ec-igrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .ec-hgrid { grid-template-columns: 1fr; }
+  .ec-hcards, .ec-hcol-universal .ec-hcards { grid-template-columns: repeat(5, 1fr); }
+  .ec-ipanel-body { grid-template-columns: 1fr; }
+}
+
+/* Tighter end of a section panel (patch pages AND Changes pages): the panel is cut ~12px under
+   its last row instead of ~47px (ul 3 + ability-block 8 + entity-block 16 + panel 20). */
+body.patch-page .cat-panel { padding-bottom: 4px; }
+body.patch-page .cat-panel > .entity-block:last-child { padding-bottom: 8px; }
+body.patch-page .cat-panel > .entity-block:last-child .ability-block:last-child,
+body.patch-page .cat-panel > .entity-block:last-child .ec-scope:last-child .ability-block:last-child { margin-bottom: 0; }
+body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { margin-bottom: 0; }
+
+/* a unit named inside a row (creep_ref): small portrait + bold name, capped to the line height */
+.creep-ref { white-space: nowrap; }
+.creep-ref img { width: 28px; height: 16px; object-fit: cover; border-radius: 2px; vertical-align: -3px; margin: 0 4px 0 2px; }
+.creep-ref b { font-weight: 700; color: var(--text-bright); }
+/* camp compositions (camp_table): a light table inside the row, creep names in columns */
+.camp-table {
+  display: grid; grid-template-columns: max-content repeat(var(--camp-cols, 2), max-content);
+  margin: 6px 0 2px 2px; align-items: stretch;
+}
+/* thin see-through lines between rows and columns, like the site's tables */
+.camp-table .camp-name, .camp-table .camp-cell {
+  display: flex; align-items: center; padding: 3px 14px;
+  border-bottom: 1px solid var(--line-soft); border-left: 1px solid var(--line-soft);
+}
+.camp-table .camp-name { color: var(--text-dim, #969289); padding-left: 0; border-left: 0; }
+.camp-table .camp-num { justify-content: center; font-variant-numeric: tabular-nums; font-weight: 700; }
+.camp-table .camp-head { color: var(--text-dim, #969289); font-size: 12px; font-weight: 400; }
+

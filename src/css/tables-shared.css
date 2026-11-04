@@ -1,0 +1,125 @@
+/* ==========================================================================
+   07. TABLES SHARED
+   ========================================================================== */
+
+/* ============================================================================
+   UNIFIED TOOLBAR PANEL — SITE STANDARD (every Materials toolbar).
+   All controls live inside ONE bordered surface (.toolbar-panel) instead of a row
+   of separate floating pills. The outer .cal-toggle-bar.inbox-bar keeps the
+   Materials rhythm (28px side inset + top/bottom gaps); .toolbar-panel is the
+   raised surface. RULE: wrap any new page's toolbar controls in
+   <div class="toolbar-panel">…</div>.
+   ============================================================================ */
+.hd-page .cal-toggle-bar.hd-toolbar { flex-wrap: wrap; row-gap: 8px; }
+.toolbar-panel {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 6px 6px; width: 100%; flex: 1 1 100%; box-sizing: border-box;
+  background: var(--bg-panel-2); border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 12px;
+}
+/* Switches + chip/label groups go FLAT (transparent) — the panel border replaces
+   their individual pill borders. Inputs/selects (search, price combo, View select)
+   keep their own field border. Chips keep their own design. */
+.toolbar-panel .ua-upgrades-toggle,
+.toolbar-panel .hd-remove-group,
+.toolbar-panel .hs-attack-filter-group,
+.toolbar-panel .hs-attr-filter-group,
+.toolbar-panel .hs-level-group,
+.toolbar-panel .view-group {
+  background: transparent; border-color: transparent;
+}
+.toolbar-panel .ua-upgrades-toggle:hover { border-color: transparent; }
+.toolbar-panel .ua-upgrades-toggle { padding: 4px 4px; gap: 5px; }
+/* Thin divider before every control except the first — so the panel reads as one
+   surface with sections. EXCEPT between two consecutive switches (they group
+   tightly, no divider). */
+.toolbar-panel > *:not(:first-child) { position: relative; padding-left: 12px; }
+.toolbar-panel > *:not(:first-child)::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 18px; background: var(--line);
+}
+.toolbar-panel > .ua-upgrades-toggle + .ua-upgrades-toggle { padding-left: 4px; }
+.toolbar-panel > .ua-upgrades-toggle + .ua-upgrades-toggle::before { content: none; }
+.hs-attack-filter-group,
+.hs-attr-filter-group,
+.hs-level-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  box-sizing: border-box;
+}
+.hs-attack-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px 0 6px;
+  border: 1px solid var(--white-12);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease, filter 0.12s ease;
+}
+.hs-attr-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--white-12);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, filter 0.12s ease;
+}
+.hs-attack-filter:hover {
+  color: #fff;
+  border-color: var(--gold-line);
+  filter: brightness(1.12);
+}
+.hs-attr-filter:hover {
+  border-color: var(--gold-line);
+  filter: brightness(1.12);
+}
+.hs-attack-filter.active,
+.hs-attack-filter[aria-pressed="true"] {
+  border-color: rgba(227, 196, 106, 0.82);
+  background: var(--gold-14);
+  box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.12);
+}
+.hs-attr-filter.active,
+.hs-attr-filter[aria-pressed="true"] {
+  border-color: rgba(227, 196, 106, 0.82);
+  background: var(--gold-14);
+  box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.12);
+}
+.hs-attack-filter .atk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 18px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background: linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.hs-attack-filter .atk-badge img {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  display: block;
+  opacity: 0.9;
+}
+.hs-attr-filter img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
+}
+

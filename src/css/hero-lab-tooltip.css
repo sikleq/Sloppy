@@ -1,0 +1,436 @@
+/* ---- Item tooltip — 1:1 port of the in-game Dota 2 Panorama tooltip ----
+   Values lifted from the decompiled game CSS (tooltip_ability.css +
+   ability_details_v2.css): colors are the Valve @define constants, the
+   container is the AbilityContents shell, typography is Radiance.
+     TextColor      #B9CCE5   TextColorDark  #8698B0   TextColorLight #CEDDF0
+     Gold1          #FFEDD2   Green          #68C08B
+     Magical #7C81FF  Physical #DF5454  Pure #BE934E                       */
+.hl-tooltip {
+  position: fixed;
+  z-index: 9999;
+  width: 360px;                /* AbilityContents width */
+  background: linear-gradient(to bottom, #1c2024fd, #000000fd);
+  border: 2px solid #000;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+  font-family: var(--font-dota);
+  font-size: 15px;
+  color: #B9CCE5;              /* TextColor */
+  pointer-events: none;
+  line-height: 1.4;
+}
+.hl-tooltip[hidden] { display: none; }
+.hl-innate-tooltip {
+  width: min(320px, calc(100vw - 24px));
+}
+.hlt-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px 9px;
+}
+/* Neutral items — tier-coloured header (game NeutralTier1..5 palette):
+     T1 #BEBEBE  T2 #92E47E  T3 #7F93FC  T4 #D57BFF  T5 #FFE195
+   Header gets the tier tint (col@~20% → ~2%); name takes the tier colour. */
+.hl-tooltip.neutral-tier-1 .hlt-head { background: linear-gradient(to right, #BEBEBE33, #BEBEBE05); }
+.hl-tooltip.neutral-tier-2 .hlt-head { background: linear-gradient(to right, #92E47E33, #92E47E05); }
+.hl-tooltip.neutral-tier-3 .hlt-head { background: linear-gradient(to right, #7F93FC33, #7F93FC05); }
+.hl-tooltip.neutral-tier-4 .hlt-head { background: linear-gradient(to right, #D57BFF33, #D57BFF05); }
+.hl-tooltip.neutral-tier-5 .hlt-head { background: linear-gradient(to right, #FFE19533, #FFE19505); }
+.hl-tooltip.neutral-tier-1 .hlt-name { color: #BEBEBE; }
+.hl-tooltip.neutral-tier-2 .hlt-name { color: #92E47E; }
+.hl-tooltip.neutral-tier-3 .hlt-name { color: #7F93FC; }
+.hl-tooltip.neutral-tier-4 .hlt-name { color: #D57BFF; }
+.hl-tooltip.neutral-tier-5 .hlt-name { color: #FFE195; }
+.hlt-icon {
+  width: 58px;
+  height: 42px;
+  border: 1px solid #000;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.45);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.hlt-title { display: flex; flex-direction: column; gap: 3px; }
+.hlt-name {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;            /* Radiance SemiBold */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;       /* TitleFont (game uses 2px panorama-units → ~0.5px web) */
+  text-shadow: 2px 2px 0 #000;
+}
+.hlt-cost {
+  color: #FFEDD2;              /* Gold1 */
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hlt-gold-icon {
+  width: 20px; height: 14px;
+  object-fit: contain;
+  vertical-align: -1px;
+  flex-shrink: 0;
+}
+.hlt-info {
+  padding: 4px 12px 6px;
+  font-size: 12px;
+  color: #757E91;             /* TextColorStat */
+  letter-spacing: 0.04em;
+}
+.hlt-stats {
+  padding: 5px 12px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hlt-stat {
+  font-size: 15px;
+  color: #8698B0;             /* TextColorDark */
+}
+.hlt-stat b {
+  color: #CEDDF0;             /* TextColorLight — the bonus number */
+  font-weight: 600;
+}
+.hlt-penalty, .hlt-penalty b {
+  color: #F44336;
+}
+.hlt-ability-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 11px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+/* Ability header bar — tinted by type, matching the in-game item tooltip:
+     passive  bg #1c262f→#1b262f  text #626d7b
+     active   bg #171d2f→#1b2437  h1   #b0b0ff
+     use      bg #15221f→#1a2926  text #95c07a  (consumables: Tango, Salve) */
+.hlt-ability-bar.is-passive {
+  background: linear-gradient(to bottom, #1c262f, #1b262f);
+  color: #b8c2cf;
+}
+.hlt-ability-bar.is-active {
+  background: linear-gradient(to bottom, #171d2f, #1b2437);
+  color: #b0b0ff;
+}
+.hlt-ability-bar.is-use {
+  background: linear-gradient(to bottom, #15221f, #1a2926);
+  color: #95c07a;
+}
+.hlt-ability-costs {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #CEDDF0;
+}
+.hlt-cost-icon { display: flex; align-items: center; gap: 3px; }
+.hlt-cost-icon::before {
+  content: '';
+  display: inline-block;
+  width: 16px; height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+/* In-game the cost VALUES are all one color (TextColorLight); only the
+   icons are colored — so don't tint the text per type. */
+.hlt-cost-icon { color: #CEDDF0; }
+.hlt-cast-range::before { background-image: url('icons/misc/tt_castrange.png'); }
+.hlt-mana-cost::before { background-image: url('icons/misc/tt_manacost.png'); }
+.hlt-cooldown::before { background-image: url('icons/misc/tt_cooldown.png'); }
+.hlt-desc {
+  padding: 9px 12px;
+  font-size: 15px;
+  color: #626d7b;            /* item description body (game) */
+  background: #1b242d;
+}
+/* Description block tinted to match its ability header type (game values). */
+.hlt-desc.is-passive { background: #1b242d; color: #626d7b; }
+.hlt-desc.is-active  { background: #171d2f; color: #7a80a7; }
+.hlt-desc.is-use     { background: #15221f; color: #7b8a72; }
+.hlt-desc br { display: block; margin: 3px 0; }
+.hlt-desc .GameplayValues { color: #474a61; }
+.hlt-desc .GameplayVariable { color: #7e8c9d; }
+.hlt-desc.is-active .GameplayVariable { color: #9f9fcf; }
+.hlt-desc.is-use .GameplayVariable { color: #95c07a; }
+.hlt-notes {
+  padding: 7px 12px 9px;
+  border-top: 1px solid rgba(255,255,255,0.035);
+  background: #111820;
+}
+.hlt-note {
+  position: relative;
+  padding-left: 10px;
+  color: #757e91;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.hlt-note::before {
+  content: "\2022";
+  position: absolute;
+  left: 0;
+  color: #526173;
+}
+@media (max-width: 1040px) {
+  .hero-lab {
+    grid-template-columns: 1fr;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .hl-diff-panel {
+    order: 3;
+  }
+}
+@media (max-width: 820px) {
+  .hl-hud {
+    grid-template-columns: 1fr;
+  }
+  .hl-inventory {
+    justify-content: start;
+  }
+  .hl-picker-card {
+    width: min(100vw - 20px, 1180px);
+    max-height: calc(100vh - 20px);
+  }
+}
+@media (max-width: 560px) {
+  .hero-lab {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .hl-identity {
+    grid-template-columns: 1fr;
+  }
+  .hl-identity {
+    display: block;
+  }
+  .hl-inventory {
+    grid-template-columns: 220px 62px;
+    grid-template-rows: 122px;
+  }
+  .hl-inv-grid {
+    grid-template-columns: repeat(3, minmax(0, 60px));
+  }
+  .hl-enchant-slot {
+    width: 30px;
+    height: 30px;
+  }
+  .hl-inv-slot {
+    width: 100%;
+  }
+  .hl-hero-grid {
+    grid-template-columns: repeat(auto-fill, minmax(48px, 48px));
+  }
+  .hl-hero-tile,
+  .hl-item-tile {
+    width: 48px;
+    height: 36px;
+  }
+}
+.hs-level-group {
+  color: var(--text-main);
+  font-size: 12px;
+}
+.hs-level-group span {
+  color: var(--text-dim);
+  /* Match the "View" label spec (the toolbar-label standard): 600 / 11px /
+     0.6px tracking — was 700 / 12px, which read taller than its neighbours. */
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.hs-level-group input {
+  width: 44px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--bg-panel);
+  color: var(--text-bright);
+  font: inherit;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  /* Hide native number-spinner controls — easy to misclick when aiming at
+     the field itself. Keyboard +/- + scroll-wheel still work. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.hs-level-group input::-webkit-outer-spin-button,
+.hs-level-group input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.hs-level-group input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(227, 196, 106, 0.22);
+}
+.hs-level-group input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* A toolbar search box always sits on its OWN full-width row at the bottom of the
+   panel (flex-basis 100% forces a wrap) — even when there are few other controls.
+   No leading divider/indent since it owns its row. */
+.toolbar-panel > .hd-search {
+  flex: 1 1 100%; min-width: 0; padding-left: 0; margin-top: 2px;
+}
+.toolbar-panel > .hd-search::before { content: none; }
+.toolbar-panel > .hd-search input { width: 100%; box-sizing: border-box; }
+/* "Remove" group + search wrapped in the SAME 32px bordered pill-block as the
+   switches, so all toolbar controls share one height/baseline. */
+.hd-remove-group {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; box-sizing: border-box; padding: 0 10px;
+  background: var(--bg-panel-3); border: 1px solid var(--line); border-radius: 5px;
+}
+.hd-search { flex: 0 1 240px; min-width: 150px; }
+.hd-search input { height: 32px; box-sizing: border-box; }
+/* "Remove" tag chips: the patch-page badges, clickable. A removed tag sinks in
+   (inset shadow + nudge) and greys out — visibly "off". */
+.hd-tag {
+  cursor: pointer; user-select: none; font-family: inherit; font-size: 11px;
+  padding: 2px 9px; transition: filter 0.12s, transform 0.12s, opacity 0.12s, box-shadow 0.12s;
+}
+.hd-tag:hover { filter: brightness(1.18); transform: translateY(-1px); }
+.hd-tag.removed {
+  filter: grayscale(1) brightness(0.62); opacity: 0.5; transform: translateY(1px);
+  box-shadow: inset 0 2px 4px var(--shadow-55);
+}
+/* Multi-select dropdown (items_dyn Type / Category): the button is FLAT inside the
+   panel — no own box/border, just text + caret like the switches, so every control
+   shares one height and the panel is the only border. The gold badge shows the
+   selected count (blank when all are selected = no active filter). Only the popover
+   itself is a floating box. */
+.hd-dd { position: relative; display: inline-flex; }
+.hd-dd-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; box-sizing: border-box; padding: 0 2px;
+  background: transparent; border: none; border-radius: 0;
+  color: var(--text-main); font-family: inherit; font-size: 12.5px;
+  cursor: pointer; user-select: none; transition: color 0.12s;
+}
+.hd-dd-btn:hover .hd-dd-label,
+.hd-dd-btn[aria-expanded="true"] .hd-dd-label { color: #fff; }
+.hd-dd-caret { color: var(--text-dim); flex: none; transition: transform 0.12s; }
+.hd-dd-btn[aria-expanded="true"] .hd-dd-caret { transform: rotate(180deg); color: var(--text-main); }
+.hd-dd-badge { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+.hd-dd-badge:empty { display: none; }
+/* Popover is PORTALED to <body> + positioned `fixed` by JS (top/left), so it escapes
+   .creeps-scroll's contain:paint clip and never pushes a scrollbar on an empty table. */
+.hd-dd-menu {
+  position: fixed; z-index: 1000;
+  min-width: 150px; white-space: nowrap; max-height: 70vh; overflow: auto;
+  background: var(--bg-panel); border: 1px solid var(--line); border-radius: 6px;
+  padding: 5px; box-shadow: 0 6px 22px var(--shadow-50);
+  display: flex; flex-direction: column; gap: 1px;
+}
+.hd-dd-menu[hidden] { display: none; }
+.hd-dd-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 4px;
+  font-size: 12.5px; color: var(--text-main); cursor: pointer; user-select: none;
+}
+.hd-dd-opt:hover { background: var(--bg-panel-3); }
+.hd-dd-opt input { accent-color: var(--gold); width: 14px; height: 14px; cursor: pointer; flex: none; }
+.hd-dd-all { font-weight: 700; color: var(--gold); }   /* the "All" master row */
+.hd-dd-sep { height: 1px; background: var(--line); margin: 3px 2px; }
+/* The dynamics toolbar must out-stack the table's sticky header/corner cells
+   (z up to 52, hover-zoom 60) so an open dropdown popover isn't hidden under them.
+   Overrides the z-index:6 from `.creeps-scroll > .inbox-bar`. */
+.creeps-scroll > .cal-toggle-bar.hd-toolbar { z-index: 62; }
+/* Price filter (items_dyn + mana_items, both use .toolbar-panel): FLAT — the range
+   has no box, inputs read as underlined fields, label is muted. Same height as the
+   rest. The 12px inner left padding keeps the "Price" label off the focus-ring border
+   even when the control is the panel's FIRST child (mana_items, where the divider's
+   left gap doesn't apply). */
+.toolbar-panel .mr-price-range {
+  height: 32px; box-sizing: border-box; padding-left: 12px;
+  background: transparent; border-color: transparent;
+}
+.mr-price-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text-dim); padding-right: 4px; user-select: none;
+}
+.toolbar-panel .mr-price-input {
+  width: 44px; padding: 3px 2px;
+  border-bottom: 1px solid var(--line); border-radius: 0; transition: border-color 0.12s;
+}
+.toolbar-panel .mr-price-input:focus { border-bottom-color: var(--gold); }
+.toolbar-panel .mr-price-clear { border-left: none; }
+/* Uniform 32px height for the flat switches too, so every panel control lines up. */
+.toolbar-panel .ua-upgrades-toggle { height: 32px; }
+/* Full-height vertical divider separating super-category (base-version) groups —
+   same idea as Neutral Creeps' .col-sep category dividers. On the first column
+   of each group (except the first); aligns with the cat-row's group border. */
+.heroes-dyn-table th.hd-gsep,
+.heroes-dyn-table td.hd-gsep { border-left: 2px solid rgba(213, 207, 195, 0.22); }
+/* Patch column header: just the version; release date shows in the hover tip. */
+.heroes-dyn-table th.hd-patch {
+  white-space: nowrap; padding: 4px 2px; font-weight: 600; font-size: 12px;
+  color: var(--text-main); text-align: center; vertical-align: bottom; cursor: help;
+  overflow: hidden;
+}
+/* Super-category row: base version (e.g. 7.41) spanning its lettered variants
+   (7.41/a/b/c). Reuses the shared .cat-head sticky/layout infrastructure;
+   overrides the dim-uppercase look for a centred version number. Solo bases
+   (single patch, no letters) render an empty cell — no label. JS
+   dynRecomputeSupercats() re-spans these to the visible columns after fit. */
+.heroes-dyn-table thead tr.cat-row th.hd-supercat {
+  font-size: 12px; text-transform: none; letter-spacing: 0.02em;
+  color: #bcb7ac; text-align: center;
+}
+/* The cell over the frozen Hero column continues the hero divider (0.30) up
+   through the super-category row. (Beats the shared .cat-head:first-child 0.22
+   rule via the extra .heroes-dyn-table class + later source order.) */
+.creeps-table.heroes-dyn-table thead tr.cat-row th.hd-hero-cat {
+  border-right: 2px solid var(--blue-30);
+}
+/* Cell holding one dyn-cell pill (or the empty-diamond pseudo). */
+.heroes-dyn-table td.hd-cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: 2px;
+  line-height: 0;
+}
+/* Trailing spacer column: fills the reserved right-edge gutter (where the last
+   patch column's 2.5× hover-pop overflows) with a clipped slice of an empty
+   column, so the grid reaches the box edge instead of ending in blank space.
+   Fixed 24px (= HD_RIGHT_GUTTER in scripts.js); the 28px empty diamond is
+   left-aligned and clipped by the cell → reads as a column cut off at the edge. */
+.creeps-table.heroes-dyn-table th.hd-spacer,
+.creeps-table.heroes-dyn-table td.hd-spacer {
+  width: 24px; min-width: 24px; max-width: 24px;
+  overflow: hidden;
+  text-align: left;
+}
+/* The trailing spacer is pure hover-pop room for the last patch column — render
+   NOTHING in it (no empty diamond). A faded square still read as "the grid continues
+   past the last patch"; an invisible gutter just lets the grid end cleanly. */
+.creeps-table.heroes-dyn-table td.hd-spacer::after { display: none; }
+/* Bigger pill in the matrix than on patch pages (28px vs 24px) — more legible
+   in a dense grid; scoped so patch pages keep their size. */
+.heroes-dyn-table .dyn-cell-wrap { width: 28px; height: 28px; }
+/* PERF: empty cells are the bulk of the ~14k-cell grid. A flat fill (NO
+   box-shadow, no opacity layer) paints far cheaper than thousands of inset
+   shadows — the main scroll-jank source on this page. */
+.heroes-dyn-table td.hd-cell.hd-empty::after,
+.heroes-dyn-table td.he::after {
+  content: ''; display: inline-block; width: 28px; height: 28px; border-radius: 4px;
+  background: rgba(14, 14, 13, 0.72);
+}
+/* Outside the item's lifespan (items_dyn): the item wasn't in the game in this
+   patch — either not added yet, or already removed. NO empty-slot square; just a
+   tiny faint dot so the live span reads as a clear band of slots flanked by
+   "n/a" gaps. Flat fill (no shadow) keeps the big grid cheap to paint. */
+.heroes-dyn-table td.hd-cell.hd-absent::after,
+.heroes-dyn-table td.ha::after {
+  content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(138, 134, 126, 0.16);
+}

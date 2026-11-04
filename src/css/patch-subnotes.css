@@ -1,0 +1,297 @@
+/* Collapsible subnote — long bullet lists hidden behind a "▶ summary (N)"
+   click target. Native <details>/<summary> preserves keyboard and SR support. */
+.subnote-collapse > summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline;
+  user-select: none;
+}
+.subnote-collapse > summary::-webkit-details-marker { display: none; }
+.subnote-collapse > summary::before {
+  content: "▶";
+  display: inline-block;
+  width: 10px;
+  margin-right: 4px;
+  font-size: 9px;
+  color: var(--text-dimmer);
+  transition: transform 0.15s;
+}
+.subnote-collapse[open] > summary::before { transform: rotate(90deg); }
+.subnote-collapse > summary:hover { color: var(--text-main); }
+.subnote-count {
+  color: var(--text-dimmer);
+  font-weight: 500;
+  font-size: 12px;
+}
+ul.subnote-items {
+  margin: 4px 0 4px 18px;
+  list-style: none;
+}
+ul.subnote-items > li {
+  padding: 1px 0;
+  line-height: 1.45;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+ul.subnote-items > li::before {
+  content: "•  ";
+  color: var(--text-dimmer);
+}
+
+/* Block-level 'Show list (N)' info row that drops to a new line below the
+   sentence inside an ability box. Matches the visual language of
+   subnote-collapse (rotating triangle arrow) but lives inside the box. */
+.show-list-inline {
+  display: block;
+  grid-column: 1 / -1;        /* span full li width inside the row grid */
+  margin-top: 0;
+}
+.show-list-inline > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-size: 12.5px;
+  user-select: none;
+}
+.show-list-inline > summary::-webkit-details-marker { display: none; }
+/* ↳ corner arrow (matches the subnote-style indent marker) followed by the
+   rotating ▸ chevron. Both rendered via a single ::before so they animate
+   together. */
+.show-list-inline > summary::before {
+  content: '\21B3';           /* ↳ */
+  display: inline-block;
+  color: var(--text-dimmer);
+  font-size: 12.5px;
+  margin-right: 2px;
+}
+.show-list-inline > summary > .show-list-chevron {
+  display: inline-block;
+  color: var(--text-dimmer);
+  font-size: 11px;
+  transition: transform 0.15s ease;
+}
+.show-list-inline[open] > summary > .show-list-chevron { transform: rotate(90deg); }
+.show-list-inline > summary:hover { color: var(--text-main); }
+.show-list-inline[open] > summary { color: var(--text-main); }
+.show-list-inline > .show-list-body {
+  display: block;
+  margin: 6px 0 2px 6px;
+  padding: 0;
+}
+.show-list-inline > .show-list-body > .show-list-item {
+  display: block;
+  padding: 1px 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.show-list-inline > .show-list-body > .show-list-item::before {
+  content: "•  ";
+  color: var(--text-dimmer);
+}
+
+/* One-liner ↳ note hanging off a li (passed via extra= on li()). Drops to a
+   new visual line below the row text. Spans the FULL li width (col 1 / -1)
+   like correction-note, formula-table, subnote — using the tag column's
+   empty space below the tag rather than leaving it blank. The ↳ glyph
+   provides the visual indent so the note still reads as a child of the row. */
+.inline-note {
+  display: block;
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.45;
+  /* ↳ pseudo is absolute-positioned so the note's body content (including
+     wrapping lines and <br>-separated entries) all share the same left
+     indent — first line isn't offset by the arrow's inline width. */
+  position: relative;
+  padding-left: 16px;
+}
+.inline-note::before {
+  content: "↳";
+  position: absolute;
+  left: 0;
+  top: 1px;
+  color: var(--text-dimmer);
+}
+/* ---- Section intro (section_intro): descriptive lead-in under a header ----
+   Frames a category in prose; deliberately NOT a tagged change row (no badge,
+   no bullet). Muted + italic + a thin gold-tinted rail so it reads as context,
+   visually distinct from the BUFF/NERF/MISC rows that follow. */
+.section-intro {
+  margin: 2px 0 14px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.5;
+  color: #a7a298;
+  border-left: 2px solid var(--gold-line);
+  background: rgba(227, 196, 106, 0.05);
+  border-radius: 0 5px 5px 0;
+}
+/* ---- Game-formula change (formula_change): old → new, ability_change-style ---- */
+.formula-change { margin: 10px 0 8px; }
+.formula-change-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #dbd5c8;
+}
+/* the title's tag as wide as every row's (owner 2026-10-27, 7.40 Assist Gold Formula: REWORK 60px beside 64px) */
+.formula-change-title > .badge {
+  width: 64px;
+  min-width: 64px;
+}
+/* Number input — reader plugs in their own value; scripts.js recomputes rows. */
+.formula-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 11px;
+  font-size: 12px;
+}
+.formula-input-label { color: #aaa59b; }   /* "Set" = normal text */
+.formula-input-label .fx-vname {            /* the variable name keeps the var colour */
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  color: #9fc1e3;
+}
+.formula-input {
+  width: 150px;
+  padding: 4px 9px;
+  background: var(--bg-deep-60);
+  border: 1px solid rgba(141, 137, 129, 0.30);
+  border-radius: 5px;
+  color: var(--text-bright);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  appearance: textfield;
+  -moz-appearance: textfield;    /* no number spinner arrows */
+}
+.formula-input::-webkit-outer-spin-button,
+.formula-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.formula-input::placeholder { color: #6f695d; }
+.formula-input:focus { outline: none; border-color: rgba(182, 177, 166, 0.6); }
+.formula-change-panes {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 12px;
+  align-items: stretch;
+}
+.formula-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;           /* formula + table centred in the block */
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+.formula-expr {
+  text-align: center;
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #9a968d;               /* parentheses / operators — muted */
+  overflow-wrap: anywhere;
+}
+.formula-expr .f-var { color: #9fc1e3; }              /* variables  */
+.formula-expr .f-num { color: #e0b87a; font-weight: 600; }  /* numbers */
+/* Worked-example table — faint grid lines, offset below the formula. */
+.formula-ex {
+  border-collapse: collapse;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.formula-ex th,
+.formula-ex td {
+  border: 1px solid rgba(141, 137, 129, 0.14);
+  padding: 3px 12px;
+}
+.formula-ex th {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #8c8880;
+  text-align: center;
+}
+.formula-ex .fx-k    { color: #d0cabe; text-align: center; }
+.formula-ex .fx-gold { color: #e0b87a; font-weight: 600; text-align: right; }
+.formula-ex .fx-pct  { text-align: right; }
+
+/* ---- Captains Mode draft board (cm_draft) ----
+   The WHOLE draft as a VERTICAL in-game-style pick/ban screen: step numbers run
+   down the centre, the acting team's slot on the LEFT (Team 1) or RIGHT (Team 2).
+   The Old draft and the New draft sit side by side. No colours — slot SIZE marks
+   ban (small) vs pick (large). Compare the two boards directly. */
+/* No big outer box — just a margin wrapper. Each Old/New board is its own light
+   block instead (more concise). */
+.cm-draft { margin: 12px 0 8px; }
+.cm-scroll { overflow-x: auto; padding-bottom: 3px; }
+/* Old + New boards sit close together with the arrow centred between — like the
+   ability_change rework panes. */
+.cm-boards {
+  display: flex;
+  align-items: stretch;            /* Old & New blocks share one (taller) height */
+  justify-content: center;
+  gap: 12px;
+}
+/* Each draft (Old / New) in its own block — same look as the ability_change
+   rework panes (.ability-change-pane). */
+.cm-board {
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  background: var(--muted-04);
+}
+/* Arrow between the Old and New blocks — same glyph/style as .ability-change-arrow. */
+.cm-arrow {
+  flex: none;
+  align-self: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+  opacity: 0.85;
+  padding: 0 2px;
+}
+.cm-vgrid {
+  --cm-lane: 68px;
+  --cm-num: 18px;
+  --cm-row: 18px;
+  display: grid;
+  grid-template-columns: var(--cm-lane) var(--cm-num) var(--cm-lane);
+  grid-template-rows: auto;        /* header row natural height */
+  grid-auto-rows: var(--cm-row);   /* uniform row height → identical ban cells */
+  column-gap: 22px;                /* wide gap so the long number→slot dashes fit */
+  row-gap: 7px;                    /* more breathing room between slots */
+  align-items: center;
+}
+.cm-vhead {
+  text-align: center;
+  white-space: nowrap;           /* "Second pick" stays on one line */
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #bcb7ac;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(141, 137, 129, 0.22);
+}
+.cm-vnum {
+  position: relative;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8c8880;
+  font-variant-numeric: tabular-nums;
+}

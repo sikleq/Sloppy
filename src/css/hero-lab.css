@@ -1,0 +1,190 @@
+/* ==========================================================================
+   12. HERO LAB
+   ========================================================================== */
+
+/* ===================== Hero Lab calculator ===================== */
+.hero-lab-page {
+  max-width: none;
+}
+.hero-lab-toolbar .toolbar-panel {
+  justify-content: flex-start;
+}
+.hero-lab {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) minmax(240px, 300px) minmax(420px, 1fr);
+  gap: 18px;
+  align-items: stretch;
+  padding: 0 28px 28px;
+}
+.hl-panel,
+.hl-diff-panel {
+  background:
+    linear-gradient(180deg, rgba(56, 54, 51, 0.9), rgba(30, 30, 28, 0.96)),
+    #1c1b19;
+  border: 1px solid rgba(122, 111, 88, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 242, 200, 0.08),
+    inset 0 -1px 0 var(--shadow-45),
+    0 8px 18px rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+.hl-hud {
+  display: grid;
+  /* Wide portrait column matches the hero-art asset's native aspect (≈ 16:9),
+     same approach as heroes_stats `.mr-ico` (36×26 = 1.38:1). 124×72 keeps the
+     portrait readable without forcing it into a square. */
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+.hl-identity {
+  display: block;
+}
+.hl-portrait-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+.hl-portrait-wrap {
+  position: relative;
+  width: 124px;
+  min-width: 124px;
+  height: 72px;
+}
+.hl-innate-chip {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(117, 108, 87, 0.72);
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(36, 35, 33, 0.95), rgba(12, 12, 11, 0.98)),
+    #0f0e0d;
+  box-shadow: inset 0 1px 0 rgba(255, 241, 200, 0.05);
+  z-index: 2;
+}
+.hl-innate-chip.is-hidden {
+  display: none;
+}
+.hl-innate-chip-icon {
+  display: block;
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+.hl-hero-trigger,
+.hl-inv-slot,
+.hl-picker-close,
+.hl-hero-tile,
+.hl-item-tile {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.hl-hero-icon {
+  /* Same pattern as heroes_stats `.mr-ico` — wide rect, cover-fit so the hero
+     art fills the box without letterboxing. Codex noted: `icons/heroes/*.png`
+     is a wide art asset, not square. */
+  width: 124px;
+  height: 72px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 4px;
+  display: block;
+  border: 1px solid var(--blue-18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
+  background: #111110;
+}
+.hl-hero-trigger {
+  width: 124px;
+  height: 72px;
+  display: block;
+}
+.hl-identity-main {
+  display: none;
+}
+.hl-level-corner {
+  position: absolute;
+  left: 2px;
+  bottom: 2px;
+  width: 44px;
+  height: 44px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hl-level-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.hl-level-ring-bg {
+  fill: #121212;
+  stroke: #393939;
+  stroke-width: 2.5;
+}
+.hl-level-ring-fg {
+  fill: none;
+  stroke: #E7D291;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 0 113.1;
+  transition: stroke-dasharray 0.2s ease;
+  filter: drop-shadow(0 0 2px #DA6F00aa);
+}
+.hl-level-input,
+.hl-custom input {
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #E7D291;
+  font: inherit;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding: 0;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  box-shadow: none;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 3px #EC780E66;
+}
+.hl-level-input {
+  font-size: 13px;
+  font-weight: 700;
+  outline: none;
+  caret-color: #E7D291;
+}
+.hl-level-input::selection {
+  background: rgba(231, 210, 145, 0.25);
+  color: #E7D291;
+}
+.hl-custom input {
+  height: 30px;
+}
+.hl-level-input::-webkit-outer-spin-button,
+.hl-level-input::-webkit-inner-spin-button,
+.hl-custom input::-webkit-outer-spin-button,
+.hl-custom input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

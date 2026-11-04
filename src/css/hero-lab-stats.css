@@ -1,0 +1,392 @@
+/* ── Hero Lab: Dota-style stats UI ─────────────────────────────────────── */
+.hl-dota-stats {
+  margin-top: 10px;
+  font-family: var(--font-dota);
+}
+.hl-dota-combat {
+  display: flex;
+  gap: 0;
+  background: #000;
+}
+.hl-dota-stat-panel {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding: 8px;
+  background: linear-gradient(to top, #1b1b1b, #000);
+}
+.hl-diff-panel {
+  min-width: 0;
+  padding: 8px;
+  background: linear-gradient(to top, #1b1b1b, #000);
+}
+.hl-dota-attack {
+  border-top: 4px solid #000;
+  border-right: 3px solid #000;
+  border-bottom: 5px solid #000;
+  border-left: 6px solid #000;
+}
+.hl-dota-defense {
+  border-top: 4px solid #000;
+  border-right: 6px solid #000;
+  border-bottom: 5px solid #000;
+  border-left: 3px solid #000;
+}
+.hl-ds-head {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #656565;
+  text-align: center;
+  margin: 0 0 5px;
+  padding: 0;
+  text-transform: uppercase;
+}
+.hl-ds-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.012);
+  min-height: 19px;
+  padding: 2px 0;
+}
+.hl-ds-name {
+  font-size: 13px;
+  font-weight: normal;
+  color: #a2a2a2;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.hl-ds-val {
+  font-size: 13px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.hl-ds-bon-pos {
+  color: #3ed038;
+  font-variant-numeric: tabular-nums;
+}
+.hl-ds-bon-neg {
+  color: #ec3d06;
+  font-variant-numeric: tabular-nums;
+}
+/* Attribute rows */
+.hl-dota-attributes {
+  background: #000;
+  width: 100%;
+  padding: 0;
+}
+.hl-da-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 8px;
+  min-height: 48px;
+}
+.hl-da-primary-row {
+}
+.hl-da-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  object-fit: contain;
+  margin-top: 2px;
+}
+.hl-da-details {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-top: 4px;
+}
+.hl-da-top {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.hl-da-base {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.hl-da-gain {
+  font-size: 13px;
+  color: #a2a2a2;
+}
+.hl-da-primary {
+  font-size: 13px;
+  margin-top: 1px;
+}
+.hl-da-breakdown {
+  font-size: 12px;
+  color: #a2a2a2;
+  margin-top: 1px;
+  word-break: break-word;
+}
+@media (max-width: 420px) {
+  .hl-dota-combat {
+    flex-direction: column;
+  }
+  .hl-dota-attack,
+  .hl-dota-defense {
+    border: none;
+    border-bottom: 4px solid #000;
+  }
+}
+
+.hl-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  background: rgba(9, 9, 8, 0.84);
+  backdrop-filter: blur(6px);
+}
+.hl-overlay.is-open {
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+.hl-picker-card {
+  width: min(1180px, calc(100vw - 56px));
+  max-height: min(820px, calc(100vh - 56px));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(114, 103, 75, 0.92);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(31, 30, 28, 0.985), rgba(20, 20, 18, 0.985)),
+    #1a1a18;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 205, 0.08),
+    0 22px 48px rgba(0, 0, 0, 0.48);
+}
+.hl-picker-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.hl-picker-head strong {
+  color: #fbf4e5;
+  font-size: 18px;
+  font-family: var(--font-j25);
+  letter-spacing: 0.04em;
+}
+.hl-picker-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hl-picker-close,
+.hl-picker-back {
+  border: 1px solid rgba(121, 109, 81, 0.6);
+  background: linear-gradient(180deg, rgba(49, 48, 45, 0.9), rgba(20, 20, 19, 0.95));
+  color: rgba(210, 200, 175, 0.8);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+/* (the picker-close hover lives with the pixel close button below — an old shorthand
+   `background` here wiped its pixel X on hover) */
+.hl-picker-back {
+  margin-right: 4px;
+}
+.hl-picker-back:hover {
+  color: #e3c46a;
+  border-color: rgba(227, 196, 106, 0.6);
+  background: linear-gradient(180deg, rgba(50, 45, 20, 0.9), rgba(25, 22, 10, 0.95));
+}
+/* wider hero picker so the icons are bigger and the hover zoom has room at the edges */
+.hl-hero-picker-card { width: min(1360px, calc(100vw - 32px)); }
+.hl-hero-grid-wrap {
+  padding: 22px 26px 24px;   /* extra side/top room so an edge tile's hover zoom doesn't clip on the frame */
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.hl-picker-searchbar {
+  padding: 10px 16px 0;
+}
+.hl-picker-search {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(135, 131, 123, 0.32);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(20, 19, 18,0.98), rgba(12, 12, 11,0.98));
+  color: #e3ddcf;
+  font: inherit;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.hl-picker-search:focus {
+  border-color: rgba(213, 173, 95, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 0 0 1px rgba(213, 173, 95, 0.28);
+}
+.hl-picker-search::placeholder {
+  color: #8c8880;
+}
+.hl-shop-body {
+  padding: 8px 12px 10px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.hl-hero-grid-wrap {
+  display: grid;
+  grid-template-columns: 4fr 4fr 4fr 3fr;   /* Strength | Agility | Intelligence | Universal, like hero_changes */
+  gap: 0 18px;
+  align-items: start;
+}
+.hl-hero-group header,
+.hl-item-section header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+.hl-hero-group header { color: #e3ddcf; }
+/* attribute-coloured column headers, matching hero_changes */
+.hl-hero-group-str header { color: var(--attr-str); }
+.hl-hero-group-agi header { color: var(--attr-agi); }
+.hl-hero-group-int header { color: var(--attr-int); }
+.hl-hero-group-uni header { color: var(--attr-uni); }
+.hl-item-section header { color: #e3c46a; margin-bottom: 2px; font-size: 10px; }
+.hl-hero-group-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+/* Hero picker columns mirror hero_changes: fixed count per attribute column, icons fill the cell */
+.hl-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.hl-hero-group-uni .hl-hero-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 960px) { .hl-hero-grid-wrap { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) {
+  .hl-hero-grid-wrap { grid-template-columns: 1fr; }
+  .hl-hero-grid, .hl-hero-group-uni .hl-hero-grid { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); }
+}
+.hl-hero-tile,
+.hl-item-tile {
+  width: 58px;
+  height: 43px;
+  border: 1px solid rgba(109, 90, 48, 0.68);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  background: #0b0b0a;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  transition:
+    filter 0.12s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.hl-hero-tile.is-hidden,
+.hl-hero-group.is-hidden,
+.hl-item-tile.is-hidden,
+.hl-item-section.is-hidden {
+  display: none !important;
+}
+.hl-hero-tile img,
+.hl-item-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.hl-hero-tile {
+  overflow: visible;
+  z-index: 0;
+}
+/* in the 4-column layout the hero tile fills its cell (keeps the 256x144 icon ratio) */
+.hl-hero-grid .hl-hero-tile {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 256 / 144;
+}
+.hl-hero-tile:hover {
+  z-index: 8;
+}
+.hl-hero-tile:hover img {
+  transform: scale(1.5);
+  position: relative;
+  z-index: 9;
+  box-shadow: 0 3px 8px var(--shadow-60), 0 0 0 1px var(--blue-40);
+}
+.hl-hero-tile.is-selected,
+.hl-item-tile.is-selected {
+  border-color: #ffe08a;
+  z-index: 6;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 205, 0.55),
+    0 0 0 2px #f1d27b,
+    0 0 10px 2px rgba(241, 210, 123, 0.55);
+}
+.hl-item-tile {
+  width: 56px;
+  height: 42px;
+}
+.hl-enchant-picker { width: auto; min-width: 380px; }
+.hl-tier-picker {
+  width: auto;
+  min-width: 280px;
+  max-width: 380px;
+}
+.hl-tier-picker .hl-picker-head {
+  display: flex;
+  align-items: center;
+}
+.hl-tier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+.hl-tier-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  color: rgba(255,255,255,0.85);
+  text-align: left;
+}
+.hl-tier-option:hover {
+  background: rgba(227,196,106,0.15);
+  border-color: #e3c46a;
+}
+.hl-tier-label {
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  min-width: 42px;
+}
+.hl-tier-stats {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+}

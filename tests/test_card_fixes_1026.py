@@ -2,6 +2,7 @@
 the card's header, "Has only one level" is never said; a granted ability's card is an ability card from the game files
 (7.38 Demonic Cleanse, 7.41 Warp Flare); an ability's own text lists no Aghanim's-only value; Aghanim's cards keep an
 even inner padding; an icon missing on the CDN is looked for in the game files."""
+from patch.css_bundle import read_css
 from patch.js_bundle import read_js
 import os
 import re
@@ -106,14 +107,14 @@ def test_granted_card_is_an_ability_card_with_headers():
 
 
 def test_aghanims_cards_keep_even_padding_inside_an_ability_change_block():
-    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     rule = re.search(r"\.ability-change-block \.ability-change\.unified-panes\.aghs-change > \.ability-change-pane"
                      r"\s*\{([^}]*)\}", css)
     assert rule and "padding: 10px 14px" in rule.group(1) and "--pt: 10px" in rule.group(1)
 
 
 def test_removed_items_grey_aghs_panes_on_top_and_a_gone_enchant_value_struck():
-    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     # an item taken out of the game: icon and name greyed (the label and the patch strip keep their colours)
     assert re.search(r"\.entity-block\.is-removed \.entity-icon img \{[^}]*grayscale", css)
     assert re.search(r"\.entity-block\.is-removed \.entity-name > \.entity-link", css)

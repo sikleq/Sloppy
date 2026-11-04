@@ -1,0 +1,299 @@
+/* All-Heroes badge: 4 attribute icons packed into a 2×2 mini-grid that
+   fills the same 22×22 footprint as a single attribute icon — so the
+   "All Heroes" text aligns horizontally with "Strength" / "Agility" /
+   etc. on the rows beneath. */
+.enchant-attr-icons.all-attrs {
+  display: grid;
+  grid-template-columns: 10px 10px;
+  grid-template-rows: 10px 10px;
+  gap: 2px;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.enchant-attr-icons.all-attrs img {
+  width: 10px;
+  height: 10px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px var(--shadow-55));
+}
+.enchant-attr-name { letter-spacing: 0.2px; }
+.enchant-attr-name.is-str { color: var(--attr-str); }
+.enchant-attr-name.is-agi { color: var(--attr-agi); }
+.enchant-attr-name.is-int { color: var(--attr-int); }
+.enchant-attr-name.is-uni { color: var(--attr-uni); }
+.enchant-attr-name.is-all { color: var(--text-main); }
+.enchant-attr-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+}
+.enchant-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px 3px 4px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(150, 146, 137, 0.22);
+  border-radius: 14px;
+  font-size: 12.5px;
+  color: var(--text-main);
+  line-height: 1.2;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: help;
+}
+.enchant-chip:hover {
+  background: var(--shadow-35);
+  border-color: rgba(150, 146, 137, 0.4);
+}
+.enchant-chip img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--shadow-40);
+  flex-shrink: 0;
+}
+/* Tooltip — appears above the chip on hover. Multi-line via pre-line. */
+.enchant-chip[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: pre-line;
+  background: var(--bg-deep-97);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 400;
+  padding: 7px 11px;
+  border: 1px solid var(--muted-35);
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+  min-width: 180px;
+  max-width: 280px;
+  text-align: left;
+  line-height: 1.45;
+  letter-spacing: 0.1px;
+  transition: opacity 0.12s 0.05s;
+  box-shadow: 0 4px 18px var(--shadow-45);
+}
+.enchant-chip[data-tooltip]:hover::after {
+  opacity: 1;
+}
+/* Souvenir pills (Ringmaster Dark Carnival pool change). Reuse the
+   `.enchant-chip` box style (border + background + tooltip on hover);
+   `removed` modifier dims souvenirs no longer in the pool — no strike.
+   Dim the icon + label only, NOT the hover tooltip popup — readability
+   of the description text must stay full-strength. */
+.enchant-chip.souvenir-chip.removed > img,
+.enchant-chip.souvenir-chip.removed > span {
+  opacity: 0.55;
+}
+.enchant-chip.souvenir-chip.removed > img {
+  filter: grayscale(0.85);
+}
+.enchant-chip.souvenir-chip.removed::after {
+  /* explicit reset — tooltip popup must NOT inherit the dim */
+  opacity: 0;
+  filter: none;
+}
+.enchant-chip.souvenir-chip.removed:hover::after {
+  opacity: 1;
+}
+/* Info marker — matches the `.qhint` "?" badge (rounded square), with the
+   question mark in our gold. Popup body is the .info-pop child below. */
+.info-tip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;            /* ~cap height of the row text so it fits the line */
+  margin-left: 4px;
+  border: 1px solid #77746d;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+  user-select: none;
+  position: relative;
+  /* Centred on the row text's digit band: vertical-align:middle sits the box
+     centre near the x-height; nudge up so it spans cap-to-baseline (no poke
+     below the text). */
+  vertical-align: middle;
+  top: -0.5px;
+  transition: background 0.15s, border-color 0.15s;
+}
+/* a game bug: the [?] box with a pixel bug in it, warm orange so it reads at a glance (owner 2026-10-21) */
+.info-tip.bug-tip { color: #f0a050; border-color: rgba(240, 160, 80, 0.75); background: rgba(240, 160, 80, 0.12); }
+.info-tip.bug-tip .bug-ico { display: block; width: 9px; height: 9px; background: currentColor;
+  -webkit-mask: url('icons/ui/bug.png') center / contain no-repeat; mask: url('icons/ui/bug.png') center / contain no-repeat; }
+/* "Ability reworked (Aghanim's Scepter upgrade)." — taken out of the card text (2026-10-21) */
+.ability-change-summary-ul .ac-aghs { color: var(--text-dim); }
+.info-tip:hover,
+.info-tip:focus {
+  border-color: var(--gold);
+  background: rgba(227, 196, 106, 0.15);
+  outline: none;
+}
+/* HTML popup child — supports rich content (badges, <br>) + a bold header,
+   unlike a pure attr() tooltip. Hidden until hover/focus. */
+.info-tip .info-pop {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(17, 16, 16, 0.98);
+  color: var(--text-main);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  padding: 8px 12px;
+  border: 1px solid var(--gold-glow);
+  border-radius: 6px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 100;
+  width: max-content;
+  min-width: 150px;
+  max-width: 340px;
+  text-align: left;
+  line-height: 1.55;
+  letter-spacing: 0.1px;
+  /* Avoid orphan words/numbers on a line of their own — keeps stat ranges
+     like "…100–110" intact rather than dropping "110" to the next line. */
+  text-wrap: pretty;
+  /* No slide — the popup just appears on hover/focus (no transform anim). */
+  transition: none;
+  box-shadow: 0 4px 18px var(--shadow-45);
+}
+/* Hover/focus handled by JS body-level popup — suppress CSS-driven version. Not just hidden: the in-row copy
+   (absolute, up to 340px wide) near the right edge widened the page at 1024px (2026-10-30, 7.37b) — the body-level
+   popup reads its innerHTML, which display:none keeps */
+.info-tip .info-pop,
+.info-tip:hover .info-pop,
+.info-tip:focus .info-pop {
+  display: none;
+}
+/* Body-level shared popup for .info-tip — positioned by scripts.js so it
+   stays inside the viewport even when the badge is near an edge. */
+.info-pop-body {
+  position: fixed;
+  z-index: 1100;
+  pointer-events: none;
+  display: none;
+  background: rgba(17, 16, 16, 0.98);
+  color: var(--text-main);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 8px 12px;
+  border: 1px solid var(--gold-glow);
+  border-radius: 6px;
+  width: max-content;
+  min-width: 150px;
+  max-width: min(440px, calc(100vw - 16px));
+  overflow-wrap: break-word;
+  text-align: left;
+  line-height: 1.55;
+  letter-spacing: 0.1px;
+  text-wrap: pretty;
+  box-shadow: 0 4px 18px var(--shadow-45);
+}
+.info-pop-body.is-visible { display: block; }
+/* pinned by a click on its "?" (ecPinnableTip in scripts.js): stays up, text selectable */
+.info-pop-body.is-pinned, .qhint-tip.is-pinned { position: absolute; pointer-events: auto; user-select: text; border-color: var(--gold); }
+/* several lines in a "?" popup = a list: gold bullet per line, "–" for a sub-item */
+.pop-li { display: block; position: relative; padding-left: 13px; }
+.pop-li + .pop-li { margin-top: 3px; }
+.pop-li::before { content: "•"; position: absolute; left: 1px; color: var(--gold); }
+.pop-li.pop-sub { padding-left: 26px; margin-top: 1px; }
+.pop-li.pop-sub::before { content: "–"; left: 14px; color: var(--text-dim, #969289); }
+/* one "?" holding several notes of a row (patch/elements.py merge_tips): a thin line between them */
+.pop-part { display: block; }
+.pop-part + .pop-part { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(227, 196, 106, 0.18); }
+.pop-note { color: var(--text-dim, #969289); }
+.info-pop-h {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 700;
+  color: var(--gold);
+}
+/* Trailing cluster (Aghanim glyph + (i) tip) — kept on one line and bound to
+   the preceding word (via a leading nbsp) so it never orphans onto an
+   otherwise-empty wrapped line. */
+.li-tail {
+  white-space: nowrap;
+}
+/* Group wrapper: label + chips on a single horizontal row, wrapping if
+   needed. "In pool:" and "Removed:" are separate groups on their own
+   lines (each `.souvenir-group` is a block-level flex row). */
+.souvenir-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+.souvenir-group-label {
+  font-weight: 600;
+  font-size: 12.5px;
+  color: #87847c;
+  margin-right: 2px;
+}
+@media (max-width: 640px) {
+  .enchant-attr-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* PROPERTIES BOX — single line of comma-separated attributes shown under the
+   components box for new items. Soft outlined to match other blocks. */
+.provides-box {
+  margin: 4px 0;
+  padding: 6px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 13.5px;
+}
+/* Flat purchase price for a basic (no-recipe) new item — same bordered box as
+   the components() build, with the gold value on the right like a recipe total. */
+.item-cost-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 6px 0 4px;
+  padding: 8px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.item-cost-label {
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+}
+.item-cost-val {
+  color: #f0c674;
+  font-size: 14px;
+  font-weight: 700;
+}
+.provides-box .provides-row {
+  padding: 2px 0;
+  line-height: 1.5;
+}
+

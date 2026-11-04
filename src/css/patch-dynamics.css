@@ -1,0 +1,279 @@
+/* =====================================================================
+   PATCH DYNAMICS WIDGET
+   Right-aligned row of small diamond pills, one per recent patch. Each
+   pill is filled with a vertical linear-gradient whose segments are
+   proportional to the tag counts for this entity in that patch. Glassy
+   look via translucent borders + faint inner glow; subtle drop-shadow
+   gives a hint of color bleed between neighbors. Untouched patches show
+   a near-black translucent diamond, are non-clickable, and carry a
+   "not touched" tooltip.
+   ===================================================================== */
+.entity {
+  position: relative;
+}
+.entity-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* Outer wrapper: positions the cell row and provides an anchor for the
+   absolutely-placed nav arrows. The ::before pseudo extends the hover zone
+   so the cursor can slide from a cell onto an arrow without a gap. */
+.dyn-row-wrap {
+  position: relative;
+  margin-left: auto;
+  margin-right: -8px;
+}
+.dyn-row-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  left: -18px;
+  right: -18px;
+}
+.patch-dynamics {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  position: relative;
+}
+/* Pixel-art navigation arrows — same visual language as .version-nav-arrow
+   (gold staircase SVG, octagonal clip, dark glass background).
+   Arrows are flex siblings of .patch-dynamics inside .dyn-row-wrap, so the
+   hover zone is continuous: cursor slides from a cell onto an arrow without
+   losing the hover state and the arrow stays visible and clickable. */
+.dyn-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: var(--shadow-28);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 6px 10px;
+  image-rendering: pixelated;
+  box-shadow: inset 0 1px 2px var(--shadow-50);
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s, filter 0.15s;
+}
+.dyn-nav-left {
+  right: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="4" y="0" width="2" height="2"/><rect x="2" y="2" width="4" height="2"/><rect x="0" y="4" width="6" height="2"/><rect x="2" y="6" width="4" height="2"/><rect x="4" y="8" width="2" height="2"/></g></svg>');
+}
+.dyn-nav-right {
+  left: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="0" y="0" width="2" height="2"/><rect x="0" y="2" width="4" height="2"/><rect x="0" y="4" width="6" height="2"/><rect x="0" y="6" width="4" height="2"/><rect x="0" y="8" width="2" height="2"/></g></svg>');
+}
+.dyn-row-wrap:hover .dyn-nav-arrow,
+.dyn-nav-arrow:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+.dyn-nav-arrow:hover {
+  background-color: var(--shadow-45);
+  filter: brightness(1.2);
+}
+/* Wrapper holds the rounded-rectangle pill AND the absolutely-positioned
+   tooltip. The pill is clipped via overflow:hidden + border-radius so
+   pseudo highlights stay inside; the tooltip is a real DOM sibling that
+   lives outside the clip. */
+.dyn-cell-wrap {
+  position: relative;
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.dyn-cell-wrap.empty,
+.dyn-cell-wrap.current {
+  cursor: default;
+}
+/* Raise the WHOLE wrap of the hovered cell above a just-left neighbour: the
+   leaving cell keeps its hover z for 0.14s (delayed z revert) while it
+   shrinks, and both cells' z values tie — so without this the leaving cell
+   can paint over the newly hovered one mid-descent. The wrap's z (7) beats
+   the leaving cell's held z (6); its own cell isn't isolated (wrap z:auto),
+   so the comparison happens in the same stacking context. */
+.dyn-cell-wrap:not(.empty):hover {
+  z-index: 7;
+}
+.dyn-cell {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  /* Background is a multi-layer stack rendered in a SINGLE paint pass —
+     no mix-blend-mode pseudos. With ~3000 cells visible on the largest
+     patch page, every blend-mode pseudo would force its own compositing
+     layer (a known scroll-jank cause). Stack order, top → bottom:
+       1. Top-centre specular ellipse (highlight catching the light)
+       2. Vertical top sheen + bottom darken (convex shading)
+       3. Fluid color gradient driven by JS (--dyn-bg)
+     The opaque fallback color at the end ensures rendering even before
+     JS runs. */
+  /* Glassy pill: thin top light edge + soft diagonal sheen + dark bottom
+     edge over the fluid tag gradient — single paint pass, no pseudos
+     (~3000 cells on the largest pages; extra layers cause scroll jank). */
+  background:
+    linear-gradient(160deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.05) 42%,
+      rgba(255, 255, 255, 0.0) 62%,
+      rgba(0, 0, 0, 0.10) 100%),
+    var(--dyn-bg, rgba(10, 11, 14, 0.55));
+  /* z-index reverts 0.14s AFTER un-hover (matches the scale duration) so the
+     cell stays on top while it shrinks back — otherwise the right-hand
+     neighbour (later in DOM) paints over it mid-descent. */
+  transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease, z-index 0s linear 0.14s;
+  box-shadow:
+    0 1px 2px var(--shadow-55),
+    inset 0 1px 0 var(--white-22),
+    inset 0 -1px 0 var(--shadow-35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+/* Empty patch — flat dark fill with a barely-there pressed-in inset:
+   1px darker line along the top edge (the "lip" of the recess casts a
+   shadow into it) + 1px faint highlight along the bottom edge (light
+   bouncing off the back of the recess). Together they read as a
+   shallow inset without competing with the painted cells. */
+.dyn-cell-wrap.empty .dyn-cell {
+  background: rgba(5, 6, 9, 0.92);
+  box-shadow:
+    inset 0  1px 0 var(--shadow-45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  opacity: 0.9;
+}
+.dyn-cell-wrap:not(.empty):hover .dyn-cell {
+  /* Raise immediately on hover (no z-index delay); the delayed revert lives
+     on the base .dyn-cell rule for the un-hover descent. */
+  transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease, z-index 0s linear 0s;
+  transform: scale(2.5);
+  /* Opaque backdrop under the translucent fluid: stops neighbouring cells
+     from showing through the scaled-up hovered cell. Matches the
+     entity-block gradient mid-tone (~#1c1b19). */
+  background-color: rgb(28, 27, 25);
+  box-shadow:
+    0 2px 4px var(--shadow-60),
+    inset 0 0 0 1px var(--white-12),
+    0 0 8px var(--white-22);
+  /* 6 — strictly ABOVE a just-left neighbour, which keeps its hover z (5,
+     via the delayed z-index revert) for 0.14s while it shrinks back.
+     Without this, the descending cell paints OVER the newly hovered one. */
+  z-index: 6;
+}
+/* Hover on the current patch — keep the same 2× pop + glow but layer the
+   blue+black outline back on top so the "you are here" marker stays
+   visible. Higher specificity than the generic hover rule above so this
+   wins for the current cell. */
+.dyn-cell-wrap.current:hover .dyn-cell {
+  box-shadow:
+    0 2px 4px var(--shadow-60),
+    inset 0 0 0 1px var(--white-12),
+    0 0 8px var(--white-22),
+    0 0 0 2.5px rgba(227, 196, 106, 0.95),
+    0 0 0 3.5px rgba(0, 0, 0, 0.85),
+    0 0 9px 2px rgba(227, 196, 106, 0.45);
+}
+/* Current patch (the page the user is on) — thin faint blue outline in
+   the same style as .cal-patch.current in the calendar, just slimmer
+   (1px instead of 2px, lower alpha) so it reads as a subtle "you are
+   here" marker without competing with the painted color band inside. */
+.dyn-cell-wrap.current .dyn-cell {
+  /* Gold "you are here" ring: gold on top (1.5px) + a thin black ring
+     beneath, giving the marker a crisp dark edge against the page
+     background. box-shadow paints in source order top→bottom, so gold
+     covers the inner 1.5px of the wider 2.5px black layer and leaves
+     1px of black exposed as the outermost ring. */
+  /* 2026-10-06 (owner: "не видно, что патч выделен"): ring 1.5px -> 2.5px, black edge 3.5px, a soft gold glow */
+  box-shadow:
+    0 1px 1.5px var(--shadow-50),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 0 2.5px rgba(227, 196, 106, 0.95),
+    0 0 0 3.5px rgba(0, 0, 0, 0.85),
+    0 0 9px 2px rgba(227, 196, 106, 0.45);
+}
+/* The convex highlight + specular layers used to live on ::before/::after
+   with mix-blend-mode: screen. They've been folded directly into
+   .dyn-cell's `background` stack above to eliminate ~6000 compositing
+   layers on the larger patch pages — fixes scroll jank. */
+/* Shared tooltip popup — ONE element on document.body (not inside any
+   .dyn-cell-wrap), repositioned on hover. Lives outside .entity-block
+   so `contain: paint` from content-visibility:auto doesn't clip it.
+   Positioned via JS (position: fixed) — top/left set inline per show. */
+.dyn-tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: var(--bg-deep-97);
+  color: var(--text-main);
+  padding: 8px 10px;
+  border: 1px solid var(--muted-35);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 1000;
+  text-align: left;
+  line-height: 1.3;
+  box-shadow: 0 4px 18px var(--shadow-45);
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.dyn-tip.is-visible {
+  display: flex;
+}
+.dyn-tip-header {
+  font-size: 12px;
+  color: var(--text-bright);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4px;
+  text-align: center;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(150, 146, 137, 0.28);
+}
+.dyn-tip-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
+  row-gap: 5px;
+  align-items: center;
+}
+.dyn-tip-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dyn-tip-row > .badge {
+  width: 68px;
+  min-width: 68px;
+  padding-left: 4px;
+  padding-right: 4px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+.dyn-tip-count {
+  font-size: 11px;
+  color: var(--text-main);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.dyn-tip-note {
+  font-size: 11px;
+  color: #949087;
+  font-style: italic;
+}
+/* `.is-visible` toggle is handled higher up via display:flex. */
+

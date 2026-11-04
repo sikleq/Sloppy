@@ -1,5 +1,6 @@
 """Enchantments as tier tables, before -> after (owner 2026-10-17, 7.41: "Vital is written as a bare row… a table? a
 card? Mystical / Crude too" -> variant A: the 7.38 table under each enchantment, a changed cell "was → now")."""
+from patch.css_bundle import read_css
 from patch.js_bundle import read_js
 import glob
 import json
@@ -82,7 +83,7 @@ def test_7_41_enchantments_show_tables_and_keep_only_word_rows():
 def test_tables_have_lines_between_cells_and_centred_values():
     # owner 2026-10-17: "все таблицы оформляются с вертикальными линиями-разделителями между ячейками, а значения
     # стоят центрировано"
-    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     rule = css.split(".ench-change .ench-v, .ench-change .ench-tier-h {", 1)[1].split("}", 1)[0]
     assert "border-left: 1px solid" in rule and "justify-content: center" in rule
     assert "row-gap: 0" in css.split(".ench-tiers.ench-change {", 1)[1].split("}", 1)[0]
@@ -91,5 +92,5 @@ def test_tables_have_lines_between_cells_and_centred_values():
 def test_the_filters_know_the_table():
     js = read_js()
     assert "el.classList.contains('ench-change') ? 'covered-ench'" in js
-    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    css = read_css()
     assert "html.cb-mode .iab-lv.iab-del" in css or "html.cb-mode" in css and ".iab-lv.iab-del" in css

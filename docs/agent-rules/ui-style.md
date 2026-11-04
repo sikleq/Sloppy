@@ -1,6 +1,6 @@
 # UI и стили
 
-Правила вёрстки/стилей для всех страниц. `styles.css` и `scripts.js` — единственный источник правды (см. AGENTS.md «source of truth»).
+Правила вёрстки/стилей для всех страниц. `src/css/*.css` и `src/js/*.js` — единственный источник правды (см. AGENTS.md «source of truth»).
 
 > Подсистема таблиц (Neutral Creeps / Unit Abilities / Mana Items, sticky/overlay) — `docs/tables.md`.
 
@@ -43,7 +43,7 @@
 <div class="cal-toggle-bar inbox-bar"><div class="toolbar-panel">… контролы …</div></div>
 ```
 
-CSS (`styles.css`, секция «UNIFIED TOOLBAR PANEL») делает всё автоматически:
+CSS (`src/css/tables-shared.css`, секция «UNIFIED TOOLBAR PANEL») делает всё автоматически:
 - панель = тёмная подложка `#11161d` + рамка + `border-radius:8px`, `width:100%` внутри тулбара (тулбар держит ритм 28px по бокам);
 - переключатели (`.ua-upgrades-toggle`) и группы-лейблы (`.view-group`/`.hd-remove-group`/`.hd-class-group`) — **плоские** (прозрачные); инпуты/селекты (`.cal-mode-select`, `.mr-price-range`, search) сохраняют свою рамку поля; чипы тегов/классов — свой дизайн;
 - **тонкий разделитель** перед каждым контролом, КРОМЕ между двумя подряд идущими `.ua-upgrades-toggle` (тумблеры группируются плотно). Реализовано через `> *:not(:first-child)::before` + отмена для `.ua-upgrades-toggle + .ua-upgrades-toggle`;
@@ -157,7 +157,7 @@ the round loupe button».
 С коммита 356e152c у каждой страницы есть `<meta name="viewport" content="width=device-width">`
 (`builders/site_common.head_common`). До этого телефон рисовал страницу шириной 980 px и ужимал её до 40 %: текст
 строк выходил примерно 6 px, а правила для узкого экрана не срабатывали вовсе.
-- Все правила под телефон — в **последнем** блоке `styles.css` «PHONES», внутри `@media (max-width: 760px)`. ПК они не
+- Все правила под телефон — в **последней** части `src/css/phones.css` «PHONES», внутри `@media (max-width: 760px)`. ПК они не
   трогают: полностраничные снимки на 1440 px до и после совпадают пиксель в пиксель.
 - **Страница не шире экрана** (`scrollWidth <= innerWidth`): широкое (вкладки, фильтры, таблицы уровней, календарь,
   таблица лагерей, таблицы Silent Changes) прокручивается внутри своего контейнера (`overflow-x: auto`), а не всей

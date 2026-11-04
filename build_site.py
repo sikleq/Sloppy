@@ -188,7 +188,7 @@ def main() -> int:
     print(f"\n{SEP}")
     print("  Copying static assets into dist/")
     print(SEP)
-    for name, src in (("styles.css", _root / "styles.css"), ("_dynamics.json", _root / ".cache" / "_dynamics.json")):
+    for name, src in (("_dynamics.json", _root / ".cache" / "_dynamics.json"),):
         if src.exists():
             shutil.copy2(src, _dist / name)
     for name in ("src", "icons"):
@@ -198,10 +198,12 @@ def main() -> int:
             if dst.exists():
                 shutil.rmtree(dst)
             # icons/ref holds third-party / reference pictures that .gitignore keeps out of the site — never deploy it
-            ignore = {"icons": "ref", "src": "js"}[name]       # src/js is glued into one file below
-            shutil.copytree(src, dst, ignore=shutil.ignore_patterns(ignore))
+            ignore = {"icons": ("ref",), "src": ("js", "css")}[name]       # src/js and src/css are glued below
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns(*ignore))
+    from patch.css_bundle import read_css
     from patch.js_bundle import read_js
     (_dist / "src" / "scripts.js").write_text(read_js(), encoding="utf-8")
+    (_dist / "styles.css").write_text(read_css(), encoding="utf-8")
     # Minify CSS and JS copies in dist/ (source files stay readable)
     _minify_assets(_dist)
     print("  [OK]")
