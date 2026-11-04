@@ -1,5 +1,7 @@
 # База статов (stats DB) и маппинг полей
 
+> Код генератора: части в `tools/patchgen`, вход прежний `tools/generate_patch_code_v2.py` (карта частей в `docs/architecture.md`).
+
 ## База статов
 
 Файлы `data/stats/{version}/heroes.json` и `items.json` — поля из npc_heroes.txt / items.txt. Покрытие: с 7.33 (источник muk-as/DOTA2_CLIENT). Для патчей старше 7.33 БД нет, fallback на t().

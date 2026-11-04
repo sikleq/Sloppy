@@ -124,3 +124,21 @@ Key fields:
 - `abilities.json`: neutral creep abilities only (hero abilities live elsewhere).
 
 `bstat_h(hero, field, before_patch, delta)` resolves a base-stat change against the named patch's snapshot and renders the actual `+N%` badge instead of a generic BUFF / NERF tag.
+
+## Где код генератора (`tools/patchgen`, с 2026-11-04)
+
+Запуск и импорт прежние: `python tools/generate_patch_code_v2.py <версия>`, `import tools.generate_patch_code_v2 as g`. Сам код лежит в частях, части импортируют друг друга в одну сторону (`tests/test_patchgen_split.py`).
+
+| Часть | Что в ней |
+|:---|:---|
+| `common`, `data` | Корень проекта, строки Valve и списки игры |
+| `tags` | Какой тег у заметки: канонические фразы, `TAG_OVERRIDES`, ошибки Valve |
+| `rows`, `notes` | Одна заметка как строка `W(li(...))`, список заметок: складывание, группировка, порядок |
+| `general`, `entities` | General Updates, герой, предмет, нейтральный крип |
+| `lines` | Общее для проходов: шаблоны блоков, боссы, мелкие помощники |
+| `post_stats`, `post_cards`, `post_general`, `post_items`, `post_late` | Проходы по готовым строкам (`_postprocess_*`) |
+| `normalize` | Datafeed и нормализованный JSON |
+| `pipeline` | `generate(version)`: порядок всех шагов |
+| `facets_auto`, `cli` | Новые грани в `patch/badges.py`, командная строка |
+
+Новый проход: добавить в подходящую часть `post_*` и вызвать в `pipeline.generate`. Часть не должна импортировать `pipeline` или более позднюю часть: тест покажет круг.
