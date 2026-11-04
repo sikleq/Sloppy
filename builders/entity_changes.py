@@ -892,7 +892,7 @@ _UNIT_CAMP_CACHE = None
 _UNIT_ORDER = ["Small", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Other"]
 # Map units with their own Changes page but no camp: Roshan -> "Other"; the Tormentor is
 # reached from its card on structures.html, not listed among the units.
-_UNIT_BUCKET = {"npc_dota_roshan": "Other"}
+_UNIT_BUCKET = {"npc_dota_roshan": "Other", "npc_dota_courier": "Other"}
 _UNIT_NOT_LISTED = {"npc_dota_miniboss"}
 
 # Summoned / split units that have a portrait icon in icons/units/ but belong to

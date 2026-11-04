@@ -348,6 +348,9 @@ _NOT_LOWER_IS_BUFF = re.compile(
 # Key = substring to look for (case-insensitive), Value = forced tag.
 # Add here when a generated scaffold consistently gets the wrong tag.
 TAG_OVERRIDES = {
+    # owner 2026-11-05: the behaviour changed, neither side only loses (7.40 The Shining, 7.41 free movement uphill)
+    "only starts dealing damage to the surrounding enemies when attacked": "REWORK",
+    "units with free movement now can miss their attacks":                 "REWORK",
     # owner 2026-10-27 (7.39): convenience of control, not a gameplay change → QoL (first: the row also says
     # "Now requires", which is REWORK below)
     "added an auto-cast":              "QoL",   # Quill Spray: "Right-click the ability to … cast it"

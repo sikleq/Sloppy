@@ -1,4 +1,4 @@
-"""extract_vpk_boss_icons.py — Roshan and Tormentor art straight from the game VPK.
+"""extract_vpk_boss_icons.py — Roshan, Tormentor and Courier art straight from the game VPK.
 
 Roshan's and the Tormentor's ability icons (roshan_revengeroar, roshan_grab_and_throw,
 miniboss_*) are not on Valve's web CDN, and neither is Roshan's portrait. The client has
@@ -10,6 +10,8 @@ panorama/images/heroes/npc_dota_hero_roshan_png.vtex_c. Decoding reuses extract_
 import sys
 from pathlib import Path
 
+from PIL import Image, ImageOps
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from extract_vpk_icons import DEFAULT_VPK, decode, read_file, read_tree  # noqa: E402
 
@@ -19,8 +21,10 @@ ABILITIES = ["roshan_bash", "roshan_slam", "roshan_spell_block", "roshan_revenge
              "miniboss_fortification",
              # lane creeps' abilities, for their cards in General Updates (2026-10-16, 7.40 Flagbearer Inspiration Aura)
              "flagbearer_creep_aura_effect"]
+UNIT_SIZE = (128, 72)
 UNITS = {"npc_dota_roshan": "panorama/images/heroes/npc_dota_hero_roshan_png.vtex_c",
-         "npc_dota_miniboss": "panorama/images/heroes/npc_dota_tormentor_radiant_png.vtex_c"}
+         "npc_dota_miniboss": "panorama/images/heroes/npc_dota_tormentor_radiant_png.vtex_c",
+         "npc_dota_courier": "panorama/images/items/courier_radiant_png.vtex_c"}
 
 
 def main() -> int:
@@ -35,6 +39,8 @@ def main() -> int:
             print(f"  missing in VPK: {internal}")
             missing += 1
             continue
+        if dst.parent.name == "units" and img.size != UNIT_SIZE:     # the courier's icon is 88x64: every portrait is one size
+            img = ImageOps.fit(img, UNIT_SIZE, Image.LANCZOS, centering=(0.5, 0.4))
         img.save(dst)
         print(f"  {dst.relative_to(ROOT)}  {img.size[0]}x{img.size[1]}")
     return 1 if missing else 0

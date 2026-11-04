@@ -62,12 +62,18 @@ def test_the_terrain_power_layer_button_is_our_power_rune_icon():
     assert "powerBtnImg" not in js and "togglePowerCycle" in js
 
 
-def test_runes_share_the_terrain_page_icons():
-    """One style — the minimap icons the Terrain page shows (owner 2026-10-28)."""
-    import filecmp
-    for key, name in (("haste", "tc_rune_2"), ("illusion", "tc_rune_3"), ("bounty", "tc_bounty")):
-        assert filecmp.cmp(os.path.join(ROOT, "icons", "runes", f"{key}.png"),
-                           os.path.join(ROOT, "icons", "ui", "gothic", f"{name}.png"), shallow=False)
+def test_runes_share_the_terrain_page_art():
+    """One style: the minimap art the Terrain page shows (owner 2026-10-28). Since 2026-11-04 the patch pages' copies are
+    smoothed to 96 px, so the same source is compared, not the bytes."""
+    import re
+    with open(os.path.join(ROOT, "scripts", "gen", "gen_terrain_layer_icons.py"), encoding="utf-8") as f:
+        order = re.search(r"RUNE_ORDER = \[(.*?)\]", f.read(), re.S).group(1)
+    with open(os.path.join(ROOT, "scripts", "fetch", "fetch_rune_icons.py"), encoding="utf-8") as f:
+        fetch = f.read()
+    names = re.findall(r'"(\w+)"', order)
+    assert len(names) == 7
+    for name in names:
+        assert f': "{name}"' in fetch, name
 
 
 def test_a_transparent_icon_sits_on_a_dark_square():

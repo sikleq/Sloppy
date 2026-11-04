@@ -4,6 +4,8 @@ follow-up "All <same subject> …" sentence as the "?" of the row before it."""
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import tools.generate_patch_code_v2 as g  # noqa: E402
 
@@ -225,3 +227,126 @@ def test_now_instead_of_rows_become_a_before_after_table():
     # outside a reworked mechanic the rows stay as they are (a hero's REWORK rows)
     hero = ['W(hero_header("Axe"))', 'W(ul_open())', hr, ia, 'W(ul_close())']
     assert g._postprocess_before_after(hero) == hero
+
+
+def test_courier_rows_of_general_updates_leave_for_the_unit_s_own_category():
+    # the Courier and the Flying Courier are one unit (owner 2026-11-04, 7.40)
+    lines = ['W(section("General Updates"))', 'W(plain_header("General Changes"))', 'W(ul_open())',
+             'W(li("Talents no longer require a skill point", t("REWORK")))',
+             'W(li("Courier respawn time decreased from 60 to 45", b(60, 45, l=True)))',
+             'W(li("Flying Courier will now go somewhere else", t("QoL")))', 'W(ul_close())',
+             'W(section("Item Updates"))', 'W(item_header("Flying Courier"))', 'W(ul_open())',
+             'W(li("Courier items are cheaper", t("BUFF")))', 'W(ul_close())']
+    out = g._postprocess_courier_rows(lines)
+    at = out.index(g._COURIER_HEAD)
+    assert out[at - 1] == "W(ul_close())" and out[at + 1] == "W(ul_open())"
+    assert out[at + 2].startswith('W(li("Courier respawn') and out[at + 3].startswith('W(li("Flying Courier')
+    assert out[2:5] == ["W(ul_open())", 'W(li("Talents no longer require a skill point", t("REWORK")))', "W(ul_close())"]
+    assert 'W(li("Courier items are cheaper", t("BUFF")))' in out[out.index('W(section("Item Updates"))'):]    # an item's row stays
+
+
+def test_no_courier_row_leaves_the_lines_alone():
+    lines = ['W(section("General Updates"))', 'W(ul_open())', 'W(li("Roshan", t("BUFF")))', 'W(ul_close())']
+    assert g._postprocess_courier_rows(lines) is lines
+
+
+def test_a_list_left_empty_goes_with_its_header():
+    lines = ['W(section("General Updates"))', 'W(plain_header("General Changes"))', 'W(ul_open())',
+             'W(li("Courier respawn time decreased", t("BUFF")))', 'W(ul_close())', 'W(section("Item Updates"))']
+    out = g._postprocess_courier_rows(lines)
+    assert 'W(plain_header("General Changes"))' not in out and out[1] == g._COURIER_HEAD
+
+
+def test_740_has_the_courier_category():
+    src = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "content", "p740.py"), encoding="utf-8").read()
+    start = src.index('W(unit_header("Courier", "../icons/units/npc_dota_courier.png", general=False, track=True))')
+    block = src[start:src.index("W(ul_close())", start)]
+    assert "Courier respawn time" in block and "Flying Courier will now" in block
+    assert src.count("Courier respawn time") == 1
+
+
+def test_the_courier_portrait_has_the_size_of_every_unit_portrait():
+    pil = pytest.importorskip("PIL.Image")
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "icons", "units", "npc_dota_courier.png")
+    assert pil.open(path).size == (128, 72)
+
+
+def test_a_unit_column_that_wraps_keeps_its_width():
+    from patch.css_bundle import read_css
+    css = read_css()
+    assert ".ec-ugrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));" in css
+    assert ".ec-ucol { flex:" not in css
+
+
+def test_rune_rows_become_blocks_with_the_rune_s_icon_and_name():
+    # owner 2026-11-04, 7.40: "Haste Rune: ..." as an ability's block
+    lines = ['W(section("General Updates"))', 'W(subgroup("Runes"))', 'W(ul_open())',
+             'W(li("Haste Rune: duration no longer increases", t("DEL")))', 'W(li("Rune spawn interval increased", t("NERF")))',
+             'W(li("Haste Rune: Lasts 22s", t("DEL")))', 'W(li("Fire Rune: not a rune of the game", t("NEW")))', 'W(ul_close())']
+    out = g._postprocess_rune_rows(lines)
+    head = 'W(ability("Haste Rune", icon_url="../icons/runes/haste.png", innate=False))'
+    assert out[out.index(head) + 1:out.index(head) + 5] == ["W(ul_open())", 'W(li("Duration no longer increases", t("DEL")))',
+                                                             'W(li("Lasts 22s", t("DEL")))', "W(ul_close())"]
+    assert 'W(li("Rune spawn interval increased", t("NERF")))' in out[:out.index(head)]    # not about one rune: stays
+    assert 'W(li("Fire Rune: not a rune of the game", t("NEW")))' in out[:out.index(head)]
+
+
+def test_a_rune_subgroup_becomes_the_block_header_and_the_list_stays():
+    lines = ['W(section("General Updates"))', 'W(subgroup("Bounty Runes"))', 'W(ul_open())', 'W(li("Gold changed", t("NERF")))', 'W(ul_close())']
+    out = g._postprocess_rune_rows(lines)
+    assert out[1] == 'W(subgroup("Runes"))' and out[2] == 'W(ability("Bounty Rune", icon_url="../icons/runes/bounty.png", innate=False))'
+    assert out[4] == 'W(li("Gold changed", t("NERF")))'
+
+
+def test_rune_rows_outside_general_updates_stay_and_no_rune_leaves_the_lines_alone():
+    lines = ['W(section("Item Updates"))', 'W(ul_open())', 'W(li("Haste Rune: x", t("BUFF")))', 'W(ul_close())']
+    assert g._postprocess_rune_rows(lines) is lines
+
+
+def test_740_and_738_runes_are_blocks():
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    p740 = open(os.path.join(root, "content", "p740.py"), encoding="utf-8").read()
+    for name, icon in (("Bounty", "bounty"), ("Haste", "haste"), ("Invisibility", "invisibility")):
+        assert f'W(ability("{name} Rune", icon_url="../icons/runes/{icon}.png", innate=False))' in p740
+        assert f'W(li("{name} Rune: ' not in p740
+    p738 = open(os.path.join(root, "content", "p738.py"), encoding="utf-8").read()
+    assert 'W(subgroup("Bounty Runes"))' not in p738 and 'W(ability("Wisdom Rune"' in p738
+
+
+def test_rune_blocks_stand_together_under_one_subheading():
+    # 7.38: Bounty and Wisdom Runes were split by Lotus Pools
+    lines = ['W(section("General Updates"))', 'W(subgroup("Bounty Runes"))', 'W(ul_open())', 'W(li("Gold", t("NERF")))', 'W(ul_close())',
+             'W(subgroup("Lotus Pools"))', 'W(ul_open())', 'W(li("Lotus", t("NEW")))', 'W(ul_close())',
+             'W(subgroup("Wisdom Runes"))', 'W(ul_open())', 'W(li("Removed", t("DEL")))', 'W(ul_close())']
+    out = g._postprocess_rune_rows(lines)
+    assert out.count('W(subgroup("Runes"))') == 1
+    names = [line.split('"')[1] for line in out if line.startswith(('W(ability(', 'W(subgroup('))]
+    assert names == ["Runes", "Bounty Rune", "Wisdom Rune", "Lotus Pools"]
+
+
+def test_738_runes_stand_before_lotus_pools_under_their_subheading():
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    src = open(os.path.join(root, "content", "p738.py"), encoding="utf-8").read()
+    order = [src.index(s) for s in ('W(subgroup("Runes"))', 'W(ability("Bounty Rune"', 'W(ability("Wisdom Rune"', 'W(subgroup("Lotus Pools"))')]
+    assert order == sorted(order)
+
+
+def test_rune_icons_are_smooth():
+    pil = pytest.importorskip("PIL.Image")
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for key in ("invisibility", "wisdom", "water", "haste", "bounty"):
+        im = pil.open(os.path.join(root, "icons", "runes", f"{key}.png")).convert("RGBA")
+        hist = im.getchannel("A").histogram()
+        assert im.size == (96, 96), key
+        assert sum(hist[1:255]) / max(1, sum(hist[1:])) > 0.15, key       # the edge fades instead of a hard step
+
+
+def test_every_rune_fills_its_square_alike_and_stands_in_the_middle():
+    # owner 2026-11-04: Wisdom sat off-centre and smaller than Bounty
+    pil = pytest.importorskip("PIL.Image")
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for key in ("arcane", "bounty", "doubledamage", "haste", "illusion", "invisibility", "regeneration", "shield", "water", "wisdom"):
+        alpha = pil.open(os.path.join(root, "icons", "runes", f"{key}.png")).convert("RGBA").getchannel("A")
+        left, top, right, bottom = alpha.point(lambda v: 255 if v >= 16 else 0).getbbox()
+        assert abs(max(right - left, bottom - top) - 88) <= 2, key
+        assert abs((left + right) / 2 - 48) <= 2 and abs((top + bottom) / 2 - 48) <= 2, key

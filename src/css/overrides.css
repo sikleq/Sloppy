@@ -326,8 +326,9 @@ a.ec-hstat-who:hover { color: var(--gold); }
    pace with the Hero Changes cards, which scale with width — a fixed gap made
    unit cards drift bigger on wide monitors. Columns flex-grow to fill the row;
    a small basis avoids mid-width wrapping. */
-.ec-ugrid { display: flex; flex-wrap: wrap; gap: 18px clamp(34px, 4vw + 12px, 150px); margin-top: 14px; align-items: flex-start; }
-.ec-ucol { flex: 1 1 110px; min-width: 0; }
+/* a grid: a column that wraps to the next row keeps its width. In a flex row "Other" grew over the whole page, Roshan 481px */
+.ec-ugrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 18px clamp(34px, 4vw + 12px, 150px); margin-top: 14px; align-items: start; }
+.ec-ucol { min-width: 0; }
 /* Unit column titles inherit the shared .ec-group-title look (same font + size
    as Hero attribute / Item panel headers); only keep them on one line. */
 .ec-ucol .ec-group-title { white-space: nowrap; }
@@ -344,7 +345,7 @@ a.ec-hstat-who:hover { color: var(--gold); }
 .ec-card-unit.ec-nopage:hover { opacity: 0.62; }
 /* Structures catalogue: full-colour but non-clickable — no hover lift. */
 .ec-card-unit.ec-static { cursor: default; }
-@media (max-width: 900px) { .ec-ucol { flex: 1 1 44%; } }
+@media (max-width: 900px) { .ec-ugrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 1100px) {
   .ec-hgrid { grid-template-columns: 1fr 1fr; }
   .ec-igrid { grid-template-columns: 1fr; }

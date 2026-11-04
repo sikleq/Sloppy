@@ -26,6 +26,8 @@ from .post_general import (
     _postprocess_new_units,
     _postprocess_per_minute,
     _postprocess_switched_note,
+    _postprocess_courier_rows,
+    _postprocess_rune_rows,
     _postprocess_team_abilities,
     _postprocess_unit_possessive,
 )
@@ -183,6 +185,8 @@ def generate(version):
     out = _postprocess_per_minute(out)                # "… upgrade per minute …" -> minute table
     out = _postprocess_merge_twin_rows(out)
     out = _postprocess_new_units(out, version)        # a creep new in the game's files: its header and numbers
+    out = _postprocess_rune_rows(out)                 # a rune reads as an ability: icon, name, rows (owner 2026-11-04)
+    out = _postprocess_courier_rows(out)              # Courier rows -> the unit's own category (owner 2026-11-04)
     out = _postprocess_team_abilities(out)            # Glyph, Scan rows -> an ability's header (owner 2026-11-04)
     out = _postprocess_minute_formula(out)
     out = _postprocess_scale_pill(out)

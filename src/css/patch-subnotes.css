@@ -135,14 +135,14 @@ ul.subnote-items > li::before {
 }
 /* ---- Game-formula change (formula_change): old → new, ability_change-style ---- */
 .formula-change { margin: 10px 0 8px; }
-.formula-change-title {
+.formula-change-title {      /* the type of a row, its text in the column of the rows' text (owner 2026-11-04) */
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 12px;
   margin-bottom: 9px;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #dbd5c8;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-main);
 }
 /* the title's tag as wide as every row's (owner 2026-10-27, 7.40 Assist Gold Formula: REWORK 60px beside 64px) */
 .formula-change-title > .badge {

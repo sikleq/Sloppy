@@ -12,7 +12,7 @@ from .elements import (
 from .ability_group import ability_group
 from .item_links import item_link
 from .unit_numbers import unit_sheet
-from .mech_abilities import mech_before_after, mech_pair, mech_story, mech_table, mech_text
+from .mech_abilities import mech_before_after, mech_example, mech_formula, mech_list, mech_pair, mech_story, mech_table, mech_text
 from .cards_ability_change import ability_change, new_ability, game_ability_desc, game_ability_pair
 from .cards_aghs import aghs_line, aghs_shard_line
 from .cards_item_abilities import item_abilities_change

@@ -398,6 +398,8 @@ h4.subgroup {
 .mech-abils.mech-cols-1 { grid-template-columns: auto; }
 .mech-abils.mech-cols-4 { grid-template-columns: fit-content(22%) minmax(0, 1fr) fit-content(20%) fit-content(22%); }
 .mech-abils.mech-cols-2 { grid-template-columns: fit-content(35%) minmax(0, 1fr); }
+.mech-abils.mech-cols-2.mech-values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mech-abils.mech-cols-3.mech-values { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .mech-abils.mech-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }   /* a line of values (7.38 Lotus Pools) */
 .mech-cell {
   display: flex;
@@ -435,6 +437,15 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
   transform: scale(2.6);
   box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
 }
+/* an icon named with its name in a text grows as well (owner 2026-11-04, 7.38 Open Wounds) */
+.ac-sub > .ac-sub-ico { transition: transform 0.12s ease; transform-origin: center; }
+.ac-sub:hover { position: relative; z-index: 101; }
+.ac-sub:hover > .ac-sub-ico {
+  position: relative;
+  z-index: 1;
+  transform: scale(2.6);
+  box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
+}
 .ability-chip[data-tooltip]::after { bottom: calc(100% + 22px); }
 /* "[Wex] – …" in a card row; several abilities saying one thing stand side by side (owner 2026-10-30) */
 .acr-lead-chips .ability-chip + .ability-chip { margin-left: -2px; }
@@ -445,9 +456,10 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
 /* a folded text's icons don't grow: the fold would cut the grown icon and its name (owner 2026-10-30); a click opens
    the text, and there they grow */
 .acr-fold:not(.is-open) .acr-fold-body .ability-chip:hover > img { transform: none; box-shadow: none; }
+.acr-fold:not(.is-open) .acr-fold-body .ac-sub:hover > .ac-sub-ico { transform: none; box-shadow: none; }
 .acr-fold:not(.is-open) .acr-fold-body .ability-chip[data-tooltip]::after,
 .acr-fold:not(.is-open) .acr-fold-body .ability-chip[data-tooltip]::before { display: none; }
-@media (prefers-reduced-motion: reduce) { .ability-chip > img { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .ability-chip > img { transition: none; } .ac-sub > .ac-sub-ico { transition: none; } }
 .facet-icon-overlay {
   width: 36px;
   height: 36px;

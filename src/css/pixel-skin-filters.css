@@ -100,8 +100,9 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-card.iab-added { border: 1px dashed rgba(110, 170, 118, 0.42); }   /* a step darker (owner 2026-09-30) */
 .iab-card.iab-removed { border: 1px dashed rgba(227, 128, 110, 0.5); }
 /* another ability named inside a card's text: a small icon + its name (sub_ability, 7.41 Overclocking) */
-.ac-sub { display: inline-flex; align-items: center; gap: 5px; vertical-align: -5px; margin-right: 2px; }
-.ac-sub-ico { width: 20px; height: 20px; border-radius: 3px; border: 1px solid var(--line-soft); }
+/* inline, not inline-flex: the name stays on the baseline of the words around it (owner 2026-11-04, 7.39 Sange) */
+.ac-sub { white-space: nowrap; margin-right: 2px; }
+.ac-sub-ico { width: 20px; height: 20px; object-fit: cover; margin-right: 5px; vertical-align: -5px; border-radius: 3px; border: 1px solid var(--line-soft); }
 .ac-sub-name { color: var(--text-bright); font-weight: 600; }
 /* changed words in a card's text: the change's colour as a light highlighter under the text, the text keeps its
    own colour (owner: preview on Dragon Knight 2026-10-24, the whole site 10-25 at ~0.15). The colour is the side

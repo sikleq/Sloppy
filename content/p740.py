@@ -48,15 +48,17 @@ def build():
         unit="Gold",
     ))
     W(ul_open())
+    W(li("All illusions now have 800 daytime vision and 400 nighttime vision", b([1800, 800], [800, 400], slash=True),
+         extra=inline_note("Previously inherited the hero's full vision (typically 1800 daytime / 800 nighttime)")))
+    W(ul_close())
+    # the Courier and the Flying Courier are one unit: a category of its own (owner 2026-11-04; generator _postprocess_courier_rows)
+    W(unit_header("Courier", "../icons/units/npc_dota_courier.png", general=False, track=True))
+    W(ul_open())
     W(li_formula("Courier respawn time decreased",
                  "60s + 6s per Hero Level", "45s + 5s per Hero Level",
                  lambda L: 60 + 6 * L, lambda L: 45 + 5 * L, l=True))
     W(li("Courier no longer has a 15% movement speed penalty while carrying a Clarity, Enchanted Mango, Faerie Fire, Healing Salve, or Tango", t("BUFF")))
     W(li("Flying Courier will now go to a more obscure shopping area within range of the Secret Shop when using Go To Secret Shop", t("QoL")))
-    W(ul_close())
-    W(ul_open())
-    W(li("All illusions now have 800 daytime vision and 400 nighttime vision", b([1800, 800], [800, 400], slash=True),
-         extra=inline_note("Previously inherited the hero's full vision (typically 1800 daytime / 800 nighttime)")))
     W(ul_close())
     # each lane creep's rows under its card, as units elsewhere (owner 2026-10-16; generator _general_topics)
     W(unit_header("Melee Creep", "../icons/units/npc_dota_creep_goodguys_melee.png", general=False, page="melee-creep"))
@@ -78,11 +80,19 @@ def build():
     W(ul_close())
 
     W(plain_header("Map Objectives"))
+    # a rune reads as an ability: its icon, its name, its rows (owner 2026-11-04; generator _postprocess_rune_rows)
     W(subgroup("Runes"))
+    W(ability("Bounty Rune", icon_url="../icons/runes/bounty.png", innate=False))
     W(ul_open())
-    W(li("Bounty Rune: Now grants gold based on when it was created, not when it was activated", t("REWORK")))
-    W(li("Haste Rune: Duration no longer increases by 3s per rune cycle, and is always 22s now", t("DEL")))
-    W(li("Invisibility Rune: No longer grants incoming damage reduction", t("DEL")))
+    W(li("Now grants gold based on when it was created, not when it was activated", t("REWORK")))
+    W(ul_close())
+    W(ability("Haste Rune", icon_url="../icons/runes/haste.png", innate=False))
+    W(ul_open())
+    W(li("Duration no longer increases by 3s per rune cycle, and is always 22s now", t("DEL")))
+    W(ul_close())
+    W(ability("Invisibility Rune", icon_url="../icons/runes/invisibility.png", innate=False))
+    W(ul_open())
+    W(li("No longer grants incoming damage reduction", t("DEL")))
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
@@ -109,7 +119,7 @@ def build():
     W(ul_close())
     W(ability("The Shining", icon_url="../icons/abilities/miniboss_radiance.png"))
     W(ul_open())
-    W(li("Now only starts dealing damage to the surrounding enemies when attacked/damaged", t("NERF")))
+    W(li("Now only starts dealing damage to the surrounding enemies when attacked/damaged", t("REWORK")))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.40"))

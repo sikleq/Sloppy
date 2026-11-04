@@ -344,9 +344,7 @@ extra=inline_note(info_tip("Batrider's Arsonist", "Magnus' Diminishing Return", 
 аспекта (`mech_abilities.rune_row_chip`, вызывается в `li()`). Рун в игре 10: Bounty, Haste, Amplify Damage (Double
 Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (удалена 7.38). Один стиль — значки
 миникарты, как на странице Terrain (владелец 2026-10-28: «в terrain всё есть кроме wisdom/water, придерживаемся этого,
-остальные докачиваем»): 7 power-рун и Bounty копируются из `icons/ui/gothic/tc_rune_0..6`, `tc_bounty`
-(`python scripts/fetch/fetch_rune_icons.py`); Water и Wisdom — «<Name> Rune mapicon dota2 gameasset.png» с Liquipedia
-(через `tools/liquipedia_cache.py`), лежат в `icons/runes/` как есть. Общего значка power-рун в игре нет (значок
+остальные докачиваем»): все из значков миникарты Liquipedia в `icons/ref/runes` (32 px, не в git), `python scripts/fetch/fetch_rune_icons.py` сглаживает их до 96 px, обрезает по настоящим краям и ставит в центр, длинная сторона у всех 88 px (владелец 2026-11-04: края были ступенчатые, Wisdom стояла не в центре). Общего значка power-рун в игре нет (значок
 таймера HUD — это руна воды), поэтому `icons/runes/power.png` — свой: связка из трёх значков рун игры (Regeneration
 сзади слева, Haste сзади справа, крупнее спереди Double Damage; выбор владельца 2026-10-28 из трёх вариантов —
 связка / кристалл в семи цветах / кольцо из семи камней), генератор `scripts/gen/gen_power_rune_icon.py` (запускать

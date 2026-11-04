@@ -43,14 +43,23 @@ def build():
     # Targeting (owner 2026-10-16: "суммируем, показывая, что изменилось"); the rows' own tags stay hidden (force_tag)
     W(plain_header("Scaling with Hero Level", new="Reworked mechanic"))
     W(ul_open())
+    # as 7.38 (owner 2026-11-04): a paragraph first, the rows under it keep the tags and weights
+    W(mech_story([
+        "Innate abilities no longer scale with other abilities' level. The ones that did now either give a fixed bonus or "
+        "grow with hero level. A value that grows with hero level has a <b>base value</b> and an <b>increment</b>; some need "
+        "several hero levels per increment. A value that grows every level gives its increment already at level 1. Abilities "
+        "that scaled 'per level up' now scale 'per level', mostly the heroes reworked in 7.40 and Largo.",
+        "A new icon shows which values grow with hero level and their current value; hold ALT to see the base value and the "
+        "increment. Some non-innate abilities show it too."],
+        tags=("rework", "misc", "qol")))
     W(li("Innate abilities no longer scale with other abilities' level. The ones that did now either give a fixed "
-         "bonus or grow with hero level", t("REWORK")))
+         "bonus or grow with hero level", t("REWORK"), covered=True))
     W(li("A value that grows with hero level has a <b>base value</b> and an <b>increment</b>; some need several hero "
-         "levels per increment. A value that grows every level gives its increment already at level 1", t("REWORK")))
+         "levels per increment. A value that grows every level gives its increment already at level 1", t("REWORK"), covered=True))
     W(li("Abilities that scaled 'per level up' now scale 'per level' — mostly the heroes reworked in 7.40 and Largo",
-         t("REWORK"), force_tag="rework misc"))
+         t("REWORK"), force_tag="rework misc", covered=True))
     W(li("A new icon shows which values grow with hero level and their current value; hold ALT to see the base value "
-         "and the increment. Some non-innate abilities show it too", t("REWORK"), force_tag="rework qol"))
+         "and the increment. Some non-innate abilities show it too", t("REWORK"), force_tag="rework qol", covered=True))
     W(ul_close())
 
     W(plain_header("Map Objectives"))
@@ -193,7 +202,8 @@ def build():
 
     W(subgroup("Lifesteal and Damage Manipulations", new="Reworked mechanic"))
     W(ul_open())
-    W(li("Physical and Magical Lifesteal will now take into account overall damage reductions/amplifications when computing how much to lifesteal " + info_tip(
+    # as 7.38 (owner 2026-11-04): the paragraph with the "?" written in, the sources' icons under it
+    _lifesteal_sources = info_tip(
             "Aeon Disk", "Bloodstone", "Consecrated Wraps", "Veil of Discord", "Prophet's Pendulum",
             "Audacious Enchantment", "Abaddon's Borrowed Time with Aghanim's Scepter", "Beastmaster's Wild Axes",
             "Bounty Hunter's Shadow Walk with talent", "Bristleback's Bristleback", "Centaur Warrunner's Stampede",
@@ -203,8 +213,14 @@ def build():
             "Oracle's False Promise", "Pudge's Flesh Heap", "Shadow Demon's Menace", "Spectre's Dispersion",
             "Treant Protector's Living Armor", "Underlord's Invading Force", "Undying's Flesh Golem",
             "Ursa's Enrage", "Visage's Gravekeeper's Cloak", "Warlock's Golem with talent",
-            header="This affects the following:"), t("REWORK")))
-    W(li("Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by Aeon Disk's Combo Breaker). This will not happen anymore", t("REWORK"), extra=inline_note("The only amplification that is not taken into account is increased damage against illusions")))
+            header="This affects the following:")
+    W(mech_story([
+        "Physical and Magical Lifesteal will now take into account overall damage reductions/amplifications when computing "
+        "how much to lifesteal. The only amplification that is not taken into account is increased damage against illusions.",
+        "Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by " + mech_example("Aeon Disk's Combo Breaker") + "). This will not happen anymore."],
+        tags=("rework",), table=mech_list(_lifesteal_sources)))
+    W(li("Physical and Magical Lifesteal will now take into account overall damage reductions/amplifications when computing how much to lifesteal", t("REWORK"), covered=True))
+    W(li("Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by Aeon Disk's Combo Breaker). This will not happen anymore", t("REWORK"), covered=True, extra=inline_note("The only amplification that is not taken into account is increased damage against illusions")))
     W(ul_close())
 
     # the rows about reflected damage are a mechanic of their own, its sources a table of icons (owner 2026-10-28:
@@ -229,7 +245,7 @@ def build():
     W(li("Units with free movement now can miss their attacks when attacking uphill targets " + info_tip(
             "Batrider during Firefly", "Dragon Knight during Elder Dragon Form with Aghanim's Scepter",
             "Lina during Flame Cloak", "Terrorblade's Reflection illusions",
-            header="Affected units:"), t("NERF")))
+            header="Affected units:"), t("REWORK")))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====

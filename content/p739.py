@@ -104,16 +104,40 @@ def build():
     # version folded "Provides …" into an intro); generate_patch_code_v2._mechanic_blocks drafts it so
     W(plain_header("Health Restoration", new="New mechanic"))
     W(ul_open())
-    W(li("Lifesteal Amplification and Spell Lifesteal Amplification have been removed and a new umbrella stat has been created in their place: Health Restoration", t("NEW"), force_tag="new del"))
-    W(li("Provides a percentage increase to the health gained from Lifesteal, Spell Lifesteal, and Health Regeneration", t("NEW"), extra=inline_note("Also decreases those values when negative")))
-    W(li("Positive and Negative sources of Health Restoration stack diminishingly with each other", t("NEW"), extra=inline_note("\"Stacking diminishingly\" is the same behavior as evasion and magic resistance. Given N sources of positive Health Restoration, the final value will be calculated as: 1 - (1 - n0) * (1 - n1) * ...<br><br>For example, if you have a Sange (16%) and a Tier 4 Neutral Item with the Crude Enchantment (20%), your total Health Restoration would be 1 - (1 - .16) * (1 - .2) = 32.8%. In other words, multiple smaller sources are less effective than one single large source.<br><br>Negative sources of Health Restoration are stacked the same way, and then the positive and negative values are added together for your final Health Restoration.")))
-    W(li("Health Restoration cannot go lower than -100% and cannot go higher than 100%", t("NEW")))
+    # as 7.38 (owner 2026-11-04), and with formulas in blocks of their own: what it is, how it stacks, an example
+    W(mech_story(
+        "Lifesteal Amplification and Spell Lifesteal Amplification have been removed and a new umbrella stat has been created "
+        "in their place: Health Restoration. It provides a percentage increase to the health gained from Lifesteal, Spell "
+        "Lifesteal, and Health Regeneration, and also decreases those values when negative.",
+        tags=("new", "del"),
+        table=mech_table(["Lowest", "Highest"], [["<b>-100%</b>", "<b>100%</b>"]], labels=False)))
+    W(mech_story(
+        "Positive and Negative sources of Health Restoration stack diminishingly with each other. \"Stacking diminishingly\" is "
+        "the same behavior as evasion and magic resistance. In other words, multiple smaller sources are less effective than "
+        "one single large source.",
+        table=mech_table(["Sources", "Total"], [
+            ["Positive", mech_formula("1 - (1 - n0) * (1 - n1) * ...")],
+            ["Negative", "Stacked the same way"],
+            ["All", "The positive and negative values are added together"]])))
+    W(mech_story(
+        f"For example, a {mech_example('Sange')} and a Tier 4 Neutral Item with the {mech_example('Crude Enchantment')}:",
+        table=mech_table(["Sange", "Crude Enchantment", "Total Health Restoration"], [
+            ["<b>16%</b>", "<b>20%</b>", mech_formula("1 - (1 - 0.16) * (1 - 0.2)") + " = <b>32.8%</b>"]], labels=False)))
+    W(li("Lifesteal Amplification and Spell Lifesteal Amplification have been removed and a new umbrella stat has been created in their place: Health Restoration", t("NEW"), force_tag="new del", covered=True))
+    W(li("Provides a percentage increase to the health gained from Lifesteal, Spell Lifesteal, and Health Regeneration", t("NEW"), covered=True, extra=inline_note("Also decreases those values when negative")))
+    W(li("Positive and Negative sources of Health Restoration stack diminishingly with each other", t("NEW"), covered=True, extra=inline_note("\"Stacking diminishingly\" is the same behavior as evasion and magic resistance. Given N sources of positive Health Restoration, the final value will be calculated as: 1 - (1 - n0) * (1 - n1) * ...<br><br>For example, if you have a Sange (16%) and a Tier 4 Neutral Item with the Crude Enchantment (20%), your total Health Restoration would be 1 - (1 - .16) * (1 - .2) = 32.8%. In other words, multiple smaller sources are less effective than one single large source.<br><br>Negative sources of Health Restoration are stacked the same way, and then the positive and negative values are added together for your final Health Restoration.")))
+    W(li("Health Restoration cannot go lower than -100% and cannot go higher than 100%", t("NEW"), covered=True))
     W(ul_close())
 
     W(plain_header("Heal Amplification", new="Reworked mechanic"))
     W(ul_open())
-    W(li("Sources of Heal Amplification now stack additively with each other instead of diminishingly", t("REWORK"), extra=inline_note("This includes both Incoming Heal Amplification and Outgoing Heal Amplification")))
-    W(li("Heal Amplification cannot go lower than -100% and has no upper limit", t("REWORK")))
+    W(mech_story(
+        "Sources of Heal Amplification now stack additively with each other instead of diminishingly. This includes both "
+        "Incoming Heal Amplification and Outgoing Heal Amplification. Heal Amplification cannot go lower than <b>-100%</b> and "
+        "has no upper limit.",
+        tags=("rework",)))
+    W(li("Sources of Heal Amplification now stack additively with each other instead of diminishingly", t("REWORK"), covered=True, extra=inline_note("This includes both Incoming Heal Amplification and Outgoing Heal Amplification")))
+    W(li("Heal Amplification cannot go lower than -100% and has no upper limit", t("REWORK"), covered=True))
     W(ul_close())
 
     W(plain_header("General Changes"))

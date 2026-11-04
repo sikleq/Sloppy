@@ -306,6 +306,103 @@ def _postprocess_new_units(lines, version):
     return out
 
 
+_COURIER_HEAD = 'W(unit_header("Courier", "../icons/units/npc_dota_courier.png", general=False, track=True))'
+_COURIER_ROW_RE = re.compile(r'^W\(li(?:_formula)?\("(?:Flying )?Couriers? ')
+
+
+def _drop_empty_lists(out):
+    """The lists a pass left empty go, with their header when nothing else is under it."""
+    out, i = list(out), 0
+    while i + 1 < len(out):
+        if out[i].startswith('W(ul_open())') and out[i + 1].startswith('W(ul_close())'):
+            del out[i:i + 2]
+            if i and out[i - 1].startswith(('W(plain_header(', 'W(subgroup(')) \
+                    and (i == len(out) or out[i].startswith(('W(plain_header(', 'W(section(', 'W(subgroup(', 'W(unit_header('))):
+                del out[i - 1]
+                i -= 1
+            continue
+        i += 1
+    return out
+
+
+def _postprocess_courier_rows(lines):
+    """The Courier and the Flying Courier are one unit (owner 2026-11-04): General Updates' rows about them leave their lists
+    for a category of its own, with the unit's portrait and its patch cells, right after the first such list, as Roshan,
+    the Tormentor and Team Abilities."""
+    section, rows, keep, first, anchor = "", [], [], None, None
+    for raw in lines:
+        head = re.match(r'^\s*W\(section\("([^"]+)"', raw)
+        if head:
+            section = head.group(1)
+        if section == "General Updates" and _COURIER_ROW_RE.match(raw):
+            rows.append(raw)
+            first = len(keep) if first is None else first
+            continue
+        keep.append(raw)
+        if first is not None and anchor is None and raw.startswith('W(ul_close())'):
+            anchor = len(keep)
+    if not rows:
+        return lines
+    if anchor is None:                                 # no list closes after the row: the block goes last
+        anchor = len(keep)
+    return _drop_empty_lists(keep[:anchor] + [_COURIER_HEAD, 'W(ul_open())', *rows, 'W(ul_close())'] + keep[anchor:])
+
+
+_RUNE_ROW_LINE_RE = re.compile(r'^W\(li\("(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes?: (?P<rest>.*)$')
+_RUNE_SUBGROUP_RE = re.compile(r'^W\(subgroup\("(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes?"\)\)$')
+
+
+def _rune_head(name, icons):
+    return f'W(ability("{name} Rune", icon_url="../icons/runes/{icons[name]}.png", innate=False))'
+
+
+def _postprocess_rune_rows(lines):
+    """A rune reads as an ability (owner 2026-11-04): its icon and name over its rows. In General Updates, "Haste Rune: ..."
+    rows leave their list for a block each right after it, without the name; a subgroup "Bounty Runes" becomes the block's
+    header."""
+    from patch.mech_abilities import RUNE_ICONS
+    section, out, pending, changed = "", [], {}, False
+    for raw in lines:
+        head = re.match(r'^\s*W\(section\("([^"]+)"', raw)
+        if head:
+            section = head.group(1)
+        row = _RUNE_ROW_LINE_RE.match(raw) if section == "General Updates" else None
+        sub = _RUNE_SUBGROUP_RE.match(raw) if section == "General Updates" else None
+        if row and row.group("name") in RUNE_ICONS:
+            rest = row.group("rest")
+            pending.setdefault(row.group("name"), []).append(f'W(li("{rest[0].upper()}{rest[1:]}')
+            changed = True
+        elif sub and sub.group("name") in RUNE_ICONS:
+            out.append(_rune_head(sub.group("name"), RUNE_ICONS))
+            changed = True
+        else:
+            out.append(raw)
+            if raw.startswith('W(ul_close())') and pending:
+                for name, rows in pending.items():
+                    out += [_rune_head(name, RUNE_ICONS), 'W(ul_open())', *rows, 'W(ul_close())']
+                pending = {}
+    return _gather_rune_blocks(_drop_empty_lists(out)) if changed else lines
+
+
+def _gather_rune_blocks(lines):
+    """All rune blocks of a patch stand together at the first one's place, under one subheading "Runes" (owner 2026-11-04,
+    7.38: Bounty and Wisdom Runes were split by Lotus Pools)."""
+    keep, blocks, first, i = [], [], None, 0
+    while i < len(lines):
+        if lines[i].startswith('W(ability("') and '"../icons/runes/' in lines[i]:
+            first = len(keep) if first is None else first
+            end = lines.index('W(ul_close())', i) + 1
+            blocks += lines[i:end]
+            i = end
+        else:
+            keep.append(lines[i])
+            i += 1
+    if first is None:
+        return lines
+    head = [] if 'W(subgroup("Runes"))' in keep[:first] else ['W(subgroup("Runes"))']
+    return keep[:first] + head + blocks + keep[first:]
+
+
 def _postprocess_team_abilities(lines):
     """Glyph of Fortification and Scan are abilities every team has (owner 2026-11-04: "определять в патче и выносить в
     отдельную подкатегорию"): wherever a patch names them at the start of a row, the rows leave their lists for a
@@ -332,18 +429,7 @@ def _postprocess_team_abilities(lines):
                   'W(ul_open())', *rows[name], 'W(ul_close())']
     if anchor is None:                                 # no list closes after the row: the block goes last
         anchor = len(keep)
-    out = keep[:anchor] + block + keep[anchor:]
-    i = 0
-    while i + 1 < len(out):                            # the lists left empty
-        if out[i].startswith('W(ul_open())') and out[i + 1].startswith('W(ul_close())'):
-            del out[i:i + 2]
-            if i and out[i - 1].startswith(('W(plain_header(', 'W(subgroup(')) \
-                    and (i == len(out) or out[i].startswith(('W(plain_header(', 'W(section(', 'W(subgroup('))):
-                del out[i - 1]
-                i -= 1
-            continue
-        i += 1
-    return out
+    return _drop_empty_lists(keep[:anchor] + block + keep[anchor:])
 
 
 def _postprocess_new_block_label(lines):

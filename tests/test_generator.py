@@ -625,13 +625,13 @@ def test_item_and_creep_canonical_tags_738(text, tag):
 
 @pytest.mark.parametrize("text,tag", [
     # the 2026-10-03 audit of 7.40 / 7.41: a limit added reads NERF, a lost application DEL, a rename / catch REWORK
-    ("Now only starts dealing damage to the surrounding enemies when attacked/damaged", "NERF"),
+    ("Now only starts dealing damage to the surrounding enemies when attacked/damaged", "REWORK"),      # owner 2026-11-05
     ("Now takes 1 second to reach full Roll Speed", "NERF"),
     ("Now heals for half the amount per second when cast on an ally", "NERF"),
     ("Shared Tango now heals for half the amount per second", "NERF"),
     ("Ability can now be reflected", "NERF"),
     ("Reflected damage cannot be reflected back", "DEL"),                            # owner 2026-10-28 (was NERF)
-    ("Units with free movement now can miss their attacks when attacking uphill targets", "NERF"),
+    ("Units with free movement now can miss their attacks when attacking uphill targets", "REWORK"),      # owner 2026-11-05
     ("Now also provides -10/12/14% Attack Speed", "NERF"),
     ("Break now also goes on cooldown when the item is disassembled", "NERF"),
     ("Now always destroys the target illusion", "NERF"),

@@ -48,13 +48,19 @@ def build():
     W(ul_close())
 
     W(plain_header("Map Objectives"))
-    W(subgroup("Bounty Runes"))
+    # a rune reads as an ability: its icon, its name, its rows (owner 2026-11-04; generator _postprocess_rune_rows)
+    W(subgroup("Runes"))
+    W(ability("Bounty Rune", icon_url="../icons/runes/bounty.png", innate=False))
     W(ul_open())
     W(li_formula("Gold provided after the initial set rescaled", "36 + (9 per 5 minutes)", "40 + (6 per 4 minutes)",
                  lambda M: 36 + 9 * (M // 5), lambda M: 40 + 6 * (M // 4),
                  levels=[4, 5, 8, 10, 12, 15, 16, 20, 25, 30, 35, 40, 45, 50, 55, 60],
                  level_fmt=lambda M: f"{M}:00", headline_level=4, jump_at=None, value_fmt="{:g}g"))
     W(li("Spawn interval increased from 3 minutes to 4 minutes", b(3, 4, l=True)))
+    W(ul_close())
+    W(ability("Wisdom Rune", icon_url="../icons/runes/wisdom.png", innate=False))
+    W(ul_open())
+    W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))
     W(ul_close())
     W(subgroup("Lotus Pools"))
     W(ul_open())
@@ -75,10 +81,6 @@ def build():
         maps=["Changed the way Healing Lotuses"]))
     W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available, and Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), covered=True, extra=inline_note("All remaining lotuses in Lotus Pools will be combined and rounded up to the nearest number of lotuses of the next tier they could form")))
     W(li("Changed the way Healing Lotuses are collected from Lotus Pools: they now have three entrances and an empty region in the center. Heroes automatically gather lotuses when within range as long as they have available space in their inventory, and each subsequent lotus in a row takes 30% less time. The timer only counts down when all heroes within range are on the same team, pausing if an enemy hero enters the area and resuming when enemies leave. If multiple allied heroes are all within range, the Lotus is granted to a random hero", t("REWORK"), covered=True))
-    W(ul_close())
-    W(subgroup("Wisdom Runes"))
-    W(ul_open())
-    W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))
     W(ul_close())
     W(subgroup("Shrines of Wisdom", new="New objective"))
     W(ul_open())
@@ -116,7 +118,7 @@ def build():
     W(ul_close())
     W(ability_change(None, {"name": "Throw", "icon_url": "../icons/abilities/roshan_grab_and_throw.png",
                             "desc": ["When running into a hero while moving between pits, Roshan will stop and grab them before violently throwing them away. Upon landing, heroes are stunned for 1s and take 200 pure damage + 0.5% of target's current health per minute of game time. Each time Roshan throws a hero, he gains 70 bonus movement speed and increases throw damage by additional 100 until he reaches his destination pit. After 5 throws Roshan ignores heroes on his way",
-                                     "Throw distance: 1500. Max bonus movespeed: 300. Can be blocked by spell-blocking abilities and items, like Linken's Sphere, but can't be reflected. Heroes will be thrown away from Roshan based on their relative position to him"]},
+                                     "Throw distance: 1500. Max bonus movespeed: 300. Can be blocked by spell-blocking abilities and items, like " + mech_example("Linken's Sphere") + ", but can't be reflected. Heroes will be thrown away from Roshan based on their relative position to him"]},
                      summary="New ability", tag="new"))
     W(ability("Roar of Retribution", icon_url="../icons/abilities/roshan_revengeroar.png"))
     W(ul_open())
@@ -201,8 +203,9 @@ def build():
     W(li("The following sources and targets do not provide any lifesteal", t("REWORK"), extra=inline_list("Attacks that do not proc Attack Modifiers <span class=\"pop-note\">(Examples: Cleave, Luna's Bouncing Glaives)</span><br>Attack damage against wards, buildings, or couriers<br>Spell damage against illusions, wards, buildings, or couriers<br>Reflected damage <span class=\"pop-note\">(Example: Blade Mail return damage)</span><br>Spells that remove Health instead of dealing direct damage <span class=\"pop-note\">(Effects that don't break Blink Dagger, like Orb of Venom or Necrophos' Heartstopper Aura)</span><br>Any damage dealt to self or allies")))
     W(mech_story(
         "A small number of abilities that do not use Lifesteal or Spell Lifesteal still result in healing and can benefit "
-        "from Lifesteal Amp: Lifestealer's Open Wounds heals attackers for a percentage of the damage done, Lifestealer's "
-        "Feast heals for a percentage of the target's max health, and Meepo's Ransack heals all Meepos a flat amount for "
+        "from Lifesteal Amp: " + mech_example("Lifestealer's Open Wounds") + " heals attackers for a percentage of the damage done, "
+        + mech_example("Lifestealer's Feast") + " heals for a percentage of the target's max health, and "
+        + mech_example("Meepo's Ransack") + " heals all Meepos a flat amount for "
         "each strike. Holding Alt while looking at tooltips for these abilities will describe their interaction with "
         "Lifesteal Amp.", tags=("rework",)))
     W(li("A small number of abilities that do not use Lifesteal or Spell Lifesteal still result in healing and can benefit from Lifesteal Amp", t("REWORK"), covered=True, extra=inline_note("Lifestealer's Open Wounds heals attackers for a percentage of the damage done<br>Lifestealer's Feast heals for a percentage of the target's max health<br>Meepo's Ransack heals all Meepos a flat amount for each strike<br><span class=\"pop-note\">Holding Alt while looking at tooltips for these abilities will describe their interaction with Lifesteal Amp</span>")))

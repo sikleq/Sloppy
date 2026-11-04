@@ -322,6 +322,16 @@ def _example_chip(name):
     return f'<span class="mech-ex-name">{name}</span>'
 
 
+def mech_example(name):
+    """An item or ability a mechanic's text names as an example: its icon and name (owner 2026-11-04: "если есть примеры, их
+    надо оформлять иконками"). A name with no icon stops the build, the example would lose its look unnoticed."""
+    parsed = _parse_line(name)
+    if not parsed or parsed[2] or not parsed[1] or parsed[1].startswith("facet:"):
+        raise ValueError(f"mech_example: no icon for {name!r}")
+    return (f'<span class="ac-sub"><img class="ac-sub-ico" src="{parsed[1]}" alt="" loading="lazy" width="20" height="20">'
+            f'<b class="ac-sub-name">{_html.escape(name)}</b></span>')
+
+
 def _split_examples(caveat):
     """"Examples: Cleave, Luna's Bouncing Glaives" -> ("", [chips]); "Effects that don't break Blink Dagger, like Orb
     of Venom or Necrophos' Heartstopper Aura" -> ("Effects that don't break Blink Dagger", [chips]); else None."""
@@ -410,7 +420,14 @@ def mech_table(head, rows, labels=True, wide_last=False):
                 f'<span class="mech-cell{" mech-label" if i == label_col else ""}">{cell(c)}</span>' for i, c in enumerate(row))
                 + '</span>')
     wide = " mech-wide-last" if wide_last else ""
-    return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}{wide}">{out}</span><!--/MECHTABLE-->'
+    values = "" if labels else " mech-values"     # no label column: the values are equals, their columns too
+    return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}{wide}{values}">{out}</span><!--/MECHTABLE-->'
+
+
+def mech_formula(expr):
+    """A formula for a mech_table's cell, in the look of the site's formula blocks: variables and numbers coloured."""
+    from .elements import _fmt_formula
+    return f'<code class="formula-expr">{_fmt_formula(expr)}</code>'
 
 
 def mech_text(*paragraphs):
@@ -420,7 +437,8 @@ def mech_text(*paragraphs):
     return f'<!--MECHTABLE--><span class="mech-abils mech-cols-1 mech-text">{rows}</span><!--/MECHTABLE-->'
 
 
-_STORY_TAGS = {"new": "buff new", "rework": "rework"}      # as li() marks a row of that tag: the filters read these
+# as li() marks a row of that tag: the filters read these, so a block with a QoL row still answers the QoL filter
+_STORY_TAGS = {"new": "buff new", "rework": "rework", "misc": "misc", "qol": "qol", "del": "del"}
 
 
 def _story_pictures(patch, match):
@@ -640,6 +658,15 @@ def hero_ability_rows(raw, least=1, row_text=""):
     cols = "mech-cols-hero4" if two else "mech-cols-hero3" if with_details else "mech-cols-hero2"
     lead = " mech-captioned" if row_text else ""
     return f'<span class="mech-abils mech-cols-hero {cols}{lead}">{html}</span>', []
+
+
+def mech_list(tip):
+    """The list behind a "?" as its table of icons, for the table of a mech_story (7.41 Lifesteal). A list it cannot read
+    stops the build: the abilities would silently vanish from the page."""
+    left, rows, notes = lift_ability_lists([tip])
+    if left or notes:
+        raise ValueError(f"mech_list: not a plain list of abilities: {TIP_RAW.get(tip, tip)[:80]!r}")
+    return rows
 
 
 def lift_ability_lists(tips, open_text=False, row_text=""):
