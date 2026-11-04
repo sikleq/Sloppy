@@ -1,5 +1,6 @@
 """One Terrain page per patch whose map file changed (the owner 2026-10-02: "the difference between the letter
 patches has to be shown too, not just two major versions" — 7.39b's own changes were folded into 7.39 -> 7.40)."""
+from patch.js_bundle import read_js
 import json
 import os
 import sys
@@ -137,7 +138,7 @@ def test_the_page_opens_on_the_small_pictures_and_keeps_the_full_ones_for_zoom()
 def test_small_pictures_are_swapped_for_full_ones_only_when_drawn_bigger():
     """fitSrc swaps to data-full once the drawn width times the pixel ratio passes 2048, never back; the lens
     fits on switch-on, fullscreen zoom on every resize (updateTiles)."""
-    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     fit = js.split("function fitSrc(img, cssW) {", 1)[1].split("\n    }\n", 1)[0]
     assert "devicePixelRatio" in fit and "SMALL_PX * 1.05" in fit and "img.dataset.sharp" in fit
     assert "if (loupeMode) { fitSrc(lensOld, w); fitSrc(lensNew, w); }" in js
@@ -359,7 +360,7 @@ def test_fullscreen_has_a_folding_panel_with_the_change_filters():
 def test_the_slider_writes_clip_paths_not_an_inherited_property():
     """2026-10-03 probe: setting --pos on the stage re-styled every marker under it on each move (13 s of style
     recalc per drag on a 4x-throttled CPU); the slider now writes each split element's clip-path itself."""
-    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     apply = js.split("function apply(p) {")[1].split("apply(pos);")[0]
     assert "setProperty('--pos'" not in apply and "el.style.clipPath = clipNew" in apply
     assert "handle.style.left = pos + '%'" in apply
@@ -554,7 +555,7 @@ def test_the_patch_label_opens_its_notes_and_the_tiles_pop_out():
     elements.plain_header("General Changes", dynamics=False)
     assert '<a class="terrain-jump-btn" id="terrain" href="../terrain_741.html"' in first
     assert 'id="terrain"' not in second
-    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     picker = js.split("function initSubpatchPicker()", 1)[1].split("function initChangeHighlights()", 1)[0]
     assert "document.createElement('a')" in picker and "'patches/' + ver + '.html'" in picker
     assert "'?from=' + here" in picker and "'#terrain'" in picker and "linkTo(groups[i].ver)" in picker
@@ -586,7 +587,7 @@ def test_note_pictures_mark_camps_and_show_tier_icons():
 def test_a_chip_turns_off_the_layer_it_turned_on():
     """The owner 2026-10-03: a chip that switched its layer on switches it off again with the chip; a layer the viewer
     had on (or clicked meanwhile, "All" too) stays."""
-    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     block = js.split("function initChangeHighlights() {", 1)[1].split("\n  }\n", 1)[0]
     assert "autoLayers[layer] = true;" in block
     assert "!on && autoLayers[layer] && !layerChipsOn(layer)" in block
@@ -594,7 +595,7 @@ def test_a_chip_turns_off_the_layer_it_turned_on():
 
 
 def test_note_pictures_open_large_and_fold_under_the_button():
-    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     block = js.split("Terrain note pictures", 1)[1][:3000]
     assert ".tshots-btn" in block and "pics.hidden = !open" in block and "img.dataset.large" in block
     css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()

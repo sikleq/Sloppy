@@ -105,6 +105,15 @@ def save_assets():
 
 _LI_RE = re.compile(r'<li\b([^>]*)>(.*?)</li>', re.S)
 _UL_CHANGES_RE = re.compile(r'(<ul class="changes">)(.*?)(</ul>)', re.S)
+_CARD_LINE = ('<svg class="ability-change-connector under-rows-connector" viewBox="0 0 100 100" '
+              'preserveAspectRatio="none" aria-hidden="true"><path d="" /></svg>')
+
+
+def _right_under_ability_title(html, pos):
+    """Does the list at `pos` stand right under an ability's title (not an item's or a section's)?"""
+    if not html[max(0, pos - 16):pos].rstrip().endswith('</h4>'):
+        return False
+    return html.startswith('<h4 class="ability-title"', html.rfind('<h4', 0, pos))
 
 
 def _wrap_ability_boxes(html):
@@ -182,6 +191,11 @@ def _wrap_ability_boxes(html):
             tagged[i] = cur and role is not None
             if role in ('solo', 'cont-end'):
                 cur = False
+
+        # An ability described only by its boxes (a new creep's, 7.38 Boglet) is a card like any other: under the
+        # icon's left edge with the line from the icon (owner 2026-11-04: "нет единого положения карточек").
+        if all(roles) and not any(tagged) and _right_under_ability_title(m.string, m.start()):
+            head = _CARD_LINE + head.replace('class="changes"', 'class="changes ability-card-rows"')
 
         def aug_role(it, i, cls):
             return aug_class(it, cls + (' ability-box-tagged' if tagged[i] else ''))
@@ -327,6 +341,16 @@ def _li_rank(li_html):
     return 8
 
 
+def _story_rank(li_html):
+    """A mech_story has no chip to rank it by: its tag decides, so it opens a list with lesser tags (7.38 Roshan)."""
+    head = li_html[:li_html.index(">")]
+    if 'class="unit-sheet"' in head:
+        return 1          # a unit's numbers open its list
+    if " mech-story" not in head:
+        return None
+    return 1 if re.search(r'data-tag="[^"]*\bnew\b', head) else 2
+
+
 def _sort_changes_li(html):
     """Enforce the canonical row order inside every <ul class="changes"> block:
        NEW → REWORK → BUFF → NERF → DEL → QoL → MISC → untagged.
@@ -346,7 +370,7 @@ def _sort_changes_li(html):
                or ' ability-row"' in li or ' ability-row ' in li for li in lis):
             return m.group(0)
         # Stable sort: Python's sorted is stable, so equal ranks keep order.
-        ranked = sorted(enumerate(lis), key=lambda iv: (_li_rank(iv[1]), iv[0]))
+        ranked = sorted(enumerate(lis), key=lambda iv: (_story_rank(iv[1]) or _li_rank(iv[1]), iv[0]))
         ordered = [li for _, li in ranked]
         return open_tag + prefix + ''.join(ordered) + suffix + close_tag
     return _CHANGES_UL_RE.sub(repl, html)
@@ -401,10 +425,19 @@ def _new_mech_rows(html):
         chip_re = _ANY_CHIP_RE if one_box else _mech_chip_re(m.group(1) or "new")
         body = m.group(3)
         items = list(_LI_RE.finditer(body))
-        box_idx = [i for i, it in enumerate(items) if one_box or chip_re.match(it.group(0))]
-        if not box_idx:
+        # a covered row is hidden (mech_story retells it): it opens and closes no box
+        box_idx = [i for i, it in enumerate(items) if (one_box or chip_re.match(it.group(0)))
+                   and "iab-covered" not in it.group(0)[:it.group(0).index(">")]]
+        # a mech_story before the box rows (or with none) leads the list, whatever the sort by tag did
+        lead = [i for i, it in enumerate(items) if ' mech-story' in it.group(0)[:it.group(0).index(">")]
+                and (not box_idx or i < box_idx[0])]
+        if not box_idx and not lead:
             return '<ul class="changes">' + body + '</ul>'
         box, rest, last = [], [], 0
+        for i in lead:
+            box.append(items[i].group(0))
+            rest.append(body[last:items[i].start()])
+            last = items[i].end()
         # a row with its table (7.38 Lifesteal, 7.40 Cyclone cases) is a box of its own, apart from the rows around
         # it (owner 2026-10-28: "в отдельном блоке, с отступом от предыдущего") — unless the block is one box
         # (subgroup(one_box=True): 7.41 Reflected Damage, its sources' table under the last line)

@@ -4,7 +4,7 @@
 
 **Язык общения:** отвечай пользователю на русском (триггер `session_go` и работа над Sloppy в целом).
 
-Сайт = две подсистемы: (1) аннотированные патчноуты и (2) сортируемые таблицы под разделом Materials. Общие `styles.css` / `scripts.js`.
+Сайт = две подсистемы: (1) аннотированные патчноуты и (2) сортируемые таблицы под разделом Materials. Общие `styles.css` / `src/js/*.js`.
 
 Чтобы сразу быть в контексте, в начале сессии прочитай:
 - `AGENTS.md` (этот файл) — source of truth + карта правил.
@@ -14,7 +14,7 @@
 ## ВАЖНО: source of truth
 
 `build_site.py` — **единственный entrypoint сборки**. Он запускает все builders (patches, creeps, mana items, hero lab, terrain, silent, …). `builders/build_patches.py` сам авто-обнаруживает `content/p*.py` — ручной регистрации нового патча в builders/ не требуется (только `patch/meta.py`).
-- `scripts.js` и `styles.css` — единственный источник правды для стилей и поведения всех страниц (включая `index.html` и `calendar.html`). Редактируй напрямую — IDE/linter работают нормально. `build_site.py` минифицирует их в `dist/` при сборке.
+- `src/js/*.js` (34 части, порядок склейки и единый файл `dist/src/scripts.js` — `patch/js_bundle.py`) и `styles.css` — единственный источник правды для стилей и поведения всех страниц (включая `index.html` и `calendar.html`). Редактируй напрямую — IDE/linter работают нормально. `build_site.py` минифицирует их в `dist/` при сборке.
 - Сгенерированные HTML (`dist/patches/7.41d.html` и т.д.) — результат запуска `python build_site.py`, не редактируй вручную.
 - Все патч-файлы лежат в `dist/patches/` (не в корне), поэтому их CSS/JS подключаются через `../styles.css`, `../src/scripts.js`.
 

@@ -25,6 +25,7 @@ _sys.path.insert(0, str(_HERE))
 _sys.path.insert(0, str(_HERE / "builders"))
 
 import patch.site_common as _site          # noqa: E402
+from patch.js_bundle import read_js
 from patch.meta import PATCHES, RELEASE_HISTORY        # noqa: E402
 
 DIST = _HERE / "dist"
@@ -802,8 +803,8 @@ def _hero_groups(ents):
 
 
 def _shop_order() -> dict[str, list[str]]:
-    """Item order of the Hero Lab picker (src/scripts.js SHOP_ORDER) — the in-game shop order."""
-    js = (_HERE / "src" / "scripts.js").read_text(encoding="utf-8")
+    """Item order of the Hero Lab picker (src/js/hero-lab.js SHOP_ORDER) — the in-game shop order."""
+    js = read_js()
     m = _re.search(r"var SHOP_ORDER = \{(.*?)\n  \};", js, _re.S)
     out = {}
     if m:

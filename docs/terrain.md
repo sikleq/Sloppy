@@ -800,6 +800,17 @@ are not a change stay neutral: the Trees layer is a light square per tree on bot
 currents keep their blue. A camp note always shows the camps' spawn boxes as well. Gold is only the boss's start ring
 (`first`) and the minimap frame. `scripts/gen/terrain_shots.py COLOUR`; test `tests/test_runes_and_two_colours.py`.
 
+**Thin lines, many dashes (owner 2026-11-04, 7.38 Watchers: "слишком толстые обводки, глобально сделать их тоньше и с
+большим кол-вом пунктира"):** line width 2 px on the row picture, 3 px on the large one, the whole map too (it was 3 / 5,
+one more on the whole map); a dash is `s / 7`, a gap `s / 10` of the outline's half size (`dash_gap`; it was `s / 3`, `s /
+5`, three dashes a side). All patches' pictures were rendered again. Only the pictures: the Terrain page's own SVG
+outlines were tuned separately (2026-10-05) and did not change. Test `tests/test_mech_story.py`.
+
+**Currents with arrows (owner 2026-11-04, 7.38: "показать течения", "указать течения на скриншотах"):** the `currents`
+key draws the zones (+150 deep blue, +100 pale) and white chevrons downstream with a dark edge (`_flow_arrows`, from
+`diff["currents"]`, whose nodes run downstream). 7.38: rim and main jungle pictures and a whole-map one
+("These streams have a current").
+
 ## Recipe: a picture for a patch note (read this first — no code digging)
 
 1. Find what changed and where: `python scripts/gen/terrain_hotspots.py <patch>` (camps / trees / cliffs, outside the
@@ -836,8 +847,8 @@ currents keep their blue. A camp note always shows the camps' spawn boxes as wel
   ("Touched up the map in general") or a whole-map picture of its own.
 - **Whole map** (`"spots": [[0, 0]], "r": 8400`) for a move across the map — 7.38 Roshan corners → river, Tormentors →
   corners, watchers, "Touched up the map in general" (camps, lotus, bounty): the old spot dashed on the old half, the new
-  one on the new half. On the whole map a mark never gets smaller than 1/32 of the picture and is a pixel thicker
-  (`_outlines`), or it is a dot nobody finds.
+  one on the new half. On the whole map a mark never gets smaller than 1/32 of the picture (`_outlines`), or it is a
+  dot nobody finds.
 - `first` may name one half only (`"new": [x, y]`): 7.38 Roshan "initially spawns in the Bottom Pit" — the gold "Start"
   ring on the 7.38 half; the old half says nothing about it.
 - 7.38 Roshan's six lines from behind the "?" are a table of the two pits in the content (`mech_table`).

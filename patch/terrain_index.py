@@ -97,8 +97,8 @@ def _notes_in_body(body):
             title = _str_arg(inner.args[0]) if inner.args else None
             in_block = any(k.arg == "terrain_link" for k in inner.keywords)
             sub = None if title == "Terrain Changes" else title
-        elif not in_block or iname in ("ul_open", "ul_close"):
-            continue
+        elif not in_block or iname in ("ul_open", "ul_close", "mech_story"):
+            continue                           # mech_story retells the rows under it, they stay the list
         elif iname == "subgroup" and inner.args:
             sub = _str_arg(inner.args[0])
         elif iname == "li" and inner.args and _str_arg(inner.args[0]) and patch:

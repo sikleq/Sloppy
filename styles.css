@@ -2722,10 +2722,6 @@ h2.section {
     inset 0 -1px 0 var(--shadow-35),
     inset 0 0 0 1px rgba(255, 255, 255, 0.07);
 }
-/* Misc-only patch — every tag was MISC. The dimmed look is achieved by
-   halving the fluid alpha in JS (see scripts.js `miscOnly` branch); we
-   deliberately avoid CSS `opacity` here so the hover-time backdrop layer
-   can stay fully opaque and block neighbouring cells. */
 /* Empty patch — flat dark fill with a barely-there pressed-in inset:
    1px darker line along the top edge (the "lip" of the recess casts a
    shadow into it) + 1px faint highlight along the bottom edge (light
@@ -3741,13 +3737,16 @@ h4.subgroup .subgroup-new-type {
 .ability-block > .under-rows-connector { position: absolute; left: 0; top: 0; width: 100%; height: 100%;
   pointer-events: none; z-index: 0; overflow: visible; }
 .ability-block > .under-rows-caption { margin: 10px 0 2px; position: relative; z-index: 1; }
-.ability-block > .under-rows-caption + .ability-change { position: relative; z-index: 1; }
+.ability-block > .under-rows-caption + .ability-change { position: relative; z-index: 1; margin-top: 14px; }
 /* a card with no caption of its own ("scales with" cards: the headers say it) */
-.ability-block > .under-rows-connector + .ability-change { position: relative; z-index: 1; margin-top: 10px; }
-/* Connector curve from the icon's bottom-center down-right toward the
-   centre of the old pane — visual cue that the swap panes belong to
-   the icon above. Sized to bridge the gap between the icon (col 1) and
-   the old pane (column 1 of the unified-panes sub-grid in col 2). */
+.ability-block > .under-rows-connector + .ability-change { position: relative; z-index: 1; margin-top: 14px; }
+/* The line from the icon's bottom down into the card: the panes belong to the icon above (owner 2026-11-04: solid,
+   instead of the dashed one round the icon). */
+.ability-change-connector path {
+  fill: none;
+  stroke: rgba(150, 146, 137, 0.6);
+  stroke-width: 1;
+}
 .ability-change-block > .ability-change-connector {
   position: absolute;
   /* Real position + size set by drawAbilityChangeConnectors() JS at load
@@ -3763,7 +3762,7 @@ h4.subgroup .subgroup-new-type {
   overflow: visible;
 }
 .ability-change-block .ability-change.unified-panes {
-  margin-top: 4px;
+  margin-top: 14px;           /* under the icon's edge now, the icon must not touch it (owner 2026-11-04: "слишком близко") */
   align-items: center;
   position: relative;
   z-index: 1;
@@ -4062,9 +4061,7 @@ h4.subgroup .subgroup-new-type {
   border: 1px solid var(--line-soft);
   border-radius: 6px;
 }
-/* Chips inside the panes = the page's chips: same 64px width, and the recipe + properties pair
-   hangs 15px left (pane padding 14 + border 1) so the old-pane chips (DEL / BUFF …) sit in
-   the SAME column as the change rows' chips below (7.38 Heaven's Halberd). */
+/* Chips inside the panes = the page's chips: same 64px width. */
 .properties-change .property-tag .badge {
   display: inline-block;
   width: 64px;
@@ -4072,20 +4069,20 @@ h4.subgroup .subgroup-new-type {
   box-sizing: border-box;
   text-align: center;
 }
-/* ... and 15px right, the mirror: the cards' % bands end on the change rows' % column (owner 2026-09-27,
-   Battle Fury 7.38: -23% in the card vs -14% in the row) */
+/* Every card of the site starts under the icon's left edge (owner 2026-11-04: "нет единого положения карточек"; they
+   hung 15px left of it since 2026-09-27). 15px right stays: the cards' % bands end on the change rows' % column (owner
+   2026-09-27, Battle Fury 7.38: -23% in the card vs -14% in the row) */
 body.patch-page .entity-block > .components-change,
 body.patch-page .entity-block > .properties-change,
-body.patch-page .entity-block > .ench-change { margin-left: -15px; margin-right: -15px; }   /* the tiers table too (2026-10-27) */
-/* a new item's cost box and a full-width item ability box (no chip column) hang the same way, so every
-   item box starts on one line (owner 2026-09-27: Orb of Frost 7.38 sat 15px right of Block of Cheese
-   and Orb of Venom) */
+body.patch-page .entity-block > .ench-change { margin-left: 0; margin-right: -15px; }   /* the tiers table too (2026-10-27) */
+/* a new item's cost box and a full-width item ability box (no chip column) the same way, so every item box starts on
+   one line (owner 2026-09-27: Orb of Frost 7.38 sat 15px right of Block of Cheese and Orb of Venom) */
 body.patch-page .entity-block.item-block > .item-cost-box,
 body.patch-page .entity-block.item-block > .components-box,
 body.patch-page .entity-block.item-block > .provides-box,
 body.patch-page .entity-block.item-block ul.changes li.ability-row:not(.ability-box-tagged),
 body.patch-page .entity-block.item-block ul.changes li.ability-row-cont:not(.ability-box-tagged),
-body.patch-page .entity-block.item-block.is-new ul.changes li.ability-box-tagged { margin-left: -15px; margin-right: -15px; }
+body.patch-page .entity-block.item-block.is-new ul.changes li.ability-box-tagged { margin-left: 0; margin-right: -15px; }
 /* ... every line of a multi-line box (7.41 Stonefeather Satchel: the "Pound of Feathers" lines sat 15px in)
    — and a box with its chip column keeps the chip, but its right edge joins the others */
 body.patch-page .entity-block.item-block:not(.is-new) ul.changes li.ability-box-tagged { margin-right: -15px; }
@@ -4106,42 +4103,36 @@ body.patch-page .entity-block.item-block:not(.is-new) ul.changes li.ability-box-
 }
 .properties-change.new-only .pane-new { grid-column: 3; }
 .properties-change.old-only .pane-old { grid-column: 1; }
-/* STAT TABLE — a NEW entity's base numbers (new creep / new item). A compact
-   two-column table: label column (auto) then value column (1fr), so every
-   value lines up vertically instead of floating after labels of different
-   widths. Thin row separators; labels are muted, not gold. */
-.entity-block .stat-table {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  column-gap: 28px;
-  max-width: 380px;
-  margin: 6px 0 6px;
-  border-top: 1px solid var(--line-soft);
+/* A unit's numbers as the game shows them (owner 2026-11-04, patch/unit_numbers.py): no tag chips, short health and mana bars
+   in the game's colours under the icon's left edge, the rest as tiles. A changed number is its tag's colour and dotted (the
+   rules with .iab-num.iab-buff). */
+ul.changes li.unit-sheet {
+  display: grid; grid-template-columns: 130px minmax(0, 1fr); column-gap: 12px; align-items: stretch;
+  margin: 10px 0 14px; padding: 0;
 }
-.entity-block .stat-table > div {
-  padding: 5px 2px;
-  border-bottom: 1px solid var(--line-soft);
-  font-size: 13.5px;
-  line-height: 1.4;
+ul.changes li.unit-sheet::before { content: none; display: none; }
+.us-bars { display: grid; grid-auto-rows: minmax(26px, 1fr); row-gap: 4px; }     /* level with the two rows of tiles */
+.us-bar {
+  position: relative; display: flex; align-items: center; justify-content: center; min-height: 26px;
+  padding: 2px 30px 2px 8px; border: 1px solid rgba(0, 0, 0, 0.6); border-radius: 2px;
+  color: #fff; font-size: 13.5px; text-shadow: 0 1px 1px #000; font-variant-numeric: tabular-nums;
 }
-.entity-block .stat-table .stat-k {
-  color: var(--text-dim, #969289);
-  /* vertical divider between the stat name and its value, as in the tables */
-  position: relative;
+.us-hp { background: linear-gradient(#3f8f3a, #2a6a27); }
+.us-mp { background: linear-gradient(#3a6fc0, #27518f); }
+.us-regen { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 12px; opacity: 0.85; }
+.us-bar .us-v { color: #fff; }
+.us-bar .us-v.iab-buff, .us-bar .us-v.iab-nerf { padding: 0 6px; background: rgba(0, 0, 0, 0.6); border-radius: 2px; text-shadow: none; }
+.us-tiles { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.us-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; row-gap: 3px; min-width: 0;
+  padding: 5px 2px; text-align: center; line-height: 1.25;
+  background: rgba(255, 255, 255, 0.03); border: 1px solid var(--line-soft); border-radius: 3px;
 }
-.entity-block .stat-table .stat-k::after {
-  content: ""; position: absolute; top: 0; bottom: -1px; right: -14px;
-  width: 1px; background: var(--line-soft);
-}
-.entity-block .stat-table .stat-v {
-  color: var(--text-main);
-  font-variant-numeric: tabular-nums;
-}
-.stat-table-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-dim, #969289);
-  margin: 8px 0 2px 2px;
+.us-k { color: var(--text-dim, #969289); font-size: 12px; }
+.us-v { color: var(--text-main); font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  ul.changes li.unit-sheet { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+  .us-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 /* CHIP-LESS DESCRIPTION ROWS — a li with no tag (Flooded Camps / Map Objectives
    mechanics, new-entity notes). Drop the 76px phantom tag column the change
@@ -4180,6 +4171,35 @@ ul.changes li.mech-desc.mech-last {
   border-bottom: 1px solid var(--line-soft);
   border-bottom-left-radius: 6px; border-bottom-right-radius: 6px;
   padding-bottom: 9px; margin-bottom: 8px;
+}
+/* A mechanic as one paragraph with its map in sight (owner 2026-11-04, patch/mech_abilities.mech_story): one picture
+   beside the text, more under it; the pictures a word in the text opens stay in the usual box under the row. */
+ul.changes li.mech-story { line-height: 1.6; grid-template-columns: minmax(0, 1fr); }
+ul.changes li.mech-story .mech-story-p { display: block; }
+ul.changes li.mech-story .mech-story-p + .mech-story-p { margin-top: 6px; }
+ul.changes li.mech-story > .mech-story-table { display: block; grid-column: 1 / -1; min-width: 0; }
+/* one picture beside the text: its width (mech_abilities.story_side_width) makes the two fill the block; if the text
+   runs taller on a narrower screen the picture's dark panel still fills the height, the sheet's own black round it */
+ul.changes li.mech-story.mech-story-side {
+  grid-template-columns: minmax(0, 1fr) var(--story-side, 300px); column-gap: 16px; align-items: center;
+}
+ul.changes li.mech-story > .mech-story-maps {
+  grid-column: 1 / -1; justify-self: stretch; justify-content: space-between; flex-wrap: nowrap;
+  margin: 8px 0 2px; padding: 0; background: none; border: 0; border-radius: 0;
+}
+ul.changes li.mech-story.mech-story-side > .mech-story-maps {
+  grid-column: 2; grid-row: 1; align-self: stretch; align-items: center; margin: 2px 0;
+  background: #080b06; border-radius: 3px;
+}
+ul.changes li.mech-story > .mech-story-maps img,
+ul.changes li.mech-story > .tshots[data-part] img { width: calc(50% - 3px); }   /* two pictures fill the block's width */
+ul.changes li.mech-story.mech-story-side > .mech-story-maps img { width: 100%; }
+@media (max-width: 760px) {
+  ul.changes li.mech-story.mech-story-side { grid-template-columns: minmax(0, 1fr); }
+  ul.changes li.mech-story.mech-story-side > .mech-story-maps { grid-column: 1; grid-row: auto; margin-top: 8px; }
+  ul.changes li.mech-story > .mech-story-maps { flex-wrap: wrap; }
+  ul.changes li.mech-story > .mech-story-maps img,
+  ul.changes li.mech-story > .tshots[data-part] img { width: 100%; }
 }
 /* A NEW entity is already flagged by its header label ("New Tier 3 Artifact");
    an ability-row inside it must not repeat a folded NEW chip mid-description. */
@@ -4318,6 +4338,13 @@ h4.subgroup {
   column-gap: 12px;
   align-items: start;
   margin: 12px 0 8px 0;
+}
+/* A card under an ability starts at the icon's left edge, on the vertical of the block's other boxes, the width of the
+   icon column its own (owner 2026-11-04). A thin line goes from the icon down into it: drawAbilityChangeConnectors */
+.ability-block > .ability-change,
+.ability-block > .properties-change {
+  grid-column: 1 / -1;
+  min-width: 0;
 }
 .ability-block > .ability-icon-wrap {
   grid-column: 1;
@@ -4560,6 +4587,7 @@ h4.subgroup {
 .mech-abils.mech-cols-ex { grid-template-columns: 1fr fit-content(40%); }
 .mech-abils.mech-cols-3 { grid-template-columns: fit-content(28%) minmax(0, 1fr) fit-content(28%); }
 /* before / after the patch (mech_before_after): the two columns one width (7.41 Health Restoration) */
+.mech-abils.mech-cols-3.mech-wide-last { grid-template-columns: fit-content(28%) fit-content(20%) minmax(0, 1fr); }
 .mech-abils.mech-cols-3.mech-ba { grid-template-columns: fit-content(30%) minmax(0, 1fr) minmax(0, 1fr); }
 /* two tables side by side, their rows level (subgrid): 7.38 Lifesteal damage types | Against non-heroes */
 .mech-pair {
@@ -4573,6 +4601,7 @@ h4.subgroup {
 .mech-abils.mech-cols-1 { grid-template-columns: auto; }
 .mech-abils.mech-cols-4 { grid-template-columns: fit-content(22%) minmax(0, 1fr) fit-content(20%) fit-content(22%); }
 .mech-abils.mech-cols-2 { grid-template-columns: fit-content(35%) minmax(0, 1fr); }
+.mech-abils.mech-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }   /* a line of values (7.38 Lotus Pools) */
 .mech-cell {
   display: flex;
   flex-wrap: wrap;
@@ -4663,6 +4692,19 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
 .ability-block > ul.changes {
   grid-column: 2;
   margin-top: 0;
+}
+/* ... nothing stands beside the icon but the name (no tag row: Riverborn Aura): the name is centred on the icon
+   (owner 2026-11-04). */
+.ability-block.ab-card-only > .ability-icon-wrap { grid-row: 1; }
+.ability-block.ab-card-only > .ability-title { grid-row: 1; align-self: center; margin: 0; padding: 0; }
+/* An ability described only by its boxes (a new creep's, 7.38 Boglet): the boxes are its card, under the icon's left
+   edge and below the icon (the box itself keeps its 14px from the row above). */
+.ability-block > ul.ability-card-rows {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
 }
 .ability-block > ul.subnotes {
   grid-column: 2;
@@ -8739,8 +8781,8 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .mr-table.hs-table td.hs-col-hpr.regen-zero { color: rgba(154, 230, 110, 0.42); }
 .creeps-table td.col-mp_regen.regen-zero,
 .mr-table.hs-table td.hs-col-mpr.regen-zero { color: rgba(111, 195, 236, 0.42); }
-.creeps-table td.col-gold     { color: #e3b341; }   /* gold (золотой) */
-.creeps-table td.col-xp       { color: #8bb8d6; }   /* dusty blue (пыльно-голубой) */
+.creeps-table td.col-gold, .us-gold .us-v, .camp-table .camp-gold { color: #e3b341; }   /* gold (золотой) */
+.creeps-table td.col-xp, .us-xp .us-v, .camp-table .camp-xp { color: #8bb8d6; }   /* dusty blue (пыльно-голубой) */
 /* Attack-type value colors. */
 .creeps-table td.atk-basic    { color: #56d364; }   /* "Обычный" — green */
 .creeps-table td.atk-pierce   { color: #b18cd9; }   /* "Проникающий" — muted purple */
@@ -10801,6 +10843,8 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
   border-bottom: 1px solid var(--line-soft); border-left: 1px solid var(--line-soft);
 }
 .camp-table .camp-name { color: var(--text-dim, #969289); padding-left: 0; border-left: 0; }
+.camp-table .camp-num { justify-content: center; font-variant-numeric: tabular-nums; font-weight: 700; }
+.camp-table .camp-head { color: var(--text-dim, #969289); font-size: 12px; font-weight: 400; }
 
 /* ==========================================================================
    WARM PIXEL SKIN — menus, toolbars and their controls (header "embers", variant A)
@@ -11392,8 +11436,8 @@ ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8
    hidden, so tag filters and counts still see their tags (owner 2026-09-27) */
 ul.changes li.iab-covered { display: none !important; }
 /* the numbers those rows change, coloured by the row's tag */
-.iab-num.iab-buff, .iab-m.iab-buff, .iab-lv.iab-buff { color: #7fd08c; }
-.iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf { color: #cf828d; }
+.iab-num.iab-buff, .iab-m.iab-buff, .iab-lv.iab-buff, .us-v.iab-buff, .us-bar .us-v.iab-buff, .camp-v.iab-buff { color: #7fd08c; }
+.iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf, .us-v.iab-nerf, .us-bar .us-v.iab-nerf, .camp-v.iab-nerf { color: #cf828d; }
 .iab-num.iab-new, .iab-m.iab-new, .iab-lv.iab-new { color: #e0bd62; }
 .iab-num.iab-misc, .iab-m.iab-misc, .iab-lv.iab-misc { color: var(--text-dimmer); }
 .iab-num.iab-rework, .iab-m.iab-rework, .iab-lv.iab-rework { color: #b99ae6; }   /* Orb of Venom 7.38: a cooldown where there was none */
@@ -11503,8 +11547,8 @@ html.cb-mode .iab-hl-del { --hl-bg: rgba(154, 51, 90, 0.24); }
 html.cb-mode .iab-hl-num.iab-hl-buff { color: #64baeb; }
 html.cb-mode .iab-hl-num.iab-hl-nerf { color: #f19e60; }
 html.cb-mode .iab-hl-num.iab-hl-del { color: #ce6c91; }
-html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff { color: #64baeb; }
-html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf { color: #f19e60; }
+html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff, html.cb-mode .us-v.iab-buff, html.cb-mode .us-bar .us-v.iab-buff, html.cb-mode .camp-v.iab-buff { color: #64baeb; }
+html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf, html.cb-mode .us-v.iab-nerf, html.cb-mode .us-bar .us-v.iab-nerf, html.cb-mode .camp-v.iab-nerf { color: #f19e60; }
 html.cb-mode .components-change .component-price.cost-buff, html.cb-mode .components-change .components-total span.cost-buff { color: #64baeb; }
 html.cb-mode .components-change .component-price.cost-nerf, html.cb-mode .components-change .components-total span.cost-nerf { color: #f19e60; }
 /* === END COLOUR-BLIND MODE (generated) === */

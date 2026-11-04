@@ -211,6 +211,8 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
              skip=None if history else no_hist),
         Step("talent_slots", "data/rules/talent_slots.json", [PY, "tools/build_talent_slots.py"],
              skip=None if history else no_hist),
+        Step("creep_abilities", "data/creep_abilities.json (which ability each creep has: the generator's ability blocks)",
+             [PY, "scripts/gen/build_creep_abilities.py", version]),
         Step("draft", f"generator draft _generated_p_{version}_v2.py + data/normalized/patches/{version}.json",
              [PY, "tools/generate_patch_code_v2.py", version],
              skip=f"content/p{code(version)}.py exists (proofread pages are never regenerated)" if content else None),
@@ -224,6 +226,22 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
         Step("build", "the whole site", [PY, "build_site.py"]),
         Step("check", f"tools/patch_check.py {version}", [PY, "tools/patch_check.py", version]),
     ]
+
+
+def new_creep_steps(version):
+    """What the site cannot learn about a new creep from the game's files: its name, its camp, its row of the table. Its
+    numbers, abilities, patch-page block and own page come by themselves."""
+    from patch.unit_numbers import new_neutrals
+    from patch.weights import _prev_version
+    found = new_neutrals(version, _prev_version(version))
+    if found is None:
+        return [f"new neutral creeps NOT CHECKED: {version} or the patch before it is not in the game-files store"]
+    if not found:
+        return []
+    names = ", ".join(n.replace("npc_dota_neutral_", "") for n in found)
+    return [f"new neutral creeps ({names}): builders/creeps.py CREEP_NAME_TO_NPC, CREEP_DISPLAY_NAMES (the game's name), "
+            "CREEP_CAMP, AURA_SELF if its aura counts on itself; a row in data/creeps_raw.csv; fetch_icons.py. "
+            "tests/test_unit_sheet.py fails until they are listed"]
 
 
 def remaining(version, source, map_state):
@@ -318,7 +336,9 @@ def main(argv=None):
         last = code_
     state = map_status(args.version, args.source)
     print("\nStill human (this command cannot do it):")
-    for line in remaining(args.version, args.source, state):
+    # a dry run touches nothing, git included: its new creeps show on the real run
+    creeps = [] if args.dry_run else new_creep_steps(args.version)
+    for line in remaining(args.version, args.source, state) + creeps:
         print(f"  - {line}")
     if last:
         print("\npatch_check reports MISSING steps (above) — the human steps listed here close them.")

@@ -2,6 +2,7 @@
 the card's header, "Has only one level" is never said; a granted ability's card is an ability card from the game files
 (7.38 Demonic Cleanse, 7.41 Warp Flare); an ability's own text lists no Aghanim's-only value; Aghanim's cards keep an
 even inner padding; an icon missing on the CDN is looked for in the game files."""
+from patch.js_bundle import read_js
 import os
 import re
 import sys
@@ -128,7 +129,7 @@ def test_removed_items_grey_aghs_panes_on_top_and_a_gone_enchant_value_struck():
     assert re.search(r"\.ench-change \.ench-stat\.ench-gone \{[^}]*line-through", css)
     assert re.search(r"\.ench-change \.ench-was \{[^}]*font-size: inherit", css)
     # the Aghanim's card arrow stands at the old pane's middle (7.41 Techies)
-    js = open(os.path.join(ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     assert ".ability-change.aghs-change" in js and "arrow.style.marginTop" in js
 
 

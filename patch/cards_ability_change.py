@@ -311,13 +311,11 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
         block_cls = 'ability-block ability-change-block'
         if is_innate:
             block_cls += ' is-innate'
-        connector_html = '' if single_new else (
+        connector_html = (
             '<svg class="ability-change-connector" '
             'viewBox="0 0 100 100" preserveAspectRatio="none" '
             'aria-hidden="true">'
-            '<path d="" fill="none" '
-            'stroke="rgba(150, 146, 137, 0.45)" stroke-width="1.3" '
-            'stroke-dasharray="3 3" stroke-linecap="round" />'
+            '<path d="" />'
             '</svg>'
         )
         if single_new:

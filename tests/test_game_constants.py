@@ -3,6 +3,7 @@ so they are typed in one place, patch/game_constants.py. These tests are the gua
   * the game's own tooltips (data/dota_english.txt) must agree with today's values — the day Valve changes
     one, this fails and says which row to add;
   * no other file may type them again (Hero Stats / Hero Lab JS read them from the page)."""
+from patch.js_bundle import read_js
 import re
 from pathlib import Path
 
@@ -169,7 +170,7 @@ _LITERALS = re.compile(r"\* ?(?:22|0\.16667|0\.45)\b|(?:0\.45|0\.16667) ?\*|a\.a
 
 
 def test_scripts_js_types_no_attribute_constant():
-    js = (ROOT / "src" / "scripts.js").read_text(encoding="utf-8")
+    js = read_js()
     hits = [ln.strip() for ln in js.splitlines() if _LITERALS.search(ln)]
     assert not hits, f"scripts.js types attribute constants again (read C.* from the page): {hits}"
     for key in gc.for_js():

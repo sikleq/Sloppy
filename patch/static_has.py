@@ -74,7 +74,7 @@ def add_static_has_classes(html):
             if "changes" in p.cls:
                 if "row-tag-empty" in kid_cls:
                     n.add.append("li-notag")
-                if "row-text" not in kid_cls:
+                if "row-text" not in kid_cls and "unit-sheet" not in n.cls:      # a unit's numbers are no change row
                     n.add.append("li-notext")
                 if "badge-group" in kid_cls:
                     n.add.append("li-bg")
@@ -93,6 +93,8 @@ def add_static_has_classes(html):
             if not any(k.name == "ul" and "changes" in k.cls and any(g.name == "li" for g in k.kids)
                        for k in n.kids):
                 n.add.append("ab-empty")
+            if any(k.name == "ul" and "ability-card-rows" in k.cls for k in n.kids):
+                n.add.append("ab-card-only")     # nothing but the name beside the icon
         elif n.name == "div" and {"ability-change", "unified-panes"} <= n.cls and n.has_fw:
             n.add.append("has-formula-wrap")
         elif n.name == "div" and "ability-change-row" in n.cls and "badge-group" in kid_cls:

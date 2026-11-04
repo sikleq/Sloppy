@@ -10,8 +10,13 @@ def build():
 
     W(plain_header("General Changes"))
     W(ul_open())
-    W(li("Scan no longer triggers on creep heroes (with the exception of Lone Druid's Spirit Bear)", t("DEL")))
     W(li("Neutral Creep Gold/XP penalty for stacked camps increased from 15% to 20%", b(15, 20, l=True)))
+    W(ul_close())
+    # Glyph and Scan are abilities every team has: a category of their own, an ability's header (owner 2026-11-04)
+    W(plain_header("Team Abilities"))
+    W(ability("Scan", icon_url="../icons/abilities/hud_scan.png", innate=False))
+    W(ul_open())
+    W(li("No longer triggers on creep heroes (with the exception of Lone Druid's Spirit Bear)", t("DEL")))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====

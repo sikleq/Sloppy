@@ -5,6 +5,7 @@ the Valve KV (data/stats/<ver>/items.txt) and localization
 (data/abilities_english.txt).
 """
 from __future__ import annotations
+from patch.js_bundle import read_js
 
 import re
 from pathlib import Path
@@ -122,7 +123,7 @@ def test_butterfly_base_attack_speed_is_modelled(items):
 
 
 def test_scripts_js_applies_melee_range_and_base_aspd():
-    js = (_ROOT / "src" / "scripts.js").read_text(encoding="utf-8")
+    js = read_js()
     assert "b.rangeUniqueMelee && !isRanged" in js
     assert re.search(r"\*\s*\(1 \+ \(itemsTotal\.baseAspdPct \|\| 0\) / 100\)", js)
 

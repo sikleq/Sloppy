@@ -1,5 +1,6 @@
 """maps/dota.vhcg — the map's height grid (scripts/gen/heightmap.py) and the Terrain page's Heights layer.
 The owner 2026-10-05: "decode dota.vhcg and make a height layer" — from our own files only."""
+from patch.js_bundle import read_js
 import os
 import struct
 import sys
@@ -117,7 +118,7 @@ def test_fullscreen_chips_are_icon_and_number_with_the_word_kept_for_the_tooltip
     assert '<b>7/28</b> <span class="tf-chip-word">moved</span>' in chip and 'data-tooltip="Camps: 7/28 moved"' in chip
     css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
     assert ".tc-fsp-chips .tf-chip-word { display: none; }" in css
-    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     assert ".tc-fsp-chips .tf-chip[data-tooltip]" in js and "function initHeightBands()" in js
 
 

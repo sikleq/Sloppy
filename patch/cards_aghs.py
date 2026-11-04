@@ -451,8 +451,7 @@ def _under_rows_card(caption, tag, li_cls, card_cls, old_pane, new_pane):
             f'<span class="badge {tag}" data-tag="{tag}">{tag.upper()}</span>'
             f'<span class="row-text">{caption}{marker}</span></li></ul>') if caption else ""
     return ('<svg class="ability-change-connector under-rows-connector" viewBox="0 0 100 100" preserveAspectRatio="none" '
-            'aria-hidden="true"><path d="" fill="none" stroke="rgba(150, 146, 137, 0.45)" stroke-width="1.3" '
-            'stroke-dasharray="3 3" stroke-linecap="round" /></svg>'
+            'aria-hidden="true"><path d="" /></svg>'
             + head +
             f'<div class="ability-change unified-panes {card_cls}">{old_pane}'
             + (f'<span class="ability-change-arrow">→</span>{new_pane}' if new_pane else '') + '</div>')

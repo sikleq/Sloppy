@@ -4,6 +4,7 @@
   `_checked_version` — a new value gets its own history entry with no edit.
 * Everything else is guarded: review() lists innates that changed in the latest patch in a way the rules
   do not follow (a reworked innate, a hero with a new innate, a new hero), and the test fails with that list."""
+from patch.js_bundle import read_js
 import pytest
 
 from builders import innate_rules as ir
@@ -108,8 +109,7 @@ def test_techies_void_ogre_medusa_numbers_come_from_the_rules():
     hs._set_ctx_version(hs._LATEST_STATS_VERSION)
     assert hs._innate_entry("techies", "mpr", "mana_pool_pct_per_level")["per_level_pct"] == 0.0001
     assert hs._innate_entry("ogre_magi", "mpr", "attr_substitution")["factor"] == 0.02
-    from pathlib import Path
-    js = (Path(hs.__file__).resolve().parent.parent / "src" / "scripts.js").read_text(encoding="utf-8")
+    js = read_js()
     for literal in ("2 + 0.1 * level", "* 1.15", "0.001 + lvl", "wa.str * 6", "str * 0.02", "mana * 0.98"):
         assert literal not in js, f"scripts.js types an innate number again: {literal!r}"
 
@@ -128,6 +128,5 @@ def test_ogre_dumb_luck_regen_follows_its_history():
     assert hs._innate_entry("ogre_magi", "mp", "attr_substitution") is None
     assert hs._innate_entry("ogre_magi", "mpr", "attr_substitution") is None
     hs._set_ctx_version(hs._LATEST_STATS_VERSION)
-    from pathlib import Path
-    js = (Path(hs.__file__).resolve().parent.parent / "src" / "scripts.js").read_text(encoding="utf-8")
+    js = read_js()
     assert "s.slug === 'ogre_magi' ? 0 : bonus" not in js      # the Int level-ups follow the same rule in JS

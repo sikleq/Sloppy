@@ -1,9 +1,9 @@
 {
   "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry. Only the note's own objects are outlined (terrain_shots.show_keys: its first object word; ground words give none); 'show' overrides that with the keys to draw (camps, camptiers, boxes, trees, towers, watchers, lotus, twinGates, tormentors, bounty, roshan, wisdom, outposts). A spot [x, y, \"7.40\"] pictures that patch's two maps instead of the entry's own (a change the map file made a patch earlier than the note says); 'mark' outlines unchanged camps white, or towers with 'mark_kind': 'towers'. The row's words naming the object open the pictures (patch/terrain_notes.note_phrase); 'phrase' names them when it picks wrong.",
   "7.38": [
-    {"match": "The top and bottom outer rim areas are now flooded by streams of traversable water", "spots": [[3500, -7900], [-3500, 7900]], "r": 1400, "phrase": "top and bottom outer rim areas"},
+    {"match": "The top and bottom outer rim areas are now flooded by streams of traversable water", "spots": [[3500, -7900], [-3500, 7900]], "r": 1400, "show": ["currents"], "phrase": "top and bottom outer rim areas"},
     {"match": "The Twin Gates have been repositioned to the corners of the map", "spots": [[6624, -6848], [-6816, 7232]], "r": 1100},
-    {"match": "Radiant and Dire main jungles now also have a stream with moderate current", "spots": [[300, -5400], [-600, 5100]], "r": 1300},
+    {"match": "Radiant and Dire main jungles now also have a stream with moderate current", "spots": [[300, -5400], [-600, 5100]], "r": 1300, "show": ["currents"]},
     {"match": "Corner outposts have been removed", "spots": [[4992, -8256], [-5312, 7680]]},
     {"match": "Shrines of Wisdom are located in the offlane side jungles", "spots": [[8340, -1008], [-8088, 408]], "r": 1100, "show": ["wisdom", "wisdomRunes", "camps"], "phrase": "offlane side jungles"},
     {"match": "Roshan is back in the river", "spots": [[0, 0]], "r": 8400, "show": ["roshan"], "phrase": "back in the river", "first": {"kind": "roshan", "label": "Start", "new": [2966, -2967]}},
@@ -37,7 +37,9 @@
     {"match": "Touched up the map in general", "part": true, "phrase": "cliffs", "show": ["cliffs"], "spots": [[7680, -7600]], "r": 1500},
     {"match": "Touched up the map in general", "part": true, "phrase": "cliffs", "show": ["cliffs"], "spots": [[720, 8048]], "r": 1500},
     {"match": "Touched up the map in general", "part": true, "phrase": "cliffs", "show": ["cliffs"], "spots": [[-1744, 4576]], "r": 1500},
-    {"match": "Touched up the map in general", "part": true, "phrase": "cliffs", "show": ["cliffs"], "spots": [[-2544, -8160]], "r": 1484}
+    {"match": "Touched up the map in general", "part": true, "phrase": "cliffs", "show": ["cliffs"], "spots": [[-2544, -8160]], "r": 1484},
+    {"match": "These streams have a current", "spots": [[0, 0]], "r": 8400, "show": ["currents"], "phrase": "have a current"},
+    {"match": "Changed the way Healing Lotuses", "spots": [[-7683, 4420], [8007, -4996]], "r": 700, "show": ["lotus"], "phrase": "Healing Lotuses"}
   ],
   "7.38b": [
     {"match": "Removed several trees around camps, making it easier", "spots": [[-8300, -600], [-1056, -3264]], "r": 600},

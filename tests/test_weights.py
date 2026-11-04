@@ -1,5 +1,6 @@
 """Weights (patch/weights.py + the scoring hooks in patch/elements.py) — regression tests for the
 2026-09-25 audit (docs/weights.md "Audit 2026-09-25")."""
+from patch.js_bundle import read_js
 import os
 import re
 
@@ -175,7 +176,7 @@ def test_ability_and_facet_cards_add_volume(v741):
 
 def test_matrix_line_ignores_hidden_neighbour():
     """"Hide old": the first visible cell drew a riser from the hidden column's (clipped) level."""
-    js = open(os.path.join(ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     body = js[js.index("function dynDrawRowLines"):]
     body = body[:body.index("\n  }\n")]
     assert re.search(r"const at = j => \([^)]*!vis\[j\]\)", body)

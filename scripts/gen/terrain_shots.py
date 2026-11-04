@@ -46,7 +46,8 @@ UPP = 2.0                 # game units per pixel of the full renders
 # (half px, file suffix, gap, line width, label font px): the row picture (shown at 240 css px a half) and the large
 # one a click opens. The owner 2026-10-03: "the pictures should be bigger and the camera a bit further out" —
 # every spot's square is ZOOM_OUT times wider than its r says, and a minimap shows where it is.
-SIZES = ((360, "", 6, 3, 20), (720, "_lg", 10, 5, 32))
+# Line widths: thin, on every picture (owner 2026-11-04, 7.38 Watchers: "слишком толстые обводки").
+SIZES = ((360, "", 6, 2, 20), (720, "_lg", 10, 3, 32))
 ZOOM_OUT = 1.4
 MINIMAP = 0.32                # minimap side, share of a half
 # the two colours of every picture (owner 2026-10-28): red dashed = where it was and how; green solid = how it is
@@ -95,9 +96,7 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
     2026-10-27)."""
     d = ImageDraw.Draw(img)
     k = half / (2 * r)
-    whole = r >= WHOLE_MAP_R
-    if whole:                    # a mark on the whole map is a few pixels big: thicker, and never under a set size
-        width += 1
+    whole = r >= WHOLE_MAP_R     # a mark on the whole map is a few pixels big: never under a set size
 
     def px(x, y):
         return (x - (cx - r)) * k, ((cy + r) - y) * k
@@ -171,9 +170,15 @@ def _tree_layer(img, cx, cy, r, coords, half):
             d.rectangle([X - s, Y - s, X + s, Y + s], fill=TREE_FILL, outline=TREE_EDGE, width=1)
 
 
+def dash_gap(s):
+    """Dash and gap of a dashed outline of half size s: short ones, many to a side (owner 2026-11-04: "с большим
+    кол-вом пунктира"; it was s / 3 and s / 5, three dashes a side)."""
+    return max(2.5, s / 7), max(1.8, s / 10)
+
+
 def _dashed(d, square, X, Y, s, colour, width):
     """A dashed square (or circle) of half size s round (X, Y)."""
-    dash, gap = max(3.0, s / 3), max(2.0, s / 5)
+    dash, gap = dash_gap(s)
     if not square:
         steps = max(8, int(2 * math.pi * s / (dash + gap)))
         for i in range(steps):
@@ -312,15 +317,15 @@ def _boxes(img, cx, cy, r, diff, side, half, width):
     for b in boxes:
         pts = None if terrain_index._box_key(b) in other else corners(b)
         if pts and side == "old":
-            _dashed_poly(d, pts, COLOUR["removed"], width, max(5.0, half / 36), max(3.0, half / 60))
+            _dashed_poly(d, pts, COLOUR["removed"], width, max(3.0, half / 72), max(2.0, half / 110))
         elif pts:
             d.line(pts + pts[:1], fill=COLOUR["added"], width=width)
     if side == "new":                # on top, so a box moved by a few pixels still shows its old edge
         for b in diff.get("spawnboxesOld", []):
             pts = None if terrain_index._box_key(b) in new else corners(b)
             if pts:
-                _dashed_poly(d, pts, COLOUR["removed"] + (220,), max(1, width - 1), max(4.0, half / 45),
-                             max(3.0, half / 70))
+                _dashed_poly(d, pts, COLOUR["removed"] + (220,), max(1, width - 1), max(3.0, half / 72),
+                             max(2.0, half / 110))
 
 
 # a zone of the map file (diff["zones"]): show key -> zone key (owner 2026-10-28, 7.40 "Radiant Secret Shop trigger
@@ -344,7 +349,7 @@ def _zones(img, cx, cy, r, zone, side, half, width):
     def px(poly):
         return [((x - (cx - r)) * k, ((cy + r) - y) * k) for x, y in poly]
     gone, came = changed_zones(zone)
-    dash, gap = max(6, half // 40), max(4, half // 60)
+    dash, gap = max(3, half // 72), max(2, half // 110)
     if side == "old":
         for p in gone:
             _dashed_poly(d, px(p), COLOUR["removed"], width, dash, gap)
@@ -481,10 +486,44 @@ def _lane_key(d, half, width):
 CURRENT_ZONE = {150: ((63, 156, 240, 120), (63, 156, 240, 230)), 100: ((143, 208, 255, 70), (143, 208, 255, 200))}
 
 
+FLOW_COLOUR = (230, 246, 255, 255)   # the arrows, as the Terrain page's (builders/terrain._current_svg)
+
+
+def flow_points(line, every):
+    """(x, y, ux, uy) along a current's centre line every `every` world units, first at half a step; (ux, uy) points
+    downstream, map axes: the nodes run downstream, from the stream's beginning near a base."""
+    out, walked, nxt = [], 0.0, every / 2
+    for (ax, ay), (bx, by) in zip(line, line[1:]):
+        seg = math.hypot(bx - ax, by - ay)
+        while seg and walked + seg >= nxt:
+            t = (nxt - walked) / seg
+            out.append((ax + (bx - ax) * t, ay + (by - ay) * t, (bx - ax) / seg, (by - ay) / seg))
+            nxt += every
+        walked += seg
+    return out
+
+
+def _flow_arrows(img, cx, cy, r, lines, half, width):
+    """Chevrons pointing downstream, so a picture shows the current and not only its water (owner 2026-11-04, 7.38
+    "These streams have a current": "показать течения"; "указать течения на скриншотах"). A dark edge under each: the
+    water behind them is pale. Whole map: arrows further apart, they would merge otherwise."""
+    d = ImageDraw.Draw(img, "RGBA")
+    k = half / (2 * r)
+    s = half / (60 if r >= WHOLE_MAP_R else 28)
+    every = max(700.0, 5 * s / k)
+    for line in lines:
+        for x, y, ux, uy in flow_points(line, every):
+            X, Y = (x - (cx - r)) * k, ((cy + r) - y) * k
+            uy = -uy                                   # picture axes: y runs down
+            pts = [(X - s * ux + s * uy, Y - s * uy - s * ux), (X, Y), (X - s * ux - s * uy, Y - s * uy + s * ux)]
+            d.line(pts, fill=(6, 22, 40, 210), width=width + 2, joint="curve")
+            d.line(pts, fill=FLOW_COLOUR, width=width, joint="curve")
+
+
 def _currents(img, cx, cy, r, diff, side, half, width):
     """Where the river currents give their speed bonus (2026-10-16, 7.41 "All sections of currents now give a max
     movement speed bonus of 150"): the zones of each side, +150 deep blue, +100 pale blue — the Terrain page's
-    Currents layer colours (currentAreas of the map diff)."""
+    Currents layer colours (currentAreas of the map diff) — and arrows downstream."""
     d = ImageDraw.Draw(img, "RGBA")
     k = half / (2 * r)
     for area in ((diff or {}).get("currentAreas") or {}).get(side, []):
@@ -493,7 +532,8 @@ def _currents(img, cx, cy, r, diff, side, half, width):
             xy = [((x - (cx - r)) * k, ((cy + r) - y) * k) for x, y in ring]
             if len(xy) > 2:
                 d.polygon(xy, fill=fill)
-                d.line(xy + [xy[0]], fill=line, width=width)
+                d.line(xy + [xy[0]], fill=line, width=max(1, width - 1))
+    _flow_arrows(img, cx, cy, r, ((diff or {}).get("currents") or {}).get(side, []), half, width)
 
 
 def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=True):

@@ -508,8 +508,7 @@ def hero_header(name):
 
 def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, new_mech=None, track=False, page=None):
     """`new="New Neutral Creep"` renders the same NEW-entity block as
-    item_header(new=...): is-new block + type label after the name. Pair it
-    with new_stats([...]) for the stat sheet and t("NEW") ability rows (the
+    item_header(new=...): is-new block + type label after the name. Pair it with unit_sheet(slug) for its numbers and t("NEW") ability rows (the
     is-new CSS hides per-row chips but keeps data-tag="new" for the filter).
     `label="Returning Ancient Melee Creep"` shows only the type label: a unit
     that comes back WITH numeric changes keeps its normal GENERAL block and
@@ -522,7 +521,7 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
     # after the header becomes the GENERAL block (Spirit Bear 7.41e).
     _State.current_unit = name
     _State.seen_abilities_subgroup = False       # an ability() below gets the "Abilities" heading, as for heroes
-    _State.next_ul_is_hero_stats = (not new) and general   # a NEW unit shows a stat sheet instead
+    _State.next_ul_is_hero_stats = (not new) and general   # a NEW unit shows its unit_sheet instead
     kind_attr = f' data-kind="{kind}"' if kind else ''
     entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
     # page="flagbearer-creep": a lane creep's card in General Updates links to its unit page and gets the
@@ -550,19 +549,6 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
   <div class="entity-icon hero-icon">{img}</div>
   <div class="entity-name">{name_html}{type_label}</div>
 </div>'''
-
-
-def new_stats(rows, title=None):
-    """Base-stat table for a NEW entity (creep / item): a compact two-column
-    table (label | value) with thin row separators, so every value lines up in
-    one column instead of floating after labels of different widths.
-    `rows` = (label, value) pairs, e.g. ("Health", "400")."""
-    cells = []
-    for r in rows:
-        k, v = (r[0], r[1]) if isinstance(r, (tuple, list)) and len(r) == 2 else ('', r)
-        cells.append(f'<div class="stat-k">{k}</div><div class="stat-v">{v}</div>')
-    head = f'<div class="stat-table-title">{title}</div>' if title else ''
-    return f'{head}<div class="stat-table">{"".join(cells)}</div>'
 
 
 def _removed_label(removed):
@@ -1082,6 +1068,10 @@ def _facet_pane(desc, facet, version):
     return _pane_parts(desc, props={"kind": kind}, facet=True, name_hint=hint) if kind else (head, rows)
 
 
+_CARD_LINE = ('<svg class="ability-change-connector" viewBox="0 0 100 100" preserveAspectRatio="none" '
+              'aria-hidden="true"><path d="" /></svg>')
+
+
 def new_facet(slug, desc, summary=None, tag="new"):
     """New or reworked facet — renders like ability_change(old=None, tag=...) but with facet styling."""
     from .badges import FACETS, _FACET_COLOR_GRADIENT
@@ -1129,6 +1119,7 @@ def new_facet(slug, desc, summary=None, tag="new"):
     return out + (
         f'<div class="ability-block facet-block ability-change-block">'
         f'{icon_html}'
+        f'{_CARD_LINE}'
         f'<h4 class="ability-title">{name}</h4>'
         f'{summary_row}'
         f'{panes_html}'
@@ -1195,13 +1186,6 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
         f'</li>'
         f'</ul>'
     )
-    connector_html = (
-        '<svg class="ability-change-connector" '
-        'viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'
-        '<path d="" fill="none" stroke="rgba(150, 146, 137, 0.45)" '
-        'stroke-width="1.3" stroke-dasharray="3 3" stroke-linecap="round" />'
-        '</svg>'
-    )
     panes_html = (
         f'<div class="ability-change unified-panes is-in-place" data-tag="new del rework">'
         f'<div class="ability-change-pane ability-change-old">'
@@ -1220,7 +1204,7 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
         f'{icon_html}'
         f'<h4 class="ability-title">{name}</h4>'
         f'{summary_row}'
-        f'{connector_html}'
+        f'{_CARD_LINE}'
         f'{panes_html}'
     )
 
@@ -1829,7 +1813,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if _State.terrain_rows is not None and isinstance(text, str):
         # a terrain row's chip is its number in its category (the owner 2026-10-03: "just number the rows instead of
         # tag chips"); data-tag keeps the tag for the filters / weights
-        _State.terrain_rows += 1
+        _State.terrain_rows += 0 if covered else 1     # a hidden row takes no number: the first one seen is 1
         left_tag = terrain_num_chip(_State.terrain_rows, badge if force_tag is None else "")
 
     classes = ["terrain-row"] if _State.terrain_rows is not None and isinstance(text, str) else []
@@ -2002,23 +1986,31 @@ def creep_ref(name, icon_url, count=None):
 
 
 def camp_table(rows):
-    """Camp compositions as a light table so the creep names line up in columns:
-    camp_table([("Easy camp", [(3, "Pollywog", icon)]),
-                ("Medium camp", [(2, "Boglet", icon), (1, "Marshmage Apprentice", icon)])])
-    A third item is Valve's "?" for that camp ("Average Bounty of 54 gold and 90 XP", 7.38) — it was lost
-    when the camps became a table (audit 2026-10-05)."""
+    """Camp compositions as a light table so the creep names line up in columns, each camp's average bounty in its own
+    columns after the name (owner 2026-11-04, it was Valve's "?" on the camp):
+    camp_table([("Small camp", [(3, "Pollywog", icon)], 54, 90),
+                ("Medium camp", [(2, "Boglet", icon), (1, "Marshmage Apprentice", icon)], 81, 126)])
+    A number that changed is (new, old, the % badge): coloured and dotted, the old one on hover (7.38 Ancient Prowlers)."""
+    from .unit_numbers import changed_value
+
+    def num(value):
+        return changed_value("camp-v", value[0], value[1], value[2]) if isinstance(value, tuple) else value
     width = max(len(row[1]) for row in rows)
-    cells = []
-    for camp, creeps, *info in rows:
-        tip = info_tip(info[0]) if info else ""
-        cells.append(f'<span class="camp-name">{camp}{tip}</span>')
+    cells = ['<span class="camp-name camp-head">Camp</span>',
+             '<span class="camp-cell camp-num camp-head">Average Gold</span>',
+             '<span class="camp-cell camp-num camp-head">Average XP</span>',
+             f'<span class="camp-cell camp-head" style="grid-column: span {width}">Creeps</span>']
+    for camp, creeps, gold, xp in rows:
+        cells.append(f'<span class="camp-name">{camp}</span>')
+        cells.append(f'<span class="camp-cell camp-num camp-gold">{num(gold)}</span>')
+        cells.append(f'<span class="camp-cell camp-num camp-xp">{num(xp)}</span>')
         for i in range(width):
             if i < len(creeps):
                 n, name, icon = creeps[i]
                 cells.append(f'<span class="camp-cell">{creep_ref(name, icon, n)}</span>')
             else:
                 cells.append('<span class="camp-cell"></span>')
-    return (f'<span class="camp-table" style="--camp-cols:{width}">' + "".join(cells) + '</span>')
+    return (f'<span class="camp-table" style="--camp-cols:{width + 2}">' + "".join(cells) + '</span>')
 
 
 def inline_note(text):

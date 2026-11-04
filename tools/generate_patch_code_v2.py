@@ -2264,12 +2264,12 @@ def _render_neutral_creep(creep):
         a_icon = f'"../icons/abilities/{a_slug}.png"'
         dname_esc = dname.replace('"', '\\"')
         out.append(f'W(ability("{dname_esc}", icon_url={a_icon}))')
-        # Strip "AbilityName: " prefix from first note — ability() block already shows the name
+        # Strip "AbilityName: " from every note — ability() block already shows the name (owner 2026-11-04, 7.38 Petrify)
         stripped = []
-        for ni, note in enumerate(bucket):
+        for note in bucket:
             n2 = dict(note)
             txt = n2.get('note', '')
-            if ni == 0 and txt.lower().startswith(dname.lower() + ': '):
+            if txt.lower().startswith(dname.lower() + ': '):
                 n2['note'] = txt[len(dname) + 2:]
             stripped.append(n2)
         body, _ = _emit_notes(stripped)
@@ -3608,6 +3608,83 @@ def _postprocess_before_after(lines):
     return out
 
 
+_TEAM_ABILITIES = {"Glyph of Fortification": "hud_glyph", "Scan": "hud_scan"}
+_TEAM_ABILITIES_HEADER = "Team Abilities"
+_TEAM_ABILITY_ROW_RE = re.compile(r'W\(li\("(?:The )?(Glyph of Fortification|Glyph|Scan)(?::)? (.+)$', re.S)
+
+
+_NEUTRAL_HEADER_RE = re.compile(r'^W\(unit_header\("(?P<name>[^"]+)", NEUTRAL_CDN \+ "(?P<slug>[^"]+)\.png"\)\)$')
+
+
+def _postprocess_new_units(lines, version):
+    """A neutral creep the game's files of the previous patch do not have is a new unit: its header says what it is and
+    its numbers come as a unit_sheet (owner 2026-11-04, 7.38 amphibians). A unit that returns is still in the files, its
+    sheet with the changes is written by hand (7.38 Ancient Prowlers)."""
+    from patch import game_files
+    from patch.unit_numbers import _block
+    from patch.weights import _prev_version
+    prev = _prev_version(version) if version else None
+    units = "scripts/npc/npc_units.txt"
+    now_text, prev_text = game_files.read(version, units), game_files.read(prev, units) if prev else None
+    if not now_text or not prev_text:
+        print(f"[WARN] new creeps not checked: {version} or {prev} is not in the game-files store")
+        return lines
+    out = []
+    for line in lines:
+        m = _NEUTRAL_HEADER_RE.match(line)
+        npc = f'npc_dota_neutral_{m.group("slug")}' if m else None
+        kv = _block(now_text, npc) if m else None
+        if not kv or _block(prev_text, npc) is not None:
+            out.append(line)
+            continue
+        ancient = "Ancient " if kv.get("IsAncient") == "1" else ""
+        kind = "Ranged" if "RANGED" in kv.get("AttackCapabilities", "") else "Melee"
+        label = f'New Level {kv.get("Level", "1")} {ancient}{kind} Creep'
+        out.append(line[:-2] + f', new="{label}"))')
+        out += ["W(ul_open())", f'W(unit_sheet("{m.group("slug")}", version="{version}"))', "W(ul_close())"]
+    return out
+
+
+def _postprocess_team_abilities(lines):
+    """Glyph of Fortification and Scan are abilities every team has (owner 2026-11-04: "определять в патче и выносить в
+    отдельную подкатегорию"): wherever a patch names them at the start of a row, the rows leave their lists for a
+    category of their own, right after the first such list, an ability's header with the game's icon over each one's
+    rows. A list left empty goes, with its header when nothing else is under it."""
+    rows, first, anchor = {}, None, None
+    keep = []
+    for i, raw in enumerate(lines):
+        m = _TEAM_ABILITY_ROW_RE.match(raw)
+        if m:
+            name = "Glyph of Fortification" if m.group(1) == "Glyph" else m.group(1)
+            rest = m.group(2)
+            rows.setdefault(name, []).append(f'W(li("{rest[0].upper()}{rest[1:]}')
+            first = i if first is None else first
+            continue
+        keep.append(raw)
+        if first is not None and anchor is None and raw.startswith('W(ul_close())'):
+            anchor = len(keep)                         # right after the list the first row left
+    if not rows:
+        return lines
+    block = [f'W(plain_header("{_TEAM_ABILITIES_HEADER}"))']
+    for name in sorted(rows):                          # Glyph before Scan, whatever the order in the notes
+        block += [f'W(ability("{name}", icon_url="../icons/abilities/{_TEAM_ABILITIES[name]}.png", innate=False))',
+                  'W(ul_open())', *rows[name], 'W(ul_close())']
+    if anchor is None:                                 # no list closes after the row: the block goes last
+        anchor = len(keep)
+    out = keep[:anchor] + block + keep[anchor:]
+    i = 0
+    while i + 1 < len(out):                            # the lists left empty
+        if out[i].startswith('W(ul_open())') and out[i + 1].startswith('W(ul_close())'):
+            del out[i:i + 2]
+            if i and out[i - 1].startswith(('W(plain_header(', 'W(subgroup(')) \
+                    and (i == len(out) or out[i].startswith(('W(plain_header(', 'W(section(', 'W(subgroup('))):
+                del out[i - 1]
+                i -= 1
+            continue
+        i += 1
+    return out
+
+
 def _postprocess_new_block_label(lines):
     out = list(lines)
     moves = []
@@ -4540,6 +4617,8 @@ def generate(version):
     out = _postprocess_switched_note(out)             # "has switched" + "Now …" note -> one line
     out = _postprocess_per_minute(out)                # "… upgrade per minute …" -> minute table
     out = _postprocess_merge_twin_rows(out)
+    out = _postprocess_new_units(out, version)        # a creep new in the game's files: its header and numbers
+    out = _postprocess_team_abilities(out)            # Glyph, Scan rows -> an ability's header (owner 2026-11-04)
     out = _postprocess_minute_formula(out)
     out = _postprocess_scale_pill(out)
     out = _postprocess_mechanic_rules_row(out)        # a row restating its header goes (owner 2026-10-27)

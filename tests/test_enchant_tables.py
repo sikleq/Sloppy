@@ -1,5 +1,6 @@
 """Enchantments as tier tables, before -> after (owner 2026-10-17, 7.41: "Vital is written as a bare row… a table? a
 card? Mystical / Crude too" -> variant A: the 7.38 table under each enchantment, a changed cell "was → now")."""
+from patch.js_bundle import read_js
 import glob
 import json
 import os
@@ -88,7 +89,7 @@ def test_tables_have_lines_between_cells_and_centred_values():
 
 
 def test_the_filters_know_the_table():
-    js = open(os.path.join(ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     assert "el.classList.contains('ench-change') ? 'covered-ench'" in js
     css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
     assert "html.cb-mode .iab-lv.iab-del" in css or "html.cb-mode" in css and ".iab-lv.iab-del" in css

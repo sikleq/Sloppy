@@ -198,7 +198,10 @@ def main() -> int:
             if dst.exists():
                 shutil.rmtree(dst)
             # icons/ref holds third-party / reference pictures that .gitignore keeps out of the site — never deploy it
-            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("ref") if name == "icons" else None)
+            ignore = {"icons": "ref", "src": "js"}[name]       # src/js is glued into one file below
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns(ignore))
+    from patch.js_bundle import read_js
+    (_dist / "src" / "scripts.js").write_text(read_js(), encoding="utf-8")
     # Minify CSS and JS copies in dist/ (source files stay readable)
     _minify_assets(_dist)
     print("  [OK]")

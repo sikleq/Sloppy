@@ -1,4 +1,5 @@
 """Generator fixes of 2026-10-21 (owner's 7.41 review)."""
+from patch.js_bundle import read_js
 from patch import elements as el
 from patch import cards_ability_change
 from patch import cards_item_abilities
@@ -56,8 +57,7 @@ def test_talents_after_a_scepter_ability_get_no_aghanim_stripe():
 def test_filter_keeps_a_header_only_ability_apart_from_its_rows():
     # Brewmaster 7.41: Primal Split (rows live in the Brewling blocks under it) stayed hidden after the Heroes
     # category filter was switched off
-    from pathlib import Path
-    js = (Path(__file__).resolve().parents[1] / "src" / "scripts.js").read_text(encoding="utf-8")
+    js = read_js()
     assert "if (!ul) { headerOnly.push(block); return; }" in js
 
 

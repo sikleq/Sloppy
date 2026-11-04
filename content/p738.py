@@ -13,19 +13,37 @@ def build():
     W(ul_open())
     W(li("Skill points can now be spent on All Attributes starting at level 2 instead of level 6", t("REWORK")))
     W(li("Universal Heroes' damage per attribute decreased from 0.7 to 0.45", b(0.7, 0.45), extra=inline_note("As a result, many heroes have had their Base Damages and attribute gains changed")))
-    W(li("Glyph of Fortification: Creep duration decreased from 4s to 3s", b(4, 3)))
     W(li("Reflected spells now benefit from all bonuses the original cast had, including the following", t("NEW"), extra=inline_note("Caster's facet upgrades<br>Bonuses from talents<br>Aghanim's Shard and Aghanim's Scepter upgrades — Upgrades used to depend on Aghanim's items the reflecting unit had")))
     W(li("Slow Resistance now also increases minimum movement speed by the slow resist percentage", t("NEW"), extra=inline_note("20% Slow Resistance increases your minimum movement speed from 100 to 120")))
     W(li("Units no longer gain bonus movement speed during the night", t("DEL")))
     W(li("Items that have entered a Hero's backpack for the very first time now have a 3 second grace period where they can be swapped into the main inventory without any cooldown. This can only happen once per item per Hero", t("NEW")))
     W(ul_close())
+    # Glyph and Scan are abilities every team has: a category of their own, an ability's header (owner 2026-11-04)
+    W(plain_header("Team Abilities"))
+    W(ability("Glyph of Fortification", icon_url="../icons/abilities/hud_glyph.png", innate=False))
+    W(ul_open())
+    W(li("Creep duration decreased from 4s to 3s", b(4, 3)))
+    W(ul_close())
 
     W(plain_header("Wandering Waters", new="New mechanic", terrain_link="7.38"))
     W(ul_open())
-    W(li("The top and bottom outer rim areas are now flooded by streams of traversable water", t("NEW")))
-    W(li("These streams have a current, starting near the T3 towers (right before the medium camp location), down to the T1 towers (former Twin Gate location)", t("NEW")))
-    W(li("Going downstream increases current and max movement speed, while going upstream inflicts no penalty", t("NEW"), extra=inline_note("Streams are separated by two zones: ones with a 'strong current' which provides up to 150 bonus movement speed and ones with a 'moderate current' which provides up to 100 bonus speed. The current is 'strong' from stream beginnings near each base up to the waterfalls near T2 towers. All other stream sections are considered to have a 'moderate current'<br>Bonus value depends on the faced direction, ranging from 100% while going downstream to 0% at 90 degrees")))
-    W(li("Radiant and Dire main jungles now also have a stream with moderate current, starting near the small camp close to the mid T1 towers. They join the outer streams, crossing the safelane near the T2 towers", t("NEW")))
+    W(mech_story([
+        "The top and bottom outer rim areas are now flooded by streams of traversable water. These streams have a "
+        "current, starting near the T3 towers (right before the medium camp location), down to the T1 towers (former "
+        "Twin Gate location). Radiant and Dire main jungles now also have a stream with moderate current, starting near "
+        "the small camp close to the mid T1 towers. They join the outer streams, crossing the safelane near the T2 towers.",
+        "Going downstream increases current and max movement speed, while going upstream inflicts no penalty: "
+        "the bonus depends on the faced direction, from <b>100%</b> while going downstream to <b>0%</b> at 90 degrees."],
+        table=mech_table(["Current", "Where", "Max bonus speed"], [
+            ["Strong", "From stream beginnings near each base up to the waterfalls near T2 towers", "<b>150</b>"],
+            ["Moderate", "All other stream sections", "<b>100</b>"]]),
+        maps=["These streams have a current"],
+        buttons=[("top and bottom outer rim areas", "The top and bottom outer rim areas are now flooded by streams of traversable water"),
+                 ("main jungles", "Radiant and Dire main jungles now also have a stream with moderate current")]))
+    W(li("The top and bottom outer rim areas are now flooded by streams of traversable water", t("NEW"), covered=True))
+    W(li("These streams have a current, starting near the T3 towers (right before the medium camp location), down to the T1 towers (former Twin Gate location)", t("NEW"), covered=True))
+    W(li("Going downstream increases current and max movement speed, while going upstream inflicts no penalty", t("NEW"), covered=True, extra=inline_note("Streams are separated by two zones: ones with a 'strong current' which provides up to 150 bonus movement speed and ones with a 'moderate current' which provides up to 100 bonus speed. The current is 'strong' from stream beginnings near each base up to the waterfalls near T2 towers. All other stream sections are considered to have a 'moderate current'<br>Bonus value depends on the faced direction, ranging from 100% while going downstream to 0% at 90 degrees")))
+    W(li("Radiant and Dire main jungles now also have a stream with moderate current, starting near the small camp close to the mid T1 towers. They join the outer streams, crossing the safelane near the T2 towers", t("NEW"), covered=True))
     W(li("Watchers, camps and pathways in the areas have been slightly adjusted to give way for the stream", t("REWORK")))
     W(ul_close())
 
@@ -40,8 +58,23 @@ def build():
     W(ul_close())
     W(subgroup("Lotus Pools"))
     W(ul_open())
-    W(li("Changed the way Healing Lotuses are collected from Lotus Pools", t("REWORK"), extra=inline_note("Lotus Pools now have three entrances and an empty region in the center<br>Heroes will automatically gather lotuses when within 350 units of the center of a pool as long as they have available space in their inventory<br>The first Lotus takes 1.5s to collect, and each subsequent lotus in a row takes 30% less time — The second lotus will take 1.05s, the third one takes 0.735s, down to a minimum of 0.3s<br>The timer only counts down when all heroes within range are on the same team, pausing if an enemy hero enters the area, and resuming when enemies leave<br>If multiple allied heroes are all within range, the Lotus will be granted to a random hero")))
-    W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available, and Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), extra=inline_note("All remaining lotuses in Lotus Pools will be combined and rounded up to the nearest number of lotuses of the next tier they could form")))
+    # built as Wandering Waters (owner 2026-11-04): paragraphs, the map in sight, the values in a table under them
+    W(mech_story([
+        "Lotus Pools will now spawn Great Lotuses after <b>Tier 4</b> Neutral Items are available, and Greater Lotuses after "
+        "<b>Tier 5</b> Neutral Items are available. All remaining lotuses in Lotus Pools will be combined and rounded up to "
+        "the nearest number of lotuses of the next tier they could form.",
+        "Changed the way Healing Lotuses are collected from Lotus Pools: they now have three entrances and an empty region "
+        "in the center. Heroes automatically gather lotuses when within range as long as they have available space in their "
+        "inventory, and each subsequent lotus in a row takes <b>30%</b> less time. The timer only counts down when all heroes "
+        "within range are on the same team, pausing if an enemy hero enters the area and resuming when enemies leave. If "
+        "multiple allied heroes are all within range, the Lotus is granted to a random hero."],
+        tags=("new", "rework"),
+        table=mech_table(
+            ["Range from the center", "First lotus", "Second lotus", "Third lotus", "Minimum"],
+            [["<b>350</b>", "<b>1.5s</b>", "<b>1.05s</b>", "<b>0.735s</b>", "<b>0.3s</b>"]], labels=False),
+        maps=["Changed the way Healing Lotuses"]))
+    W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available, and Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), covered=True, extra=inline_note("All remaining lotuses in Lotus Pools will be combined and rounded up to the nearest number of lotuses of the next tier they could form")))
+    W(li("Changed the way Healing Lotuses are collected from Lotus Pools: they now have three entrances and an empty region in the center. Heroes automatically gather lotuses when within range as long as they have available space in their inventory, and each subsequent lotus in a row takes 30% less time. The timer only counts down when all heroes within range are on the same team, pausing if an enemy hero enters the area and resuming when enemies leave. If multiple allied heroes are all within range, the Lotus is granted to a random hero", t("REWORK"), covered=True))
     W(ul_close())
     W(subgroup("Wisdom Runes"))
     W(ul_open())
@@ -49,22 +82,34 @@ def build():
     W(ul_close())
     W(subgroup("Shrines of Wisdom", new="New objective"))
     W(ul_open())
-    W(li("Shrines of Wisdom are located in the offlane side jungles between the Tier 1 and 2 towers where the Ancient camps used to be", t("NEW")))
-    W(li("The Shrines will activate every 7 minutes, glowing and filling with experience", t("NEW")))
-    W(li("To gather the experience from an activated Shrine, a hero must stand within 300 units for 3s", t("NEW")))
-    W(li("Like Lotus Pools, the Shrine will not count down time if an enemy hero contests by standing within the effect radius, and will resume only if the enemy hero leaves the area or is killed", t("NEW")))
-    W(li("Experience will be granted to a random hero within 300 units of the Shrine and also to their teammate with the lowest experience", t("NEW"), extra=inline_note("The values and behavior are identical to Wisdom Runes")))
+    W(mech_story(
+        "Shrines of Wisdom are located in the offlane side jungles between the Tier 1 and 2 towers, where the Ancient "
+        "camps used to be. They activate every <b>7 minutes</b>, glowing and filling with experience. To gather it a hero "
+        "must stand within <b>300 units</b> for <b>3s</b>. Like Lotus Pools, the Shrine will not count down time while an "
+        "enemy hero stands within the radius, and will resume only if the enemy hero leaves the area or is killed. "
+        "Experience is granted to a random hero within <b>300 units</b> and also to their teammate with the lowest "
+        "experience. The values and behavior are identical to Wisdom Runes.",
+        maps=["Shrines of Wisdom are located in the offlane side jungles"]))
+    W(li("Shrines of Wisdom are located in the offlane side jungles between the Tier 1 and 2 towers where the Ancient camps used to be", t("NEW"), covered=True))
+    W(li("The Shrines will activate every 7 minutes, glowing and filling with experience", t("NEW"), covered=True))
+    W(li("To gather the experience from an activated Shrine, a hero must stand within 300 units for 3s", t("NEW"), covered=True))
+    W(li("Like Lotus Pools, the Shrine will not count down time if an enemy hero contests by standing within the effect radius, and will resume only if the enemy hero leaves the area or is killed", t("NEW"), covered=True))
+    W(li("Experience will be granted to a random hero within 300 units of the Shrine and also to their teammate with the lowest experience", t("NEW"), covered=True, extra=inline_note("The values and behavior are identical to Wisdom Runes")))
     W(ul_close())
 
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
     # Valve's six lines behind a "?" (owner 2026-10-28: "много текста спрятано в [?]") as one paragraph of when Roshan
     # is where (owner 2026-10-30: "не таблицей, а абзацем с удобной информацией")
-    W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), extra=mech_text(
-        "Roshan starts in the <b>Bottom pit</b>, slightly closer to Radiant's jungle entrance. From <b>15:00</b> he "
-        "follows the time of day: <b>Bottom pit at day</b>, <b>Top pit at night</b> (slightly closer to Dire's jungle "
-        "entrance), walking across the river between them. On the way he no longer gets bonus movement speed, but gets "
-        "+25% Slow Resistance on top of his new base 25%. Only the active pit shows as a minimap icon.")))
+    # as Wandering Waters (owner 2026-11-04)
+    W(mech_story([
+        "Roshan is back in the river, with one pit located near each sidelane. He starts in the <b>Bottom pit</b>, slightly "
+        "closer to Radiant's jungle entrance. From <b>15:00</b> he follows the time of day: <b>Bottom pit at day</b>, "
+        "<b>Top pit at night</b> (slightly closer to Dire's jungle entrance), walking across the river between them.",
+        "On the way he no longer gets bonus movement speed, but gets <b>+25%</b> Slow Resistance on top of his new base "
+        "<b>25%</b>. Only the active pit shows as a minimap icon."],
+        tags=("rework",), maps=["Roshan is back in the river"]))
+    W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), covered=True))
     W(li("Added a Roshan icon near the minimap that shows Roshan's state (alive, dead, maybe alive) and location", t("QoL"), extra=inline_note("If Roshan is dead, the status will also include a timer until his possible respawn<br>Since Roshan's respawn takes between 8 to 11 minutes, during this window the status will say that he may be alive, but also include a timer until the guaranteed respawn<br>If a team gains vision over Roshan or Roshan's Roar of Retribution is heard during this status, the timer will be updated to inform that Roshan is alive<br>Templar Assassin's Third Eye Innate will cause the icon to display exactly when and where Roshan will respawn")))
     W(li("Knockback now has a 2s cooldown before it can be applied to the same unit again", t("NERF"), extra=inline_note("The knockback of Roshan's Walk: since 7.33 Roshan pushes units aside while walking between his pits (listed among knockback effects in 7.36b)")))
     W(li("Roshan no longer drops " + item_link("Aghanim's Blessing"), t("DEL")))
@@ -83,11 +128,18 @@ def build():
     W(ul_close())
     W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True, new_mech="Reworked objective"))
     W(ul_open())
-    W(li("There is only a single Tormentor active at a time", t("REWORK")))
-    W(li("Tormentor is also dependent on the day and night cycle, so it's at Radiant side at night and at Dire's side at day. As a result, it will always appear at the Radiant side first", t("REWORK"), extra=inline_note("Or at Dire side in Turbo<br>Due to this Roshan and Tormentor are always on opposite sides — Exceptions may apply in Turbo")))
-    W(li("Tormentor spawns repositioned to the corners of the map", t("REWORK")))
-    W(li("Tormentor now spawns for the first time at 15:00", t("REWORK"), extra=inline_note("7:30 in Turbo")))
-    W(li("Abilities now scale with game time instead of the number of deaths", t("REWORK")))
+    W(mech_story(
+        "There is only a single Tormentor active at a time, repositioned to the corners of the map. It first spawns at "
+        "<b>15:00</b> (<b>7:30</b> in Turbo) and depends on the day and night cycle: <b>Radiant side at night, Dire side "
+        "at day</b>. As a result, it always appears at the Radiant side first (at the Dire side in Turbo), and Roshan and "
+        "Tormentor are always on opposite sides, exceptions may apply in Turbo. Abilities now scale with game time instead "
+        "of the number of deaths.",
+        tags=("rework",), maps=["Tormentor spawns repositioned to the corners of the map"]))
+    W(li("There is only a single Tormentor active at a time", t("REWORK"), covered=True))
+    W(li("Tormentor is also dependent on the day and night cycle, so it's at Radiant side at night and at Dire's side at day. As a result, it will always appear at the Radiant side first", t("REWORK"), covered=True, extra=inline_note("Or at Dire side in Turbo<br>Due to this Roshan and Tormentor are always on opposite sides — Exceptions may apply in Turbo")))
+    W(li("Tormentor spawns repositioned to the corners of the map", t("REWORK"), covered=True))
+    W(li("Tormentor now spawns for the first time at 15:00", t("REWORK"), covered=True, extra=inline_note("7:30 in Turbo")))
+    W(li("Abilities now scale with game time instead of the number of deaths", t("REWORK"), covered=True))
     W(li("Tormentor now grants 250 gold to each team member on death", t("NEW"), extra=inline_note("Still grants additional 280 gold when all team members already have Aghanim's Shard")))
     W(ul_close())
     # Tooltips: game localization 7.37e / 7.38 (dotabuff/d2vpkr abilities_english.txt) — the text did not
@@ -147,7 +199,13 @@ def build():
                     ["Spell Lifesteal", "From spells", "From spells and attacks", "–"]]),
         mech_table(["Against non-heroes"], [["Reduced by 40%"], ["Reduced by 80%"]]))))
     W(li("The following sources and targets do not provide any lifesteal", t("REWORK"), extra=inline_list("Attacks that do not proc Attack Modifiers <span class=\"pop-note\">(Examples: Cleave, Luna's Bouncing Glaives)</span><br>Attack damage against wards, buildings, or couriers<br>Spell damage against illusions, wards, buildings, or couriers<br>Reflected damage <span class=\"pop-note\">(Example: Blade Mail return damage)</span><br>Spells that remove Health instead of dealing direct damage <span class=\"pop-note\">(Effects that don't break Blink Dagger, like Orb of Venom or Necrophos' Heartstopper Aura)</span><br>Any damage dealt to self or allies")))
-    W(li("A small number of abilities that do not use Lifesteal or Spell Lifesteal still result in healing and can benefit from Lifesteal Amp", t("REWORK"), extra=inline_note("Lifestealer's Open Wounds heals attackers for a percentage of the damage done<br>Lifestealer's Feast heals for a percentage of the target's max health<br>Meepo's Ransack heals all Meepos a flat amount for each strike<br><span class=\"pop-note\">Holding Alt while looking at tooltips for these abilities will describe their interaction with Lifesteal Amp</span>")))
+    W(mech_story(
+        "A small number of abilities that do not use Lifesteal or Spell Lifesteal still result in healing and can benefit "
+        "from Lifesteal Amp: Lifestealer's Open Wounds heals attackers for a percentage of the damage done, Lifestealer's "
+        "Feast heals for a percentage of the target's max health, and Meepo's Ransack heals all Meepos a flat amount for "
+        "each strike. Holding Alt while looking at tooltips for these abilities will describe their interaction with "
+        "Lifesteal Amp.", tags=("rework",)))
+    W(li("A small number of abilities that do not use Lifesteal or Spell Lifesteal still result in healing and can benefit from Lifesteal Amp", t("REWORK"), covered=True, extra=inline_note("Lifestealer's Open Wounds heals attackers for a percentage of the damage done<br>Lifestealer's Feast heals for a percentage of the target's max health<br>Meepo's Ransack heals all Meepos a flat amount for each strike<br><span class=\"pop-note\">Holding Alt while looking at tooltips for these abilities will describe their interaction with Lifesteal Amp</span>")))
     # Valve's QoL row "Holding Alt while looking at items that provide Lifesteal … will show the lifesteal
     # percentages" left out: the block above already says it (owner 2026-10-28)
     W(ul_close())
@@ -158,25 +216,36 @@ def build():
     # Flooded Camps (label — no own changes; sub-units follow)
     W(plain_header("Flooded Camps", dynamics=False, new="New mechanic"))
     W(ul_open())
-    W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Small camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Large camp")))
-    W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Small camp becomes a Medium camp and both Medium camps become Large; at 30:00 the Medium camp becomes Large and both Large camps become Ancient")))
-    W(li("These camps consist of the following creeps" + camp_table([
-        ("Small camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")], "Average Bounty of 54 gold and 90 XP"),
-        ("Medium camp", [(2, "Boglet", _NC_CDN + "froglet.png"), (1, "Marshmage Apprentice", _NC_CDN + "froglet_mage.png")],
-         "Average Bounty of 81 gold and 126 XP"),
-        ("Large camp", [(2, "Croaker", _NC_CDN + "grown_frog.png"), (1, "Marshmage", _NC_CDN + "grown_frog_mage.png")],
-         "Average Bounty of 117 gold and 165 XP"),
-        ("Ancient camp", [(2, "Ancient Croaker", _NC_CDN + "ancient_frog.png"), (1, "Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png")],
-         "Average Bounty of 163.5 gold and 312 XP"),
-    ]), t("NEW")))
-    # Valve's sentence; only "Easy" -> "Small" (the camp rename, content-rules)
-    W(li("Each creep can only be upgraded twice, meaning a Small camp will never reach an Ancient status (sorry, Pollywogs)", t("NEW")))
-    W(li("Units are not upgraded if the camp is blocked. Amount of upgraded units can't be increased, so if there is only 1 Ancient creep, attempting to stack that camp will not create another Ancient creep", t("NEW")))
+    _flooded_camps = camp_table([
+        ("Small camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")], 54, 90),
+        ("Medium camp", [(2, "Boglet", _NC_CDN + "froglet.png"), (1, "Marshmage Apprentice", _NC_CDN + "froglet_mage.png")], 81, 126),
+        ("Large camp", [(2, "Croaker", _NC_CDN + "grown_frog.png"), (1, "Marshmage", _NC_CDN + "grown_frog_mage.png")], 117, 165),
+        ("Ancient camp", [(2, "Ancient Croaker", _NC_CDN + "ancient_frog.png"), (1, "Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png")], 163.5, 312),
+    ])
+    # Valve's sentence on upgrades; only "Easy" -> "Small" (the camp rename, content-rules)
+    W(mech_story(
+        "Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian "
+        "neutral creeps: the Small camp on the rim between tier 1 and tier 2 towers, the Medium camp on the rim near tier 2 "
+        "tower, and the Medium camp in the main jungle that was on the stream's way and used to be a Large camp. As the "
+        "tides of battle rise, every <b>5 minutes</b> one creep in a Flooded Camp is permanently upgraded to the next tier. "
+        "Each camp has 3 units, so at <b>15:00</b> the Small camp becomes a Medium camp and both Medium camps become Large; "
+        "at <b>30:00</b> the Medium camp becomes Large and both Large camps become Ancient. Each creep can only be upgraded "
+        "twice, meaning a Small camp will never reach an Ancient status (sorry, Pollywogs). Units are not upgraded if the "
+        "camp is blocked. Amount of upgraded units can't be increased, so if there is only 1 Ancient creep, attempting to "
+        "stack that camp will not create another Ancient creep.",
+        table=_flooded_camps))
+    W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), covered=True, extra=inline_note("Small camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Large camp")))
+    W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), covered=True, extra=inline_note("Each camp has 3 units, so at 15:00 the Small camp becomes a Medium camp and both Medium camps become Large; at 30:00 the Medium camp becomes Large and both Large camps become Ancient")))
+    W(li("These camps consist of the following creeps" + _flooded_camps, t("NEW"), covered=True))
+    W(li("Each creep can only be upgraded twice, meaning a Small camp will never reach an Ancient status (sorry, Pollywogs)", t("NEW"), covered=True))
+    W(li("Units are not upgraded if the camp is blocked. Amount of upgraded units can't be increased, so if there is only 1 Ancient creep, attempting to stack that camp will not create another Ancient creep", t("NEW"), covered=True))
     W(ul_close())
 
     # Pollywog
     W(unit_header("Pollywog", _NC_CDN + "tadpole.png", new="New Level 2 Melee Creep"))
-    W(new_stats([("Health", "400"), ("Mana", "200"), ("Move Speed", "270"), ("Damage", "19-21"), ("Armor", "1"), ("Magic Resistance", "0%"), ("Bounty", "17-19 Gold / 30 XP")]))
+    W(ul_open())
+    W(unit_sheet("tadpole"))
+    W(ul_close())
     W(ability("Riverborn Aura", icon_url="../icons/abilities/frogmen_riverborn_aura.png"))
     W(ul_open())
     W(li("Passive: All allies within a 1200 range receive a 10/12/14/16% movement speed and outgoing damage bonus, as long as the aura owner is in water"))
@@ -184,11 +253,13 @@ def build():
 
     # Boglet
     W(unit_header("Boglet", _NC_CDN + "froglet.png", new="New Level 4 Melee Creep"))
-    W(new_stats([("Health", "700"), ("Mana", "300"), ("Damage", "22-24"), ("Move Speed", "290"), ("Armor", "2"), ("Magic Resistance", "0%"), ("Bounty", "25-29 Gold / 42 XP")]))
+    W(ul_open())
+    W(unit_sheet("froglet"))
+    W(ul_close())
     W(ability("Arm of the Deep", icon_url="../icons/abilities/frogmen_arm_of_the_deep.png"))
     W(ul_open())
     W(li("Active: Sends out tentacles in the target direction, stunning enemies for 0.8s and dealing 80/100/120/140 damage. Range: 275. Mana Cost: 40. Cooldown: 16s"))
-    W(li("Arm of the Deep: Neutrals will cast this ability on the closest enemy if there are three or more enemies within 550 (2x the ability's cast range) radius. After that all copies of this ability on other neutral Boglets within 1200 range are put on 5s cooldown", t("NEW")))
+    W(li("Neutrals will cast this ability on the closest enemy if there are three or more enemies within 550 (2x the ability's cast range) radius. After that all copies of this ability on other neutral Boglets within 1200 range are put on 5s cooldown", t("NEW")))
     W(ul_close())
     W(ability("Riverborn Aura", icon_url="../icons/abilities/frogmen_riverborn_aura.png"))
     W(ul_open())
@@ -197,11 +268,13 @@ def build():
 
     # Marshmage Apprentice
     W(unit_header("Marshmage Apprentice", _NC_CDN + "froglet_mage.png", new="New Level 4 Ranged Creep"))
-    W(new_stats([("Health", "700"), ("Mana", "300"), ("Damage", "24-27"), ("Move Speed", "290"), ("Attack Range", "250"), ("Armor", "2"), ("Magic Resistance", "0%"), ("Bounty", "25-29 Gold / 42 XP")]))
+    W(ul_open())
+    W(unit_sheet("froglet_mage"))
+    W(ul_close())
     W(ability("Water Bubble (Small)", icon_url="../icons/abilities/frogmen_water_bubble_small.png"))
     W(ul_open())
     W(li("Active: Creates a barrier bubble that protects the target from 100/120/140/160 magical damage for 10s. Cast Range: 550, Mana Cost: 90, Cooldown: 16s"))
-    W(li("Water Bubble (Small): Neutrals will cast this ability on a random ally that is below 50% health", t("NEW")))
+    W(li("Neutrals will cast this ability on a random ally that is below 50% health", t("NEW")))
     W(ul_close())
     W(ability("Riverborn Aura", icon_url="../icons/abilities/frogmen_riverborn_aura.png"))
     W(ul_open())
@@ -210,11 +283,13 @@ def build():
 
     # Croaker
     W(unit_header("Croaker", _NC_CDN + "grown_frog.png", new="New Level 4 Melee Creep"))
-    W(new_stats([("Health", "900"), ("Mana", "350"), ("Damage", "41-46"), ("Move Speed", "300"), ("Armor", "3"), ("Magic Resistance", "0%"), ("Bounty", "37-41 Gold / 55 XP")]))
+    W(ul_open())
+    W(unit_sheet("grown_frog"))
+    W(ul_close())
     W(ability("Tendrils of the Deep", icon_url="../icons/abilities/frogmen_tendrils_of_the_deep.png"))
     W(ul_open())
     W(li("Active: Sends out tentacles in a cone shape the target direction, stunning enemies for 1.2s and dealing 120/140/160/180 damage. Range: 300. Mana Cost: 50. Cooldown: 18s"))
-    W(li("Tendrils of the Deep: Neutrals will cast this ability on the closest enemy if there are three or more enemies within 600 (2x the ability's cast range) radius. After that all copies of this ability on other neutral Croakers within 1200 range are put on 5s cooldown", t("NEW")))
+    W(li("Neutrals will cast this ability on the closest enemy if there are three or more enemies within 600 (2x the ability's cast range) radius. After that all copies of this ability on other neutral Croakers within 1200 range are put on 5s cooldown", t("NEW")))
     W(ul_close())
     W(ability("Riverborn Aura", icon_url="../icons/abilities/frogmen_riverborn_aura.png"))
     W(ul_open())
@@ -223,11 +298,13 @@ def build():
 
     # Marshmage
     W(unit_header("Marshmage", _NC_CDN + "grown_frog_mage.png", new="New Level 4 Ranged Creep"))
-    W(new_stats([("Health", "900"), ("Mana", "350"), ("Damage", "40-45"), ("Move Speed", "300"), ("Attack Range", "250"), ("Armor", "3"), ("Magic Resistance", "0%"), ("Bounty", "37-41 Gold / 55 XP")]))
+    W(ul_open())
+    W(unit_sheet("grown_frog_mage"))
+    W(ul_close())
     W(ability("Water Bubble (Medium)", icon_url="../icons/abilities/frogmen_water_bubble_medium.png"))
     W(ul_open())
     W(li("Active: Creates a barrier bubble that protects the target from 150/180/210/240 magical damage for 10s. After the bubble bursts, heals the target for 50% of that amount. Cast Range: 550, Mana Cost: 100, Cooldown: 16s"))
-    W(li("Water Bubble (Medium): Neutrals will cast this ability on a random ally that is below 50% health", t("NEW")))
+    W(li("Neutrals will cast this ability on a random ally that is below 50% health", t("NEW")))
     W(ul_close())
     W(ability("Riverborn Aura", icon_url="../icons/abilities/frogmen_riverborn_aura.png"))
     W(ul_open())
@@ -236,11 +313,13 @@ def build():
 
     # Ancient Croaker
     W(unit_header("Ancient Croaker", _NC_CDN + "ancient_frog.png", new="New Level 5 Ancient Melee Creep"))
-    W(new_stats([("Health", "1250"), ("Mana", "450"), ("Damage", "60-64"), ("Move Speed", "300"), ("Armor", "5"), ("Magic Resistance", "30%"), ("Bounty", "53-56 Gold / 104 XP")]))
+    W(ul_open())
+    W(unit_sheet("ancient_frog"))
+    W(ul_close())
     W(ability("Congregations of the Deep", icon_url="../icons/abilities/frogmen_congregation_of_the_deep.png"))
     W(ul_open())
     W(li("Active: Sends out tentacles in 6 directions around itself, stunning enemies for 1.4s and dealing 250/275/300/325 damage. Range: 300. Mana Cost: 70. Cooldown: 20s"))
-    W(li("Congregations of the Deep: Neutrals will cast this ability if there are three or more enemies within 600 (2x the ability's range) radius and at least one unit is within cast range. After that all copies of this ability on other neutral Ancient Croakers within 1200 range are put on 5s cooldown", t("NEW")))
+    W(li("Neutrals will cast this ability if there are three or more enemies within 600 (2x the ability's range) radius and at least one unit is within cast range. After that all copies of this ability on other neutral Ancient Croakers within 1200 range are put on 5s cooldown", t("NEW")))
     W(ul_close())
     W(ability("Riverborn Aura", icon_url="../icons/abilities/frogmen_riverborn_aura.png"))
     W(ul_open())
@@ -249,11 +328,13 @@ def build():
 
     # Ancient Marshmage
     W(unit_header("Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png", new="New Level 5 Ancient Ranged Creep"))
-    W(new_stats([("Health", "1250"), ("Mana", "450"), ("Damage", "58-62"), ("Move Speed", "300"), ("Attack Range", "500"), ("Armor", "5"), ("Magic Resistance", "30%"), ("Bounty", "53-56 Gold / 104 XP")]))
+    W(ul_open())
+    W(unit_sheet("ancient_frog_mage"))
+    W(ul_close())
     W(ability("Water Bubble (Large)", icon_url="../icons/abilities/frogmen_water_bubble_large.png"))
     W(ul_open())
     W(li("Active: Creates a barrier bubble that protects the target from 210/240/270/300 magic damage for 10s. After the bubble bursts, heals the target and all allies in a 675 radius for 50% of that amount. Cast Range: 550, Mana Cost: 110, Cooldown: 16s"))
-    W(li("Water Bubble (Large): Neutrals will cast this ability on a random ally that is below 50% health", t("NEW")))
+    W(li("Neutrals will cast this ability on a random ally that is below 50% health", t("NEW")))
     W(ul_close())
     W(ability("Riverborn Aura", icon_url="../icons/abilities/frogmen_riverborn_aura.png"))
     W(ul_open())
@@ -261,43 +342,61 @@ def build():
     W(ul_close())
 
     # Ancient Prowlers (label — no own changes; sub-units follow)
-    W(plain_header("Ancient Prowlers", dynamics=False))
+    W(plain_header("Ancient Prowlers", dynamics=False, new="Returning camp"))
     W(ul_open())
+    # built as Flooded Camps (owner 2026-11-04): Valve's "?" in the text, the camp's numbers in its table
+    W(mech_story(
+        "Prowlers have returned as an Ancient Neutral Camp. The Neutral creeps upgrade system was introduced since "
+        "Prowlers removal, so their bounty and stats will increase over time.",
+        table=camp_table([
+            ("Ancient camp", [(2, "Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png"),
+                              (1, "Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png")],
+             (158, 179.5, b(179.5, 158)), (314, 195, b(195, 314)))])))
     W(li("Prowlers have returned as an Ancient Neutral Camp: "
          + creep_ref("Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png", 2) + ", "
          + creep_ref("Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png", 1),
-         t("NEW"), extra=inline_note("Average bounty: 158 gold and 314 XP — Previously average bounty was 179.5 gold and 195 XP. However, the Neutral creeps upgrade system was introduced since Prowlers removal, so their bounty and stats will increase over time")))
+         t("NEW"), covered=True, extra=inline_note("Average bounty: 158 gold and 314 XP — Previously average bounty was 179.5 gold and 195 XP. However, the Neutral creeps upgrade system was introduced since Prowlers removal, so their bounty and stats will increase over time")))
     W(ul_close())
 
     # Ancient Prowler Acolyte
-    W(unit_header("Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png", label="Returning Ancient Melee Creep"))
+    W(unit_header("Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png", label="Returning Ancient Melee Creep", general=False))
     W(ul_open())
-    W(li("Health increased from 600 to 750", b(600, 750)))
-    W(li("XP Bounty increased from 50 to 95", b(50, 95)))
-    W(li("Base Attack Time increased from 1.5s to 2s", b(1.5, 2, l=True)))
-    W(li("Base Attack Speed increased from 100 to 135", b(100, 135)))
-    W(li("Attack Point decreased from 0.83s to 0.3s", b(0.83, 0.3, l=True), extra=inline_note("These changes result in longer attack time, but smaller time between attacks, leaving overall DPS unchanged")))
-    W(li("Turn Rate improved from 0.5 to 0.9", b(0.5, 0.9)))
-    W(li("Gold Bounty decreased from 52-58 to 37-43", br(52, 58, 37, 43)))
+    W(unit_sheet("prowler_acolyte", changes={
+        "Health": (600, b(600, 750)), "XP": (50, b(50, 95)), "BAT": ("1.5s", b(1.5, 2, l=True)),
+        "Attack Speed": (100, b(100, 135)), "Attack Point": ("0.83s", b(0.83, 0.3, l=True)),
+        "Turn Rate": (0.5, b(0.5, 0.9)), "Gold": ("52-58", br(52, 58, 37, 43))},
+        notes={"Attack Point": "These changes result in longer attack time, but smaller time between attacks, leaving overall DPS unchanged"}))
+    W(li("Health increased from 600 to 750", b(600, 750), covered=True))
+    W(li("XP Bounty increased from 50 to 95", b(50, 95), covered=True))
+    W(li("Base Attack Time increased from 1.5s to 2s", b(1.5, 2, l=True), covered=True))
+    W(li("Base Attack Speed increased from 100 to 135", b(100, 135), covered=True))
+    W(li("Attack Point decreased from 0.83s to 0.3s", b(0.83, 0.3, l=True), covered=True))
+    W(li("Turn Rate improved from 0.5 to 0.9", b(0.5, 0.9), covered=True))
+    W(li("Gold Bounty decreased from 52-58 to 37-43", br(52, 58, 37, 43), covered=True))
     W(ul_close())
     W(ability("Prowler Aura", icon_url="../icons/abilities/spawnlord_aura.png"))
     W(ul_open())
-    W(li("Prowler Aura: Lifesteal rescaled from 10% to 9/10/11/12%", b(10, [9, 10, 11, 12])))
-    W(li("Prowler Aura: Health Regen rescaled from 10 to 9/10/11/12", b(10, [9, 10, 11, 12])))
+    W(li("Lifesteal rescaled from 10% to 9/10/11/12%", b(10, [9, 10, 11, 12])))
+    W(li("Health Regen rescaled from 10 to 9/10/11/12", b(10, [9, 10, 11, 12])))
     W(li("No longer stacks with itself", t("DEL")))
     W(ul_close())
 
     # Ancient Prowler Shaman
-    W(unit_header("Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png", label="Returning Ancient Melee Creep"))
+    W(unit_header("Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png", label="Returning Ancient Melee Creep", general=False))
     W(ul_open())
-    W(li("Level increased from 5 to 6", t("MISC")))
-    W(li("Health increased from 1200 to 1400", b(1200, 1400)))
-    W(li("XP Bounty increased from 95 to 124", b(95, 124)))
-    W(li("Gold Bounty increased from 58-69 to 76-80", br(58, 69, 76, 80)))
-    W(li("Base Attack Time increased from 1.5s to 2s", b(1.5, 2, l=True)))
-    W(li("Base Attack Speed increased from 100 to 135", b(100, 135)))
-    W(li("Attack Point decreased from 0.83s to 0.3s", b(0.83, 0.3, l=True), extra=inline_note("These changes result in longer attack time, but smaller time between attacks, leaving overall DPS unchanged")))
-    W(li("Turn Rate improved from 0.5 to 0.9", b(0.5, 0.9)))
+    W(unit_sheet("prowler_shaman", changes={
+        "Level": (5, t("MISC")), "Health": (1200, b(1200, 1400)), "XP": (95, b(95, 124)), "Gold": ("58-69", br(58, 69, 76, 80)),
+        "BAT": ("1.5s", b(1.5, 2, l=True)), "Attack Speed": (100, b(100, 135)), "Attack Point": ("0.83s", b(0.83, 0.3, l=True)),
+        "Turn Rate": (0.5, b(0.5, 0.9))},
+        notes={"Attack Point": "These changes result in longer attack time, but smaller time between attacks, leaving overall DPS unchanged"}))
+    W(li("Level increased from 5 to 6", t("MISC"), covered=True))
+    W(li("Health increased from 1200 to 1400", b(1200, 1400), covered=True))
+    W(li("XP Bounty increased from 95 to 124", b(95, 124), covered=True))
+    W(li("Gold Bounty increased from 58-69 to 76-80", br(58, 69, 76, 80), covered=True))
+    W(li("Base Attack Time increased from 1.5s to 2s", b(1.5, 2, l=True), covered=True))
+    W(li("Base Attack Speed increased from 100 to 135", b(100, 135), covered=True))
+    W(li("Attack Point decreased from 0.83s to 0.3s", b(0.83, 0.3, l=True), covered=True))
+    W(li("Turn Rate improved from 0.5 to 0.9", b(0.5, 0.9), covered=True))
     W(ul_close())
     W(ability("Desecrate", icon_url="../icons/abilities/spawnlord_master_stomp.png"))
     W(ul_open())
@@ -305,9 +404,9 @@ def build():
     W(ul_close())
     W(ability("Petrify", icon_url="../icons/abilities/spawnlord_master_freeze.png"))
     W(ul_open())
-    W(li("Petrify: DPS increased from 75 to 100", b(75, 100)))
-    W(li("Petrify: Duration decreased from 2s to 1.2/1.3/1.4/1.5s", b(2, [1.2, 1.3, 1.4, 1.5])))
-    W(li("Petrify: Damage Tick Interval decreased from 0.5s to 0.1s", b(0.5, 0.1, l=True)))
+    W(li("DPS increased from 75 to 100", b(75, 100)))
+    W(li("Duration decreased from 2s to 1.2/1.3/1.4/1.5s", b(2, [1.2, 1.3, 1.4, 1.5])))
+    W(li("Damage Tick Interval decreased from 0.5s to 0.1s", b(0.5, 0.1, l=True)))
     W(li("Neutrals will autocast this ability only if the Ancient Prowler Shaman has less than 90% health at the start of the attack", t("NEW")))
     W(ul_close())
 
@@ -615,43 +714,86 @@ def build():
     W(li("Neutral Stash has been removed", t("DEL")))
     W(li("Neutral creeps no longer drop Neutral Tokens", t("DEL")))
     W(li("Neutral Items can no longer be dropped or moved to the hero’s backpack", t("DEL")))
-    W(li("When available, fully clearing a Neutral Creep Camp provides the player with Madstone", t("NEW")))
-    W(li("Collecting enough Madstone allows the player to craft a Neutral Item by selecting one Artifact and one Enchantment", t("NEW")))
+    W(mech_story(
+        "When available, fully clearing a Neutral Creep Camp provides the player with Madstone. Collecting enough Madstone "
+        "allows the player to craft a Neutral Item by selecting one Artifact and one Enchantment."))
+    W(li("When available, fully clearing a Neutral Creep Camp provides the player with Madstone", t("NEW"), covered=True))
+    W(li("Collecting enough Madstone allows the player to craft a Neutral Item by selecting one Artifact and one Enchantment", t("NEW"), covered=True))
     W(ul_close())
 
     W(plain_header("Obtaining Madstone", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
-    W(li("Fully clearing a Neutral Creep Camp provides Madstone for the killing player’s team", t("NEW")))
-    W(li("The player who collects the Madstone receives 2 and 1 is given to a random teammate", t("NEW"), extra=inline_note("Clearing an Ancient Creep Camp provides 3 to the killer and 2 are split between random teammates")))
-    W(li("Dropped Madstone is automatically collected if there are no enemy heroes within an 800 unit radius of the last creep to die and there is an allied hero within 1200 units of the dead creep. Otherwise, it is left on the ground where the creep died and can be collected by either team", t("NEW"), extra=inline_note("Dropped Madstone automatically expires after 20 seconds")))
-    W(li("If the player who collects the Madstone is already at their limit (more info below), all of their Madstone is also evenly split between teammates", t("NEW")))
+    W(mech_story(
+        "Fully clearing a Neutral Creep Camp provides Madstone for the killing player’s team. The player who collects the "
+        "Madstone receives <b>2</b> and <b>1</b> is given to a random teammate; clearing an Ancient Creep Camp provides "
+        "<b>3</b> to the killer and <b>2</b> are split between random teammates. Dropped Madstone is automatically collected "
+        "if there are no enemy heroes within an <b>800 unit</b> radius of the last creep to die and there is an allied hero "
+        "within <b>1200 units</b> of the dead creep. Otherwise, it is left on the ground where the creep died and can be "
+        "collected by either team, and automatically expires after <b>20 seconds</b>. If the player who collects the "
+        "Madstone is already at their limit (more info below), all of their Madstone is also evenly split between teammates."))
+    W(li("Fully clearing a Neutral Creep Camp provides Madstone for the killing player’s team", t("NEW"), covered=True))
+    W(li("The player who collects the Madstone receives 2 and 1 is given to a random teammate", t("NEW"), covered=True, extra=inline_note("Clearing an Ancient Creep Camp provides 3 to the killer and 2 are split between random teammates")))
+    W(li("Dropped Madstone is automatically collected if there are no enemy heroes within an 800 unit radius of the last creep to die and there is an allied hero within 1200 units of the dead creep. Otherwise, it is left on the ground where the creep died and can be collected by either team", t("NEW"), covered=True, extra=inline_note("Dropped Madstone automatically expires after 20 seconds")))
+    W(li("If the player who collects the Madstone is already at their limit (more info below), all of their Madstone is also evenly split between teammates", t("NEW"), covered=True))
     W(ul_close())
 
     W(plain_header("Item Tiers", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
-    W(li("Neutral Items are now composed of two parts: Artifacts & Enchantments", t("NEW"), extra=inline_note("Artifacts are the ability of the item and can be passive and/or active<br>Enchantments provide passive stats and attributes to items")))
-    W(li("Similar to the previous Neutral Item System, items are arranged by Tiers", t("NEW"), extra=inline_note("Each Tier is only available past a specific point in time<br>Each Artifact belongs to a single tier<br>Enchantments have multiple levels and can be found in multiple tiers")))
+    W(mech_story(
+        "Neutral Items are now composed of two parts: Artifacts & Enchantments. Artifacts are the ability of the item and "
+        "can be passive and/or active. Enchantments provide passive stats and attributes to items. Similar to the previous "
+        "Neutral Item System, items are arranged by Tiers: each Tier is only available past a specific point in time, each "
+        "Artifact belongs to a single tier, and Enchantments have multiple levels and can be found in multiple tiers."))
+    W(li("Neutral Items are now composed of two parts: Artifacts & Enchantments", t("NEW"), covered=True, extra=inline_note("Artifacts are the ability of the item and can be passive and/or active<br>Enchantments provide passive stats and attributes to items")))
+    W(li("Similar to the previous Neutral Item System, items are arranged by Tiers", t("NEW"), covered=True, extra=inline_note("Each Tier is only available past a specific point in time<br>Each Artifact belongs to a single tier<br>Enchantments have multiple levels and can be found in multiple tiers")))
     W(ul_close())
 
     W(plain_header("Crafting", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
-    W(li("When crafting, players are given a choice of 4 Artifacts and 4 Enchantments and choose one of each", t("NEW"), extra=inline_note("Artifacts will provide 3 options from the current tier and the last option will be to keep the current Artifact — For Tier 1, players are given 4 random choices since they have no neutral item<br>Enchantments will provide 4 options from the current tier with no option to keep the current Enchantment — Given that Enchantments exist across multiple Tiers, it is possible that players can get the same Enchantment multiple Tiers in a row, but it is not guaranteed")))
-    W(li("Crafting a Neutral Item replaces the existing Neutral Item, if there is one", t("NEW")))
-    W(li("Players must craft a Tier 1 Neutral Item before they can craft a Tier 2 Neutral Item", t("NEW"), extra=inline_note("And a Tier 2 before a Tier 3, etc")))
-    W(li("Crafting a Tier 1 Neutral Item takes 5 Madstone", t("NEW")))
-    W(li("Crafting Tier 2, 3, 4, or 5 Neutral Items takes 10 Madstone", t("NEW"), extra=inline_note("Tier 5 Neutral Items can be recrafted for an escalating 10 Madstone cost — The first time a Tier 5 Neutral Item is recrafted the cost is 20 Madstone, then 30 Madstone, etc")))
+    W(mech_story(
+        "When crafting, players are given a choice of <b>4 Artifacts</b> and <b>4 Enchantments</b> and choose one of each. "
+        "Artifacts will provide 3 options from the current tier and the last option will be to keep the current Artifact; "
+        "for Tier 1, players are given 4 random choices since they have no neutral item. Enchantments will provide 4 options "
+        "from the current tier with no option to keep the current Enchantment. Given that Enchantments exist across multiple "
+        "Tiers, it is possible that players can get the same Enchantment multiple Tiers in a row, but it is not guaranteed. "
+        "Crafting a Neutral Item replaces the existing Neutral Item, if there is one. Players must craft a Tier 1 Neutral "
+        "Item before they can craft a Tier 2 Neutral Item, a Tier 2 before a Tier 3, etc.",
+        table=mech_table(["Crafting", "Madstone"], [
+            ["Tier 1", "<b>5</b>"],
+            ["Tier 2, 3, 4, or 5", "<b>10</b>"],
+            ["Recrafting Tier 5", "<b>20</b> the first time, then <b>30</b>, etc"]])))
+    W(li("When crafting, players are given a choice of 4 Artifacts and 4 Enchantments and choose one of each", t("NEW"), covered=True, extra=inline_note("Artifacts will provide 3 options from the current tier and the last option will be to keep the current Artifact — For Tier 1, players are given 4 random choices since they have no neutral item<br>Enchantments will provide 4 options from the current tier with no option to keep the current Enchantment — Given that Enchantments exist across multiple Tiers, it is possible that players can get the same Enchantment multiple Tiers in a row, but it is not guaranteed")))
+    W(li("Crafting a Neutral Item replaces the existing Neutral Item, if there is one", t("NEW"), covered=True))
+    W(li("Players must craft a Tier 1 Neutral Item before they can craft a Tier 2 Neutral Item", t("NEW"), covered=True, extra=inline_note("And a Tier 2 before a Tier 3, etc")))
+    W(li("Crafting a Tier 1 Neutral Item takes 5 Madstone", t("NEW"), covered=True))
+    W(li("Crafting Tier 2, 3, 4, or 5 Neutral Items takes 10 Madstone", t("NEW"), covered=True, extra=inline_note("Tier 5 Neutral Items can be recrafted for an escalating 10 Madstone cost — The first time a Tier 5 Neutral Item is recrafted the cost is 20 Madstone, then 30 Madstone, etc")))
     W(ul_close())
 
     W(plain_header("Madstone Limits", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
-    W(li("Players are limited in the amount of Madstone they can obtain at any given point in time", t("NEW")))
-    W(li("At specific intervals, the limit will increase enough to allow players to craft the next Tier of Neutral Items", t("NEW"), extra=inline_note("At the start of the game, the Madstone Cap is 0 — No Madstone will drop from killed creep camps<br>At 5:00, the Madstone Cap is increased to 5 — This is enough to craft a Tier 1 Neutral Item<br>At 15:00, the Madstone Cap is increased to 15 — This is enough to craft a Tier 2 Neutral Item<br>At 25:00, the Madstone Cap is increased to 25 — This is enough to craft a Tier 3 Neutral Item<br>At 35:00, the Madstone Cap is increased to 35 — This is enough to craft a Tier 4 Neutral Item<br>At 60:00, the Madstone Cap is increased to 45 — This is enough to craft a Tier 5 Neutral Item<br>At 70:00, the Madstone Cap is removed and players can collect infinite Madstone — This is so that the player can recraft their Tier 5 Neutral Item infinite times")))
+    W(mech_story(
+        "Players are limited in the amount of Madstone they can obtain at any given point in time. At specific intervals, "
+        "the limit will increase enough to allow players to craft the next Tier of Neutral Items.",
+        table=mech_table(["Time", "Madstone Cap", "Enough for"], [
+            ["Start of the game", "<b>0</b>", "No Madstone will drop from killed creep camps"],
+            ["5:00", "<b>5</b>", "Tier 1 Neutral Item"],
+            ["15:00", "<b>15</b>", "Tier 2 Neutral Item"],
+            ["25:00", "<b>25</b>", "Tier 3 Neutral Item"],
+            ["35:00", "<b>35</b>", "Tier 4 Neutral Item"],
+            ["60:00", "<b>45</b>", "Tier 5 Neutral Item"],
+            ["70:00", "No cap", "Recrafting the Tier 5 Neutral Item infinite times"]], wide_last=True)))
+    W(li("Players are limited in the amount of Madstone they can obtain at any given point in time", t("NEW"), covered=True))
+    W(li("At specific intervals, the limit will increase enough to allow players to craft the next Tier of Neutral Items", t("NEW"), covered=True, extra=inline_note("At the start of the game, the Madstone Cap is 0 — No Madstone will drop from killed creep camps<br>At 5:00, the Madstone Cap is increased to 5 — This is enough to craft a Tier 1 Neutral Item<br>At 15:00, the Madstone Cap is increased to 15 — This is enough to craft a Tier 2 Neutral Item<br>At 25:00, the Madstone Cap is increased to 25 — This is enough to craft a Tier 3 Neutral Item<br>At 35:00, the Madstone Cap is increased to 35 — This is enough to craft a Tier 4 Neutral Item<br>At 60:00, the Madstone Cap is increased to 45 — This is enough to craft a Tier 5 Neutral Item<br>At 70:00, the Madstone Cap is removed and players can collect infinite Madstone — This is so that the player can recraft their Tier 5 Neutral Item infinite times")))
     W(ul_close())
 
     W(plain_header("Turbo", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
-    W(li("Madstone Availability times are halved in Turbo", t("NEW"), extra=inline_note("Tier 1 items are available starting at 2:30")))
-    W(li("Collecting Madstone results in 3 Madstone for the player and 2 for their team", t("NEW"), extra=inline_note("Ancient Creep Camps give 4 Madstone for the primary player and 3 for their team")))
+    W(mech_story(
+        "Madstone Availability times are halved in Turbo, so Tier 1 items are available starting at <b>2:30</b>. Collecting "
+        "Madstone results in <b>3</b> Madstone for the player and <b>2</b> for their team; Ancient Creep Camps give <b>4</b> "
+        "Madstone for the primary player and <b>3</b> for their team."))
+    W(li("Madstone Availability times are halved in Turbo", t("NEW"), covered=True, extra=inline_note("Tier 1 items are available starting at 2:30")))
+    W(li("Collecting Madstone results in 3 Madstone for the player and 2 for their team", t("NEW"), covered=True, extra=inline_note("Ancient Creep Camps give 4 Madstone for the primary player and 3 for their team")))
     W(ul_close())
 
     W(plain_header("List of Neutral Artifacts", dynamics=False, sublabel=True))

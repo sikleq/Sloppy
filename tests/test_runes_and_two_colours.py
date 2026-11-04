@@ -1,6 +1,7 @@
 """Owner 2026-10-28: a rune row shows the rune's icon (7.40 "Haste Rune: …"), and every map picture speaks in two
 colours only — red dashed = where it was and how, green solid = how it is (yellow "moved" and the green Trees layer
 read as a third meaning)."""
+from patch.js_bundle import read_js
 import os
 import sys
 
@@ -56,7 +57,7 @@ def test_the_terrain_power_layer_button_is_our_power_rune_icon():
     import gen_power_rune_icon as gp
     btn = Image.open(os.path.join(ROOT, "icons", "ui", "gothic", "tc_power.png")).convert("RGBA")
     assert btn.size == (48, 48) and ImageChops.difference(btn, gp.power_icon(48)).getbbox() is None
-    js = open(os.path.join(ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    js = read_js()
     assert "powerBtnImg" not in js and "togglePowerCycle" in js
 
 

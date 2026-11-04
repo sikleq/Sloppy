@@ -10,6 +10,7 @@ line whose ability has no icon stays the note it was.
 """
 import functools as _functools
 import html as _html
+import math
 import os as _os
 import re
 
@@ -386,23 +387,30 @@ def _list_title(row_text):
     return _sentence(m.group(1)) if m else "Case"
 
 
-def mech_table(head, rows):
+def mech_table(head, rows, labels=True, wide_last=False):
     """A mechanic's rules as a table written in the content (7.38 Lifesteal: Lifesteal / Spell Lifesteal × what each
     applies to × its cut against non-heroes — Valve's three sentences, owner 2026-10-28 "неудобно читается"). head: the
     column titles; rows: lists of cells, or a str for a line across the whole table. The first column reads as a
-    label (left), the others are values (centred). li() puts it under the row's text."""
+    label (left), the others are values (centred); labels=False: all of them are values (7.38 Lotus Pools, a line of
+    numbers under their titles). A table holds values; a description stays text (owner 2026-11-04). li() puts it under
+    the row's text. wide_last: the last column holds phrases, in one line on a computer (7.38 Madstone Limits)."""
     cols = len(head)
+    label_col = 0 if labels and cols > 1 else None
+
+    def cell(c):                 # a cell is a flex box: words round a <b> must stay one item, or they break apart
+        return f"<span>{c}</span>" if "<b>" in c else c
     out = ('<span class="mech-abil-row mech-head">'
-           + "".join(f'<span class="mech-cell{" mech-label" if i == 0 and cols > 1 else ""}">{h}</span>' for i, h in enumerate(head))
+           + "".join(f'<span class="mech-cell{" mech-label" if i == label_col else ""}">{h}</span>' for i, h in enumerate(head))
            + '</span>')
     for row in rows:
         if isinstance(row, str):
             out += f'<span class="mech-abil-row"><span class="mech-abil-line">{row}</span></span>'
         else:
             out += ('<span class="mech-abil-row">' + "".join(
-                f'<span class="mech-cell{" mech-label" if i == 0 and cols > 1 else ""}">{c}</span>' for i, c in enumerate(row))
+                f'<span class="mech-cell{" mech-label" if i == label_col else ""}">{cell(c)}</span>' for i, c in enumerate(row))
                 + '</span>')
-    return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}">{out}</span><!--/MECHTABLE-->'
+    wide = " mech-wide-last" if wide_last else ""
+    return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}{wide}">{out}</span><!--/MECHTABLE-->'
 
 
 def mech_text(*paragraphs):
@@ -410,6 +418,81 @@ def mech_text(*paragraphs):
     таблицей, а абзацем с удобной информацией"). li() puts it under the row's text."""
     rows = "".join(f'<span class="mech-abil-row"><span class="mech-abil-line">{p}</span></span>' for p in paragraphs)
     return f'<!--MECHTABLE--><span class="mech-abils mech-cols-1 mech-text">{rows}</span><!--/MECHTABLE-->'
+
+
+_STORY_TAGS = {"new": "buff new", "rework": "rework"}      # as li() marks a row of that tag: the filters read these
+
+
+def _story_pictures(patch, match):
+    """The <img> of each picture of the patch's spot entries with this "match". A name no entry has is an error: the
+    picture would just be missing from the page."""
+    from .elements import _terrain_spot_index, TSHOT_H, TSHOT_W
+    rows = [s for s in _terrain_spot_index().get(patch, []) if s[0] == match]
+    if not rows:
+        raise ValueError(f"mech_story: no terrain_spots entry of {patch} with match {match!r}")
+    return [f'<img src="../icons/terrain/{n}" data-large="../icons/terrain/{n[:-5]}_lg.webp" '
+            f'width="{TSHOT_W}" height="{TSHOT_H}" alt="The old and the new map here" loading="lazy" decoding="async">'
+            for s in rows for n in s[1]]
+
+
+def _story_button(html, phrase, k):
+    """html with its phrase as the button of the row's k-th picture box. A phrase the text lacks is an error."""
+    from .terrain_notes import wrap_phrase
+    out = wrap_phrase(html, phrase, lambda w: f'<button type="button" class="tshots-btn" data-part="{k}" '
+                                              f'aria-expanded="false">{w}</button>')
+    if out is None:
+        raise ValueError(f"mech_story: {phrase!r} is not in its paragraph")
+    return out
+
+
+# The picture beside a story's text, px on the 970-px wide block: a sheet is 726 x 360, the text 15 px on 24-px lines
+_STORY_INNER, _STORY_GAP, _STORY_CHAR, _STORY_LINE, _STORY_PAR_GAP = 954, 16, 7.0, 24, 6
+_STORY_SIDE_MIN, _STORY_SIDE_MAX, _SHEET_RATIO = 300, 480, 360 / 726
+
+
+def story_side_width(paragraphs):
+    """The widest picture no taller than the text beside it: the two fill the block together, with no empty corner
+    under one of them (owner 2026-11-04: "скриншот… чтобы занимал всё пространство пустое внутри блока"). Short text:
+    the smallest picture still readable; the text is centred against it then."""
+    plain = [re.sub(r"<[^>]+>", "", p) for p in paragraphs]
+    best = _STORY_SIDE_MIN
+    for width in range(_STORY_SIDE_MIN, _STORY_SIDE_MAX + 1, 10):
+        per_line = (_STORY_INNER - _STORY_GAP - width) / _STORY_CHAR
+        lines = sum(math.ceil(len(p) / per_line) for p in plain)
+        if width * _SHEET_RATIO <= lines * _STORY_LINE + (len(plain) - 1) * _STORY_PAR_GAP:
+            best = width
+    return best
+
+
+def mech_story(text, tags=("new",), table="", maps=(), buttons=()):
+    """A mechanic described in text with its key values bold, its map always in sight (owner 2026-11-04, 7.38: variant 4
+    of the mock). The rows it retells stay in the content with covered=True: their tags, weights and the Terrain page's
+    list come from them.
+    text: the paragraph or a list of them, Valve's words, the "?" notes written in; table: a mech_table / camp_table
+    across the block under the text and the map.
+    maps: the terrain_spots "match" of each picture always shown — one stands beside the text, sized to fill the block
+    with it (story_side_width); two fill the block's width under the text.
+    buttons: (phrase, match) pairs, the phrase in the text opens that entry's pictures on a click."""
+    from .state import _State
+    patch = _State.current_patch_version
+    paragraphs = [text] if isinstance(text, str) else list(text)
+    shown = [img for match in maps for img in _story_pictures(patch, match)]
+    parts = ""
+    for k, (phrase, match) in enumerate(buttons):
+        hit = next(i for i, p in enumerate(paragraphs) if phrase in p) if any(phrase in p for p in paragraphs) else 0
+        paragraphs[hit] = _story_button(paragraphs[hit], phrase, k)
+        parts += f'<span class="tshots" data-part="{k}" hidden>{"".join(_story_pictures(patch, match))}</span>'
+    tag_attr = " ".join(dict.fromkeys(w for tag in tags for w in _STORY_TAGS[tag].split()))
+    side, style = "", ""
+    if len(shown) == 1:
+        side = " mech-story-side"
+        style = f' style="--story-side:{story_side_width(paragraphs) / (_STORY_INNER / 100):.1f}%"'
+    body = "".join(f'<span class="mech-story-p">{p}</span>' for p in paragraphs)
+    table = re.sub(r"<!--/?MECHTABLE-->", "", table)
+    under = f'<span class="mech-story-table">{table}</span>' if table else ""
+    pics = f'<span class="tshots mech-story-maps">{"".join(shown)}</span>' if shown else ""
+    return (f'<li class="mech-desc mech-first mech-last li-notag mech-story{side}" data-tag="{tag_attr}"{style}>'
+            f'<span class="row-tag-empty"></span><span class="row-text">{body}</span>{pics}{under}{parts}</li>')
 
 
 BEFORE, AFTER = "Before", "After"

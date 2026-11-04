@@ -1,5 +1,6 @@
 """Colour-blind mode (owner 2026-10-09): under html.cb-mode every tag (BUFF, NERF, NEW, REWORK, SWAP, QoL, DEL, MISC)
 gets its own colour, apart for deutan / protan eyes too; every page with the header carries the switch."""
+from patch.js_bundle import read_js
 import itertools
 import os
 import re
@@ -25,8 +26,7 @@ def _css():
 
 
 def _js():
-    with open(os.path.join(ROOT, "src", "scripts.js"), encoding="utf-8") as f:
-        return f.read()
+    return read_js()
 
 
 def _lin(c):
