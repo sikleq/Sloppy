@@ -1,119 +1,230 @@
-"""Passes over the scaffold's lines: removed facets, hero stat card, hidden stat rows, recipe cost."""
+"""Passes over the scaffold's lines (removed facets: post_facets.py): hero stat card, hidden stat rows, recipe cost."""
 import json
-import os
 import re
 
-from .common import _HERE
 from .lines import (
     _ENTITY_START_RE,
-    _FACET_BLOCK_RE,
     _HERO_DMG_ROW_RE,
-    _HERO_NAME_RE,
     _PROP_CHANGE_RE,
-    _REMOVED_ABILITY_RE,
-    _REMOVED_FACETS_RE,
     _py_repr,
 )
 
-def _removed_facet_blocks(hero_slug, names, extra, prev, ind):
-    """facet_header + "Removed" row per removed facet, named as the game's files of the patch before name them; None if
-    a name has no facet there. A note ("Rage remains as Lifestealer's default basic ability") goes to the facet it
-    names, else to the first."""
-    from patch.ability_kv import hero_facets
-    facets = {n.lower(): s for s, (n, _c, _i) in hero_facets(hero_slug, prev).items() if n}
-    slugs = [facets.get(n.lower()) for n in names]
-    if not names or None in slugs:
+
+_SAME_EFFECT_ROW_RE = re.compile(
+    r'^\s*W\(li\("Now has the same effect for both Arc Warden and Tempest Double", t\("REWORK"\), extra=inline_note\("'
+    r'(?P<both>.*?)\s*<span class=\\"pop-note\\">\(Previous values: Arc Warden: (?P<hero>.*?)\.\s*Tempest Double: (?P<double>.*?)\)</span>"\)\)\)\s*$')
+_ABILITY_LINE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"\)\)\s*$')
+_UPGRADE_ROW_RE = re.compile(r'^\s*W\(li\("Aghanim\'s (?:Shard|Scepter):')
+
+
+_NOTE_NUM_RE = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)(\s*seconds?\b|s\b|%)?")
+_KV_LINE_RE = re.compile(r"([A-Z][^:.]*):\s*([\d./%]+?)\.(?=\s|$)")
+
+
+def _note_values(text):
+    """The numbers of a Valve note in their order, with the unit: "activates in 2 seconds" -> "2s"."""
+    return [n + ("s" if u and u.strip().startswith("s") else (u or "")) for n, u in _NOTE_NUM_RE.findall(text)]
+
+
+def _selves_columns(ability, kv_text, hero, double, both):
+    """Columns of Arc Warden's two-selves table (owner 2026-11-06: "научиться пока что у Arc Warden это определять",
+    7.38 Spark Wraith): each number of Valve's note named by the game's own label of the value that has it in the patch
+    before ("Activation delay: 2." -> "Activation delay"; the ability's own name left out: "Wraith speed" -> "Speed").
+    (columns, hero, double, both) as tuples, or None when the three notes don't list the same count of numbers or a
+    number has no label of its own."""
+    vals = [_note_values(x) for x in (hero, double, both)]
+    if len({len(v) for v in vals}) != 1 or len(vals[0]) < 2:
         return None
-    note_at = next((k for k, n in enumerate(names) if extra and n.lower() in extra.lower()), 0)
+    pairs = [(label, value.rstrip("%")) for label, value in _KV_LINE_RE.findall(kv_text.partition("\n")[2])]
+    labels = {}
+    for label, value in pairs:
+        labels.setdefault(value, label)                      # the first one: the hero's (the double's values follow)
+    own = {w.lower() for w in ability.split()}
+    bare = lambda v: re.sub(r"[s%]$", "", v)
+    cols = []
+    for v, d in zip(vals[0], vals[1]):
+        label = labels.get(bare(v))
+        # the double's number in this column is the same value of the game (7.38 Magnetic Field: the hero's evasion,
+        # the double's attack range — two different things, no shared columns)
+        if not label or (label, bare(d)) not in pairs:
+            return None
+        words = [w for w in label.split() if w.lower() not in own] or label.split()
+        cols.append(" ".join(words).capitalize())
+    return tuple(cols), *(tuple(v) for v in vals)
+
+
+def _postprocess_two_selves_cards(lines, version=None):
+    """Arc Warden's "same effect for both" row with Valve's previous values: an old -> new card with the two selves' numbers
+    (owner 2026-11-05, 7.38). The descriptions are the game's of both patches; without them the row stays."""
+    from patch.aghs_text import ability_text
+    from patch.meta import _prev_patch_version
+    prev = _prev_patch_version(version) if version else None
     out = []
-    for k, s in enumerate(slugs):
-        tail = f', extra={extra}' if extra and k == note_at else ''
-        out += [f'{ind}W(facet_header("{s}"))', f'{ind}W(ul_open())', f'{ind}W(li("Removed", t("DEL"){tail}))',
-                f'{ind}W(ul_close())']
+    i = 0
+    while i < len(lines):
+        at = _ABILITY_LINE_RE.match(lines[i])
+        if not at or i + 1 >= len(lines) or lines[i + 1].strip() != 'W(ul_open())':
+            out.append(lines[i])
+            i += 1
+            continue
+        end = next((k for k in range(i + 2, len(lines)) if lines[k].strip() == 'W(ul_close())'), None)
+        rows = lines[i + 2:end] if end else []
+        same = next((m for m in map(_SAME_EFFECT_ROW_RE.match, rows) if m), None)
+        texts = (ability_text(at.group(3), prev), ability_text(at.group(3), version)) if same and prev else (None, None)
+        if not all(texts):
+            out.append(lines[i])
+            i += 1
+            continue
+        rest = [r for r in rows if not _SAME_EFFECT_ROW_RE.match(r)]
+        # plain rows go above the card (owner 2026-11-05); an upgrade's "Aghanim's X: ..." has its own card below it
+        plain = [r for r in rest if not _UPGRADE_ROW_RE.match(r)]
+        below = [r for r in rest if _UPGRADE_ROW_RE.match(r)]
+        first = (', rows_first=lambda: [' + ', '.join(r.strip()[2:-1] for r in plain) + ']') if plain else ''
+        # the description only: the numbers stand in the two selves' lines or table (as content/p738.py)
+        old_desc, new_desc = (json.dumps(t.partition("\n")[0], ensure_ascii=False) for t in texts)
+        table = _selves_columns(at.group(2), texts[0], same.group("hero"), same.group("double"), same.group("both"))
+        if table:
+            cols, hero, double, both = (_py_repr(x) for x in table)
+            nums = f'columns={cols}, hero={hero}, double={double}, '
+            tail = f'both={both}'
+        else:
+            nums = f'hero="{same.group("hero")}", double="{same.group("double")}", '
+            tail = f'both="{same.group("both")}"'
+        out.append(f'{at.group(1)}W(two_selves_change("{at.group(2)}", "{at.group(3)}", old_desc={old_desc}, '
+                   f'{nums}new_desc={new_desc}, {tail}{first}))')
+        if below:
+            out += [lines[i + 1], *below, lines[end]]
+        i = end + 1
     return out
 
 
-def _removed_innate_block(hero_slug, name, extra, prev, ind):
-    """ability(innate=True) + "Removed" row for "Removed <innate> ability" (owner 2026-10-29: "Mastermind вообще
-    innate"), or None when the ability wasn't the hero's innate in the patch before."""
-    from patch.ability_kv import _hero_blocks
-    for slug, block in _hero_blocks(prev).items():
-        if (slug.startswith(f"{hero_slug}_") and str(block.get("Innate", "")).strip() == "1"
-                and _slug_dname(slug) == name):
-            tail = f', extra={extra}' if extra else ''
-            return [f'{ind}W(ability("{name}", slug="{slug}", innate=True))', f'{ind}W(ul_open())',
-                    f'{ind}W(li("Removed", t("DEL"){tail}))', f'{ind}W(ul_close())']
+_CARD_CALL_RE = re.compile(r'^(\s*)W\((?:ability_change|two_selves_change)\(')
+_UPGRADE_WORDS_RE = re.compile(r"Aghanim's (?:Shard|Scepter)", re.I)
+
+
+def _statements(lines, start):
+    """[(first, last)] line spans of whole statements from `start` to the line before W(ul_close()), and that line's
+    index; None when the list does not close."""
+    spans, k = [], start
+    while k < len(lines):
+        if lines[k].strip() == 'W(ul_close())':
+            return spans, k
+        depth, j = 0, k
+        while j < len(lines):
+            code = re.sub(r'"(?:[^"\\]|\\.)*"', '""', lines[j])
+            depth += code.count("(") - code.count(")")
+            if depth <= 0:
+                break
+            j += 1
+        spans.append((k, j))
+        k = j + 1
     return None
 
 
-def _slug_dname(slug):
-    try:
-        with open(os.path.join(_HERE, 'data', 'abilities_slim.json'), encoding='utf-8') as f:
-            return (json.load(f).get(slug) or {}).get('dname')
-    except (OSError, ValueError):
-        return None
+def _split_comment(stmt):
+    """(code, "# comment") of a statement whose last line ends in a comment outside the strings, else (stmt, "")."""
+    last = stmt.split("\n")[-1]
+    code = re.sub(r'"(?:[^"\\]|\\.)*"', lambda m: "x" * len(m.group(0)), last)
+    at = code.find("#")
+    if at < 0:
+        return stmt, ""
+    head = stmt[:len(stmt) - len(last)]
+    return (head + last[:at]).rstrip(), last[at:].strip()
 
 
-def _postprocess_removed_facets(lines, version=None):
-    """Owner 2026-10-29 (7.38 Invoker): "Removed Agnostic and Elitist Facets" is not a GENERAL row — each removed facet
-    is its own block in the hero's Facets category, with its icon and name and a "Removed" row, as 7.39 does
-    (Mephitic Shroud), before the hero's new facets; "Removed Mastermind ability" of an innate goes the same way into
-    Abilities, as the innate's own block first there. The names are read from the game files of the patch before. A
-    GENERAL list left empty goes. Works on generator output and indented content."""
-    from patch.images import HERO_SLUG
-    from patch.meta import _prev_patch_version
-    prev = _prev_patch_version(version) if version else None
-    if not prev:
-        return lines
+def _postprocess_rows_first(lines):
+    """A card's plain rows stand above its caption, so all the ability's tagged rows are together under its name (owner
+    2026-11-05, "Да, переноси" after Arc Warden 7.38). A row about an Aghanim's upgrade has a card of its own and stays
+    under the card; a list holding anything but rows stays as written. Works on generator output and indented content."""
     out, i = [], 0
     while i < len(lines):
-        m = _HERO_NAME_RE.match(lines[i].lstrip())
+        m = _CARD_CALL_RE.match(lines[i])
         if not m:
             out.append(lines[i])
             i += 1
             continue
-        hero_slug = HERO_SLUG.get(m.group(1), m.group(1).lower().replace(" ", "_").replace("'", ""))
-        end = next((j for j in range(i + 1, len(lines))
-                    if lines[j].lstrip().startswith(('W(hero_header(', 'W(item_header(', 'W(section(', 'write_footer('))),
-                   len(lines))
-        block, facets, innates, gone = lines[i:end], [], [], set()
-        for k, l in enumerate(block):
-            ind = l[:len(l) - len(l.lstrip())]
-            fm, am = _REMOVED_FACETS_RE.match(l.lstrip()), _REMOVED_ABILITY_RE.match(l.lstrip())
-            if fm:
-                names = [n.strip() for n in re.split(r',\s*|\s+and\s+', fm.group(1)) if n.strip()]
-                new = _removed_facet_blocks(hero_slug, names, fm.group(2), prev, ind)
-                if new:
-                    facets += new
-                    gone.add(k)
-            elif am:
-                new = _removed_innate_block(hero_slug, am.group(1), am.group(2), prev, ind)
-                if new:
-                    innates += new
-                    gone.add(k)
-        if not gone:
-            out.extend(block)
-            i = end
+        spans = _statements(lines, i)
+        card_end = spans[0][0][1] if spans and spans[0] else i
+        card = lines[i:card_end + 1]
+        after = card_end + 1
+        if "rows_first" in "\n".join(card) or after >= len(lines) or lines[after].strip() != 'W(ul_open())':
+            out += card
+            i = after
             continue
-        rest = [l for k, l in enumerate(block) if k not in gone]
-        for k in range(len(rest) - 1):          # a GENERAL list with nothing left in it goes
-            if rest[k].strip() == 'W(ul_open())' and rest[k + 1].strip() == 'W(ul_close())':
-                del rest[k:k + 2]
-                break
-        starts = lambda pfx: next((k for k, l in enumerate(rest) if l.lstrip().startswith(pfx)), None)
-        at_abil = starts(('W(ability(', 'W(subgroup("Talents"', 'W(subgroup("Abilities"'))
-        at_abil = len(rest) if at_abil is None else at_abil
-        # with the hero's other facets (Meepo 7.38: its innate block stands before them), else before the abilities
-        at_facet = next((k for k, l in enumerate(rest) if _FACET_BLOCK_RE.match(l.lstrip())), at_abil)
-        if at_facet <= at_abil:
-            rest = rest[:at_abil] + innates + rest[at_abil:]
-            rest = rest[:at_facet] + facets + rest[at_facet:]
-        else:
-            rest = rest[:at_facet] + facets + rest[at_facet:]
-            rest = rest[:at_abil] + innates + rest[at_abil:]
-        out.extend(rest)
-        i = end
+        listed = _statements(lines, after + 1)
+        if not listed:
+            out += card
+            i = after
+            continue
+        rows, close = listed
+        stmts = ["\n".join(lines[a:b + 1]) for a, b in rows]
+        is_row = lambda s: s.lstrip().startswith(("W(li(", "W(li_formula("))
+        is_note = lambda s: s.lstrip().startswith("#") or not s.strip()
+        if not stmts or any(not is_row(s) and not is_note(s) for s in stmts):
+            out += card
+            i = after
+            continue
+        # a comment line goes with the row after it (or with the plain rows when nothing follows)
+        plain, below, notes = [], [], []
+        for s in stmts:
+            if is_note(s):
+                notes.append(s)
+                continue
+            group = below if _UPGRADE_WORDS_RE.search(s) else plain
+            group += notes + [s]
+            notes = []
+        plain += notes
+        if not any(is_row(s) for s in plain):
+            out += card
+            i = after
+            continue
+        ind = m.group(1)
+        body = "\n".join(card).rstrip()
+        assert body.endswith("))"), body[-40:]
+        body = body[:-2].rstrip()
+        body = body[:-1] if body.endswith(",") else body
+        inner = []
+        for s in plain:
+            if is_note(s):
+                inner += [f"{ind}        {s.strip()}"] if s.strip() else []
+                continue
+            s, note = _split_comment(s.strip())
+            s = s.rstrip()[2:-1]                               # W(li(...)) -> li(...)
+            inner += [f"{ind}        {ln.strip() if n == 0 else ln}" for n, ln in enumerate(s.split("\n"))]
+            inner[-1] += "," + (f"  {note}" if note else "")
+        out += (body + ",\n" + f"{ind}    rows_first=lambda: [\n" + "\n".join(inner) + f"\n{ind}    ]))").split("\n")
+        if below:
+            out += [lines[after]] + "\n".join(below).split("\n") + [lines[close]]
+        i = close + 1
     return out
+
+
+
+
+_ABILITY_SLUG_RE = re.compile(r'^\s*W\(ability\("([^"]+)", slug="([a-z0-9_]+)"')
+
+
+def _after_innates(lines, version):
+    """A removed ability that was no innate stands after the hero's innate blocks (7.38 Blood Mist came before Sanguivore:
+    innates go first, tests/test_innate_first.py)."""
+    from patch.ability_kv import _hero_blocks
+    blocks = _hero_blocks(version) if version else {}
+    innate = lambda slug: str((blocks.get(slug) or {}).get("Innate", "")).strip() == "1"
+
+    def span(k):                                # the block's lines: its header to its list's close
+        end = next((j for j in range(k, len(lines)) if lines[j].strip() == 'W(ul_close())'), k)
+        return k, end + 1
+    for k, line in enumerate(lines):
+        m = _ABILITY_SLUG_RE.match(line)
+        if not m or "innate=True" in line or innate(m.group(2)) or 'li("Removed", t("DEL")' not in "".join(lines[k:k + 3]):
+            continue
+        a, b = span(k)
+        j = b
+        while j < len(lines) and (m2 := _ABILITY_SLUG_RE.match(lines[j])) and ("innate=True" in lines[j] or innate(m2.group(2))):
+            j = span(j)[1]
+        if j > b:
+            return _after_innates(lines[:a] + lines[b:j] + lines[a:b] + lines[j:], version)
+    return lines
 
 
 def _postprocess_hero_stat_card(lines, version=None):
@@ -444,3 +555,4 @@ _PER_MINUTES_FORMULA_RE = re.compile(
     r'(?:per|every)\s+(?:(?P<n>\d+)\s+)?min(?:ute)?s?\s*\)?$'
 )
 _MINUTE_GRID = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+

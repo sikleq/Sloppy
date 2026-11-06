@@ -85,6 +85,26 @@ def _postprocess_switched_note(lines):
     return out
 
 
+# a REWORK row that only goes on describing the row above it: "This results in swapping special attacks: …" under
+# "Both Liquid Fire and Liquid Frost abilities are now available … shared level and cooldown" (owner 2026-11-06, 7.38
+# Jakiro: "соединить в один … По сути это продолжение описания реворка")
+_REWORK_ROW_RE = re.compile(r'^(\s*W\(li\(")([^"]*)(", t\("REWORK"\)\)\))$')
+_CONTINUES_RE = re.compile(r"^(?:This results in |This means |As a result, |Which means )")
+
+
+def _postprocess_rework_continuation(lines):
+    out = []
+    for line in lines:
+        m = _REWORK_ROW_RE.match(line)
+        prev = _REWORK_ROW_RE.match(out[-1]) if out else None
+        if m and prev and _CONTINUES_RE.match(m.group(2)):
+            text = prev.group(2).rstrip(". ")
+            out[-1] = f"{prev.group(1)}{text}. {m.group(2)}{prev.group(3)}"
+            continue
+        out.append(line)
+    return out
+
+
 def _postprocess_per_minute(lines):
     """"<X> upgrade per minute increased from A to B" (a value that grows with game time, 7.41 Tormentor "Barrier
     upgrade per minute increased from 20 to 50") -> a minute table li_formula, as the barrier regen row (owner
@@ -322,6 +342,34 @@ def _drop_empty_lists(out):
                 i -= 1
             continue
         i += 1
+    return out
+
+
+_EXAMPLE_RE = re.compile(r"(?:such as|e\.g\.|for example,?|\blike) (?P<list>[A-Z][^.;:)]*)")
+_EXAMPLE_NAME_RE = re.compile(r"[A-Z][\w'\u2019-]*(?: (?:of|the|[A-Z][\w'\u2019-]*))*")
+_EXAMPLE_ROW_RE = re.compile(r'^(?P<head>\s*W\(li\("(?P<text>(?:[^"\\]|\\.)*)",.*?)(?P<tail>\)\))\s*$')
+
+
+def _postprocess_example_icons(lines):
+    """A row naming an item or a hero's ability as an example gets its icon (owner 2026-11-04: "если есть примеры, их надо
+    оформлять иконками"), through li(examples=...): the row's text stays a plain literal. A bare ability's name says nothing
+    of its hero ("like Heartstopper Aura"), it stays words: the reader of the draft adds it."""
+    from patch.mech_abilities import mech_example
+    out = []
+    for raw in lines:
+        row = _EXAMPLE_ROW_RE.match(raw)
+        if not row or "examples=" in raw:
+            out.append(raw)
+            continue
+        found = {}
+        for listed in _EXAMPLE_RE.finditer(row.group("text")):
+            for name in _EXAMPLE_NAME_RE.findall(listed.group("list")):
+                try:
+                    mech_example(name)
+                except ValueError:
+                    continue
+                found[name] = name
+        out.append(f'{row.group("head")}, examples={found!r}{row.group("tail")}' if found else raw)
     return out
 
 

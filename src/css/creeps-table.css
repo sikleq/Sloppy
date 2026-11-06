@@ -224,10 +224,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   font-size: 18px;
   letter-spacing: 1px;
   line-height: 1;
-  color: var(--text-main);
   text-decoration: none;
   height: 38px;
-  padding: 0 16px;
   display: inline-flex;
   align-items: center;
   border: 1px solid transparent;
@@ -241,14 +239,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .nav-tab:hover {
   background: var(--shadow-40);
-  color: #ffffff;
 }
 .nav-tab.active {
   background: var(--shadow-45);
-  color: var(--gold);
-  text-shadow:
-    0 0 10px var(--gold-line),
-    0 0  3px rgba(227, 196, 106, 0.25);
 }
 
 /* Header "embers": the main buttons are plain labels (no plates); the active one glows gold
@@ -327,14 +320,12 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   z-index: 120;
 }
 .nav-subtab {
-  font-size: 13px;
   font-weight: 600;
-  color: var(--text-muted-blue);
   text-decoration: none;
   padding: 7px 16px;
   border: 1px solid transparent;
   border-bottom: none;
-  border-radius: 7px 7px 0 0;   /* rounded top — sits on the subnav's bottom border */
+   /* rounded top — sits on the subnav's bottom border */
   margin-bottom: -1px;          /* overlap the 1px bottom border */
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   display: inline-flex;
@@ -362,7 +353,6 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   min-width: 184px;
   background: var(--bg-panel-2);
   border: 1px solid rgba(213, 207, 195, 0.20);
-  border-radius: 0 8px 8px 8px;
   padding: 5px;
   display: flex;
   flex-direction: column;

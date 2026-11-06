@@ -6,7 +6,7 @@ ability chips in the rows. The generator makes it (`_postprocess_same_change_abi
 import html as _html
 import math
 
-from .elements import MISSING_ICON_URL, ability
+from .elements import MISSING_ICON_URL, _dyn_record_card, _facet_any, _open_facet_block, ability
 from .images import ABIL_CDN
 from .state import _State
 
@@ -54,3 +54,30 @@ def ability_group(*abilities):
     cut = head.rfind('<div class="ability-block')
     block_open = head[cut:].replace('class="ability-block', 'class="ability-block has-icon-stack', 1)
     return head[:cut] + block_open + stack + rest
+
+
+def facet_group(*slugs):
+    """One block for two or more facets a hero lost in the same patch (owner 2026-11-05, 7.38 Arc Warden Order and
+    Disorder): their icons share the 48px square as ability_group's do, the names stand in one title, one "Removed" row
+    says it of them all. The row under it is scored once by li(), so each further facet is scored here: the hero's
+    balance stays what separate blocks gave."""
+    if len(slugs) < 2:
+        raise ValueError("facet_group needs two or more facets")
+    found = [_facet_any(slug) for slug in slugs]
+    missing = [s for s, f in zip(slugs, found) if not f]
+    if missing:
+        return f'<!-- facet_group: unknown slugs {missing} -->'    # as facet_header: a draft runs without its patch
+    icons = []
+    for i, (slug, (name, gradient, icon), (left, top, size)) in enumerate(zip(slugs, found, _tiles(len(slugs)))):
+        label = _html.escape(name, quote=True)
+        art = (f'<img src="../icons/facets/{icon}.png" alt="" loading="lazy" width="72" height="72" data-slug="{slug}">'
+               if icon else '')
+        icons.append(
+            f'<span class="stack-icon" data-tooltip="{label}" role="img" aria-label="{label}" '
+            f'style="left:{_px(left)};top:{_px(top)};width:{_px(size)};height:{_px(size)};z-index:{i + 1}">'
+            f'<span class="stack-facet-tile" style="background-image:{gradient}">{art}</span></span>')
+    stack = f'<div class="ability-icon-wrap ability-icon-stack">{"".join(icons)}</div>'
+    out = _open_facet_block(", ".join(f[0] for f in found), stack, "ability-block facet-block has-icon-stack")
+    for _ in slugs[1:]:
+        _dyn_record_card({"del"}, "Removed", facet=True, base_stat=False)
+    return out

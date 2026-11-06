@@ -1655,7 +1655,7 @@ def render_html() -> str:
 
     return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        '<title>SIKLE | Hero Stats</title>\n'
+        '<title>s/kle - Hero Stats</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={ASSET_VERSION}">\n'
         '</head>\n<body>\n'
@@ -1681,7 +1681,7 @@ def render_html() -> str:
         f'<script type="application/json" id="hs-game-constants">'
         f'{_json.dumps(_gc.for_js(), separators=(",", ":"))}'
         f'</script>\n'
-        f'<script defer src="src/scripts.js?v={ASSET_VERSION}"></script>\n'
+        f'<script defer src="src/scripts-table.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )
 

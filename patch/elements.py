@@ -10,7 +10,7 @@ import re
 from .images import (ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG, hero_img,
                      item_img, _LOCAL_ABIL_ICONS)
 from .state import _State, page_cache
-from .mech_abilities import LIST_TIPS, TIP_RAW, ability_chip, lift_ability_lists, rune_row_chip
+from .mech_abilities import LIST_TIPS, TIP_RAW, ability_chip, lift_ability_lists, row_examples, rune_row_chip
 from .terrain_notes import note_phrase, wrap_phrase
 
 try:
@@ -41,9 +41,13 @@ STAT_ICONS = {
     "agility":           "../icons/agility.webp",
     "intelligence":      "../icons/intelligence.webp",
     "universal":         "../icons/universal.webp",
+    "health_regen":      "../icons/health_regen.svg",     # scripts/gen/gen_regen_icons.py (owner 2026-11-06)
+    "mana_regen":        "../icons/mana_regen.svg",
 }
 
 STAT_DETECT_RULES = [
+    ("health_regen",      ("health regen", "hp regen")),
+    ("mana_regen",        ("mana regen",)),
     ("attack_projectile", ("attack projectile", "projectile speed")),
     ("magic_resist",      ("magic resist", "magic resistance")),
     ("evasion",           ("evasion",)),
@@ -558,8 +562,10 @@ def _removed_label(removed):
     return f' <span class="entity-removed-type">{removed}</span>', 'is-removed'
 
 
-def item_header(name, new=False, changed=False, removed=None, old_title=None):
-    """old_title: a renamed item shows "Old → New" like a renamed ability, no "renamed to" row (owner 2026-10-22)."""
+def item_header(name, new=False, changed=False, removed=None, old_title=None, cost=None):
+    """old_title: a renamed item shows "Old → New" like a renamed ability, no "renamed to" row (owner 2026-10-22).
+    cost: a new item's price, a tag on its icon instead of a line of its own (owner 2026-11-05, 7.38 Orb of Frost); a later
+    change of the price is a row as ever."""
     out = _close_ability_block()
     _State.current_hero = None
     _State.current_unit = None
@@ -588,9 +594,10 @@ def item_header(name, new=False, changed=False, removed=None, old_title=None):
     if old_title and old_title != name:
         name_html = (f'<span class="ability-title-rename"><span class="ability-title-old">{old_title}</span>'
                      f'<span class="ability-title-arrow">→</span>{name_html}</span>')
+    price = f'<span class="item-icon-cost" aria-label="Cost {cost}">{cost}</span>' if cost else ''
     # item-block: every framed box of an item hangs out on one common edge (CSS, owner 2026-09-28)
     return out + _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
-  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64"></a></div>
+  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64"></a>{price}</div>
   <div class="entity-name">{name_html}{type_label}</div>
 </div>'''
 
@@ -876,10 +883,15 @@ def _facet_row_ability_chip(text):
         # decreased number of +2 All Attributes bonuses" -> "No longer has …")
         rest = text[m.end():]
         return rest[:1].upper() + rest[1:]
-    slug = _hero_ability_slug(_State.current_hero, m.group(1))
-    if slug not in _LOCAL_ABIL_ICONS:
-        return text
-    return ability_chip(m.group(1), f"{ABIL_CDN}{slug}.png") + text[m.end():]
+    name = m.group(1)
+    slug = _hero_ability_slug(_State.current_hero, name)
+    if slug in _LOCAL_ABIL_ICONS:
+        return ability_chip(name, f"{ABIL_CDN}{slug}.png") + text[m.end():]
+    # an innate without art of its own: the generic innate icon, as its block's header (owner 2026-11-05, 7.38 Ironwood
+    # Treant "Spirit of the Forest: Treant Multiplier …")
+    if slug in _INNATE_SLUGS or (_State.current_hero, name) in INNATE_ABILITIES:
+        return ability_chip(name, INNATE_ICON_URL) + text[m.end():]
+    return text
 
 
 def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=None):
@@ -991,18 +1003,20 @@ def _facet_from_game(slug):
     return None
 
 
-def facet_header(slug):
-    from .badges import FACETS, _FACET_COLOR_GRADIENT
-    from .images import _FACET_ICONS
+def _facet_any(slug):
+    """(name, gradient css, icon file stem or None) of a facet of the site's list or of the game's files; None if neither."""
+    from .badges import FACETS, _FACET_COLOR_GRADIENT, facet_look
     if slug in FACETS:
-        name, color = FACETS[slug]
-        fi = _FACET_ICONS.get(slug)
-        icon_name = fi[1] if isinstance(fi, list) and len(fi) > 1 else None
+        name, color, icon_name = facet_look(slug)
     elif (game := _facet_from_game(slug)):
         name, color, icon_name = game
     else:
-        return f'<!-- facet_header: unknown slug {slug} -->'
-    gradient = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"])
+        return None
+    return name, _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"]), icon_name
+
+
+def _open_facet_block(name, icon_html, block_class="ability-block facet-block"):
+    """A facet's block with `icon_html` as its picture, after the hero's "Facets" title if this is his first."""
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
     if _State.current_hero and not _State.seen_facets_subgroup:
@@ -1011,26 +1025,29 @@ def facet_header(slug):
     _State.ability_block_open = True
     _State.current_block_is_facet = True
     _State.current_facet_name = name
+    return out + f'<div class="{block_class}">{icon_html}<h4 class="ability-title">{name}</h4>'
+
+
+def facet_header(slug):
+    found = _facet_any(slug)
+    if not found:
+        return f'<!-- facet_header: unknown slug {slug} -->'
+    name, gradient, icon_name = found
     icon_overlay = (f'<img src="../icons/facets/{icon_name}.png" alt="" '
                     f'class="facet-icon-overlay" loading="lazy" width="72" height="72" '
                     f'data-slug="{slug}">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
-    return out + (f'<div class="ability-block facet-block">'
-                  f'{icon_html}'
-                  f'<h4 class="ability-title">{name}</h4>')
+    return _open_facet_block(name, icon_html)
 
 
 def _facet_parts(slug):
     """(name, gradient css, icon file stem or None) of a facet."""
-    from .badges import FACETS, _FACET_COLOR_GRADIENT
-    from .images import _FACET_ICONS
+    from .badges import FACETS, _FACET_COLOR_GRADIENT, facet_look
     if slug not in FACETS:
         raise KeyError(f"unknown facet {slug!r}: add it to patch/badges.FACETS")
-    name, color = FACETS[slug]
-    fi = _FACET_ICONS.get(slug)
-    return name, _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"]), (
-        fi[1] if isinstance(fi, list) and len(fi) > 1 else None)
+    name, color, icon = facet_look(slug)
+    return name, _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"]), icon
 
 
 def _facet_icon_html(slug):
@@ -1051,162 +1068,6 @@ def _facet_chip(slug):
             f'aria-label="{label}">{img}</span>')
 
 
-def _facet_pane(desc, facet, version):
-    """(head, rows) of a facet card pane. A text that says no kind ("Passive: …") gets the kind of the ability the
-    facet changes (patch/ability_kv.facet_ability) — 7.39 Transference's card said no Passive (owner 2026-10-27).
-    No single ability named for the facet in the files: no kind, as before."""
-    from .ability_kv import ability_props, facet_ability
-    from .aghs_text import ability_name
-    abil = facet_ability(facet, version) if version else None
-    if not abil:
-        return _pane_parts(desc, facet=True)
-    # the header names the ability the facet changes, when the text doesn't (owner 2026-10-27, 7.39 Old Blood:
-    # "Active" alone didn't say that it changes Bloodrage)
-    hint = ability_name(abil, version)
-    head, rows = _pane_parts(desc, facet=True, name_hint=hint)
-    kind = ability_props(abil, version)["kind"] if 'class="iab-kind"' not in head else ""
-    return _pane_parts(desc, props={"kind": kind}, facet=True, name_hint=hint) if kind else (head, rows)
-
-
-_CARD_LINE = ('<svg class="ability-change-connector" viewBox="0 0 100 100" preserveAspectRatio="none" '
-              'aria-hidden="true"><path d="" /></svg>')
-
-
-def new_facet(slug, desc, summary=None, tag="new"):
-    """New or reworked facet — renders like ability_change(old=None, tag=...) but with facet styling."""
-    from .badges import FACETS, _FACET_COLOR_GRADIENT
-    from .images import _FACET_ICONS
-    tag_key = tag.lower() if tag else "new"
-    _State.current_ability_slug = None
-    _State.current_ability_innate = False
-    _dyn_record_card({'new'} if tag_key == 'new' else {'rework'}, facet=True, base_stat=False)
-    if slug not in FACETS:
-        return f'<!-- new_facet: unknown slug {slug} -->'
-    name, color = FACETS[slug]
-    gradient = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"])
-    fi = _FACET_ICONS.get(slug)
-    icon_name = fi[1] if isinstance(fi, list) and len(fi) > 1 else None
-    out = _close_ability_block()
-    _State.next_ul_is_hero_stats = False
-    if _State.current_hero and not _State.seen_facets_subgroup:
-        out += '<h4 class="subgroup">Facets</h4>'
-        _State.seen_facets_subgroup = True
-    _State.ability_block_open = True
-    _State.current_block_is_facet = False  # content already in panes — suppress ability() warning
-    icon_overlay = (f'<img src="../icons/facets/{icon_name}.png" alt="" '
-                    f'class="facet-icon-overlay" loading="lazy" width="72" height="72">') if icon_name else ''
-    icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
-                 f'style="background-image:{gradient}">{icon_overlay}</div>')
-    head_html, desc_html = _facet_pane(desc, slug, _State.current_patch_version)
-    default_summary = "New facet" if tag_key == "new" else "Reworked facet"
-    summary_text = summary or default_summary
-    tag_label = tag_key.upper()
-    summary_row = (
-        f'<ul class="changes ability-change-summary-ul">'
-        f'<li data-tag="{tag_key}">'
-        f'<span class="badge {tag_key}" data-tag="{tag_key}">{tag_label}</span>'
-        f'<span class="row-text">{summary_text}</span>'
-        f'</li>'
-        f'</ul>'
-    )
-    panes_html = (
-        f'<div class="ability-change unified-panes is-single-new" data-tag="{tag_key}">'
-        f'<div class="ability-change-pane ability-change-new">'
-        f'{head_html}<div class="ability-change-body">{desc_html}</div>'
-        f'</div>'
-        f'</div>'
-    )
-    return out + (
-        f'<div class="ability-block facet-block ability-change-block">'
-        f'{icon_html}'
-        f'{_CARD_LINE}'
-        f'<h4 class="ability-title">{name}</h4>'
-        f'{summary_row}'
-        f'{panes_html}'
-    )
-
-
-def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_ability=None):
-    """Reworked facet — old→new two-pane layout with facet gradient/icon styling.
-
-    old_ability / new_ability: ability slug shown as a mini-header inside the respective pane.
-    """
-    from .badges import FACETS, _FACET_COLOR_GRADIENT
-    from .images import _FACET_ICONS
-    _State.current_ability_slug = None
-    _State.current_ability_innate = False
-    _dyn_record_card({'rework'}, facet=True, base_stat=False)
-    if slug not in FACETS:
-        return f'<!-- facet_change: unknown slug {slug} -->'
-    name, color = FACETS[slug]
-    gradient = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"])
-    fi = _FACET_ICONS.get(slug)
-    icon_name = fi[1] if isinstance(fi, list) and len(fi) > 1 else None
-    out = _close_ability_block()
-    _State.next_ul_is_hero_stats = False
-    if _State.current_hero and not _State.seen_facets_subgroup:
-        out += '<h4 class="subgroup">Facets</h4>'
-        _State.seen_facets_subgroup = True
-    _State.ability_block_open = True
-    _State.current_block_is_facet = False
-
-    icon_overlay = (f'<img src="../icons/facets/{icon_name}.png" alt="" '
-                    f'class="facet-icon-overlay" loading="lazy" width="72" height="72">') if icon_name else ''
-    icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
-                 f'style="background-image:{gradient}">{icon_overlay}</div>')
-
-    from .meta import _prev_patch_version
-
-    def _pane_body(desc, version):
-        head, rows = _facet_pane(desc, slug, version)
-        return f'{head}<div class="ability-change-body">{rows}</div>'
-
-    def _ability_head(abil_slug):
-        if not abil_slug:
-            return ''
-        icon_url = f'{ABIL_CDN}{abil_slug}.png'
-        on_err = f"this.onerror=null;this.src='{MISSING_ICON_URL}';"
-        dname = _SLIM_CACHE.get(abil_slug, {}).get('dname', '') if _SLIM_CACHE else ''
-        return (
-            f'<div class="ability-change-head">'
-            f'<div class="ability-change-icon-wrap">'
-            f'<img class="ability-change-icon" src="{icon_url}" alt="{dname}" '
-            f'loading="lazy" onerror="{on_err}">'
-            f'</div>'
-            f'<div class="ability-change-name">{dname}</div>'
-            f'</div>'
-        )
-
-    summary_text = summary or "Facet reworked."
-    summary_row = (
-        f'<ul class="changes ability-change-summary-ul">'
-        f'<li data-tag="rework">'
-        f'<span class="badge rework" data-tag="rework">REWORK</span>'
-        f'<span class="row-text">{summary_text}</span>'
-        f'</li>'
-        f'</ul>'
-    )
-    panes_html = (
-        f'<div class="ability-change unified-panes is-in-place" data-tag="new del rework">'
-        f'<div class="ability-change-pane ability-change-old">'
-        f'{_ability_head(old_ability)}'
-        f'{_pane_body(old_desc, _prev_patch_version(_State.current_patch_version))}'
-        f'</div>'
-        f'<span class="ability-change-arrow">→</span>'
-        f'<div class="ability-change-pane ability-change-new">'
-        f'{_ability_head(new_ability)}'
-        f'{_pane_body(new_desc, _State.current_patch_version)}'
-        f'</div>'
-        f'</div>'
-    )
-    return out + (
-        f'<div class="ability-block facet-block ability-change-block">'
-        f'{icon_html}'
-        f'<h4 class="ability-title">{name}</h4>'
-        f'{summary_row}'
-        f'{_CARD_LINE}'
-        f'{panes_html}'
-    )
 
 
 def ul_open():
@@ -1671,45 +1532,8 @@ def mark_number_highlights(html_text: str) -> str:
     return _HL_NUM_RE.sub(r'<span class="iab-hl \1 iab-hl-num"\2>\3</span>', html_text)
 
 
-def _hl_numbers(text: str) -> list:
-    """[(start, end, kind, plain number)] of the number highlights in a pane's html."""
-    return [(m.start(), m.end(), m.group(1)[7:], re.sub(r"<[^>]+>", "", m.group(3)))
-            for m in _HL_NUM_RE.finditer(text)]
-
-
-def _pair_number_tips(old_html: str, new_html: str) -> str:
-    """The new pane's changed numbers get the item cards' % on hover, paired in order with the old pane's (the
-    same count on both sides, else none: no guessing which was which)."""
-    olds, news = _hl_numbers(old_html), _hl_numbers(new_html)
-    if not news or len(olds) != len(news):
-        return new_html
-    for (_, _, _, ov), (s, e, kind, nv) in reversed(list(zip(olds, news))):
-        span = new_html[s:e]
-        inner = span[span.index(">") + 1:-len("</span>")]
-        tipped = _number_tip(ov, inner, kind)
-        if not tipped:
-            continue
-        opener = re.sub(r'class="iab-hl (iab-hl-\w+)"', r'class="iab-hl \1 iab-hl-num"', span[:span.index(">") + 1])
-        new_html = new_html[:s] + opener + tipped + "</span>" + new_html[e:]
-    return new_html
-
-
-def _number_tip(old_plain, new_inner, kind):
-    """The new number's html with the item cards' % on hover ("200/300/400" -> "200/250/300": 0% / -17% / -25%), or
-    None when there is no % to say. kind: the new side's colour (buff / nerf) says which way is better."""
-    from .badges import b
-    num = lambda s: [float(x.replace(",", "").replace("−", "-")) for x in re.findall(r"[+\-−]?\d[\d.,]*", s)]
-    o, n = num(old_plain), num(re.sub(r"<[^>]+>", "", new_inner))
-    if not o or not n or (len(o) > 1 and len(n) > 1 and len(o) != len(n)) or o == n:
-        return None
-    mean = lambda xs: sum(xs) / len(xs)
-    lower_better = (kind == "buff") == (mean(n) < mean(o)) if kind in ("buff", "nerf") else False
-    pct = b(o if len(o) > 1 else o[0], n if len(n) > 1 else n[0], l=lower_better)
-    return _iab_hint(new_inner, f'<span class="iab-tip-pct">{pct}</span>') if "badge" in pct else None
-
-
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False, covered=False,
-       facet=None):
+       facet=None, examples=None):
     """covered=True: the card above already shows this change (highlighted) — the row is hidden but keeps its weight
     and tag for the filters, like the item cards' covered rows (owner 2026-10-21, 7.41 Overclocking).
     facet="<facet slug>": a facet's talent, written under the hero's Talents with the facet's chip before it."""
@@ -1720,6 +1544,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         extra = (extra or "") + _tshots
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
         _plain_text = text                     # the weights read the words, not the highlight spans
+        text = row_examples(text, examples)
         text, badge, extra = _mark_talent_swap(text, badge, extra)
         if _State.in_stats_ul:
             _m = _FACET_INNATE_PREFIX_RE.match(text)
@@ -1750,6 +1575,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         covered = True                          # "Now granted by Aghanim's X": the upgrade's card under it says so
     elif isinstance(text, str) and _aghs_rework_card(_plain_text, covered):
         covered = True                          # the old -> new upgrade card under the rows shows it
+    elif isinstance(text, str) and not covered and "rework" in dyn_tags and _upgrade_wording_covered(_plain_text):
+        covered = True                          # "Aghanim's Scepter's X changed from … to …": the card's two texts say it
     elif isinstance(text, str) and not covered and _scale_card(_plain_text):
         covered = True                          # ... the old -> new header strips show what it scales with
     elif isinstance(text, str) and not covered and not re.match(r"\s*Aghanim's", _plain_text):
@@ -2260,13 +2087,6 @@ def components(*parts, total, recipe=None):
             f'</div>')
 
 
-def item_cost(gold):
-    return (f'<div class="item-cost-box">'
-            f'<span class="item-cost-label">Cost</span>'
-            f'<span class="item-cost-val">{gold}</span>'
-            f'</div>')
-
-
 def provides(*items):
     if len(items) == 1 and isinstance(items[0], str) and ',' in items[0]:
         items = [s.strip() for s in items[0].split(',') if s.strip()]
@@ -2570,7 +2390,6 @@ from .cards_item_abilities import (  # noqa: E402
     _iab_text_change,
     _iab_unpaired_row,
     _item_ability_html,
-    _pane_parts,
     _tone_cls,
     iab_attach_tail,
 )
@@ -2583,4 +2402,5 @@ from .cards_aghs import (  # noqa: E402
     _granted_card,
     _granted_now_covered,
     _scale_card,
+    _upgrade_wording_covered,
 )

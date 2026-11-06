@@ -24,7 +24,6 @@ nav.top-nav {
      backdrop-filter layer pinned so scroll only needs to shift it, not
      rebuild it — purely a compositing hint, no visual change. */
   will-change: backdrop-filter;
-  border-bottom: 1px solid rgba(163, 135, 73, 0.16);
   box-shadow:
     inset 0 1px 0 rgba(255, 244, 209, 0.06),
     inset 0 -1px 0 rgba(0, 0, 0, 0.44),
@@ -61,13 +60,6 @@ nav.top-nav::after {
   bottom: 0;
   height: 1px;
   pointer-events: none;
-  background: linear-gradient(90deg,
-    var(--gold-0) 0%,
-    rgba(227, 196, 106, 0.10) 12%,
-    var(--gold-14) 50%,
-    rgba(227, 196, 106, 0.10) 88%,
-    var(--gold-0) 100%);
-  opacity: 0.88;
 }
 /* Table pages (Neutral Creeps / Unit Abilities / Mana Items, all wrap their
    content in .creeps-page) keep the glass LOOK (cool top rim + gradient body)
@@ -107,7 +99,8 @@ body:has(.creeps-page) nav.top-nav {
   gap: 9px;
   text-decoration: none;
   color: var(--text-bright);
-  padding: 6px 10px 6px 4px;
+  padding: 0 12px 0 0;
+  margin: -7px 0 -3px -10px;      /* .nav-inner's padding: the logo meets the bar's top, bottom and left edge */
   justify-self: start;
   border-radius: 0;
   position: relative;
@@ -145,14 +138,13 @@ html.cb-mode button.cb-toggle::after {
   content: ""; position: absolute; left: 18%; right: 18%; bottom: 5px; height: 2px;
   background: var(--gold); box-shadow: 0 0 6px #ff9a2a;
 }
+/* the avatar as tall as the header, at its very left edge (owner 2026-11-05): the brand cancels the bar's own padding */
 .nav-brand-logo {
-  width: 54px;
-  height: 54px;
-  object-fit: contain;
+  width: var(--site-nav-h, 76px);
+  height: var(--site-nav-h, 76px);
+  object-fit: cover;
   flex-shrink: 0;
-  filter:
-    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.62))
-    drop-shadow(0 0 3px rgba(227, 196, 106, 0.05));
+  display: block;
 }
 .nav-brand-text {
   font-family: var(--font-j10);
@@ -162,6 +154,10 @@ html.cb-mode button.cb-toggle::after {
   color: #d7d1c4;
   text-shadow:
     0 1px 0 rgba(0, 0, 0, 0.68);
+}
+.nav-brand-slash {
+  color: #fff;
+  text-shadow: -2px 0 #19e3ff, 2px 0 #ff2bd6, 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 .nav-brand-sikle {
   color: var(--gold-dim);

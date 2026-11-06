@@ -128,9 +128,12 @@ def _postprocess_same_change_abilities(lines):
             i += 1
             continue
         group, rows, end = [first[0]], first[1], first[2]
+        notes = [_note_of(rows)]
         nxt = block_at(end)
-        while nxt and [r.strip() for r in nxt[1]] == [r.strip() for r in rows] and _siblings(group[0][1], nxt[0][1]):
+        while nxt and (([r.strip() for r in nxt[1]] == [r.strip() for r in rows] and _siblings(group[0][1], nxt[0][1]))
+                       or _same_row_own_notes(rows, nxt[1], group[0][1], nxt[0][1])):
             group.append(nxt[0])
+            notes.append(_note_of(nxt[1]))
             end = nxt[2]
             nxt = block_at(end)
         if len(group) < 2:
@@ -138,9 +141,33 @@ def _postprocess_same_change_abilities(lines):
         else:
             ind = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
             pairs = ", ".join(f'("{t}", "{s}")' for t, s in group)
+            if len(set(notes)) > 1:              # each ability's own [?] in one, under its name
+                merged = "<br>".join(name + ": " + _LEVELS_OF_RE.sub(r"\1 (\2) \3", line)
+                                     for (name, _s), note in zip(group, notes) for line in note.split("<br>"))
+                rows = [_ROW_NOTE_RE.sub(lambda m: f'{m.group(1)}, extra=inline_note("{merged}")))', rows[0])]
             out += [f'{ind}W(ability_group({pairs}))', lines[i + 1], *rows, f'{ind}W(ul_close())']
         i = end
     return out
+
+
+# "Travel Distance for levels 9 and 10 of Wex is 3900/4200" -> "Travel Distance (Wex) 3900/4200": the row says the levels
+_LEVELS_OF_RE = re.compile(r"^(.+?) for levels \d+ and \d+ of (\w+) is (.+)$")
+_ROW_NOTE_RE = re.compile(r'^(\s*W\(li\(.*?), extra=inline_note\("((?:[^"\\]|\\.)*)"\)\)\)\s*$')
+
+
+def _note_of(rows):
+    m = _ROW_NOTE_RE.match(rows[0]) if len(rows) == 1 else None
+    return m.group(2) if m else ""
+
+
+def _same_row_own_notes(rows, other, slug, other_slug):
+    """One row each, the same words and tag, each its own [?] (owner 2026-11-06, 7.38 Tornado, E.M.P., Alacrity, Chaos
+    Meteor, Sun Strike: "Added values for levels 9 and 10" — "имеют общий текст, поэтому их можно в одну строку, а
+    иконки по аналогии с Attribute Shift"); the hero's abilities, not only the sibling ones."""
+    if len(rows) != 1 or len(other) != 1 or slug.split("_")[0] != other_slug.split("_")[0]:
+        return False
+    a, b = _ROW_NOTE_RE.match(rows[0]), _ROW_NOTE_RE.match(other[0])
+    return bool(a and b and a.group(1).strip() == b.group(1).strip())
 
 
 _GROUP_NAMES_RE = re.compile(r'\("([^"]+)", "[^"]+"\)')

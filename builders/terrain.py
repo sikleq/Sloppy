@@ -1407,7 +1407,7 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
 
     return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        '<title>SIKLE | Terrain</title>\n'
+        '<title>s/kle - Terrain</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={ASSET_VERSION}">\n'
         '</head>\n<body>\n'
@@ -1430,7 +1430,7 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
         '</div>\n'
         '</div>\n'
         '</div>\n'
-        f'<script defer src="src/scripts.js?v={ASSET_VERSION}"></script>\n'
+        f'<script defer src="src/scripts-base.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )
 

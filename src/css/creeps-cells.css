@@ -62,16 +62,12 @@
   text-decoration: underline dotted rgba(213, 207, 195, 0.45);
   text-underline-offset: 2px;
 }
-.lvl-toggle:hover,
-.lvl-toggle[aria-expanded="true"] { color: #e9e2d4; }
 .lvl-popover {
   position: fixed;
   z-index: 80;
   display: none;
   white-space: nowrap;
-  background: var(--bg-panel);
   border: 1px solid var(--blue-40);
-  border-radius: 6px;
   padding: 5px 9px;
   font-size: 12px;
   font-variant-numeric: tabular-nums;

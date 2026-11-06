@@ -68,8 +68,6 @@
 .cal-mode-select {
   background: var(--bg-panel-3);
   border: 1px solid var(--line);
-  color: var(--text-main);
-  padding: 5px 28px 5px 12px;
   /* Fixed width so the View select on every page is the same size regardless
      of which option label is longest (Expanded vs. Auras vs. Standard). */
   min-width: 130px;
@@ -79,7 +77,6 @@
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238b949e' d='M0 0l5 6 5-6z'/></svg>");
   background-repeat: no-repeat;
   background-position: right 10px center;
 }
@@ -97,13 +94,11 @@
   padding: 5px 10px;
   background: var(--bg-panel-3);
   border: 1px solid var(--line);
-  border-radius: 5px;
   font-size: 12.5px;
   color: var(--text-main);
   cursor: pointer;
   user-select: none;
 }
-.ua-upgrades-toggle:hover { border-color: var(--gold); }
 .ua-upgrades-toggle .ua-switch-input {
   position: absolute;
   opacity: 0;
@@ -116,27 +111,18 @@
   display: inline-block;
   width: 30px;
   height: 16px;
-  background: var(--line);
-  border-radius: 999px;
   transition: background 150ms ease;
   flex-shrink: 0;
 }
 .ua-upgrades-toggle .ua-switch::after {
   content: '';
   position: absolute;
-  top: 2px; left: 2px;
-  width: 12px;
-  height: 12px;
-  background: var(--text-main);
-  border-radius: 50%;
   transition: transform 150ms ease, background 150ms ease;
 }
 /* ON state = the site-wide gold accent (var(--gold) — the "sikle" wordmark gold, same
    as the active terrain-toolbar buttons). Unifies every toggle's on-colour. */
-.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch { background: var(--gold); }
 .ua-upgrades-toggle .ua-switch-input:checked + .ua-switch::after {
   transform: translateX(14px);
-  background: #fff;
 }
 .ua-upgrades-toggle .ua-switch-input:focus-visible + .ua-switch {
   outline: 2px solid var(--gold);
@@ -198,7 +184,6 @@
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  cursor: pointer;
   user-select: none;
   padding: 10px 16px;
   display: flex;
@@ -235,24 +220,12 @@
    cool-blue border) instead of the default dark toolbar pill. It now lives in
    the year block's header row (top-right), not a separate bar above. */
 .cal-compact-toggle.ua-upgrades-toggle {
-  background:
-    linear-gradient(180deg, rgba(46, 45, 42, 0.95) 0%, rgba(34, 33, 29, 0.95) 100%);
-  border: 1px solid var(--blue-35);
-  border-radius: 6px;
   color: var(--text-bright);
   padding: 6px 12px;
   gap: 9px;
-  box-shadow:
-    inset 0 1px 0 var(--blue-cold-10),
-    0 2px 6px var(--shadow-35);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .cal-compact-toggle.ua-upgrades-toggle:hover { border-color: rgba(213, 207, 195, 0.6); }
-.cal-compact-toggle .ua-upgrades-label {
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.4px;
-}
 @media (max-width: 1400px) {
   /* Stop the breakout when the viewport can't comfortably host it. */
   .cal-year-block.is-current { margin-left: 0; margin-right: 0; }
@@ -272,10 +245,7 @@
     linear-gradient(180deg, rgba(46, 45, 42, 0.95) 0%, rgba(34, 33, 29, 0.95) 100%);
   border: 1px solid var(--blue-35);
   border-radius: 6px;
-  color: var(--text-bright);
   font: inherit;
-  font-size: 16px;
-  font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
   padding: 5px 11px;
@@ -287,7 +257,6 @@
 .cal-year-current-val { font-variant-numeric: tabular-nums; }
 .cal-year-caret {
   font-size: 10px;
-  color: var(--text-muted-blue-2);
   line-height: 1;
   transition: transform 0.15s;
 }
@@ -314,28 +283,16 @@
   /* No max-height / overflow → the full year list shows without a scrollbar
      (there are only ~9–15 years). */
   background: var(--bg-panel-2);
-  border: 1px solid var(--blue-30);
-  border-radius: 8px;
   box-shadow: 0 10px 28px var(--shadow-55);
 }
 .cal-year-menu[hidden] { display: none; }
 .cal-year-opt {
   text-align: center;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-main);
   padding: 7px 22px;
-  border-radius: 5px;
   cursor: pointer;
   letter-spacing: 0.5px;
   font-variant-numeric: tabular-nums;
   transition: background 0.1s, color 0.1s;
-}
-.cal-year-opt:hover { background: rgba(227, 196, 106, 0.12); color: #fff; }
-.cal-year-opt.is-selected {
-  background: rgba(227, 196, 106, 0.18);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.35);
 }
 .cal-year-summary {
   display: flex;

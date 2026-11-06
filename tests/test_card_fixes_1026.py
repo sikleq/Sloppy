@@ -36,7 +36,7 @@ def test_the_aghanim_word_is_its_icon_in_the_header():
 def test_shares_level_goes_to_the_header():
     head, body = cards_item_abilities._pane_parts([el.hl("Shares level with Kinetic Field", "del") + ".", "Creates a wall."],
                                 {"kind": "Active"})
-    assert _title(head) == "Active – shares level with Kinetic Field"
+    assert _title(head) == "Active – levels with Kinetic Field"
     assert "Shares level" not in body and "Creates a wall." in body
 
 
@@ -49,7 +49,7 @@ def test_only_one_level_is_never_said_and_granted_is_in_the_header():
 
 def test_granted_and_shares_level_together():
     head, _ = cards_item_abilities._pane_parts(["Shares level with Demonic Purge.", "Cleanses."], {"kind": "Active"}, granted="shard")
-    assert _title(head) == "Active – granted by Aghanim's Shard, shares level with Demonic Purge"
+    assert _title(head) == "Active – granted by Aghanim's Shard, levels with Demonic Purge"
 
 
 def test_kinetic_fence_card_says_it_in_the_headers_not_the_summary():
@@ -65,7 +65,7 @@ def test_kinetic_fence_card_says_it_in_the_headers_not_the_summary():
         el._close_ability_block()
         _State.current_patch_version = None
     titles = [_title(h) for h in re.findall(r'<div class="iab-head pane-head">.*?</div>', html)]
-    assert titles == ["Active – shares level with Kinetic Field", "Active – granted by Aghanim's Shard"]
+    assert titles == ["Active – levels with Kinetic Field", "Active – granted by Aghanim's Shard"]
     assert "(Aghanim's Shard upgrade)" not in html and 'aghanim-marker shard' in html
     assert "one level" not in html
 

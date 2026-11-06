@@ -28,7 +28,6 @@
 .toolbar-panel .view-group {
   background: transparent; border-color: transparent;
 }
-.toolbar-panel .ua-upgrades-toggle:hover { border-color: transparent; }
 .toolbar-panel .ua-upgrades-toggle { padding: 4px 4px; gap: 5px; }
 /* Thin divider before every control except the first — so the panel reads as one
    surface with sections. EXCEPT between two consecutive switches (they group
@@ -36,7 +35,7 @@
 .toolbar-panel > *:not(:first-child) { position: relative; padding-left: 12px; }
 .toolbar-panel > *:not(:first-child)::before {
   content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-  width: 1px; height: 18px; background: var(--line);
+  width: 1px; height: 18px;
 }
 .toolbar-panel > .ua-upgrades-toggle + .ua-upgrades-toggle { padding-left: 4px; }
 .toolbar-panel > .ua-upgrades-toggle + .ua-upgrades-toggle::before { content: none; }
@@ -54,11 +53,9 @@
   align-items: center;
   gap: 6px;
   height: 28px;
-  padding: 0 8px 0 6px;
   border: 1px solid var(--white-12);
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.035);
-  color: var(--text-main);
   font-family: inherit;
   font-size: 12px;
   cursor: pointer;
@@ -96,25 +93,18 @@
 .hs-attr-filter[aria-pressed="true"] {
   border-color: rgba(227, 196, 106, 0.82);
   background: var(--gold-14);
-  box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.12);
 }
 .hs-attack-filter .atk-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 18px;
   box-sizing: border-box;
-  border-radius: 5px;
-  background: linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 .hs-attack-filter .atk-badge img {
   width: 12px;
   height: 12px;
   object-fit: contain;
   display: block;
-  opacity: 0.9;
 }
 .hs-attr-filter img {
   width: 18px;

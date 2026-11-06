@@ -252,7 +252,6 @@
   border: 1px solid var(--line);
   border-radius: 5px;
   background: var(--bg-panel);
-  color: var(--text-bright);
   font: inherit;
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -316,9 +315,7 @@
   color: var(--text-main); font-family: inherit; font-size: 12.5px;
   cursor: pointer; user-select: none; transition: color 0.12s;
 }
-.hd-dd-btn:hover .hd-dd-label,
-.hd-dd-btn[aria-expanded="true"] .hd-dd-label { color: #fff; }
-.hd-dd-caret { color: var(--text-dim); flex: none; transition: transform 0.12s; }
+.hd-dd-caret { flex: none; transition: transform 0.12s; }
 .hd-dd-btn[aria-expanded="true"] .hd-dd-caret { transform: rotate(180deg); color: var(--text-main); }
 .hd-dd-badge { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
 .hd-dd-badge:empty { display: none; }
@@ -340,7 +337,7 @@
 .hd-dd-opt:hover { background: var(--bg-panel-3); }
 .hd-dd-opt input { accent-color: var(--gold); width: 14px; height: 14px; cursor: pointer; flex: none; }
 .hd-dd-all { font-weight: 700; color: var(--gold); }   /* the "All" master row */
-.hd-dd-sep { height: 1px; background: var(--line); margin: 3px 2px; }
+.hd-dd-sep { height: 1px; margin: 3px 2px; }
 /* The dynamics toolbar must out-stack the table's sticky header/corner cells
    (z up to 52, hover-zoom 60) so an open dropdown popover isn't hidden under them.
    Overrides the z-index:6 from `.creeps-scroll > .inbox-bar`. */
@@ -362,7 +359,6 @@
   width: 44px; padding: 3px 2px;
   border-bottom: 1px solid var(--line); border-radius: 0; transition: border-color 0.12s;
 }
-.toolbar-panel .mr-price-input:focus { border-bottom-color: var(--gold); }
 .toolbar-panel .mr-price-clear { border-left: none; }
 /* Uniform 32px height for the flat switches too, so every panel control lines up. */
 .toolbar-panel .ua-upgrades-toggle { height: 32px; }

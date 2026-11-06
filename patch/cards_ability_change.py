@@ -5,8 +5,8 @@ import re
 
 from .images import ABIL_CDN, _LOCAL_ABIL_ICONS
 from .state import _State
-from .elements import (INNATE_ICON_URL, MISSING_ICON_URL, _close_ability_block, _dyn_record_card, _pair_number_tips,
-                       inline_note)
+from .elements import INNATE_ICON_URL, MISSING_ICON_URL, _close_ability_block, _dyn_record_card, inline_note
+from .number_tips import _pair_number_tips
 from .cards_item_abilities import _CARD_SEQ, _iab_meta_marks, _pane_parts, _pane_props, _pane_values
 from .cards_aghs import _GRANTED_CARDS, _aghs_inline, _granted_flag, _rework_diff_html, _shares_level
 
@@ -28,6 +28,29 @@ def _take_aghs(spec):
     rest = desc[0][m.end():]
     desc = ([rest] if rest.strip() else []) + desc[1:]
     return dict(spec, desc=desc), (m.group(1) or m.group(2)).lower()
+
+
+RENAME_SHARE = 0.6        # share of the game's value names two slugs have in common to be one ability renamed
+
+
+def renamed(old_slug, new_slug, version):
+    """The same ability under a new slug: the old one gone from the game, most of its values (their names in the game
+    files) kept by the new one — 7.41 Call of the Wild Hawk -> Summon Raptors 94%, Boar -> Razorback 100%; Tinker's
+    Defense Matrix -> Deploy Turrets 0% is another ability. One icon, the values compared (owner 2026-11-06:
+    "способность не поменялась, просто название … Иконку тоже не надо двойную делать")."""
+    if not old_slug or not new_slug or old_slug == new_slug or not version:
+        return False
+    from .ability_kv import _hero_blocks
+    from .meta import _prev_patch_version
+    try:
+        now, before = _hero_blocks(version), _hero_blocks(_prev_patch_version(version))
+    except Exception:                           # no game files for that patch: not a rename we can prove
+        return False
+    if old_slug in now or new_slug in before or old_slug not in before or new_slug not in now:
+        return False
+    a = set((before[old_slug].get("AbilityValues") or {}).keys())
+    b = set((now[new_slug].get("AbilityValues") or {}).keys())
+    return bool(a) and len(a & b) / len(a | b) >= RENAME_SHARE
 
 
 def game_ability_desc(slug, version=None, note=None):
@@ -85,7 +108,18 @@ def new_ability(name, slug, note=None, innate=False, version=None):
     return ability_change(None, spec, summary="New ability.", tag="new")
 
 
-def ability_change(old, new, summary=None, tag=None, sub=False):
+_ROWS_FIRST = "<!--ROWSFIRST-->"
+
+
+def ability_change(old, new, summary=None, tag=None, sub=False, rows_first=None):
+    """rows_first: a function returning the ability's plain li() rows: they stand before the caption, so all its tagged rows
+    are in one place above the card (owner 2026-11-05, Arc Warden 7.38). A function, as a row must be made after the card
+    has set the ability it belongs to and the values it hides."""
+    html = _ability_change(old, new, summary, tag, sub, bool(rows_first))
+    return html.replace(_ROWS_FIRST, "".join(rows_first()), 1) if rows_first else html
+
+
+def _ability_change(old, new, summary, tag, sub, rows_first):
     new, _aghs_new = _take_aghs(new)
     old, _aghs_old = _take_aghs(old) if old is not None else (None, None)
     from .meta import _prev_patch_version
@@ -93,6 +127,9 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
     _granted_by = {"new": _aghs_new or _granted_flag(new.get("slug"), _State.current_patch_version),
                    "old": (_aghs_old or _granted_flag(old.get("slug"), _prev_patch_version(_State.current_patch_version)))
                    if old else None}
+    # both sides granted by the same upgrade: the summary row's Aghanim's glyph says it once, the headers don't repeat
+    # "granted by Scepter" (owner 2026-11-06, 7.41 Overclocking)
+    _both_granted = bool(old) and bool(_granted_by["new"]) and _granted_by["new"] == _granted_by["old"]
     _aghs = _aghs_new or _aghs_old
     if not _aghs and new.get("slug"):
         # an ability the game grants by Aghanim's (KV IsGrantedByShard) gets the stripe without the words too
@@ -166,7 +203,8 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
              "old": _pane_values(old.get("desc", []), _props["old"]) if old else {}}
     # only for the same ability on both sides: Tinker's Defense Matrix -> Deploy Turrets (7.41) are two abilities whose
     # headers differ, not a change; Lich's Sacrifice even kept Death Charge's slug
-    _same = bool(old) and old.get("name") == new.get("name") and old.get("slug") == new.get("slug")
+    _renamed = bool(old) and renamed(old.get("slug"), new.get("slug"), _pv)
+    _same = bool(old) and ((old.get("name") == new.get("name") and old.get("slug") == new.get("slug")) or _renamed)
     _CARD_SEQ[0] += 1
     _card_id = _CARD_SEQ[0]
     _marks = {side: {k: (mark, _card_id) + ((_vals["old"][k],) if side == "new" else ()) for k, mark in m.items()}
@@ -183,7 +221,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
             if spec.get("innate") and not used_innate_fallback else ''
         )
         strip_html, desc_html = _pane_parts(spec.get("desc", []), _props[kind], marks=_marks.get(kind),
-                                            granted=_granted_by[kind])
+                                            granted=None if _both_granted else _granted_by[kind])
         tables_html = ''.join(
             f'<div class="formula-table-wrap">{tbl}</div>'
             for tbl in (spec.get("tables", []) or [])
@@ -231,7 +269,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
         unified_icon = _new_icon
         is_innate = bool(new.get("innate"))
         old_is_innate = (not single_new) and bool(old.get("innate"))
-        has_old_underlay = (not single_new) and (_old_icon != _new_icon)
+        has_old_underlay = (not single_new) and (_old_icon != _new_icon) and not _renamed
         new_marker_html = (
             f'<img src="{INNATE_ICON_URL}" alt="" '
             f'class="innate-marker innate-marker-new">'
@@ -301,6 +339,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
                            f'<span class="aghanim-marker {_aghs}"></span>')
         summary_row = (
             f'<ul class="changes ability-change-summary-ul">'
+            f'{_ROWS_FIRST if rows_first else ""}'
             f'<li data-tag="{tag_key}"{aghs_cls}>'
             f'<span class="badge {tag_key}" data-tag="{tag_key}">{tag_label}</span>'
             f'<span class="row-text">{summary_txt}</span>'
@@ -328,7 +367,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
         else:
             _old_html = _side(old, "old")
             _new_html = _side(new, "new")
-            if _same:                           # the new numbers' % on hover, as the item cards' (2026-10-25)
+            if _same:                           # the new numbers' % on hover (2026-10-25), a renamed one too (11-06)
                 _new_html = _pair_number_tips(_old_html, _new_html)
             panes_html = (
                 f'<div class="ability-change unified-panes{extra_cls}" '

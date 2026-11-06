@@ -330,28 +330,10 @@
 }
 
 .nav-tab {
-  padding: 7px 14px 10px;
-  color: var(--text-main);
-  border-radius: 6px 6px 0 0;
   cursor: pointer;
-  text-decoration: none;
   font-weight: 500;
-  font-size: 14px;
-  background: transparent;
-  border: none;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
-  font-family: inherit;
-  transition: background 0.15s, border-color 0.15s;
-  display: inline-flex;
-  align-items: center;
-}
-.nav-tab:hover {
-  background: rgba(54, 53, 50, 0.4);
-}
-.nav-tab.active {
-  background: rgba(0, 0, 0, 0.22);
-  /* keep weight + transparent border identical to inactive — prevents header jump */
 }
 .nav-context {
   min-width: 0;

@@ -29,18 +29,42 @@
   align-self: start;
   padding-top: 6px;
 }
-/* Single-pane "New ability" card (ability_change old=None): one full-width,
-   top-anchored pane — no old side, no arrow. */
+/* A one-sided card ("New ability.", "Added Aghanim's Scepter.") is as wide as one side of an old -> new card, at the left
+   edge, not stretched across (owner 2026-11-05): the same columns, the arrow's column empty; top-anchored. */
 .ability-change.unified-panes.is-single-new {
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 23px 1fr;
+  column-gap: 12px;
   align-items: start;
 }
+/* Two new cards in a row stand side by side, each on its own half (owner 2026-11-06, patch/card_pairs.py); each card
+   fills its half */
+.card-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; align-items: start; }
+.card-pair > .ability-block { margin-left: 0; margin-right: 0; padding-left: 0; }
+.card-pair .ability-change.unified-panes.is-single-new { grid-template-columns: minmax(0, 1fr); }
+/* ... three in a row in one line, a third each (owner 2026-11-06, 7.38 Invoker's facets); each folds on its own, all
+   three folded alike (patch/card_pairs.py), no heights evened ("не обязательно одинаковой высоты карточки делать") */
+.card-pair.card-trio { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 18px; }
+/* A lone one-sided card stands to the right of its block, at its top, a line from its caption to it (owner 2026-11-06,
+   patch/card_pairs.single_cards_right; the line: drawSingleRightLines) */
+.single-right { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; align-items: start;
+  position: relative; }
+.single-right > .ability-block > .ability-change-connector { display: none; }
+.single-right > .ability-change { margin-top: 12px; }
+/* ... the block's own rows under it, where an ability's rows stand (patch/card_pairs._rows_under) */
+.ability-block.sr-under { margin-top: 6px; }
+.single-right > .ability-change.unified-panes.is-single-new { grid-template-columns: minmax(0, 1fr); }
+.sr-line { position: absolute; height: 1px; background: rgba(150, 146, 137, 0.6); pointer-events: none; }
 .ability-change.unified-panes.is-single-new > .ability-change-pane {
+  grid-column: 1;
   align-self: start;
   justify-self: stretch;
   padding: 0 4px;
   --pt: 0px; --px: 4px;
 }
+/* every old -> new card under an ability's rows (what it scales with, 7.41 Mischief): each side as tall as its text,
+   tops on one edge — stretched, the shorter side stood with an empty bottom (owner 2026-11-06: "огромным пустым
+   пространством внизу"); a card of its own block keeps its own rule above */
+.ability-change.unified-panes > .ability-change-pane { align-self: start; }
 /* Aghanim's cards keep the even inner padding wherever they stand: inside an
    ability_change block the rule above would leave them padded on the left only
    (the Aghanim's row has no header strip to fill the pane). */
@@ -183,11 +207,11 @@
   /* Stripe is narrower than its `ul.changes li.aghanim-*` cousin (no tag
      column to skip), so the fade starts earlier — solid head, decays by
      30% across, fully transparent before the right edge. */
-  background: linear-gradient(90deg,
-    rgba(72, 148, 255, 0.26) 0,
-    rgba(72, 148, 255, 0.18) 30%,
-    rgba(72, 148, 255, 0.06) 70%,
-    rgba(72, 148, 255, 0) 100%);
+  /* a band at the top that fades down, not the whole box (owner 2026-11-05: with a table under it "иначе всё синее") */
+  background: linear-gradient(180deg,
+    rgba(72, 148, 255, 0.22) 0,
+    rgba(72, 148, 255, 0.09) 24px,
+    rgba(72, 148, 255, 0) 46px);
   border-radius: 3px;
   padding: 4px 8px 4px 6px;
 }
@@ -204,7 +228,7 @@
    6px flex gap per wrap = 12px). The wrap cancels its gap; an open table puts
    back the old 6px gap + 6px margin. */
 .ability-change-body .formula-table-wrap {
-  margin-top: -6px;
+  margin-top: -4px;          /* the body's gap */
 }
 /* Formula tables inside ability_change panes show only 7 key levels
    (L1/5/10/15/20/25/30) — columns 3-5, 7-10, 12-15 are the intermediate
@@ -306,9 +330,8 @@
 body.patch-page .entity-block > .components-change,
 body.patch-page .entity-block > .properties-change,
 body.patch-page .entity-block > .ench-change { margin-left: 0; margin-right: -15px; }   /* the tiers table too (2026-10-27) */
-/* a new item's cost box and a full-width item ability box (no chip column) the same way, so every item box starts on
-   one line (owner 2026-09-27: Orb of Frost 7.38 sat 15px right of Block of Cheese and Orb of Venom) */
-body.patch-page .entity-block.item-block > .item-cost-box,
+/* a full-width item ability box (no chip column) the same way, so every item box starts on one line (owner 2026-09-27:
+   Orb of Frost 7.38 sat 15px right of Block of Cheese and Orb of Venom) */
 body.patch-page .entity-block.item-block > .components-box,
 body.patch-page .entity-block.item-block > .provides-box,
 body.patch-page .entity-block.item-block ul.changes li.ability-row:not(.ability-box-tagged),
@@ -334,6 +357,71 @@ body.patch-page .entity-block.item-block:not(.is-new) ul.changes li.ability-box-
 }
 .properties-change.new-only .pane-new { grid-column: 3; }
 .properties-change.old-only .pane-old { grid-column: 1; }
+/* A card's values as a table (patch/value_tables.py): name | value across the whole card, lines between the cells, the
+   value centred; a formula's level table opens under its own row. The table runs to the card's own edges with no frame of
+   its own: a frame inside the card's frame read as two lines side by side (owner 2026-11-06) */
+.value-table { display: grid; grid-template-columns: minmax(max-content, 42%) 1fr; box-sizing: border-box;
+  margin: 8px calc(-1 * var(--px, 0px)) 0; border-top: 1px solid var(--line-soft); }
+.value-table > .vt-l, .value-table > .vt-v { padding: 3px 10px; border-top: 1px solid var(--line-soft); }
+.value-table > .vt-first { border-top: 0; }
+.value-table > .vt-l { color: var(--text-dim); font-size: 13px; display: flex; align-items: center;
+  padding-left: max(var(--px, 0px), 4px); }
+.value-table > .vt-v { border-left: 1px solid var(--line-soft); text-align: center; }
+.value-table > .vt-f { grid-column: 1 / -1; }
+.value-table > .vt-f .formula-table-wrap { margin: 0; }
+.value-table > .vt-f .formula-table:not([hidden]) { margin: 0; border-top: 1px solid var(--line-soft); }
+.vt-after { display: block; margin-top: 6px; }
+/* Rows each led by an ability's icon stand like a table's rows: a line over each, edge to edge of the card (owner
+   2026-11-06, patch/card_sections.py); a facet changing two abilities gives each its head: icon, Active / Passive, name */
+.ability-change-row.acr-sec { border-top: 1px solid var(--line-soft); margin: 0 calc(-1 * var(--px, 0px));
+  padding: 4px var(--px, 0px) 2px; }
+.ability-change-row.acr-sec + .ability-change-row:not(.acr-sec) { border-top: 1px solid var(--line-soft);
+  margin: 0 calc(-1 * var(--px, 0px)); padding: 4px var(--px, 0px) 0; }
+/* a section's own head: the strip of a card's head (.iab-head), edge to edge; the first one sits on the pane's top */
+.ability-change-row > .acr-sec-head { margin: -4px calc(-1 * var(--px, 0px)) 4px; padding: 2px var(--px, 12px);
+  border-radius: 0; justify-content: flex-start; }
+.ability-change-row.acr-sec-top { border-top: 0; margin-top: calc(-1 * var(--pt, 0px)); }
+/* a little room before each ability's head below the first (owner 2026-11-06, 7.38 Invoker: "небольшой отступ внутри
+   карточки перед каждой способностью"; patch/card_sections.py) */
+.ability-change-row.acr-sec-headed { margin-top: 8px; }
+/* an Aghanim's row's head stands on its own row (its stripe starts under the head): its row right under it, no room
+   and no line between them (owner 2026-11-06, 7.38 Sun Strike: "шапка идёт отдельно от способности") */
+.ability-change-row.acr-sec-only { padding-bottom: 0; margin-bottom: -4px; }      /* over the rows' 4px gap */
+.ability-change-row.acr-sec-only > .acr-sec-head { margin-bottom: 0; }
+.ability-change-row.acr-sec.acr-sec-only + .ability-change-row { border-top: 0; }
+/* an Aghanim's row of a side with heads: edge to edge, a line over it, folded or not (patch/card_sections.py; 7.38
+   Quas' Scepter row had a gap on its right where the fold parted it from its head) */
+.ability-change-row.acr-aghs.acr-wide { border-top: 1px solid var(--line-soft); margin: 0 calc(-1 * var(--px, 0px));
+  padding: 4px var(--px, 0px) 0; }
+.acr-sec-top > .acr-sec-head { border-radius: 5px 5px 0 0; }
+/* Arc Warden's two selves: the same columns for both (patch/two_selves.py) */
+.selves-table { display: grid; grid-template-columns: auto repeat(var(--cols), auto); align-items: stretch;
+  margin: 8px calc(-1 * var(--px, 0px)) 0; border-top: 1px solid var(--line-soft); }   /* no frame of its own, as .value-table */
+.selves-table > span { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; padding: 4px 8px;
+  text-align: center; border-left: 1px solid var(--line-soft); border-top: 1px solid var(--line-soft); }
+.selves-table > .selves-corner, .selves-table > .selves-chips { border-left: 0; }
+.selves-table > .selves-corner, .selves-table > .selves-head { border-top: 0; }
+.selves-table > .selves-head { color: var(--text-dim); font-size: 12px; }
+.selves-table > .selves-chips { flex-wrap: nowrap; gap: 0; }
+/* Every stat gone and an abilities card under it (owner 2026-11-05, 7.38 Pirate Hat): the old stats stand over the old
+   abilities, and the new abilities rise beside them instead of leaving a hole (raise_abilities_beside_gone_stats) */
+.properties-change.iab-change.iab-raised .properties-pane { grid-template-rows: none; grid-row: auto; }
+.iab-raised > .iab-old-col { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.iab-raised > .iab-old-col > .pane-old { flex: 1; }
+.iab-raised > .properties-arrow { grid-row: 1; }
+.iab-raised > .pane-new { grid-row: 1; }
+.iab-raised .iab-none { display: none; }
+.iab-gone-stats {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  column-gap: 8px;
+  row-gap: 4px;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
 /* A unit's numbers as the game shows them (owner 2026-11-04, patch/unit_numbers.py): no tag chips, short health and mana bars
    in the game's colours under the icon's left edge, the rest as tiles. A changed number is its tag's colour and dotted (the
    rules with .iab-num.iab-buff). */

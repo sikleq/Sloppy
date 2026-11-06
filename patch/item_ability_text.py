@@ -48,6 +48,9 @@ def _num(s):
 
 def _values(blk):
     out = {}
+    # 7.37e Pirate Hat "Channel for %abilitychanneltime% second": a tooltip may name the block's own key
+    if (channel := _num(blk.get("AbilityChannelTime", ""))) is not None:
+        out["abilitychanneltime"] = channel
     av = blk.get("AbilityValues")
     if isinstance(av, dict):
         for k, v in av.items():
@@ -194,9 +197,22 @@ def insert_cards(lines, version, prev, name_to_slug):
                 + [f"{ind}    old=[" + (",\n" + ind + "         ").join(lit(t) for t in old) + "],"]
                 + [f"{ind}    new=[" + (",\n" + ind + "         ").join(lit(t) for t in new) + "]))"])
         card = "\n".join(card).split("\n")
-        out[k:k] = card
-        i = j + len(card)
+        # the card shows a brand-new ability's whole text: its row would say it twice (7.38 Pirate Hat, owner 2026-11-05)
+        gone = {n.lower() for n in _ability_names(new)} - {n.lower() for n in _ability_names(old)}
+        kept = [x for x in out[k:j] if not _restates(x, gone)]
+        out[k:j] = card + kept
+        i = k + len(card) + len(kept)
     return out
+
+
+def _ability_names(texts):
+    return [m.group(1) for t in texts for m in [re.match(r"\w+: ([^.!]+)", t)] if m]
+
+
+def _restates(line, names):
+    """A one-line row "Passive: Plunder. Steals …" about one of `names`."""
+    m = re.match(r'\s*W\(li\("(?:Active|Passive|Toggle|Aura|Use): ([^.!"]+)[.!].*\)\)\s*$', line)
+    return bool(m) and m.group(1).lower() in names
 
 
 def item_abilities(slug, version):

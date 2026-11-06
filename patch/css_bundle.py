@@ -13,6 +13,7 @@ CSS_PARTS = (
     "creeps-table", "creeps-cells", "hero-dynamics", "tables-shared", "hero-lab", "hero-lab-inventory", "hero-lab-stats",
     "hero-lab-tooltip", "table-marks", "mana-items", "hero-stats", "aoe-increase", "terrain", "terrain-controls", "overrides",
     "pixel-skin", "pixel-skin-filters",
+    "patch-tag-marks",          # tags as tiles in the row and on the line, over the tags' own look (trial, 2026-11-06)
     "colorblind.generated",     # written by scripts/gen/gen_colorblind_css.py, not by hand
     "phones",                   # last: every rule for phones wins over the rest
 )

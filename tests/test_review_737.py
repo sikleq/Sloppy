@@ -507,11 +507,10 @@ def test_a_card_row_about_an_aghanims_upgrade_gets_its_stripe(text, kind):
     from patch.cards_item_abilities import _pane_parts
     _, body = _as_hero("invoker", _pane_parts, [text, "Alacrity: Grants bonus attack range"])
     assert body.count(f'<div class="ability-change-row aghanim-{kind} acr-aghs"><span class="acr-lead-chips">') == 1
-    last = text.rsplit(" ", 1)[1]
-    assert f'<span class="li-tail">{last}</b><span class="aghanim-marker {kind}"></span></span></div>' in body \
-        or f'<span class="li-tail">{last}<span class="aghanim-marker {kind}"></span></span></div>' in body \
-        or f'<span class="li-tail"><b class="iab-num">{last}</b><span class="aghanim-marker {kind}"></span></span></div>' in body
-    assert body.count("aghanim-marker") == 1                  # the other row stays plain
+    # the upgrade's row stays where it is, its own glyph at its end, no "Aghanim's X" head over it (owner 2026-11-06:
+    # the heads were "лишнее … как до этого"); "Can be upgraded with Aghanim's X." is not said
+    assert "acr-aghs-head" not in body and "Can be upgraded" not in body
+    assert body.count(f'<span class="aghanim-marker {kind}"></span>') == 1
 
 
 def test_a_card_rows_closing_tip_never_wraps_alone():

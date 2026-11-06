@@ -66,3 +66,11 @@ def test_a_terrain_row_with_a_percent_tints_its_number():
     assert elements.terrain_num_chip(5, b(450, 800)) == '<span class="badge tnum tnum-buff">5</span>'
     tag = '<span class="badge del" data-tag="del" data-overall="nerf">DEL</span>'
     assert elements.terrain_num_chip(1, tag) == '<span class="badge tnum">1</span>'
+
+
+def test_the_738c_gate_row_opens_the_picture_of_its_two_cells():
+    # the row had no picture until 2026-11-05: two gridnav cells at the left of the Dire gate were blocked in 7.38b
+    reset_page_state()
+    phrase, shots = elements.terrain_note("7.38c", "Fixed unnecessary pathing blockers at the left of the entrance to the Dire Base through the team only gate")
+    assert phrase == "pathing blockers"
+    assert "738c_11.webp" in shots

@@ -51,7 +51,15 @@ def ability_chip(label, src):
                 f'aria-label="{label}"><img src="../icons/facets/{icon}.png" alt="" loading="lazy" width="16" '
                 f'height="16"></span>')
     return (f'<span class="ability-chip" data-tooltip="{label}" role="img" aria-label="{label}"><img src="{src}" '
-            f'alt="" loading="lazy" width="19" height="19"></span>')
+            f'alt="" loading="lazy" width="19" height="19">{_innate_marker(src)}</span>')
+
+
+def _innate_marker(src):
+    """An innate's chip carries the small innate mark, as its block's header (owner 2026-11-05, 7.38 Ironwood Treant)."""
+    from .elements import _INNATE_SLUGS, INNATE_ICON_URL
+    stem = src.rsplit("/", 1)[-1].split(".", 1)[0]
+    return (f'<img src="{INNATE_ICON_URL}" alt="" class="chip-innate-marker" loading="lazy" width="11" height="11">'
+            if stem in _INNATE_SLUGS else '')
 
 
 _ENCHANT_RE = re.compile(r"^(?:Item bonus from )?(\w+) [Ee]nchantment$")   # "Audacious Enchantment"
@@ -85,21 +93,69 @@ def rune_row_chip(text, prefix="../"):
 
 
 _RUNE_NAME = "|".join(sorted((re.escape(n) for n in RUNE_ICONS), key=len, reverse=True))
-_RUNE_LIST_RE = re.compile(rf"\b((?:{_RUNE_NAME})(?:(?:, | and )(?:{_RUNE_NAME}))*) Runes?\b")
+_RUNE_JOIN = r",? and |,? or |, "             # "Arcane, Invisibility, and Haste Runes" (7.41 Runed Replica)
+_RUNE_LIST_RE = re.compile(rf"\b((?:{_RUNE_NAME})(?:(?:{_RUNE_JOIN})(?:{_RUNE_NAME}))*) Runes?\b")
 
 
 def rune_name_chips(text, prefix="../"):
-    """Runes named inside a card's row get their icons: "Level 3 - [i] Invisibility, [i] Arcane and [i] Haste Runes" (owner
-    2026-11-02, 7.38 Runed Replica). A "?" note's text stays as it is."""
+    """Runes named inside a card's row are their icons alone, the names on hover (owner 2026-11-06: "можно просто
+    иконкой", 7.38 Runed Replica; "в способностях можно так", 7.41 Arc Warden's Runic Infusion): "Level 3 - [i], [i], [i]",
+    "gains the [i] buff", "for activating [i] or [i]". "and" in a list is a comma, "or" stays. A rune without an icon keeps
+    its name; a "?" note's text stays as it is."""
     head, sep, tips = text.partition("<!--TIP-->")
+    has_icon = lambda name: _os.path.exists(_os.path.join(_RUNE_DIR, f"{RUNE_ICONS[name]}.png"))
+    # an icon standing for a word: no gap of its own after it, the text's own space is the gap (owner 2026-11-06: "лишний
+    # пробел" after "[i] buff", "[i] .")
+    icon = lambda name: ability_chip(f"{name} Rune", f"{prefix}icons/runes/{RUNE_ICONS[name]}.png").replace(
+        'class="ability-chip"', 'class="ability-chip chip-word"', 1)
 
-    def chip(m):
-        key = RUNE_ICONS[m.group(0)]
-        if not _os.path.exists(_os.path.join(_RUNE_DIR, f"{key}.png")):
+    def runes(m):
+        names = re.findall(_RUNE_NAME, m.group(1))
+        if not all(has_icon(n) for n in names):
             return m.group(0)
-        return ability_chip(f"{m.group(0)} Rune", f"{prefix}icons/runes/{key}.png") + m.group(0)
+        joins = [" or " if "or" in j else ", " for j in re.findall(_RUNE_JOIN, m.group(1))]
+        return icon(names[0]) + "".join(j + icon(n) for j, n in zip(joins, names[1:]))
 
-    return _RUNE_LIST_RE.sub(lambda m: re.sub(_RUNE_NAME, chip, m.group(0)), head) + sep + tips
+    # only the words, never inside a tag (an icon's own data-tooltip="Haste Rune" stays as it is)
+    parts = re.split(r"(<[^>]+>)", head)
+    return "".join(p if k % 2 else _RUNE_LIST_RE.sub(runes, p) for k, p in enumerate(parts)) + sep + tips
+
+
+_ABIL_NAME = r"[A-Z][\w'’]*(?: [A-Z][\w'’]*){0,3}"
+_ABIL_LIST_RE = re.compile(rf"(?<=\bto )({_ABIL_NAME}(?:(?:,? and |,? or |, ){_ABIL_NAME})+)")
+
+
+def ability_list_chips(text, hero, version=None):
+    """A list of the hero's abilities in a card's row gets each one's icon before its name (owner 2026-11-06, 7.38
+    Dark Carnival Barker: "Sets Dark Carnival Souvenirs to Crystal Ball, Unicycle and Weighted Pie — нет иконок у этих
+    сувениров. В Carny Classics фасете они есть"). Only when every name of the list is an ability with an icon."""
+    if not hero:
+        return text
+    from .elements import _hero_ability_slug
+    from .images import ABIL_CDN, _LOCAL_ABIL_ICONS
+
+    def slug_of(name):
+        slug = _hero_ability_slug(hero, name)
+        if slug not in _LOCAL_ABIL_ICONS and version:
+            from .ability_kv import hero_abilities
+            known = hero_abilities(hero, version).get(name.lower())
+            slug = known[0] if known else slug
+        return slug if slug in _LOCAL_ABIL_ICONS else None
+
+    # the icons alone, the names on hover, as the runes (owner 2026-11-06: "помимо иконок ещё и названия, а мы только
+    # иконки вставляем"); "and" in the list is a comma, "or" stays
+    icon = lambda n, s: icon_word(n, f"{ABIL_CDN}{s}.png")
+
+    def chips(m):
+        names = re.split(r",? and |,? or |, ", m.group(1))
+        slugs = [slug_of(n) for n in names]
+        if not all(slugs):
+            return m.group(0)
+        joins = [" or " if "or" in j else ", " for j in re.findall(r",? and |,? or |, ", m.group(1))]
+        return icon(names[0], slugs[0]) + "".join(j + icon(n, s) for j, n, s in zip(joins, names[1:], slugs[1:]))
+    head, sep, tips = text.partition("<!--TIP-->")
+    parts = re.split(r"(<[^>]+>)", head)
+    return "".join(p if k % 2 else _ABIL_LIST_RE.sub(chips, p) for k, p in enumerate(parts)) + sep + tips
 
 
 # map objects a list may name among items (7.37 Teleport Classification "Twin Gates"): the Terrain page's own icon
@@ -322,14 +378,31 @@ def _example_chip(name):
     return f'<span class="mech-ex-name">{name}</span>'
 
 
-def mech_example(name):
-    """An item or ability a mechanic's text names as an example: its icon and name (owner 2026-11-04: "если есть примеры, их
-    надо оформлять иконками"). A name with no icon stops the build, the example would lose its look unnoticed."""
+def row_examples(text, examples):
+    """A row's words with the examples it names as icons; examples: {words in the text: full name}. The row is written as a
+    plain literal (the Terrain page and kv_review read it from the source), so the icons are put in here, when it renders."""
+    for words, name in (examples or {}).items():
+        if words not in text:
+            raise ValueError(f"row_examples: {words!r} is not in the row {text[:60]!r}")
+        text = text.replace(words, mech_example(name, label=words), 1)
+    return text
+
+
+def mech_example(name, label=None):
+    """An item or ability a mechanic's text names as an example: its icon (owner 2026-11-04: "если есть примеры, их
+    надо оформлять иконками"). A name with no icon stops the build, the example would lose its look unnoticed.
+    label: the words the text uses ("Firefly", Batrider's Firefly); the hover shows the full name either way."""
     parsed = _parse_line(name)
     if not parsed or parsed[2] or not parsed[1] or parsed[1].startswith("facet:"):
         raise ValueError(f"mech_example: no icon for {name!r}")
-    return (f'<span class="ac-sub"><img class="ac-sub-ico" src="{parsed[1]}" alt="" loading="lazy" width="20" height="20">'
-            f'<b class="ac-sub-name">{_html.escape(name)}</b></span>')
+    # the icon alone, the name on hover, as the runes and the lists of a hero's abilities (owner 2026-11-06:
+    # "Lifestealer's Feast... убираем название и оставляем иконку которая подписана при наведении мышки")
+    return icon_word(name, parsed[1])
+
+
+def icon_word(name, src):
+    """An ability's or item's icon standing for its name in a sentence, the name on hover (chip-word)."""
+    return ability_chip(name, src).replace('class="ability-chip"', 'class="ability-chip chip-word"', 1)
 
 
 def _split_examples(caveat):

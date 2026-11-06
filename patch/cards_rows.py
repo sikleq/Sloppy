@@ -50,6 +50,63 @@ def _card_row(chips, text):
     return _CardRow((tuple(chips), text, m.group(1).lower() if m else ""))
 
 
+# a card row's own % badges after its "from A to B" go onto B: its colour, a dotted line and the % on hover, as every
+# changed number in a card (owner 2026-11-06, 7.38 Fleshfeast "+67%, +133% … разве стоит указывать там рядом, а не в
+# самих значениях 25/35/... с пунктирной линией, как везде?", Undulation)
+_ROW_BADGES_RE = re.compile(r'\s*<span class="badge-group[^"]*" data-overall="(\w+)">.*?</span></span>', re.S)
+_ROW_FROM_TO_RE = re.compile(r"\bfrom ((?:<b[^>]*>)?[+\-]?\d[\d./%s]*(?:</b>)?) to ((?:<b[^>]*>)?[+\-]?\d[\d./%s]*?(?:</b>)?)"
+                             r"(?=[\s.,;]|$)")
+
+
+def _badges_into_number(text):
+    badges = _ROW_BADGES_RE.search(text)
+    if not badges:
+        return text
+    body = text[:badges.start()] + text[badges.end():]
+    pairs = list(_ROW_FROM_TO_RE.finditer(body))
+    if len(pairs) != 1:                         # none, or two changes in one row: whose badges — they stay
+        return text
+    from .number_tips import _number_tip
+    m, kind = pairs[0], badges.group(1)
+    new = m.group(2)
+    tipped = _number_tip(re.sub(r"<[^>]+>", "", m.group(1)), new, kind)
+    if not tipped:
+        return text
+    return (body[:m.start(2)] + f'<span class="iab-hl iab-hl-{kind} iab-hl-num">{tipped}</span>' + body[m.end(2):])
+
+
+# ... and so does a label "Aghanim's Shard: …" (7.39 Invoker's Ice Wall cards, found 2026-11-06)
+_AGHS_SAID_RE = re.compile(r"^\s*(?:Can be upgraded with Aghanim's (?:Scepter|Shard)\.|Aghanim's (?:Scepter|Shard):)\s*")
+_CHIP_NAME_RE = re.compile(r'data-tooltip="([^"]+)"')
+
+
+_BASIC = 3                   # the hero's first abilities in its files: Quas, Wex, Exort; Q, W, E
+
+
+def in_heros_order(rows):
+    """Rows of several of the hero's abilities: first the hero's basic ability with its Aghanim's rows (owner
+    2026-11-06, 7.38 Invoker's facets: "Active: Wex/Exort/Quas ставить в начале списка"), then the abilities the side
+    improves, then its Aghanim's Scepter rows, then its Shard rows, each part in the order of the hero's abilities — so
+    three facets side by side say the same thing on one line ("как ты аспекта эти 3 рядом расположил"). The rows before
+    the first icon stay first; a row without an icon goes with the one above it."""
+    if not (_State.current_hero and _State.current_patch_version) or not all(isinstance(r, _CardRow) for r in rows):
+        return rows
+    from .ability_kv import hero_abilities
+    order = list(hero_abilities(_State.current_hero, _State.current_patch_version))
+    keys, key = [], (-1, -1)
+    for r in rows:
+        m = _CHIP_NAME_RE.search(r[0][0]) if r[0] else None
+        if m:
+            name = _html.unescape(m.group(1)).lower()
+            at = order.index(name) if name in order else len(order)
+            part = 0 if at < _BASIC else {"": 1, "scepter": 2, "shard": 3}[r[2]]
+            key = (part, at)
+        keys.append(key)
+    if len({k for k in keys if k[0] >= 0}) < 2:
+        return rows
+    return [r for _k, _i, r in sorted(zip(keys, range(len(rows)), rows), key=lambda x: x[:2])]
+
+
 def _merge_same_rows(rows):
     """Neighbouring rows of different abilities that say the same — "[Funhouse Mirror] – Made exclusive to Carny Classics
     Facet" three times (7.38 Dark Carnival Barker) — become one row with the icons side by side (owner 2026-10-30:
@@ -73,8 +130,15 @@ def _row_html(row):
     lead = f'<span class="acr-lead-chips">{"".join(chips)}</span>' if chips else ""
     cls = f" aghanim-{aghs} acr-aghs" if aghs else ""
     marker = f'<span class="aghanim-marker {aghs}"></span>' if aghs else ""
-    from .mech_abilities import rune_name_chips
-    return f'<div class="ability-change-row{cls}">{lead}{rune_name_chips(_bold_numbers_html(_glue_tail(text, marker)))}</div>'
+    if aghs:
+        # "Can be upgraded with Aghanim's Scepter." says what the stripe and the glyph say (owner 2026-11-06: "да")
+        cut = _AGHS_SAID_RE.sub("", text, count=1)
+        text = cut[:1].upper() + cut[1:] if cut != text else text
+    from .mech_abilities import ability_list_chips, rune_name_chips
+    text = ability_list_chips(text, _State.current_hero, _State.current_patch_version)
+    text = _badges_into_number(text)
+    # the runes' icons before the last word glues to its "?": "any Power Rune?" kept its name (7.38 Runic Infusion)
+    return f'<div class="ability-change-row{cls}">{lead}{_bold_numbers_html(_glue_tail(rune_name_chips(text), marker))}</div>'
 
 
 # the row's closing cluster — its Aghanim's glyph, then its "?" (an inline_note) — and the word before it never part on
@@ -89,17 +153,26 @@ def _glue_tail(text, marker=""):
     if tips and re.sub(r"<!--TIP-->.*?<!--/TIP-->|<!--/?INLINETIP-->", "", tips, flags=re.S).strip():
         tips = ""                               # words between two tips: only the last tip's word could glue
     body = text[:m.start()] if tips else text.rstrip()
-    if not (tips or marker):
+    if not (tips or marker or _TAIL_CHIPS_RE.search(body)):
         return text
-    w = re.search(r"(\S+)$", body)
+    # icons closing the text ("upon activating any [rune]") go with the word before them: a line never starts with a
+    # bare icon or a (?) (owner 2026-11-06, 7.38 Runic Infusion)
+    chips = _TAIL_CHIPS_RE.search(body)
+    lead, chips = (body[:chips.start()], chips.group(0)) if chips else (body, "")
+    w = re.search(r"(\S+)$", lead)
     if w and "<" not in w.group(1) and ">" not in w.group(1):
-        return body[:w.start()] + f'<span class="li-tail">{w.group(1)}{marker}{tips}</span>'
+        return lead[:w.start()] + f'<span class="li-tail">{w.group(1)}{chips}{marker}{tips}</span>'
     return body + f'<span class="li-tail">{marker}{tips}</span>'
+
+
+_CHIP_HTML = r'<span class="ability-chip[^"]*"[^>]*>(?:<img[^>]*>)+</span>'
+_TAIL_CHIPS_RE = re.compile(rf"(?:\s*(?:,|or|and)?\s*{_CHIP_HTML})+$")
 
 
 FOLD_CHARS = 600                 # a card side longer than this folds (owner 2026-10-30: "раскатай на весь сайт"; 28
                                   # sides of 569 in 7.37–7.41, 7.37 Drunken Brawler's 733 the first)
 _INTRO_SHARE = 0.45               # a first row this short a part of the whole stays open as the intro
+FOLD_WHOLE_CHARS = 800           # a side with no short intro folds whole past this (Roshan's Throw 700 stays open)
 
 
 def _without_popups(html):
@@ -135,15 +208,18 @@ def fold_long_rows(rows):
     if total <= FOLD_CHARS or any("acr-fold" in r for r in texts):
         return rows
     k = [i for i, r in enumerate(rows) if isinstance(r, str)]
-    # no short intro to keep open: the side stays as it is (owner 2026-10-30, 7.38 Roshan's Throw: "как будто можно и
-    # не сворачивать")
-    if not (len(k) > 1 and _plain_len(rows[k[0]]) <= _INTRO_SHARE * total):
+    # no short intro to keep open: the side stays as it is (owner 2026-10-30, 7.38 Roshan's Throw, 700 characters: "как
+    # будто можно и не сворачивать") — unless it is much longer: then it folds whole (owner 2026-11-06, 7.38 Nothl
+    # Projection, 947: "генератор не определил, что такую карточку надо свернуть")
+    intro = len(k) > 1 and _plain_len(rows[k[0]]) <= _INTRO_SHARE * total
+    if not intro and not (len(k) > 1 and total > FOLD_WHOLE_CHARS):
         return rows
-    first, last = k[1], k[-1]
+    first, last = (k[1] if intro else k[0]), k[-1]
     # over the faded text's bottom a strip of soft glass says it opens, and folds it back (owner 2026-10-30: "чтобы
     # было видно, что оно разворачиваться может, а также возможность свернуть обратно"; a chevron and golden pollen
     # were tried and dropped: "эффект стекла снизу, но не резкий, а плавный … чтобы не нагружало страницу")
     toggle = ('<button type="button" class="acr-fold-toggle" aria-expanded="false" aria-label="Show the whole text">'
               '</button>')
-    return (rows[:first] + [f'<div class="acr-fold"><div class="acr-fold-body">{"".join(rows[first:last + 1])}</div>'
-                            f'{toggle}</div>'] + rows[last + 1:])
+    whole = "" if intro else " acr-fold-whole"     # folded from the start: more of its first lines show
+    return (rows[:first] + [f'<div class="acr-fold{whole}"><div class="acr-fold-body">{"".join(rows[first:last + 1])}'
+                            f'</div>{toggle}</div>'] + rows[last + 1:])

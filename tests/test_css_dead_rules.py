@@ -41,3 +41,9 @@ def test_keyframes_and_font_face_are_left_alone():
 def test_data_urls_comments_and_strings_do_not_break_the_parse():
     css = """.a { background: url(data:image/png;base64,AA==); /* ; } */ content: "}"; color: red }"""
     assert [d.prop for d in rules(css)[0].decls] == ["background", "content", "color"]
+
+
+def test_the_stylesheet_has_no_dead_declarations():
+    # 144 were taken out 2026-11-05: to change how something looks, change its declaration, do not add another below it
+    from patch.css_bundle import read_css
+    assert [f"{r.selector} {{ {d.prop} }}" for r, d, _later in dead_declarations(read_css())] == []

@@ -81,6 +81,10 @@ def _postprocess_ability_level_formula(lines, version):
 _ABILITY_LINE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"(, innate=True)?\)\)\s*$')
 _NOW_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("(?:Now is an innate ability|Moved to innate ability)\b')  # 7.37 Lunar Blessing
 _INNATE_REWORK_ROW_RE = re.compile(r'^\s*W\(li\("(?:Now levels up with|Instead of )')
+# an ability that gains an active or a passive part (owner 2026-11-06, 7.38 Special Delivery: "Now has an active
+# component. Marci whistles … — не надо оформить карточкой old > new?")
+_GAINED_PART_ROW_RE = re.compile(r'^\s*W\(li\("(?:Now has an? (?:active|passive) component|'
+                                 r'Is now an? (?:active|passive) ability)\b')
 
 
 def _postprocess_innate_cards(lines, version):
@@ -111,16 +115,22 @@ def _postprocess_innate_cards(lines, version):
                     and any(_INNATE_REWORK_ROW_RE.match(r) and 't("MISC")' not in r for r in rows)
                     and ability_text(slug, prev) and ability_text(slug, version)
                     and ability_text(slug, prev) != ability_text(slug, version))
-        if not (became or reworked):
+        gained = (not became and not reworked and any(_GAINED_PART_ROW_RE.match(r) for r in rows)
+                  and ability_text(slug, prev) and ability_text(slug, version)
+                  and ability_text(slug, prev) != ability_text(slug, version))
+        if not (became or reworked or gained):
             out.append(lines[i])
             i += 1
             continue
-        summary = f"{name} is now an innate ability." if became else "Innate reworked."
+        # the block's title names the ability (owner 2026-11-06, 7.38 Succubus: "Succubus уже есть в названии")
+        summary = ("Now is an innate ability." if became
+                   else "Innate reworked." if slug in innate_now else "Ability reworked.")
         out += [f'{ind}W(ability_change(',
                 f'{ind}    summary="{summary}",',
                 f'{ind}    tag="rework",',
                 f'{ind}    old=dict(name="{name}", slug="{slug}", desc=game_ability_desc("{slug}", "{prev}")),',
-                f'{ind}    new=dict(name="{name}", slug="{slug}", innate=True, desc=game_ability_desc("{slug}", "{version}")),',
+                f'{ind}    new=dict(name="{name}", slug="{slug}", {"innate=True, " if slug in innate_now or became else ""}'
+                f'desc=game_ability_desc("{slug}", "{version}")),',
                 f'{ind}))']
         if reworked:
             out.append(f"{ind}# TODO[covered]: the rows the card shows (its texts, the header's level) get covered=True")
@@ -130,7 +140,8 @@ def _postprocess_innate_cards(lines, version):
             out.append(f"{ind}# TODO[old-values]: the old side gets its numbers from {prev}'s KV, the new side highlights the change")
         out.append(lines[i + 1])
         for r in rows:
-            shown = _NOW_INNATE_ROW_RE.match(r) or (became and _row_values_in_text(r, new_text))
+            shown = (_NOW_INNATE_ROW_RE.match(r) or _GAINED_PART_ROW_RE.match(r)
+                     or (became and _row_values_in_text(r, new_text)))
             out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if shown else r)
         i += 2 + len(rows)
     return out
@@ -167,8 +178,8 @@ def _postprocess_facet_improves_row(lines):
     return out
 
 
-_BLOCK_START_RE = re.compile(r'^\s*W\((ability|ability_change|ability_group|new_ability|facet_header|new_facet|facet_change)\(')
-_FACET_KINDS = ("facet_header", "new_facet", "facet_change")
+_BLOCK_START_RE = re.compile(r'^\s*W\((ability|ability_change|ability_group|two_selves_change|new_ability|facet_header|facet_group|new_facet|facet_change)\(')
+_FACET_KINDS = ("facet_header", "facet_group", "new_facet", "facet_change")
 _HERO_END_RE = re.compile(r'^\s*(?:W\((?:hero_header|section|unit_header|item_header|plain_header|enchant_header)\(|write_footer\(|save_html\()')
 
 

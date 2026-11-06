@@ -68,7 +68,7 @@ def _pending_card(monkeypatch, hero="centaur", slug="centaur_horsepower"):
     """An ability block whose old -> new Aghanim's card is still to draw (7.41 Centaur: the block has no rows)."""
     monkeypatch.setattr(at, "holders", lambda h, kind, v: ["centaur_stampede"] if kind == "scepter" and v == "7.40c"
                         else ([slug] if kind == "scepter" else []))
-    monkeypatch.setattr(at, "aghs_text", lambda s, kind, v: {"centaur_stampede": "Old upgrade.",
+    monkeypatch.setattr(at, "aghs_text", lambda s, kind, v, *_: {"centaur_stampede": "Old upgrade.",
                                                              slug: "New upgrade."}.get(s) if kind == "scepter" else None)
     monkeypatch.setattr(at, "ability_name", lambda s, v: s.title())
     _State.current_patch_version = "7.41"

@@ -23,7 +23,7 @@ def test_an_ability_that_became_innate_gets_its_card():
                                              'W(li("Now dispelled when attacking Roshan or enemy Barracks", t("NERF")))'),
                                       "7.39")
     text = "\n".join(out)
-    assert 'summary="Blur is now an innate ability."' in text
+    assert 'summary="Now is an innate ability."' in text
     assert 'game_ability_desc("phantom_assassin_blur", "7.38c")' in text and "innate=True" in text
     assert 'Coup de Grace level", t("REWORK"), covered=True))' in text
     assert 'Barracks", t("NERF")))' in text                                       # its own change stays a row

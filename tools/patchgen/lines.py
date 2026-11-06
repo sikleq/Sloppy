@@ -36,8 +36,9 @@ _HERO_DMG_ROW_RE = re.compile(r'W\(li\(\s*"(?:Damage gain per level|Damage at le
 
 
 _REMOVED_FACETS_RE = re.compile(r'W\(li\("Removed (.+?) Facets?", t\("DEL"\)(?:, extra=(.*))?\)\)$')
-_REMOVED_ABILITY_RE = re.compile(r'W\(li\("Removed ([A-Z][^"]*?) ability", t\("DEL"\)(?:, extra=(.*))?\)\)$')
-_FACET_BLOCK_RE = re.compile(r'W\((?:facet_header|new_facet|facet_change)\(')
+# "Removed Parting Shot ability", "Removed Adaptive Strike (Strength) ability as it is merged with an Agility one"
+_REMOVED_ABILITY_RE = re.compile(r'W\(li\("Removed ([A-Z][^"]*?) ability(?: [^"]*)?", t\("DEL"\)(?:, extra=(.*))?\)\)$')
+_FACET_BLOCK_RE = re.compile(r'W\((?:facet_header|facet_group|new_facet|facet_change)\(')
 _HERO_NAME_RE = re.compile(r'W\(hero_header\("([^"]+)"')
 
 

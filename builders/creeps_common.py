@@ -193,7 +193,7 @@ def page_shell(title, nav, inner, asset_version):
         '<html lang="ru">\n'
         '<head>\n'
         '<meta charset="UTF-8">\n'
-        f'<title>SIKLE | {title}</title>\n'
+        f'<title>s/kle - {title}</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={asset_version}">\n'
         '</head>\n'
@@ -214,7 +214,7 @@ def page_shell(title, nav, inner, asset_version):
         f'{inner}'
         '</div>\n'
         '</div>\n'
-        f'<script defer src="src/scripts.js?v={asset_version}"></script>\n'
+        f'<script defer src="src/scripts-table.js?v={asset_version}"></script>\n'
         '</body>\n</html>\n'
     )
 

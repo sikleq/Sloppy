@@ -405,7 +405,7 @@ def save_calendar_html():
     html = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
         '<meta charset="UTF-8">\n'
-        '<title>SIKLE | Calendar</title>\n'
+        '<title>s/kle - Calendar</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={_ASSET_VERSION}">\n'
         '</head>\n<body>\n\n'
@@ -413,7 +413,7 @@ def save_calendar_html():
         + '\n<div class="container calendar-page">\n'
         + '\n'.join(body)
         + '\n</div>\n\n'
-        + f'<script defer src="src/scripts.js?v={_ASSET_VERSION}"></script>\n'
+        + f'<script defer src="src/scripts-base.js?v={_ASSET_VERSION}"></script>\n'
         + toggle_script + '\n'
         + '</body>\n</html>\n'
     )

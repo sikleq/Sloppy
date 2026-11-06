@@ -49,7 +49,7 @@ builders/
   silent.py                 ← dist/patches/silent/<ver>.html (changes the notes don't mention)
 
 tools/generate_patch_code_v2.py   ← Valve datafeed → Python scaffold for content/p<ver>.py + normalized JSON
-src/css/*.css / src/js/*.js ← the one stylesheet and script of every page (glued by patch/css_bundle.py and patch/js_bundle.py, minified into dist/)
+src/css/*.css / src/js/*.js ← the stylesheet and scripts of every page (glued by patch/css_bundle.py and patch/js_bundle.py, minified into dist/; each kind of page loads only its script parts)
 
 patch/                      ← the content API used by content/p*.py: li(), b(), t(), headers, cards, …
                               and the release list (patch/meta.py RELEASE_HISTORY); also the core every builder

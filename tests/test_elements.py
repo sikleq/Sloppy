@@ -336,42 +336,6 @@ class TestShowList:
 
 
 # ---------------------------------------------------------------------------
-# item_cost()
-# ---------------------------------------------------------------------------
-
-class TestItemCost:
-    def test_returns_string(self):
-        from patch.elements import item_cost
-        result = item_cost(4200)
-        assert isinstance(result, str)
-
-    def test_contains_gold_value(self):
-        from patch.elements import item_cost
-        result = item_cost(4200)
-        assert "4200" in result
-
-    def test_contains_cost_label(self):
-        from patch.elements import item_cost
-        result = item_cost(100)
-        assert "Cost" in result
-
-    def test_wrapped_in_item_cost_box(self):
-        from patch.elements import item_cost
-        result = item_cost(500)
-        assert 'class="item-cost-box"' in result
-
-    def test_zero_cost(self):
-        from patch.elements import item_cost
-        result = item_cost(0)
-        assert "0" in result
-
-    def test_large_cost(self):
-        from patch.elements import item_cost
-        result = item_cost(99999)
-        assert "99999" in result
-
-
-# ---------------------------------------------------------------------------
 # aghs_line()
 # ---------------------------------------------------------------------------
 

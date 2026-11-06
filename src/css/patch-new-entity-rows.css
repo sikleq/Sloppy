@@ -162,7 +162,8 @@ h4.subgroup {
    share the usual 48px square (positions inline, patch/ability_group.py) so the rows keep their place; each grows on
    hover with its name above it, as .ability-chip */
 .ability-icon-stack > .stack-icon { position: absolute; display: block; border-radius: 4px; }
-.ability-icon-stack > .stack-icon > .ability-icon-img {
+.ability-icon-stack > .stack-icon > .ability-icon-img,
+.ability-icon-stack > .stack-icon > .stack-facet-tile {
   display: block;
   width: 100%;
   height: 100%;
@@ -173,8 +174,10 @@ h4.subgroup {
   transition: transform 0.12s ease;
   transform-origin: center;
 }
+.ability-icon-stack > .stack-icon > .stack-facet-tile > img { display: block; width: 100%; height: 100%; }
 .ability-icon-stack > .stack-icon:hover { z-index: 101 !important; }
-.ability-icon-stack > .stack-icon:hover > .ability-icon-img {
+.ability-icon-stack > .stack-icon:hover > .ability-icon-img,
+.ability-icon-stack > .stack-icon:hover > .stack-facet-tile {
   transform: scale(2);
   box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
 }
@@ -199,7 +202,7 @@ h4.subgroup {
   display: none;              /* not visibility: a hidden box near the right edge still widens the page */
 }
 .ability-icon-stack > .stack-icon[data-tooltip]:hover::after { display: block; visibility: visible; opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .ability-icon-stack > .stack-icon > .ability-icon-img { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .ability-icon-stack > .stack-icon > .ability-icon-img, .ability-icon-stack > .stack-icon > .stack-facet-tile { transition: none; } }
 /* A facet's ability without art of its own (7.38b Venomous Volley): the facet's gradient + icon, as a facet block's */
 .ability-block > .ability-icon-wrap > .facet-ability-icon {
   display: flex;
@@ -294,6 +297,8 @@ h4.subgroup {
   border-radius: 3px;
   box-shadow: 0 0 0 1px var(--muted-35);
 }
+/* an icon standing for a word in a sentence (runes, owner 2026-11-06): the text's own spaces are its gaps */
+.ability-chip.chip-word { margin-right: 0; }
 .ability-chip > img {
   width: 100%;
   height: 100%;
@@ -302,6 +307,23 @@ h4.subgroup {
   /* an icon with a transparent background (7.40 Bounty Rune, Water, Wisdom, Illusion) sits on a dark square of its
      own: grown on hover, the text behind no longer shows through it (owner 2026-10-28) */
   background: var(--bg-deep-97);
+}
+/* an innate's small mark, as .innate-marker on its block's icon */
+.ability-chip > .chip-innate-marker {
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--bg-page);
+}
+.ability-chip:hover > .chip-innate-marker {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, 15px) scale(2);
+  box-shadow: none;
 }
 /* a reworked mechanic's list of abilities: rows under the text, icons in place of the names, the abilities with the
    same sentence in one row (owner 2026-10-28, 7.40 Invulnerability Targeting) */
@@ -438,6 +460,8 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
   box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
 }
 /* an icon named with its name in a text grows as well (owner 2026-11-04, 7.38 Open Wounds) */
+/* from its centre, as every icon that grows: it may cover a bit of the text (owner 2026-11-06: "Убрать анимацию
+   выдвигающихся иконок … откати. Пусть закрывает часть текста") */
 .ac-sub > .ac-sub-ico { transition: transform 0.12s ease; transform-origin: center; }
 .ac-sub:hover { position: relative; z-index: 101; }
 .ac-sub:hover > .ac-sub-ico {
@@ -449,9 +473,12 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
 .ability-chip[data-tooltip]::after { bottom: calc(100% + 22px); }
 /* "[Wex] – …" in a card row; several abilities saying one thing stand side by side (owner 2026-10-30) */
 .acr-lead-chips .ability-chip + .ability-chip { margin-left: -2px; }
-/* a card text row about an Aghanim's upgrade: its stripe reaches a little left of the text, the text and icon start
-   where the plain rows' do, the glyph closes the text (owner 2026-10-30: "в конце строки … и выровнять строки") */
-.ability-change-row.acr-aghs { margin-left: -6px; padding-left: 6px; }
+/* a card text row about an Aghanim's upgrade: its stripe reaches a little past the text on both sides, never past the
+   card's padding, the text and icon start where the plain rows' do, the glyph closes the text (owner 2026-10-30: "в
+   конце строки … и выровнять строки"; 2026-11-06: "с зазором подсветки скипетра справа" — it reached left only, and
+   past a narrow card's edge) */
+.ability-change-row.acr-aghs { --agr: min(6px, var(--px, 6px)); margin-left: calc(-1 * var(--agr));
+  margin-right: calc(-1 * var(--agr)); padding-left: var(--agr); padding-right: calc(8px + var(--agr)); }
 .ability-change-row.acr-aghs .aghanim-marker { margin: 0 0 0 6px; vertical-align: -2px; }
 /* a folded text's icons don't grow: the fold would cut the grown icon and its name (owner 2026-10-30); a click opens
    the text, and there they grow */

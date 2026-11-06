@@ -67,7 +67,7 @@ ul.changes li.ability-row-start {
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
   padding-top: 6px;
-  margin-top: 10px;          /* gap between adjacent ability boxes */
+          /* gap between adjacent ability boxes */
 }
 /* A box whose ability row has its own change chip (7.38 Heaven's Halberd "NEW Passive:
    Damage Block"): the box starts after the 76px tag column and the chip hangs in that
@@ -84,7 +84,6 @@ ul.changes li.ability-row-end {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   padding-bottom: 6px;
-  margin-bottom: 4px;
 }
 
 /* COMPONENTS BOX — visual assembly recipe shown under a new item's header.

@@ -171,14 +171,10 @@ ul.changes li > .badge-group {
   border: 1px solid var(--line-soft);
 }
 .badge.rework {
-  background: rgba(180, 145, 220, 0.05);
-  color: #7d6e93;
   border: 1px solid rgba(180, 145, 220, 0.15);
 }
 /* SWAP (2026-09-26): a talent replaced by another in the same slot — teal, apart from REWORK purple */
 .badge.swap {
-  background: rgba(95, 176, 164, 0.05);
-  color: #5b8f87;
   border: 1px solid rgba(95, 176, 164, 0.18);
 }
 .badge.misc {
@@ -192,15 +188,11 @@ ul.changes li > .badge-group {
   border: 1px solid rgba(121, 192, 255, 0.20);
 }
 .badge.new {
-  background: rgba(220, 175, 95, 0.06);
-  color: #9a7f4d;
   border: 1px solid rgba(220, 175, 95, 0.22);
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 .badge.del {
-  background: rgba(179, 56, 56, 0.07);
-  color: #a85151;
   border: 1px solid rgba(179, 56, 56, 0.25);
   font-weight: 700;
   letter-spacing: 0.5px;

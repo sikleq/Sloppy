@@ -65,6 +65,14 @@ h4.subgroup .subgroup-new-type {
   margin: 0;
   min-width: 0;
 }
+/* a side's components stay on one line, the icons a little narrower when the side is tight (owner 2026-11-06, 7.38
+   Battle Fury: the new side's recipe dropped to a second line, its two framed components and the % took the room);
+   a phone stacks the sides and may wrap */
+@media (min-width: 761px) {
+  .components-change .components-row { flex-wrap: nowrap; min-width: 0; }
+  .components-change .component { flex: 0 1 auto; min-width: 0; }
+  .components-change .component img { max-width: 100%; height: auto; aspect-ratio: 4 / 3; }
+}
 .components-change .components-arrow,
 .properties-change .properties-arrow {
   align-self: center;
@@ -172,18 +180,23 @@ h4.subgroup .subgroup-new-type {
 .ability-change-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;                 /* rows closer: 14px between two lines read as an empty line (owner 2026-11-05) */
   font-size: 15px;          /* as an item ability card's text (owner 2026-09-30: 13.5px "very small" next to them) */
   line-height: 1.5;
   color: var(--text-main);
   min-width: 0;
 }
-.ability-change-row { padding: 4px 0; line-height: 1.45; }
+.ability-change-row { padding: 1px 0; line-height: 1.45; }
 /* a text of named parts (Drunken Brawler's stances) folds: its first lines fade out, a click opens it (owner
    2026-10-30: "нижняя часть блока полупрозрачная и если её нажать, то она развернётся") */
-.acr-fold-body { max-height: 4.4em; overflow: hidden; cursor: pointer;
+/* its rows 4px apart as the card's own (.ability-change-body): a head and its row sit alike folded or not (owner
+   2026-11-06, 7.38 Sun Strike "между шапкой … и текстом снова отступ") */
+.acr-fold-body { display: flex; flex-direction: column; gap: 4px; max-height: 4.4em; overflow: hidden; cursor: pointer;
   -webkit-mask-image: linear-gradient(to bottom, #000 15%, transparent);
   mask-image: linear-gradient(to bottom, #000 15%, transparent); }
+/* a side folded from its first line (no short intro above, 7.38 Nothl Projection): twice the lines, it reads as a start */
+.acr-fold-whole > .acr-fold-body { max-height: 8.8em; -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent); }
 .acr-fold:not(.is-open) .acr-fold-body:hover { -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
   mask-image: linear-gradient(to bottom, #000 35%, transparent); }
 /* open, nothing is cut: a hovered icon grows past the text's edge (owner 2026-10-30, 7.38 Mind of Tornarus' Wex) */

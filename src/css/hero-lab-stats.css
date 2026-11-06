@@ -171,12 +171,6 @@
   padding: 14px 16px 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
-.hl-picker-head strong {
-  color: #fbf4e5;
-  font-size: 18px;
-  font-family: var(--font-j25);
-  letter-spacing: 0.04em;
-}
 .hl-picker-actions {
   display: inline-flex;
   align-items: center;
@@ -220,24 +214,11 @@
 }
 .hl-picker-search {
   width: 100%;
-  height: 32px;
-  padding: 0 10px;
-  border: 1px solid rgba(135, 131, 123, 0.32);
-  border-radius: 4px;
-  background: linear-gradient(180deg, rgba(20, 19, 18,0.98), rgba(12, 12, 11,0.98));
-  color: #e3ddcf;
   font: inherit;
   outline: none;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 .hl-picker-search:focus {
   border-color: rgba(213, 173, 95, 0.72);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.04),
-    0 0 0 1px rgba(213, 173, 95, 0.28);
-}
-.hl-picker-search::placeholder {
-  color: #8c8880;
 }
 .hl-shop-body {
   padding: 8px 12px 10px;

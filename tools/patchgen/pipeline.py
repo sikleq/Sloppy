@@ -5,12 +5,16 @@ from .general import _render_general_note
 from .lines import _drop_empty_ul
 from .normalize import fetch_datafeed
 from .notes import _postprocess_group_rows_home, _postprocess_same_change_abilities
+from .post_facets import _postprocess_removed_facet_groups, _postprocess_removed_facets
+from .post_shared import _postprocess_shared_row_group
+from .post_hero import _postprocess_attr_change_first, _postprocess_facets_summary_covered
 from .post_cards import (
     _postprocess_card_stat_notes,
     _postprocess_drop_now_requires,
     _postprocess_hero_stat_card,
     _postprocess_recipe_cost_zero_net,
-    _postprocess_removed_facets,
+    _postprocess_rows_first,
+    _postprocess_two_selves_cards,
     _postprocess_removed_label,
     _postprocess_silent_stats,
     _postprocess_stack_note_into_ability,
@@ -26,7 +30,9 @@ from .post_general import (
     _postprocess_new_units,
     _postprocess_per_minute,
     _postprocess_switched_note,
+    _postprocess_rework_continuation,
     _postprocess_courier_rows,
+    _postprocess_example_icons,
     _postprocess_rune_rows,
     _postprocess_team_abilities,
     _postprocess_unit_possessive,
@@ -178,14 +184,16 @@ def generate(version):
     # 2. Auto-emit scale_pill(...) for per-level formula text.
     # 3. Drop a v2-todo breadcrumb above ability blocks tagged "reworked".
     out = _postprocess_aghs_merge(out)
-    out = _postprocess_boss_blocks(out)
+    out = _postprocess_boss_blocks(out, version)
     out = _postprocess_boss_rows_home(out)            # "Roshan's X" in a flat list -> Roshan's card
     out = _postprocess_unit_possessive(out)           # "Tormentor's X" on its card -> "X"
     out = _postprocess_switched_note(out)             # "has switched" + "Now …" note -> one line
+    out = _postprocess_rework_continuation(out)       # "This results in …" goes on the REWORK row above (11-06)
     out = _postprocess_per_minute(out)                # "… upgrade per minute …" -> minute table
     out = _postprocess_merge_twin_rows(out)
     out = _postprocess_new_units(out, version)        # a creep new in the game's files: its header and numbers
     out = _postprocess_rune_rows(out)                 # a rune reads as an ability: icon, name, rows (owner 2026-11-04)
+    out = _postprocess_example_icons(out)             # an example named in a row carries its icon (owner 2026-11-04)
     out = _postprocess_courier_rows(out)              # Courier rows -> the unit's own category (owner 2026-11-04)
     out = _postprocess_team_abilities(out)            # Glyph, Scan rows -> an ability's header (owner 2026-11-04)
     out = _postprocess_minute_formula(out)
@@ -226,9 +234,15 @@ def generate(version):
     out = _postprocess_mechanic_lists(out)             # General subgroups of lists -> mechanic blocks, tables (10-30)
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
     out = _postprocess_same_change_abilities(out)     # one block, stacked icons (owner 2026-10-30)
+    out = _postprocess_shared_row_group(out)          # one row of 3+ abilities, all their icons (owner 2026-11-06)
     out = _postprocess_group_rows_home(out)           # a hero row about all of a block's abilities -> that block
     out = _postprocess_facet_improves_row(out)        # "Now is a facet that improves X" + "X: …" -> one row (owner)
     out = _postprocess_facets_first(out)              # a hero's facets, then his abilities (owner 2026-11-02)
+    out = _postprocess_removed_facet_groups(out)      # lost facets side by side (owner 2026-11-05)
+    out = _postprocess_two_selves_cards(out, version)  # Arc Warden's two selves -> old / new cards (owner 2026-11-05)
+    out = _postprocess_rows_first(out)                # a card's plain rows above its caption (owner 2026-11-05)
+    out = _postprocess_attr_change_first(out)         # a new main attribute first in General (owner 2026-11-06)
+    out = _postprocess_facets_summary_covered(out)    # "Added three … facets" under the facet cards (owner 2026-11-06)
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is

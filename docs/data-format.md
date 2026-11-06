@@ -2,6 +2,8 @@
 
 ## Normalized JSON (`data/normalized/patches/<ver>.json`)
 
+**A snapshot, not a live file** (decided 2026-11-05). It keeps the generator's first draft at the patch's release: the owner's review lives in `content/p<ver>.py`, and `tools/kv_review.py` takes the page's tags over it. Later generator rules do not rewrite old files, so an old file can differ from a fresh run (7.38: about 270 rows). Do not regenerate old patches: the site does not read these files, CI only validates them and needs the newest patch's one (2026-10-16 a regeneration brought 12 HIGH from old rows).
+
 `tools/generate_patch_code_v2.py` writes this alongside the Python scaffold. It
 is the structured per-change artifact that:
 

@@ -346,7 +346,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SIKLE | Silent Changes {version}</title>
+<title>s/kle - Silent Changes {version}</title>
 {head}<link rel="stylesheet" href="../../styles.css?v={asset}">
 </head>
 <body>

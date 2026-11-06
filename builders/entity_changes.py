@@ -72,7 +72,10 @@ def _blocks(page: str):
         name = _re.search(r'<div class="entity-name">(.*?)</div>', header, _re.S)
         icon = _re.search(r'<img[^>]*\bsrc="([^"]+)"', header)
         label = _re.search(r'<span class="entity-(?:new|changed)-type">.*?</span>', header, _re.S)
-        body = block[:h.start()] + (f'<div class="ec-entity-note">{label.group(0)}</div>' if label else "") + block[h_end:]
+        # the price on a new item's icon: the item's page has the icon once, so the price goes with the patch's label
+        price = _re.search(r'<span class="item-icon-cost"[^>]*>.*?</span>', header, _re.S)
+        price_html = price.group(0) if price else ""
+        body = block[:h.start()] + (f'<div class="ec-entity-note">{label.group(0)}{price_html}</div>' if label else "") + block[h_end:]
         # the header may carry labels ("Returning Tier 4 Artifact", "NEW", "Recipe changed") —
         # the icon's alt text is the clean display name
         alt = _re.search(r'<img[^>]*\balt="([^"]+)"', header)
@@ -173,7 +176,7 @@ def _add_also_rows(ents: dict, also: dict, dates: dict, order: list) -> None:
 
 def _head(title: str, asset: str, prefix: str, body_cls: str) -> str:
     return ('<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-            f'<title>SIKLE | {_esc(title)}</title>\n' + _site.head_common(prefix=prefix) +
+            f'<title>s/kle - {_esc(title)}</title>\n' + _site.head_common(prefix=prefix) +
             f'<link rel="stylesheet" href="{prefix}styles.css?v={asset}">\n</head>\n<body class="{body_cls}"')
 
 
@@ -671,7 +674,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     out.append('<button class="back-to-top" aria-label="Back to top" '
                'onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>'
                '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>'
-               f'<script defer src="../src/scripts.js?v={asset}"></script>\n</div></body></html>\n')
+               f'<script defer src="../src/scripts-entity.js?v={asset}"></script>\n</div></body></html>\n')
     return "".join(out)
 
 
@@ -1376,7 +1379,7 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
                '<input type="checkbox" id="ec-show-old" class="ua-switch-input">'
                '<span class="ua-switch" aria-hidden="true"></span></label>' if n_old else '')
             + '</div></div>' + grid + '</div>\n</div>\n</div>\n'
-            f'<script defer src="src/scripts.js?v={asset}"></script>\n</body>\n</html>\n')
+            f'<script defer src="src/scripts-changes.js?v={asset}"></script>\n</body>\n</html>\n')
 
 
 def main() -> int:

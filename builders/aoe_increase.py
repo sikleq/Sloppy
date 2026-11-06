@@ -965,7 +965,7 @@ def render_html() -> str:
 
     return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        '<title>SIKLE | AoE Increase</title>\n'
+        '<title>s/kle - AoE Increase</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={asset_version}">\n'
         '</head>\n<body>\n'
@@ -979,7 +979,7 @@ def render_html() -> str:
         f'{table}\n'
         '</div>\n'
         '</div>\n'
-        f'<script defer src="src/scripts.js?v={asset_version}"></script>\n'
+        f'<script defer src="src/scripts-table.js?v={asset_version}"></script>\n'
         '</body>\n</html>\n'
     )
 

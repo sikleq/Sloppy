@@ -91,9 +91,28 @@ CANONICAL_TAGS = [
     (re.compile(r'^\s*now (?:levels(?: up)?|scales|upgrades) with\b', re.I), 'REWORK'),
     # ── classes from the 2026-09-18 datafeed proofread (memory: sloppy-datafeed-proofread-method) ──
     # a restriction / self-penalty on the OWNER is lifted → BUFF
+    # an ability that can now be pressed under silence is NEW, as "can now be cast while silenced" (owner 2026-11-05);
+    # toggles stay MISC above (owner 2026-09-27)
+    (re.compile(r'^\s*(?:Can )?no longer (?:be )?disabled by Silence\b', re.I), 'NEW'),   # 7.40b Kez's switch: MISC by hand
     (re.compile(r'\bno longer (?:be )?(?:disabled|interrupted|cancell?ed|blocked|prevented|stopped) by\b', re.I), 'BUFF'),
     (re.compile(r'\bno longer (?:interrupts?|cancels?) (?:movement|channel)', re.I), 'BUFF'),
-    (re.compile(r'\b(?:can now|now can) be (?:cast|used|toggled|activated) (?:without|while)\b', re.I), 'BUFF'),
+    (re.compile(r'\b(?:can now|now can) be (?:cast|used|toggled|activated) without\b', re.I), 'BUFF'),
+    # a new way to use it, not a bigger number (owner 2026-11-05, 7.38 Death Pact "Now can be cast while rooted or leashed",
+    # 7.41e Sniper): NEW. "can now be toggled while" is MISC above
+    (re.compile(r'\b(?:can now|now can) be (?:cast|used|activated) while\b', re.I), 'NEW'),
+    # ── owner's decisions on the 7.38 rows, 2026-11-05 ──
+    (re.compile(r'\bAdded alt-cast mode\b', re.I), 'QoL'),                 # "all it is is a convenience" (Death Pact)
+    # how a neutral creep's AI casts it, not the ability (owner 2026-11-06: "misc всё же, т.к это просто в нейтральном
+    # состоянии такая механика"; NERF on 2026-11-05 for Petrify's "only if")
+    (re.compile(r'\bNeutrals will (?:auto)?cast\b', re.I), 'MISC'),
+    # an aura for the team now for the hero alone changes what the ability is (owner 2026-11-06, 7.38 Dauntless)
+    (re.compile(r'^Now affects only \w+ (?:himself|herself|itself)\b', re.I), 'REWORK'),
+    (re.compile(r'^\s*Now is a (?:point[- ]targeted|no-target|unit[- ]targeted) ability\b', re.I), 'REWORK'),  # Magnetic Field
+    # the base value stands: the upgrade got a new property, as "no longer decreases cooldown" lost one (Hawk, Marci)
+    (re.compile(r"\bAghanim's (?:Shard|Scepter) now increases\b[^.]*\(from\b", re.I), 'NEW'),
+    (re.compile(r'\bNow provides \d+% of the bonuses to all allies\b', re.I), 'NEW'),      # Mars's Arena Of Blood
+    (re.compile(r'\bAllied Tangos provide double\b', re.I), 'NEW'),                        # Soothing Saplings
+    (re.compile(r'\bspirit is now added to both\b', re.I), 'NEW'),                         # Exorcism
     (re.compile(r'\bno longer has (?:a |an )?(?:reduced|decreased|lower|fixed|illusion vision)\b', re.I), 'BUFF'),
     (re.compile(r'\bno longer (?:freezes|loses|pauses|resets|delays)\b', re.I), 'BUFF'),
     (re.compile(r'\bis no longer (?:decreased|reduced|lowered) on \w+ from (?:his|her|their|its) own\b', re.I), 'BUFF'),

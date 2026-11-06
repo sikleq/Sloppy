@@ -38,7 +38,7 @@ Helpers are imported in every `content/p*.py` via `from patch.api import *`.
 | `patch/images.py` | CDN constants, `HERO_SLUG` / `ITEM_SLUG`, `_LOCAL_ABIL_ICONS` |
 | `patch/badges.py` | `gradient_class()`, `b()`, `br()`, `bf()`, `t()`, `scale_pill()` |
 | `patch/elements.py` | HTML helpers: `hero_header()`, `item_header()`, `section()`, `ability()`, `li()`, `subnote()`, … |
-| `patch/cards_*.py` | the cards, cut out of `elements.py` (audit 2026-10-26 #8): `cards_hero_stats` (hero stat card), `cards_aghs` (Aghanim's), `cards_item_abilities` (`item_abilities_change`), `cards_item_stats` (`properties_change`, `components_change`), `cards_ability_change` (`ability_change`, `new_ability`). They import their helpers from `elements`, which imports them back at its end; `patch/__init__.py` loads `elements` first |
+| `patch/cards_*.py` | the cards, cut out of `elements.py` (audit 2026-10-26 #8): `cards_hero_stats` (hero stat card), `cards_aghs` (Aghanim's), `cards_item_abilities` (`item_abilities_change`), `cards_item_stats` (`properties_change`, `components_change`), `cards_ability_change` (`ability_change`, `new_ability`), `cards_facets` (`new_facet`, `facet_change`, 2026-11-06; `patch/api.py` takes them from it). They import their helpers from `elements` (or the helpers' own modules), which imports the others back at its end; `patch/__init__.py` loads `elements` first |
 | `patch/site_common.py`, `kv.py`, `game_files.py`, `loc_history.py`, `terrain_index.py` | the core every builder shares: site header, the KV parser, the game-files store, old tooltips, which patches get a Terrain page. `patch/` imports nothing from `builders/` or `tools/` (`tests/test_layers.py`) |
 | `patch/output.py` / `patch/state.py` | `W()` writer accumulator + `_State` build singleton |
 | `patch/page.py` | `write_head()` / `write_footer()` / `save_html()`; reads the glued `src/css/*.css` + `src/js/*.js` (`patch/css_bundle.py`, `patch/js_bundle.py`) from disk, minifies into `dist/`, stamps a cache-busting `?v=` |
@@ -57,8 +57,8 @@ under `dist/patches/`, plus `index.html`, `calendar.html`, `neutral_stats.html`
 `terrain_<code>.html` (one per map-changing patch) + `terrain_stats.html`,
 `hero_changes.html` / `item_changes.html` / `unit_changes.html`, the
 `dist/patches/silent/*.html` KV-diff pages, `_dynamics.json`, and minified
-copies of `styles.css` + `src/scripts.js`. `styles.css` and `src/scripts.js`
-in the repo root are **source files, not outputs**.
+copies of `styles.css` + `src/scripts-<kind>.js`. `src/css/` and `src/js/`
+in the repo are **source files, not outputs**.
 
 ### Patch-dynamics widget (dyn-cells)
 
@@ -106,9 +106,8 @@ The autodetector is right ~80% of the time. Tag classification, `l=True` placeme
 
 ## How CSS / JS reach the HTML
 
-`src/css/*.css` (glued into `dist/styles.css` in the order of `patch/css_bundle.py` CSS_PARTS: that order is the cascade) and `src/js/*.js` (glued into `dist/src/scripts.js` in the order of `patch/js_bundle.py` JS_PARTS) are **hand-edited source files**, shared
-by every page. They are **linked, not embedded**: patch pages reference
-`../styles.css?v=…` / `../src/scripts.js?v=…`, and root pages (`index.html`,
+`src/css/*.css` (glued into `dist/styles.css` in the order of `patch/css_bundle.py` CSS_PARTS: that order is the cascade) and `src/js/*.js` (glued in the order of `patch/js_bundle.py` JS_PARTS into `dist/src/scripts-<kind>.js`, one file per kind of page: JS_PAGES says which parts beyond the common ones it gets, PART_MARKERS what in a page's HTML asks for a part, `tests/test_js_pages.py` checks every built page; `dist/src/scripts.js` stays whole for pages cached from before) are **hand-edited source files**. They are **linked, not embedded**: patch pages reference
+`../styles.css?v=…` / `../src/scripts-base.js?v=…`, and root pages (`index.html`,
 `calendar.html`, `neutral_stats.html`, …) reference them relative to root.
 `patch/page.py` reads them from disk and stamps a cache-busting `?v=` asset
 version — editing happens in one place, no copy is embedded.
@@ -136,7 +135,7 @@ Key fields:
 | `rows`, `notes` | Одна заметка как строка `W(li(...))`, список заметок: складывание, группировка, порядок |
 | `general`, `entities` | General Updates, герой, предмет, нейтральный крип |
 | `lines` | Общее для проходов: шаблоны блоков, боссы, мелкие помощники |
-| `post_stats`, `post_cards`, `post_general`, `post_items`, `post_late` | Проходы по готовым строкам (`_postprocess_*`) |
+| `post_stats`, `post_cards`, `post_facets`, `post_general`, `post_items`, `post_late`, `post_hero`, `post_shared` | Проходы по готовым строкам (`_postprocess_*`); `post_facets` — удалённые грани и способности (вынесено из `post_cards` 2026-11-06), `post_hero` — General героя, `post_shared` — одна строка нескольких способностей |
 | `normalize` | Datafeed и нормализованный JSON |
 | `pipeline` | `generate(version)`: порядок всех шагов |
 | `facets_auto`, `cli` | Новые грани в `patch/badges.py`, командная строка |

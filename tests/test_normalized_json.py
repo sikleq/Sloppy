@@ -79,3 +79,11 @@ def test_a_gold_price_is_parsed_so_a_cost_increase_is_a_nerf_with_lower_is_bette
     import tools.generate_patch_code_v2 as g
     rec = g._normalize_note_text("Total cost increased from 4450g to 4550g (due to Dragon Lance cost increase)")
     assert (rec["old"], rec["new"], rec["tag"], rec.get("lower_is_better")) == (4450, 4550, "nerf", True)
+
+
+def test_the_site_build_does_not_read_the_snapshots():
+    # they are the generator's first draft at release, not the page's truth (decided 2026-11-05): the page reads content/p*.py
+    for folder in ("builders", "patch", "content"):
+        for path in (_ROOT / folder).rglob("*.py"):
+            assert "data/normalized" not in path.read_text(encoding="utf-8").replace(chr(92), "/"), path
+            assert '"normalized"' not in path.read_text(encoding="utf-8"), path

@@ -327,7 +327,8 @@ def test_an_example_has_its_icon_and_a_name_without_one_stops_the_build(monkeypa
     from patch.state import _State
     import pytest
     monkeypatch.setattr(_State, "current_patch_version", "7.39")
-    assert 'src="../icons/items/sange.png"' in mech_example("Sange") and ">Sange</b>" in mech_example("Sange")
+    # the icon alone, its name on hover (owner 2026-11-06)
+    assert 'src="../icons/items/sange.png"' in mech_example("Sange") and 'data-tooltip="Sange"' in mech_example("Sange")
     assert 'src="../icons/items/enhancement_crude.png"' in mech_example("Crude Enchantment")
     assert 'src="../icons/items/aeon_disk.png"' in mech_example("Aeon Disk's Combo Breaker")
     with pytest.raises(ValueError):
@@ -352,7 +353,8 @@ def test_an_example_name_stays_on_the_line_of_the_words_around_it():
 
 def test_738_examples_have_icons():
     src = _content("p738.py")
-    for name in ("Lifestealer's Open Wounds", "Lifestealer's Feast", "Meepo's Ransack", "Linken's Sphere"):
+    # Lifesteal Amp's three abilities are a table now (owner 2026-11-06), tests/test_review_1106_markers.py
+    for name in ("Linken's Sphere",):
         assert f'mech_example("{name}")' in src, name
 
 

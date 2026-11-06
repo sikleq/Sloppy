@@ -857,7 +857,7 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
 
     return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        '<title>SIKLE | Mana Items</title>\n'
+        '<title>s/kle - Mana Items</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={ASSET_VERSION}">\n'
         '</head>\n<body>\n'
@@ -914,7 +914,7 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
         f'{table}\n'
         '</div>\n'   # close .creeps-scroll
         '</div>\n'   # close .creeps-page
-        f'<script defer src="src/scripts.js?v={ASSET_VERSION}"></script>\n'
+        f'<script defer src="src/scripts-table.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )
 

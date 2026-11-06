@@ -28,8 +28,11 @@ def test_upgrade_numbers_are_listed_like_the_game():
                                "armor": {"value": "0", "special_bonus_shard": "+0"},
                                "nolabel": {"special_bonus_shard": "5"}}}
     lines = at._value_lines(block, "shard", "x", "7.41", _tip)
-    # a bonus on a base value keeps its sign; an upgrade-only value is bare; "+0" and unlabelled ones are left out
-    assert lines == ["Radius: +100.", "Damage to barrier: 50%."]
+    # a bonus on a base value is the value with it ("=" for "to 700", owner 2026-11-06); an upgrade-only value is bare;
+    # "+0" and unlabelled ones are left out
+    assert lines == ["Radius: =700.", "Damage to barrier: 50%."]
+    # the bonuses as the game lists them, to compare two patches
+    assert at._value_lines(block, "shard", "x", "7.41", _tip, totals=False) == ["Radius: +100.", "Damage to barrier: 50%."]
 
 
 def test_a_decrease_never_says_minus():
@@ -48,7 +51,7 @@ def test_numbers_line_is_compared_by_label():
 def test_row_becomes_a_hidden_card(monkeypatch):
     texts = {"7.40c": "Gives 100 bonus radius when cast during Duel.\nRadius bonus in duel: 100.",
              "7.41": "Overwhelming Odds has larger radius.\nRadius: +100."}
-    monkeypatch.setattr(at, "aghs_text", lambda slug, kind, v: texts.get(v))
+    monkeypatch.setattr(at, "aghs_text", lambda slug, kind, v, *_: texts.get(v))
     monkeypatch.setattr(_State, "current_ability_slug", "legion_commander_overwhelming_odds")
     monkeypatch.setattr(_State, "current_patch_version", "7.41")
     monkeypatch.setattr(_State, "aghs_cards", [])
@@ -62,7 +65,7 @@ def test_row_becomes_a_hidden_card(monkeypatch):
 
 def test_no_old_tooltip_stops_the_build(monkeypatch):
     # owner 2026-10-24: "ты всегда должен знать, как было и как стало" — no row is left without its card
-    monkeypatch.setattr(at, "aghs_text", lambda slug, kind, v: None if v != "7.41" else "New text.")
+    monkeypatch.setattr(at, "aghs_text", lambda slug, kind, v, *_: None if v != "7.41" else "New text.")
     monkeypatch.setattr(_State, "current_ability_slug", "nyx_assassin_vendetta")
     monkeypatch.setattr(_State, "current_patch_version", "7.41")
     monkeypatch.setattr(_State, "aghs_cards", [])
@@ -72,7 +75,7 @@ def test_no_old_tooltip_stops_the_build(monkeypatch):
 
 def _moved(monkeypatch, old_h, new_h, slug):
     monkeypatch.setattr(at, "holders", lambda hero, kind, v: old_h if v == "7.40c" else new_h)
-    monkeypatch.setattr(at, "aghs_text", lambda s, kind, v: f"{s} upgrade, {'old' if v == '7.40c' else 'new'}.")
+    monkeypatch.setattr(at, "aghs_text", lambda s, kind, v, *_: f"{s} upgrade, {'old' if v == '7.40c' else 'new'}.")
     monkeypatch.setattr(at, "ability_name", lambda s, v: s.title())
     monkeypatch.setattr(_State, "current_hero", "arc_warden")
     monkeypatch.setattr(_State, "current_ability_slug", slug)
@@ -115,7 +118,7 @@ def test_reworked_card_shows_the_old_parts_other_abilities_lost(monkeypatch):
 def _parts(monkeypatch, old, new, slug, hero="windrunner"):
     """old / new: {ability: upgrade text} of the hero in 7.40c / 7.41."""
     monkeypatch.setattr(at, "holders", lambda h, kind, v: sorted(old if v == "7.40c" else new) if kind == "scepter" else [])
-    monkeypatch.setattr(at, "aghs_text", lambda s, kind, v: (old if v == "7.40c" else new).get(s))
+    monkeypatch.setattr(at, "aghs_text", lambda s, kind, v, *_: (old if v == "7.40c" else new).get(s))
     monkeypatch.setattr(at, "ability_name", lambda s, v: s.title())
     monkeypatch.setattr(_State, "current_patch_version", "7.41")
     monkeypatch.setattr(_State, "aghs_part_slug", (slug, hero))
@@ -199,7 +202,8 @@ def test_number_highlight_is_a_number_change_not_a_strip():
     assert 'class="iab-hl iab-hl-nerf iab-hl-num">45/40/35/30s' in html
     assert 'class="iab-hl iab-hl-nerf">Dispellable' in html
     # the new side's number gets the old one's % on hover
-    out = el._pair_number_tips(el.hl("20", "del"), el.hl("25", "buff"))
+    from patch.number_tips import _pair_number_tips
+    out = _pair_number_tips(el.hl("20", "del"), el.hl("25", "buff"))
     assert "iab-hl-num" in out and "iab-hint" in out and "+25%" in out
 
 
@@ -220,8 +224,11 @@ def test_huskar_inner_fire_numbers_are_right():
     # (AbilityCooldown -3) and two labels end in "heal": none of them goes after the word
     line = cards_aghs._aghs_inline("Lowers Inner Fire cooldown and causes it to apply a movement speed slow and heal Huskar."
                            "\nCooldown: -3s. Movement slow: 50%. Hero damage as heal: 50%. Non-hero damage as heal: 10%.")
-    assert line == ("Lowers Inner Fire cooldown (-3s) and causes it to apply a movement speed slow (50%) and heal "
-                    "Huskar. Hero damage as heal: 50%. Non-hero damage as heal: 10%.")
+    # four values: a table takes them all, none goes into the sentence (owner 2026-11-06)
+    assert line == ("Lowers Inner Fire cooldown and causes it to apply a movement speed slow and heal Huskar. "
+                    "Cooldown: -3s. Movement slow: 50%. Hero damage as heal: 50%. Non-hero damage as heal: 10%.")
+    two = cards_aghs._aghs_inline("Lowers Inner Fire cooldown and applies a slow.\nCooldown: -3s. Movement slow: 50%.")
+    assert two == "Lowers Inner Fire cooldown (-3s) and applies a slow (50%)."
     assert at._HEADER_LABELS["abilitycooldown"] == "Cooldown" and at._num("-50%") == "-50%"
 
 
@@ -267,14 +274,15 @@ def test_added_upgrade_is_a_card_and_removed_one_a_row(monkeypatch):
            ["legion_commander_overwhelming_odds"], "legion_commander_duel")
     plain = lambda h: re.sub(r"<[^>]+>", "", h)
     row = el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
-    # the hero keeps the Shard on Overwhelming Odds: only this ability's part is gone (owner 2026-10-26)
-    assert ("iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard bonus from this ability.")
+    # the hero keeps the Shard on Overwhelming Odds: still the short row (owner 2026-11-06; 10-26 it said "bonus from
+    # this ability")
+    assert ("iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard.")
             and "No longer" not in row)
     assert "ability-change" not in el.ul_close()
     # moved to another ability: the same row
     _moved(monkeypatch, ["arc_warden_spark_wraith"], ["arc_warden_tempest_double"], "arc_warden_spark_wraith")
     row = el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
-    assert "iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard bonus from this ability.")
+    assert "iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard.")
     # nothing of it left on the hero: the whole upgrade is gone
     _moved(monkeypatch, ["arc_warden_spark_wraith"], [], "arc_warden_spark_wraith")
     row = el.li("No longer upgraded with Aghanim's Shard", t("DEL"))

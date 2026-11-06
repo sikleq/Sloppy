@@ -23,7 +23,7 @@ def save_index_html():
     # cells. Assets: icons/ui/gothic/ (Gothic Pixel UI FREE, gold variant).
     latest = PATCHES[0]['version'] if PATCHES else None
     # Captions are placeholder words for now (final wording TBD); the hrefs are
-    # the real destinations. Font matches the "sikle" wordmark (Jersey 10).
+    # the real destinations. Font matches the "s/kle" wordmark (Jersey 10).
     # Top row = two simple link tiles, three SUB-PANEL openers (Creeps / Items /
     # Heroes, which expand in place like Support instead of redirecting), then
     # Terrain. Each link tile swaps its static PNG for an animated GIF on hover:
@@ -349,7 +349,7 @@ def save_index_html():
         '<html lang="en">\n'
         '<head>\n'
         '<meta charset="UTF-8">\n'
-        '<title>SIKLE | dota.vpk</title>\n'
+        '<title>s/kle</title>\n'
         # Handjet = pixel/dot-matrix font WITH Cyrillic (Jersey 10 is Latin-only), used for the signature
         # wall so Cyrillic member names render in-style; self-hosted like Jersey (styles.css @font-face)
         + _site.head_common() +
@@ -359,7 +359,7 @@ def save_index_html():
         f'{nav}\n'
         f'{sig_layer}\n'
         f'<div class="container main-page">{grid_html}</div>\n'
-        f'<script defer src="src/scripts.js?v={_ASSET_VERSION}"></script>\n'
+        f'<script defer src="src/scripts-home.js?v={_ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )
     _os.makedirs(_site.DIST_DIR, exist_ok=True)

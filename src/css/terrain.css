@@ -34,7 +34,6 @@
   box-shadow:
     inset 0 1px 0 rgba(222, 216, 203, 0.08),
     0 6px 22px var(--shadow-50);
-  cursor: grab;
   touch-action: none;          /* JS owns the pointer drag — no scroll hijack */
   user-select: none;
   -webkit-user-select: none;
@@ -352,7 +351,6 @@ button.tf-hband[aria-pressed="false"] { opacity: 0.45; }
 }
 .tc-fs-active .terrain-compare {
   display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100%;
 }

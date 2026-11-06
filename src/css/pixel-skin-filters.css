@@ -46,22 +46,28 @@ html.cb-mode .ability-block.talents-block svg.ttree .ttree-on[data-tag="swap"] {
    a low header strip — "Active: Name" left, cast range / mana / health cost / cooldown right with the
    game's own icons — then the description with every number bold and a step brighter. */
 ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
-.iab-head { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+.iab-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
   margin: -6px -12px 5px; padding: 2px 12px; min-height: 22px; box-sizing: border-box;
   background: rgba(255, 255, 255, 0.035); border-bottom: 1px solid var(--line-soft);
-  border-radius: 6px 6px 0 0; line-height: 18px; flex-wrap: wrap; row-gap: 0; }
-/* the name stays on one line; long values (Dagon's 5 levels) wrap below it, still on the right */
-.iab-title { white-space: nowrap; }
-/* a long header wraps on a phone, or it widens the whole page (7.38 Demonic Cleanse: 471 px on a 375 px screen) */
-@media (max-width: 640px) { .iab-title { white-space: normal; } }
+  border-radius: 6px 6px 0 0; line-height: 18px; flex-wrap: nowrap; row-gap: 0; }
+/* the values never leave the first line (owner 2026-11-06, 7.38 Demonic Cleanse: "shares level with Demonic Purge
+   заставляет перезарядку … съезжать на другую строку. Этого в шапках не допускаем"): the title gives way, its kind and
+   name whole, "– scales / shares level with …" wrapping under them */
+.iab-title { white-space: normal; flex: 1 1 auto; min-width: 0; }
+.iab-title > .iab-kind, .iab-title > .iab-name { white-space: nowrap; }
+/* on a phone the values may go under the title: there is no room for both (7.38 Demonic Cleanse: 471 px on a 375 px
+   screen widened the whole page) */
+@media (max-width: 640px) { .iab-head { flex-wrap: wrap; } }
 .iab-name { color: var(--text-bright); font-weight: 600; }
 /* "Passive (Scales with Duel)": what the ability levels with, moved out of the text (owner 2026-10-24) */
 .iab-scale { color: var(--text-dim); font-weight: 400; font-size: 0.92em; }
 .iab-scale .aghanim-marker { margin: 0 2px 0 3px; width: 13px; height: 13px; }
-.iab-meta { display: flex; align-items: center; gap: 9px; flex: none; font-weight: 600; margin-left: auto;
-  color: var(--text-bright); font-variant-numeric: tabular-nums; }
-.iab-m { display: inline-flex; align-items: center; gap: 4px; }
-.iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; }
+.iab-meta { display: flex; align-items: center; flex: none; margin-left: auto;
+  color: var(--text-bright); }
+.iab-m { display: inline-flex; align-items: center; }
+/* Radiance's digits sit 1px above their line's middle: the icon goes up 1px so the two centres meet (owner 2026-11-06,
+   7.38 Time Zone; measured by ink, 1.0-1.25px on every head, dotted or not) */
+.iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; position: relative; top: -1px; }
 .iab-desc { display: block; }
 .iab-num { font-weight: 700; color: var(--text-bright); }
 /* An ability / facet card has no header strip (its name is the title above), so its radius / range / cost /

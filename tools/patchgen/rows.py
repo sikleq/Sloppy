@@ -7,6 +7,9 @@ from .common import _HERE
 from .data import _strip_html
 from .tags import _FROM_TO_RE, _guess_tag, _is_lower_better
 
+# the ability's base value stands, the upgrade got a new property: NEW with the numbers in the text, no % (owner 2026-11-05)
+_NEW_UPGRADE_RE = re.compile(r"\bAghanim's (?:Shard|Scepter) now increases\b[^.]*\(from\b", re.I)
+
 def _split_levels(s):
     """'5/7/9/11' or '5' or '52–56' → list or scalar. Strips trailing unit suffix (%/s/x/g).
     En-dash ranges (52–56) are kept as-is (string); / separates levels."""
@@ -78,7 +81,8 @@ def _emit_badge(text, hero_side=False):
         old, new = float(m.group("old")), float(m.group("new"))
         num = lambda v: int(v) if v.is_integer() else v
         return f'b({num(old)!r}, {num(new)!r}{", l=True" if _is_lower_better(text) else ""})'
-    m = _FROM_TO_RE.search(text)
+    # "Treant Multiplier rescaled from x2/x3/x4/x5/x6 to x4" (7.38): numbers like any others
+    m = _FROM_TO_RE.search(re.sub(r'(?<![\w.])x(?=\d)', '', text))
     if not m:
         return _emit_range_badge(text, hero_side)
     old = _split_levels(m.group(1))
@@ -226,6 +230,10 @@ _HERO_SIDE = [False]      # True while generate() renders the Heroes section
 _DRAFT_TIME_RE = re.compile(r'\b(?:drafting|pick(?:ing)?|ban(?:ning)?|strategy|hero selection)\s+(?:phase\s+)?time\b', re.I)
 
 
+_LEVEL_VALUES_RE = re.compile(r"^Added (?P<what>[A-Z][\w' ]+?) values for levels (?P<levels>\d+ and \d+) of "
+                              r"(?P<orb>[A-Z]\w+): (?P<vals>\S+)$")
+
+
 def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, version=None):
     """Render one W(li(...)) call. tag_override overrides heuristic; aghs is
     'scepter'/'shard' (already encoded in text if from datafeed); info is
@@ -237,6 +245,13 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
     if chg and '. ' not in txt[:len(chg.group(0))]:
         txt = txt.split(': ', 1)[1]
     clean = _strip_html(txt)
+    # "Added Mana Burned values for levels 9 and 10 of Wex: 700/775" is the row every such ability has, its numbers
+    # under the [?] (owner 2026-11-06, 7.38 E.M.P. / Sun Strike: "забыл числа под [?]")
+    lv = _LEVEL_VALUES_RE.match(clean)
+    if lv:
+        note = f"{lv.group('what')} for levels {lv.group('levels')} of {lv.group('orb')} is {lv.group('vals')}"
+        note = f"{note}<br>{info}" if info else note
+        return f'W(li("Added values for levels {lv.group("levels")}", t("NEW"), extra=inline_note("{note}")))'
     if re.match(r'^Level (?:increased|decreased|changed) from \d+ to \d+$', clean):
         return f'W(li("{txt}", t("MISC")))'        # a creep's level: classification, not a buff/nerf
     if _DRAFT_TIME_RE.search(clean):
@@ -285,7 +300,7 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
 
     badge_call = _emit_badge(txt, hero_side=bool(hero_name) or _HERO_SIDE[0])
     tag = tag_override or _guess_tag(txt)
-    if badge_call:
+    if badge_call and not _NEW_UPGRADE_RE.search(txt):
         # Numeric change — let b() drive the tag (BUFF/NERF inferred from
         # value direction + l=True flag). Tag-text only if explicit.
         badge_str = badge_call

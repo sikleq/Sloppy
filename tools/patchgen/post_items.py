@@ -8,13 +8,13 @@ from .lines import _BOSSES, _ROW_RE, _boss_abilities, _row
 from .post_stats import _NEW_ABILITY_TRIGGERS, _REWORK_TRIGGERS
 from .rows import _emit_li
 
-def _postprocess_boss_blocks(lines):
+def _postprocess_boss_blocks(lines, version=None):
     """W(subgroup("Tormentor")) + flat rows  ->  unit_header(..., general=False, track=True),
     general rows, then one block per ability:
       "Alleviation: New ability. X"            -> new-ability card (ability_change(None, …, tag="new"))
       "The Shining: <change>" / "Roar of Retribution" + info lines -> ability(...) + its rows
-      info line "Unyielding Shield: … rescaled from A + (B per death) to …" -> a TODO for the
-      old/new card (old tooltip: patch/loc_history.py (the game-files store); scale_pill tables — see content/p738.py).
+      info line "Unyielding Shield: … rescaled from A + (B per death) to …" -> a "Scaling reworked" card when the
+      formula's variable changed (_scaling_cards, patch/scaling_card.py), else a TODO.
     If every general row is REWORK except NEW ones (and ≥3 REWORK) -> new_mech="Reworked objective":
     the REWORK rows become the description box, the NEW rows stay changes."""
     out = []
@@ -77,10 +77,7 @@ def _postprocess_boss_blocks(lines):
         mech = ', new_mech="Reworked objective"' if reworked else ''
         out.append(f'W(unit_header("{name}", "{icon}", general=False, track=True{mech}))')
         out += ['W(ul_open())'] + general + ['W(ul_close())']
-        for ab, part in todos:
-            out.append(f'# v2-todo: {ab} — scaling changed ({part}). Make an ability_change(old=…, new=…, '
-                       f'tag="rework") card: old tooltip from patch/loc_history.py (the game-files store), '
-                       f'formulas as scale_pill tables (deaths / game time) — see content/p738.py Tormentor')
+        out += _scaling_cards(todos, abil_icons, version)
         for ab, rows in per_abil.items():
             out += [f'W(ability("{ab}", icon_url="{abil_icons[ab]}"))', 'W(ul_open())'] + rows + ['W(ul_close())']
         for ab, desc in new_cards:
@@ -90,7 +87,36 @@ def _postprocess_boss_blocks(lines):
     return out
 
 
-_COST_ROW_RE = re.compile(r'^Costs? (\d+) gold$', re.I)
+_RESCALED_RE = re.compile(r"^(?P<ab>[^:]+): (?P<stat>.+?) rescaled from (?P<old>.+?) to (?P<new>.+)$")
+
+
+def _scaling_cards(todos, abil_icons, version):
+    """Info lines "Unyielding Shield: Damage absorb rescaled from 2500 + (200 per death) to 1900 + (20 per minute of game
+    time)" -> one scaling_rework(...) card per ability when the formula's variable changed (owner 2026-11-06, 7.38
+    Tormentor: was by hand); the description is the game's own of each patch. Anything else stays a TODO."""
+    from patch.loc_history import tooltip
+    from patch.meta import _prev_patch_version
+    from patch.scaling_card import variable
+    out, cards = [], {}
+    for ab, part in todos:
+        m = _RESCALED_RE.match(part)
+        old_var, new_var = (variable(m.group("old")), variable(m.group("new"))) if m else (None, None)
+        if not (old_var and new_var and old_var != new_var):
+            out.append(f'# v2-todo: {ab} — scaling changed ({part}). Make an ability_change(old=…, new=…, '
+                       f'tag="rework") card: formulas as scale_pill tables — see patch/scaling_card.py')
+            continue
+        cards.setdefault(ab, []).append((m.group("stat")[:1].upper() + m.group("stat")[1:], m.group("old"), m.group("new")))
+    prev = _prev_patch_version(version) if version else None
+    for ab, stats in cards.items():
+        icon = abil_icons[ab]
+        slug = icon.rsplit("/", 1)[-1].split(".")[0]
+        desc = lambda v: (tooltip(f"DOTA_Tooltip_ability_{slug}_Description", v) or "") if v else ""
+        out.append(f'W(scaling_rework({json.dumps(ab)}, {json.dumps(icon)}, {json.dumps(desc(prev), ensure_ascii=False)}, '
+                   f'{json.dumps(desc(version), ensure_ascii=False)}, {stats!r}))')
+    return out
+
+
+_NEW_ITEM_COST_RE = re.compile(r'^Costs? (\d+) gold$', re.I)
 _REQ_ROW_RE = re.compile(r'^Requires (?P<parts>.+?)\. Total cost: (?P<total>\d+)g?$', re.I)
 _REQ_PART_RE = re.compile(r"(?:and )?(?:an? )?(?P<name>[A-Za-z][\w' -]+?) \((?P<cost>\d+)\)")
 
@@ -102,9 +128,9 @@ def _new_item_card_parts(text, note):
     """One row of a NEW item -> a card piece, or None if the row is a normal NEW row."""
     if re.match(r'^Provides no bonuses\.?$', text, re.I):
         return []                                          # nothing to show: no bonus box at all
-    m = _COST_ROW_RE.match(text)
+    m = _NEW_ITEM_COST_RE.match(text)
     if m:
-        return [f'W(item_cost({m.group(1)}))']
+        return [f'cost={m.group(1)}']                      # the header takes it: a tag on the icon
     m = _REQ_ROW_RE.match(text)
     if m:
         parts = [(pm.group('name'), pm.group('cost')) for pm in _REQ_PART_RE.finditer(m.group('parts'))]
@@ -278,7 +304,7 @@ def _postprocess_unstated_total_cost(lines):
 
 def _postprocess_new_item_card(lines, version=None):
     """A NEW item is a card, not a change list (docs/agent-rules/patch-tags.md "Новый предмет"):
-    header with label -> price (item_cost / components) -> bonuses (provides box; none -> no box)
+    header with label and price on the icon (or components under it) -> bonuses (provides box; none -> no box)
     -> Passive:/Active: ability rows and other notes, all t("NEW")."""
     out = []
     i = 0
@@ -294,7 +320,7 @@ def _postprocess_new_item_card(lines, version=None):
         while j < len(lines) and lines[j] != 'W(ul_close())':
             body.append(lines[j])
             j += 1
-        price, bonus, rows = [], [], []
+        price, bonus, rows, cost = [], [], [], None
         for b_ in body:
             raw = re.match(r'^W\(li\("((?:[^"\\]|\\.)*)"', b_)
             note = re.search(r'extra=inline_note\("((?:[^"\\]|\\.)*)"\)', b_)
@@ -308,13 +334,15 @@ def _postprocess_new_item_card(lines, version=None):
                 rows.append(row)
             elif piece and 'provides(' in piece[0]:
                 bonus += piece
+            elif piece and piece[0].startswith('cost='):
+                cost = piece[0][len('cost='):]
             else:
                 price += piece
-        if not price and 'Artifact' not in ln and 'Enchantment' not in ln:
+        if not price and not cost and 'Artifact' not in ln and 'Enchantment' not in ln:
             name = re.match(r'^W\(item_header\("([^"]+)"', ln).group(1)
             cost = _kv_item_cost(name, version) if version else None
-            if cost:
-                price = [f'W(item_cost({cost}))']
+        if cost:
+            ln = f'{ln.rstrip()[:-2]}, cost={cost}))'
         out += [ln] + price + bonus
         if rows:
             out += ['W(ul_open())'] + rows + ['W(ul_close())']

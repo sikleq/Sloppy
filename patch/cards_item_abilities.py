@@ -5,7 +5,8 @@ import html as _html
 import re
 
 from .state import _State, page_cache
-from .elements import _number_tip, hl
+from .elements import hl
+from .number_tips import _number_tip
 
 
 # ---- An item's ability described in a row: a light header like the game's item tooltip ----
@@ -271,6 +272,10 @@ def _bold_numbers_html(html_text):
 
 # "Ultimate. Passive — at the ult's level-up points …" (7.41 Divided We Stand): the header says the kind, the text not
 _PANE_KIND_RE = re.compile(r"^\s*(?:Ultimate[.,]\s*)?(Active|Passive|Toggle|Aura)(?:([.,])|\s+([—–-]))\s*")
+# "Passive and active components." (7.41 Zealot): the header says both (owner 2026-11-06: "Можем ли указать
+# Active/Passive?")
+_PANE_GRANTS_RE = re.compile(r"^\s*Grants (?:the )?([A-Z][\w'’ -]{1,40}?) ability\.?\s*$")
+_PANE_BOTH_KINDS_RE = re.compile(r"^\s*(?:Passive and active|Active and passive) components\.\s*", re.I)
 
 
 # What the ability levels / scales with leaves the text for the header, after the kind: "Passive, levels up with
@@ -279,7 +284,47 @@ _PANE_KIND_RE = re.compile(r"^\s*(?:Ultimate[.,]\s*)?(Active|Passive|Toggle|Aura
 # highlight on the phrase (Distortion Field 7.41: "del") stays on it in the header.
 # "Shares level with Kinetic Field." goes there too (owner 2026-10-26, 7.41 Kinetic Fence: "в шапку, как scales with").
 _PANE_SCALE_RE = re.compile(r"(?:^|(?<=[.!]))\s*(<span[^>]*>)?((?:[Ll]evels(?: up)?|[Ss]cales|[Ii]mproves)|"
-                            r"[Ss]hares (?:its )?level) with ([^.<]+?)(</span>)?\.(?=\s|$)")
+                            r"[Ss]hares (?:its )?level) with ([^.<]+?)(</span>)?(?:\.(?=\s|$)|\s*$)")
+# the same said in brackets or as what a part depends on (owner 2026-11-06: "scales with … проверь где в каком патче
+# упустили"): 7.41 Tiny "per stack (levels with Grow)", 7.38 Summon Convert "Summoned unit depends on the level of Holy
+# Persuasion: …" -> "Summoned unit: …"
+_PANE_SCALE_BRACKET_RE = re.compile(r"\s*\((?:levels|scales) with ([A-Z][\w' ]+)\)")
+_PANE_DEPENDS_RE = re.compile(r"\s+depends on the level of ([A-Z][\w' ]+):")
+# no words for it, but a formula of the text grows with it: "+ 20 per minute of game time" (7.38 Tormentor, Roshan),
+# "10% + 1.5% per hero level" (7.41 Dark Seer); "per level of his bonus movement speed" is no hero level
+_PANE_TIME_RE = re.compile(r"\bper minute of (?:the )?game(?: time)?\b|\bScales with game time\b", re.I)
+_PANE_LEVEL_RE = re.compile(r"\d%? [+\-] \d+(?:\.\d+)?%? per (?:hero )?level\b(?! of| up)")
+
+
+def _pane_scale(items, plain, props=None, kind=""):
+    """What the pane scales with, its words cut from the text — "" when the text doesn't say it or says two. The
+    guesses from a formula need the pane's kind; hero level is left to the game files when they know the ability
+    (props' "level_scaled")."""
+    found = [(i, m) for i in plain for m in _PANE_SCALE_RE.finditer(items[i])]
+    if len(found) == 1:                         # two of them (two sub-abilities) can't say whose: they stay
+        i, m = found[0]
+        o, verb, what, c = m.group(1, 2, 3, 4)
+        # "shares level with" -> "levels with": shorter, the header stays on one line (owner 2026-11-06, Demonic Cleanse)
+        verb = "levels" if verb.lower().startswith("shares") else "scales"
+        items[i] = _PANE_SCALE_RE.sub("", items[i], count=1)
+        what = re.sub(r"\bgame's time\b", "game time", what.strip())     # 7.41 Zealot "Improves with game's time"
+        return f'{o or ""}{verb} with {what}{c if o else ""}'
+    if found:
+        return ""
+    for rx, cut in ((_PANE_SCALE_BRACKET_RE, ""), (_PANE_DEPENDS_RE, ":")):
+        hits = [(i, m) for i in plain for m in rx.finditer(items[i])]
+        if len(hits) == 1:
+            i, m = hits[0]
+            items[i] = items[i][:m.start()] + cut + items[i][m.end():]
+            return f"scales with {m.group(1).strip()}"
+    if not kind:
+        return ""
+    said = " ".join(re.sub(r"<[^>]+>", "", items[i]) for i in plain)
+    if _PANE_TIME_RE.search(said):
+        return "scales with game time"
+    if "level_scaled" not in (props or {}) and _PANE_LEVEL_RE.search(said):
+        return "scales with level"
+    return ""
 
 
 # never said in a card: "can't be leveled up", and "Has only one level" (the header's "granted by Aghanim's X" says it,
@@ -296,8 +341,9 @@ _PANE_NAME_RE = re.compile(r"^\s*([A-Z][\w'’-]*(?: [A-Za-z][\w'’-]*){0,4}):\
 # Keen Scope, Bitter Chill, Fiend's Gate — 33 cards of 7.38-7.41 had it as bare text). A pill already there (its
 # number right after the trigger's ">") is left alone.
 # "<b>10% + 2%</b> per hero level" (7.38 Dark Seer, hand-written) is one too: the bold closes after the pill
+# "40% + 5% per 5 levels" too: a step every few levels (owner 2026-11-05, 7.41 Essence Flux had no level table)
 _PER_LEVEL_RE = re.compile(r'(?<![\w.])(?<!">)(\d+(?:\.\d+)?)(%|s)?( [+\-] )(\d+(?:\.\d+)?)(%|s)?(</b>)?'
-                           r'( per (?:hero )?level)\b(?! up)')
+                           r'( per (?:hero )?level| per (\d+) levels)\b(?! up)')
 
 
 def _pill_formulas(html_text):
@@ -308,9 +354,10 @@ def _pill_formulas(html_text):
     def pill(m):
         base, unit, sign, inc = float(m.group(1)), m.group(2) or m.group(5) or "", m.group(3).strip(), float(m.group(4))
         step = inc if sign == "+" else -inc
+        every = int(m.group(8)) if m.group(8) else None
         places = max(len((x.split(".") + [""])[1]) for x in (m.group(1), m.group(4)))
-        trigger, table = scale_pill(m.group(0).replace("</b>", ""), lambda L: base + step * L,
-                                    value_fmt=f"{{:.{places}f}}{unit}")
+        grow = (lambda L: base + step * (L // every)) if every else (lambda L: base + step * L)
+        trigger, table = scale_pill(m.group(0).replace("</b>", ""), grow, value_fmt=f"{{:.{places}f}}{unit}")
         tables.append(f'<div class="formula-table-wrap">{table}</div>')
         return trigger + (m.group(6) or "")
     return _PER_LEVEL_RE.sub(pill, html_text), "".join(tables)
@@ -319,7 +366,9 @@ def _pill_formulas(html_text):
 # A header radius / cast range the text already names with its own words ("Vanish radius: 625/550/475/400", 7.41
 # Blur) or the same as the radius (a self-centred ability's cast range = its radius: Crimson Guard, Blur, Frost
 # Shield) is not said twice: the header keeps one line (owner 2026-10-25, Blur's "scales with Coup de Grace" wrapped).
-_HEAD_SAID_LABEL = {"aoe": r"radius", "castrange": r"range"}
+# a cooldown the text gives as its formula ("Cooldown: 24.5 - 0.5 per level", 7.41 Mischief) is not its first value
+# again in the header (owner 2026-11-06)
+_HEAD_SAID_LABEL = {"aoe": r"radius", "castrange": r"range", "cooldown": r"cooldown", "manacost": r"mana cost"}
 
 
 def _head_said_twice(key, val, text, props) -> bool:
@@ -340,7 +389,8 @@ def _pane_values(desc, props=None) -> dict:
             if (props or {}).get(key) or found.get(key)}
 
 
-from .cards_rows import _CardRow, _card_row, _lead_ability_chip, _merge_same_rows, _row_html, fold_long_rows
+from .cards_rows import (_CardRow, _card_row, _lead_ability_chip, _merge_same_rows, _row_html, fold_long_rows,
+                         in_heros_order)
 
 
 def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hint=None):
@@ -351,22 +401,30 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
     items = [d for d in (desc if isinstance(desc, list) else [desc]) if d is not None]
     plain = [i for i, d in enumerate(items) if isinstance(d, str) and not d.lstrip().startswith("<div")]
     kind = (props or {}).get("kind", "")
-    if plain:
-        mk = _PANE_KIND_RE.match(items[plain[0]])
+    both = _PANE_BOTH_KINDS_RE.match(items[plain[0]]) if plain else None
+    if both:                                    # the text says both: over the files' one kind (7.41 Zealot)
+        kind = "Active / Passive"
+        items[plain[0]] = items[plain[0]][both.end():]
+    # a facet granting an ability: "Grants Chicken Fingers ability" names the header, "Passive. …" under it says the
+    # kind (owner 2026-11-06, 7.38 Chicken Fingers: "шапка есть, а passive нет … в карточке написано passive")
+    grants = _PANE_GRANTS_RE.match(items[plain[0]]) if facet and len(plain) > 1 else None
+    if grants:
+        name_hint = name_hint or grants.group(1)
+        items[plain[0]] = ""                    # an empty row is dropped below
+    first = plain[1] if grants else plain[0] if plain else None
+    if first is not None:
+        mk = _PANE_KIND_RE.match(items[first])
         if mk:
             kind = kind or mk.group(1)
-            rest = items[plain[0]][mk.end():]
+            rest = items[first][mk.end():]
             # "Active, targets an allied creep …" (7.41 Sacrifice): the clause after the comma starts the text
-            items[plain[0]] = rest[:1].upper() + rest[1:] if mk.group(2) == "," or mk.group(3) else rest
+            items[first] = rest[:1].upper() + rest[1:] if mk.group(2) == "," or mk.group(3) else rest
     scale = ""
+    # the text's own words go to the header with or without a kind (7.37 Lone Druid's "Scales with True Form")
+    scale = _pane_scale(items, plain, props, kind)
     if kind:
-        found = [m for i in plain for m in _PANE_SCALE_RE.finditer(items[i])]
-        if len(found) == 1:                     # two of them (two sub-abilities) can't say whose: they stay
-            o, verb, what, c = found[0].group(1, 2, 3, 4)
-            verb = "shares level" if verb.lower().startswith("shares") else "scales"
-            scale = f'{o or ""}{verb} with {what.strip()}{c if o else ""}'
         for i in plain:
-            cut = _PANE_NOLEVEL_RE.sub("", _PANE_SCALE_RE.sub("", items[i], count=1) if scale else items[i]).strip()
+            cut = _PANE_NOLEVEL_RE.sub("", items[i]).strip()
             if cut != items[i]:                 # rule of 2026-05-16: "can't be leveled up" is never said in a card
                 items[i] = cut[:1].upper() + cut[1:]
     name = ""
@@ -404,7 +462,9 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
             rows.append(_bold_numbers_html(d) if isinstance(d, str) else d)
         else:
             rows.append(_card_row(*_lead_ability_chip(d)))
-    rows = _merge_same_rows(rows)
+    # an Aghanim's row stays among its ability's rows, its stripe and glyph say what it is (owner 2026-11-06, 7.38
+    # Invoker: the "Aghanim's Scepter" / "Aghanim's Shard" heads over them were "лишнее … как до этого")
+    rows = _merge_same_rows(in_heros_order(rows))
     rows = [_row_html(r) if isinstance(r, _CardRow) else r for r in rows]
     rows = fold_long_rows(rows)
     rows += tables
@@ -1096,6 +1156,23 @@ def render_iab_card(key):
             f'<div class="properties-pane pane-old">{left}</div>'
             f'<span class="properties-arrow" style="grid-row:{span}">→</span>'
             f'<div class="properties-pane pane-new">{right}</div></div>')
+
+
+_GONE_STATS_THEN_CARD_RE = re.compile(
+    r'<div class="properties-change old-only"[^>]*><div class="properties-pane pane-old">((?:(?!</div>).)*)</div>'
+    r'<span class="properties-arrow"[^>]*>→</span></div>\s*'
+    r'<div class="properties-change iab-change"[^>]*><div class="properties-pane pane-old">(.*?)</div>'
+    r'<span class="properties-arrow"[^>]*>→</span>(<div class="properties-pane pane-new">)', re.S)
+
+
+def raise_abilities_beside_gone_stats(html):
+    """A stats card with only an old side leaves a hole on its right, over the abilities card under it (owner 2026-11-05,
+    7.38 Pirate Hat: "блоки способностей подними выше"). Old stats over the old abilities in one column, the new
+    abilities from the top of the other. A stat with a note of its own has a nested box and stays as it was."""
+    return _GONE_STATS_THEN_CARD_RE.sub(
+        lambda m: ('<div class="properties-change iab-change iab-raised"><div class="iab-old-col">'
+                   f'<div class="iab-gone-stats">{m.group(1)}</div><div class="properties-pane pane-old">{m.group(2)}</div></div>'
+                   f'<span class="properties-arrow">→</span>{m.group(3)}'), html)
 
 
 def _tone_cls(badge_html, fallback=""):

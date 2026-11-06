@@ -41,13 +41,15 @@ def test_the_line_goes_straight_from_the_icon_into_the_card():
     body = re.search(r"function connectorPath\(blockRect, iconRect, paneRect\) \{(.*?)\n  \}", js, re.S).group(1)
     assert "iconRect.bottom - blockRect.top" in body and "paneRect.top - blockRect.top" in body
     assert body.count(" L ") == 1                        # one straight piece, no elbow
-    assert js.count("connectorPath(blockRect, iconRect, paneRect));") == 2      # both kinds of card
+    # both kinds of card; a card under rows starts under the card before it, if there is one (7.38 Flux, owner 2026-11-05)
+    assert js.count("connectorPath(blockRect, iconRect, paneRect));") == 1
+    assert js.count("connectorPath(blockRect, start, paneRect));") == 1
 
 
 def test_the_line_is_solid_and_styled_in_one_place():
     rule = re.search(r"\.ability-change-connector path \{([^}]*)\}", read_css())
     assert rule and "stroke:" in rule.group(1) and "dash" not in rule.group(1)
-    for path in (("patch", "cards_ability_change.py"), ("patch", "elements.py"), ("patch", "cards_aghs.py")):
+    for path in (("patch", "cards_ability_change.py"), ("patch", "cards_facets.py"), ("patch", "cards_aghs.py")):
         source = _read(*path)
         assert 'class="ability-change-connector' in source
         assert '<path d="" />' in source and 'stroke-dasharray="3 3"' not in source, path
@@ -61,7 +63,7 @@ def test_no_card_hangs_left_of_the_icon():
     # item cards hung 15px left of the item's icon (owner 2026-11-04: "нет единого положения карточек")
     css = read_css()
     assert not re.search(r"(?:components-change|properties-change|ench-change|ability-box-tagged)[^{}]*\{[^}]*margin-left: -15px", css)
-    assert not re.search(r"(?:ability-row|item-cost-box|provides-box|components-box)[^{}]*\{[^}]*margin-left: -15px", css)
+    assert not re.search(r"(?:ability-row|provides-box|components-box)[^{}]*\{[^}]*margin-left: -15px", css)
 
 
 def test_a_new_ability_card_has_the_line_too():
@@ -105,8 +107,8 @@ def test_the_boxes_span_the_icon_column_and_the_line_reaches_them():
 
 def test_a_new_facet_card_has_the_line_too():
     # 7.38 Dividends, Runed Replica: a facet's card is one of the site's cards
-    from patch import elements as el
+    from patch import cards_facets, elements as el
     from patch.badges import FACETS
-    html = el.new_facet(next(iter(FACETS)), ["Grants gold."])
+    html = cards_facets.new_facet(next(iter(FACETS)), ["Grants gold."])
     el._close_ability_block()
     assert "is-single-new" in html and 'class="ability-change-connector"' in html

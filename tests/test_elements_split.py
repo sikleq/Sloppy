@@ -8,7 +8,8 @@ import sys
 import pytest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CARDS = ("cards_hero_stats", "cards_item_abilities", "cards_item_stats", "cards_aghs", "cards_ability_change")
+CARDS = ("cards_hero_stats", "cards_item_abilities", "cards_item_stats", "cards_aghs", "cards_ability_change",
+         "cards_facets")
 
 
 def _lines(name):

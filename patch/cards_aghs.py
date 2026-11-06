@@ -4,7 +4,8 @@ import html as _html
 import re
 
 from .state import _State, page_cache
-from .elements import _pair_number_tips, hl, sub_ability
+from .elements import hl, sub_ability
+from .number_tips import _pair_number_tips
 from .cards_item_abilities import (_CARD_CONFIRMED, _CARD_SEQ, _bold_numbers_html, _iab_meta_marks,
                                    _iab_meta_numbers, _pane_parts, _pane_values)
 
@@ -27,8 +28,8 @@ _AGHS_VALUE_RE = re.compile(r"([^:.]+):\s*([^.]+(?:\.\d+[^.]*)?)\.")
 def _aghs_values_html(old, new):
     """The numbers line of both sides, compared by label: same value plain, another value rework, a label only the
     old side has del, only the new side new."""
-    o = {m.group(1).strip(): m.group(2).strip() for m in _AGHS_VALUE_RE.finditer(old or "")}
-    n = {m.group(1).strip(): m.group(2).strip() for m in _AGHS_VALUE_RE.finditer(new or "")}
+    o = {m.group(1).strip(): m.group(2).strip().lstrip("=") for m in _AGHS_VALUE_RE.finditer(old or "")}
+    n = {m.group(1).strip(): m.group(2).strip().lstrip("=") for m in _AGHS_VALUE_RE.finditer(new or "")}
     esc = lambda s: _html.escape(s, quote=False)
     side = lambda own, other, gone: " ".join(
         f"{esc(k)}: {esc(v)}." if other.get(k) == v
@@ -54,35 +55,66 @@ def _aghs_inline(text, loose=True):
     said = desc                                 # the game's own words, before any number is put in
     pairs = [(m.group(1).strip(), m.group(2).strip()) for m in _AGHS_VALUE_SENT_RE.finditer(vals)]
     last = lambda label: ([w for w in re.findall(r"[A-Za-z]+", label) if w.lower() not in _AGHS_LABEL_SKIP] or [""])[-1]
+    shown = lambda value: value[1:] if value.startswith("=") else value        # "=16%": the value with the upgrade
+    said_already = lambda value: re.search(rf"(?<![\d.]){re.escape(shown(value).lstrip('+-'))}(?!\d|\.\d)", said)
+    # "-10s" and "Lowers cooldown by 10s" say the same (7.41 Arena of Blood); "grants 6 armor" (7.40 Warcry)
+    pairs = [(label, value) for label, value in pairs if not said_already(value)]
+    # enough values for a table: all of them go there, none into the sentence (owner 2026-11-06, 7.41 Objurgation's
+    # "barrier (120/180/240/300)" stood in the text beside a table of the others)
+    inline = len(pairs) < INLINE_UNTIL
     rest, put = [], []
     for label, value in pairs:
-        bare = value.lstrip("+-")               # "-10s" and "Lowers cooldown by 10s" say the same (7.41 Arena of Blood)
-        if re.search(rf"(?<![\d.]){re.escape(bare)}(?!\d|\.\d)", said):
-            continue                            # the description already says it ("grants 6 armor", 7.40 Warcry)
-        spot = re.search(rf"\b{re.escape(label)}\b", desc, re.I)
+        spot = re.search(rf"\b{re.escape(label)}\b", desc, re.I) if inline else None
         # an ability's own longer text: the whole label only (7.40 "level (1%)"); a last word two labels share says
         # neither (7.40 Inner Fire: "Hero damage as heal" / "Non-hero damage as heal" -> no "heal (10%)")
-        if not spot and loose and last(label) and sum(last(x).lower() == last(label).lower() for x, _ in pairs) == 1:
+        if inline and not spot and loose and last(label) and sum(last(x).lower() == last(label).lower() for x, _ in pairs) == 1:
             hits = list(re.finditer(rf"\b{re.escape(last(label))}\b", desc, re.I))
             spot = hits[0] if len(hits) == 1 else None
+        by = _BY_RE.match(desc[spot.end():]) if spot and value.startswith("=") else None
+        if by and not by.group(2):
+            continue        # "Increases Duel damage by 5 per win": the bonus is said and the total fits no word (7.41)
         if spot and "(" not in desc[spot.end():spot.end() + 2]:
-            desc = f"{desc[:spot.end()]} ({value}){desc[spot.end():]}"
-            put.append(value)
+            # a total after "Increases …" reads "to 16%" (owner 2026-11-06: "не +X, а to X"); otherwise in brackets
+            sentence = desc[:spot.start()].rsplit(". ", 1)[-1]
+            words = (f" to {shown(value)}" if value.startswith("=") and _CHANGE_VERB_RE.search(sentence)
+                     else f" ({shown(value)})")
+            tail = desc[spot.end():]
+            if by and words.startswith(" to "):
+                # "Decreases cooldown by 10s." -> "to 70/60/50s (by 10s)": the bonus stays, in brackets (owner 2026-11-06,
+                # 7.41 Nyx Assassin)
+                tail = f" (by {by.group(1)})" + tail[by.start(2):]
+            desc = f"{desc[:spot.end()]}{words}{tail}"
+            put.append(words.strip())
+            if words.startswith(" ("):
+                INLINED[f"{desc[spot.start():spot.end()].lower()} ({shown(value)})"] = label
         else:
-            rest.append(f"{label}: {value}.")
+            rest.append(f"{label}: {shown(value)}.")
     return " ".join([_drop_said_percent(desc, put)] + rest)
+
+
+# an upgrade's one or two numbers go into its sentence ("Increases radius (+150)", owner 2026-10-25); three or more
+# stand as a table, none in the sentence (2026-11-06)
+INLINE_UNTIL = 3
+
+# "damage (150)" -> "Damage": a number put into a sentence and the label it came from, so a card whose other side makes a
+# table takes it back into its own (patch/value_tables.py, 7.37 Flayed Flare's "dealing damage (150)" beside a table)
+INLINED = {}
+
+# " by 10s" right after the words a total goes after; group 2: the sentence ends there (not "by 5 per win")
+_BY_RE = re.compile(r"\s+by\s+(\d[\d./]*%?s?)(\s*(?:[.,;]|$))?")
+_CHANGE_VERB_RE = re.compile(r"\b(?:increas|decreas|reduc|lower|rais|improv|extend|boost|amplif|enhanc|shorten)\w*", re.I)
 
 
 def _drop_said_percent(desc, put):
     """"Increases cast range (+200) and projectile speed (+300) by 25%." -> without "by 25%": the flat numbers put in
     already say it (owner 2026-10-25, 7.41 Venomous Gale). Only right after such a bracket ("slows by 25%" is another
     effect) and in a sentence whose every bracket is a flat number put in here."""
-    flat = {v for v in put if "%" not in v}
-
+    # put: what was put in, "(+200)" or "to 900"
     def one(sent):
-        brackets = re.findall(r"\(([^)]*)\)", sent)
-        if brackets and all(b in flat for b in brackets):
-            return re.sub(r"(\([^)]*\))\s+by\s+\d+(?:\.\d+)?%(?=[.,;]|\s*$)", r"\1", sent, count=1)
+        ins = [w for w in put if w in sent]
+        brackets = re.findall(r"\([^)]*\)", sent)
+        if ins and all("%" not in w for w in ins) and all(b in put for b in brackets):
+            return re.sub(r"(\([^)]*\)|\bto \d[\d./]*s?)\s+by\s+\d+(?:\.\d+)?%(?=[.,;]|\s*$)", r"\1", sent, count=1)
         return sent
     return "".join(one(s) for s in re.split(r"(?<=[.!])(?=\s)", desc))
 
@@ -200,7 +232,8 @@ def _aghs_rework_card(text, covered=False) -> bool:
     new = aghs_text(slug, kind, version)
     olds = [(s, aghs_text(s, kind, prev)) for s in sources]
     for s, old in olds:
-        if not old or not new or (s == slug and old == new):
+        same = s == slug and aghs_text(s, kind, prev, False) == aghs_text(slug, kind, version, False)   # the bonuses
+        if not old or not new or same:
             _aghs_missing(kind, slug, version, prev, old, new)
     new, olds = _aghs_inline(new), [(s, _aghs_inline(old)) for s, old in olds]
     esc = lambda s: _html.escape(s, quote=False)
@@ -217,13 +250,13 @@ def _aghs_rework_card(text, covered=False) -> bool:
             for s, old in gone_olds:
                 if not old:
                     _aghs_missing(kind, s, version, prev, old, "-")
-            name = lambda s, v: sub_ability(s, ability_name(s, v) or s) + " "
+            name = lambda s, v: sub_ability(s, ability_name(s, v) or s) + ": "
             old_lines = [aghs_line(name(slug, prev) + old_html, kind=kind)] + [
                 aghs_line(name(s, prev) + esc(_aghs_inline(old)), kind=kind) for s, old in gone_olds]
             new_html = name(slug, version) + new_html
     else:                                       # another ability's upgrade: no word diff, its icon + name say whose
-        old_lines = [aghs_line(sub_ability(s, ability_name(s, prev) or s) + " " + esc(old), kind=kind) for s, old in olds]
-        new_html = sub_ability(slug, ability_name(slug, version) or slug) + " " + esc(new)
+        old_lines = [aghs_line(sub_ability(s, ability_name(s, prev) or s) + ": " + esc(old), kind=kind) for s, old in olds]
+        new_html = sub_ability(slug, ability_name(slug, version) or slug) + ": " + esc(new)
         caption = f"Added {up}."                # owner 2026-10-25: not "moved from X" — the card says from where
         if m:                                   # Valve said "reworked" (7.37 Anti-Mage: Mana Overload's → Blink's)
             caption = f"{up} reworked."
@@ -241,7 +274,7 @@ def _aghs_rework_card(text, covered=False) -> bool:
 
 # an upgrade that trades the cooldown for charges: "Cooldown: -100%. Charge restore time: 38/32/26/20s." (7.37e Escape
 # Act) — the restore time is the cooldown the game shows, so it goes to the header and both sentences leave the text
-_AGHS_NO_COOLDOWN_RE = re.compile(r"\s*Cooldown:\s*-100%\.")
+_AGHS_NO_COOLDOWN_RE = re.compile(r"\s*Cooldown:\s*(?:-100%|0s?)\.")      # "0s": the cooldown with the upgrade
 _AGHS_RESTORE_RE = re.compile(r"\s*Charge restore time:\s*([\d.]+(?:/[\d.]+)*)s?\.")
 
 
@@ -367,11 +400,12 @@ def _aghs_parts_cards() -> str:
             continue
         # the parts: abilities the game flags as holding it that have a text of their own (a flag without a text is
         # the same upgrade told on another ability, 7.38 Axe)
-        parts = lambda v: {s: t for s in holders(hero, kind, v) if (t := aghs_text(s, kind, v))}
+        parts = lambda v, totals=True: {s: t for s in holders(hero, kind, v) if (t := aghs_text(s, kind, v, totals))}
         old_t, new_t = parts(prev), parts(version)
+        old_b, new_b = parts(prev, False), parts(version, False)    # the bonuses: a base value's change isn't the upgrade's
         lost = [s for s in old_t if s not in new_t]
         # this and the other abilities that hold it now and are new to it or changed it: the new side
-        moved = [s for s in new_t if old_t.get(s) != new_t[s]]
+        moved = [s for s in new_t if old_b.get(s) != new_b.get(s)]
         # C: the part that stayed is the same — the card under the ability that lost its part, so "Removed …" doesn't
         # read as the hero having no upgrade left (owner 2026-10-26, 7.40b Necromastery: Requiem of Souls keeps it)
         same = not moved and bool(new_t)
@@ -380,7 +414,7 @@ def _aghs_parts_cards() -> str:
         olds = [(s, t) for s, t in old_t.items() if s in lost or s in moved or same]
         news = [(s, new_t[s]) for s in (new_t if same else moved)]
         esc = lambda s: _html.escape(_aghs_inline(s), quote=False)
-        name = lambda s, v: sub_ability(s, ability_name(s, v) or s) + " "
+        name = lambda s, v: sub_ability(s, ability_name(s, v) or s) + ": "
         old_text = dict(olds)
         lines = {"old": [], "new": []}
         for s, t in olds:
@@ -410,6 +444,24 @@ def _aghs_parts_cards() -> str:
     return "".join(out)
 
 
+_UPGRADE_WORDING_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard)'s .+ changed from .+ to ", re.I)
+
+
+def _upgrade_wording_covered(plain) -> bool:
+    """"Aghanim's Scepter's Martyrdom healing changed from … to …" (a REWORK row) under an ability whose upgrade text is
+    another than in the patch before: the old -> new upgrade card under it shows both texts, the row would say it twice
+    (owner 2026-11-06, 7.38 Holy Persuasion)."""
+    m = _UPGRADE_WORDING_RE.match(plain or "")
+    slug, version = _State.current_ability_slug, _State.current_patch_version
+    if not m or not slug or not version:
+        return False
+    from .aghs_text import aghs_text
+    from .meta import _prev_patch_version
+    kind = m.group(1).lower()
+    new = aghs_text(slug, kind, version, False)
+    return bool(new) and new != aghs_text(slug, kind, _prev_patch_version(version), False)
+
+
 _AGHS_REMOVED_RE = re.compile(r"^\s*No longer upgraded with Aghanim's (Scepter|Shard)\b", re.I)
 
 
@@ -419,19 +471,10 @@ def _aghs_removed_row(plain):
     m = re.fullmatch(r"\s*No longer upgraded with Aghanim's (Scepter|Shard)\.?\s*", plain or "", re.I)
     if not m:
         return None
-    up = f"Aghanim's {m.group(1).title()}"
-    # the hero keeps the upgrade on another ability: only this ability's part is gone (owner 2026-10-26, 7.40b
-    # Necromastery: "кажется, что удалили весь аганим, а не часть")
-    return f"Removed {up} bonus from this ability." if _aghs_kept_elsewhere(m.group(1).lower()) else f"Removed {up}."
-
-
-def _aghs_kept_elsewhere(kind) -> bool:
-    """True when another ability of the current hero holds the upgrade in this patch, with a text of its own."""
-    hero, slug, version = _State.current_hero, _State.current_ability_slug, _State.current_patch_version
-    if not hero or not version:
-        return False
-    from .aghs_text import aghs_text, holders
-    return any(s != slug and aghs_text(s, kind, version) for s in holders(hero, kind, version))
+    # one short row whether or not the hero keeps the upgrade on another ability: the row stands under this ability,
+    # which says whose part is gone (owner 2026-11-06: "надо сократить везде до Removed Aghanim's Shard/Scepter";
+    # 2026-10-26 it read "... bonus from this ability.")
+    return f"Removed Aghanim's {m.group(1).title()}."
 
 
 def _under_rows_single(caption, tag, card_cls, pane):
@@ -517,10 +560,12 @@ def _card_meta_covered(text) -> bool:
 
 
 def aghs_line(text, kind="scepter", inline_note_text=None):
+    from .mech_abilities import rune_name_chips
     note = (f'<div class="inline-note">{inline_note_text}</div>'
             if inline_note_text else '')
+    # runes as their icons, as in every card row (owner 2026-11-06, 7.41 Tempest Double's Shard)
     return (f'<div class="ability-change-row aghanim-{kind}">'
-            f'<span class="aghanim-marker {kind}"></span>{text}{note}</div>')
+            f'<span class="aghanim-marker {kind}"></span>{rune_name_chips(text)}{note}</div>')
 
 
 def aghs_shard_line(text):

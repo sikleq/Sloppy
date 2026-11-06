@@ -11,7 +11,7 @@
 - `.cat-panel` — один непрерывный content slab под заголовком категории: blue/black translucent gradient + broad black glow. Не возвращать старую модель большой скруглённой карточки с opaque фоном.
 - `h2.section` — отдельная orange-to-transparent полоса с left orange border и glow; после неё нужен явный шов перед content slab.
 - `.entity-block` внутри `.cat-panel` не должен быть отдельной карточкой/slab. Между героями/предметами/сущностями не должно быть “пропастей”; только тонкая full-width hairline, которая доходит до dyn-cells справа, чтобы было понятно, к какой сущности они относятся.
-- Внутренние `item-cost-box`, `provides-box`, `properties-change`, `components-change`, `ability-block`, `patch-dynamics` должны оставаться одной ширины внутри entity-block. Если меняешь отступы, обязательно проверить Chasm Stone и соседние items в `patches/7.41.html`.
+- Внутренние `provides-box`, `properties-change`, `components-change`, `ability-block`, `patch-dynamics` должны оставаться одной ширины внутри entity-block. Если меняешь отступы, обязательно проверить Chasm Stone и соседние items в `patches/7.41.html`.
 
 ## Patch-page filters and Hero Dynamics
 
@@ -92,7 +92,7 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
 Все **навигационные / направленные стрелки** на сайте должны использовать единый дизайн: сплошной **пиксельный SVG-треугольник** (`shape-rendering=crispEdges`, золото `#e3c46a`) на золото-кожаном кружке (`linear-gradient(180deg,#3b2e1d,#2a2014)`, рамка `2px solid #e3c46a`). Эталон — `.back-to-top` / `.nav-back-arrow` / `.version-nav-arrow` (`is-prev`/`is-next`). Это касается и стрелок слайдера terrain (`.tc-chev-l/.tc-chev-r` переиспользуют те же data-URI пиксель-треугольники). НЕ использовать CSS-border-треугольники, юникод-стрелки (▲◄►) или эмодзи для навигации.
 
 ## Глобальные UI-элементы (во всех страницах через `site_common.py` / `scripts.js`)
-- **Лого** — простой `<img class="nav-brand-logo" src="…/icons/logo_knight.png">` (пиксельный рыцарский шлем, прозрачный фон). Раньше был шлем `header-helmet.png` с canvas-эффектом EyeFire — удалён целиком (файлы + код).
+- **Лого и название** (владелец 2026-11-05) — знак «s/» из аватара (буква в золоте сайта, голубой и розовый край, белый разрез, прозрачный фон) `icons/logo_sikle.png` во всю высоту шапки у левого края, название «s/kle» (`site_common.BRAND_HTML`, косая черта белая с голубым и розовым краем, как разрез на аватаре); значки вкладки из того же аватара. Прежний пиксельный шлем `logo_knight.png` удалён 2026-11-05 (прозрачный фон). Раньше был шлем `header-helmet.png` с canvas-эффектом EyeFire — удалён целиком (файлы + код).
 - **Режим для дальтоников** (2026-10-09): значок-глаз `button.cb-toggle` в правом конце шапки (`.nav-end`, в рамке
   как `.version`, той же высоты 38px; иконки `icon_cb_off/on.png` из `scripts/gen/gen_cb_icon.py`). Выключен —
   серый тусклый глаз; включён — цветной глаз над золотой полоской с искрами, как у активной вкладки шапки

@@ -51,6 +51,15 @@ def _render_item(item, version, neutral=False):
     if is_reworked and notes and re.match(
             r'^Requires\b', _strip_html(notes[0].get('note', '')).strip()):
         notes = notes[1:]
+    # "Item Reworked" over "Now is a Tier 5 Neutral Artifact" (7.38 Pirate Hat, owner 2026-11-05): the header says both,
+    # "Reworked Tier 5 Artifact", and the texts nested under it are the new abilities the card shows
+    if is_reworked and neutral and notes:
+        tier = re.match(r'^Now\s+is\s+a\s+(Tier\s+\d+)\s+Neutral\s+Artifact$', _strip_html(notes[0].get('note', '')).strip(), re.I)
+        if tier:
+            lvl = notes[0].get('indent_level', 1)
+            deco = f', changed="Reworked {tier.group(1)} Artifact"'
+            notes = [dict(n, indent_level=max(1, n.get('indent_level', 1) - 1)) if n.get('indent_level', 1) > lvl else n
+                     for n in notes[1:]]
     # Detect "New Tier N Artifact" / "Returning as a Tier N Neutral Artifact" as
     # the first note in neutral items — convert to item_header(new="...") and drop.
     # Owner 2026-09-27: "Now is a Tier 1 Neutral Artifact" (7.38, an old neutral item in the new artifact

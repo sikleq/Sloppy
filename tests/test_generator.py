@@ -56,7 +56,7 @@ import tools.generate_patch_code_v2 as g
     # ── classes found by the 2026-09-18 datafeed proofread ──
     # removed own restriction / self-penalty → BUFF
     ("Toggling is no longer disabled by silence", "MISC"),   # owner 2026-09-27: toggles → MISC
-    ("Can no longer be disabled by Silence", "BUFF"),
+    ("Can no longer be disabled by Silence", "NEW"),
     ("Now can be toggled while silenced", "MISC"),
     ("Raptor Dance: Can no longer be interrupted by casting Grappling Claw", "BUFF"),
     ("Activation no longer interrupts movement", "BUFF"),
@@ -552,7 +552,8 @@ def test_boss_block_splits_abilities_and_marks_reworked_objective():
     out = g._postprocess_boss_blocks(lines)
     assert out[0].startswith('W(unit_header("Tormentor"') and 'new_mech="Reworked objective"' in out[0]
     assert not any("The Shining:" in ln or "inline_note(\"Reflect" in ln for ln in out)
-    assert any(ln.startswith('# v2-todo: Reflect') for ln in out)
+    # deaths -> game time: the "Scaling reworked" card itself, not a TODO (owner 2026-11-06)
+    assert any(ln.startswith('W(scaling_rework("Reflect"') for ln in out)
     assert 'W(ability("The Shining", icon_url="../icons/abilities/miniboss_radiance.png"))' in out
     assert any(ln.startswith('W(ability_change(None, {"name": "Alleviation"') and 'tag="new"' in ln for ln in out)
 
@@ -606,7 +607,7 @@ def test_new_item_without_bonuses_has_no_bonus_row_and_gets_kv_price():
     lines = ['W(item_header("Orb of Frost", new="New Basic Equipment Item"))', 'W(ul_open())',
              'W(li("Provides no bonuses", t("MISC")))', 'W(li("Passive: Frost. Slows", t("MISC")))', 'W(ul_close())']
     out = g._postprocess_new_item_card(lines, "7.38")
-    assert out[1] == 'W(item_cost(250))'
+    assert out[0] == 'W(item_header("Orb of Frost", new="New Basic Equipment Item", cost=250))'
     assert not any("no bonuses" in ln for ln in out)
 
 
@@ -946,7 +947,7 @@ def test_no_rows_hang_after_a_facet_block_without_a_header():
                 state = "hero"
             elif re.match(r'W\((facet_header|new_facet)\(', s):
                 state = "facet"
-            elif re.match(r'W\((ability|ability_group|ability_change|subgroup)\(', s):
+            elif re.match(r'W\((ability|ability_group|ability_change|two_selves_change|subgroup)\(', s):
                 state = "block"
             elif s == "W(ul_close())" and state == "facet":
                 state = "after_facet"

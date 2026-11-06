@@ -8,7 +8,7 @@ from patch.site_common import compute_asset_version
 
 ROOT = Path(__file__).resolve().parent.parent
 # one closure each: their insides share variables, so they are cut only with care, as a task of its own
-_LONG = {"patch-page", "hero-lab"}
+_LONG = {"patch-dynamics", "hero-lab"}
 _LIMIT = 800
 
 

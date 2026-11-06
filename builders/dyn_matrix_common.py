@@ -437,7 +437,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
 
     page = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        f'<title>SIKLE | {_esc(page_title)}</title>\n'
+        f'<title>s/kle - {_esc(page_title)}</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={_site.compute_asset_version()}">\n'
         '</head>\n'
@@ -461,7 +461,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         f'<tr class="col-row">{head_html}</tr></thead>\n'
         f'<tbody>\n{chr(10).join(rows)}\n</tbody>\n'
         '</table>\n</div>\n</div>\n'
-        f'<script defer src="src/scripts.js?v={_site.compute_asset_version()}"></script>\n'
+        f'<script defer src="src/scripts-table.js?v={_site.compute_asset_version()}"></script>\n'
         '</body>\n</html>\n'
     )
     dist = _os.path.join(_HERE, "dist")

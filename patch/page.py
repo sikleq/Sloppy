@@ -46,7 +46,7 @@ def write_head(version, date):
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SIKLE | Patch {version}</title>
+<title>s/kle - Patch {version}</title>
 {_site.head_common(prefix="../")}
 <link rel="stylesheet" href="../styles.css?v={_ASSET_VERSION}">
 </head>
@@ -93,7 +93,7 @@ def write_footer():
     W('<div class="search-pop" id="search-pop" hidden><div class="search-box">'
       '<input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">'
       '<div class="search-results" id="search-results"></div></div></div>')
-    W(f'<script defer src="../src/scripts.js?v={_ASSET_VERSION}"></script>')
+    W(f'<script defer src="../src/scripts-base.js?v={_ASSET_VERSION}"></script>')
     W('</div></body></html>')
 
 
@@ -239,23 +239,54 @@ _STAT_DETECT_SKIP_PHRASES = (
 )
 
 
-def _swap_single_row_other_icons(html):
-    """For each .other-block containing exactly one <li>, swap the generic
-    'Other' icon for a stat-specific one matched against the row's text.
+# Rows' tags as small tiles with an icon where the tags stood (owner 2026-11-06, mock "Плитка 22x18"; the bookmarks on
+# the panel's left line before them are gone) — the pages it runs on; None = every page. CSS src/css/patch-tag-marks.css
+TAG_MARK_PAGES = {"7.41f", "7.38"}           # the trial pages (owner 2026-11-06: "тестируем ещё на 7.38")
 
-    Rows whose text matches a phrase in _STAT_DETECT_SKIP_PHRASES keep the
-    neutral icon — they mention a stat name without being a stat change."""
+# tiles in a GENERAL block's icon; more stats changed: the General icon as before (owner 2026-11-06: "Если изменённых
+# характеристик >4 (не =4), то ставим иконку General как раньше стояла. Если <=4, то показываем те 4")
+MOSAIC_MAX = 4
+_LI_TEXT_RE = re.compile(r'<li\b[^>]*>(.*?)</li>', re.S)
+
+
+def _row_stat(li_html):
+    """The stat a GENERAL row changes ("other" for a row naming none, or only mentioning one: "model size")."""
+    text = re.sub(r'<[^>]+>', ' ', re.sub(r'<span class="info-pop">.*?</span>', '', li_html, flags=re.S)).lower()
+    if any(skip in text for skip in _STAT_DETECT_SKIP_PHRASES):
+        return "other"
+    return next((key for key, phrases in STAT_DETECT_RULES if any(p in text for p in phrases)), "other")
+
+
+def _stat_mosaic(stats, other_src):
+    """Variant C (owner 2026-11-06): the stats' own icons whole and small in the 48px square, two to four of them."""
+    # each icon in a cell of its own, the cells parted by lines (owner 2026-11-06: "слишком мелкие значки внутри, а
+    # также не хватает разделителей между ними")
+    tiles = "".join(f'<span class="sm-cell"><img src="{STAT_ICONS.get(s, other_src)}" alt="" loading="lazy"></span>'
+                    for s in stats)
+    return f'<div class="ability-icon-img stat-mosaic n{len(stats)}" role="img" aria-label="{", ".join(stats)}">{tiles}</div>'
+
+
+def _swap_single_row_other_icons(html):
+    """A hero's GENERAL block shows the icons of the stats its rows change: one stat -> its icon (rows naming another
+    thing too add the generic one), two or more -> those icons small in one square (owner 2026-11-06, 7.41 Arc Warden:
+    movement speed, strength, agility). Rows only mentioning a stat (_STAT_DETECT_SKIP_PHRASES) count as "other"."""
     def repl(m):
         head, src, mid, ul_inner, ul_close = m.groups()
-        if len(re.findall(r'<li\b', ul_inner)) != 1:
+        stats = []
+        for li in _LI_TEXT_RE.findall(ul_inner):
+            stat = _row_stat(li)
+            if stat not in stats:
+                stats.append(stat)
+        known = [s for s in stats if s != "other"]
+        if not known:
             return m.group(0)
-        text = re.sub(r'<[^>]+>', ' ', ul_inner).lower()
-        if any(skip in text for skip in _STAT_DETECT_SKIP_PHRASES):
-            return m.group(0)
-        for key, phrases in STAT_DETECT_RULES:
-            if any(p in text for p in phrases):
-                return head + STAT_ICONS.get(key, src) + mid + ul_inner + ul_close
-        return m.group(0)
+        if len(stats) == 1:
+            return head + STAT_ICONS[known[0]] + mid + ul_inner + ul_close
+        if len(stats) > MOSAIC_MAX:
+            return m.group(0)        # more than four: the General icon, as before (owner 2026-11-06)
+        img_start = head.rfind("<img")
+        img_end = mid.index(">") + 1
+        return (head[:img_start] + _stat_mosaic(stats, src) + mid[img_end:] + ul_inner + ul_close)
     return _OTHER_BLOCK_RE.sub(repl, html)
 
 
@@ -517,15 +548,34 @@ def save_html(filename):
     # row by li() (e.g. used outside an `extra=`) ships without its markers —
     # the (i) bubble still renders in place; only the comments are stripped.
     # (?) notes of hidden duplicate item-ability rows, moved into the abilities card (elements._IAB_NOTES)
-    from .cards_item_abilities import _IAB_NOTES, render_iab_card, resolve_chip_marks
+    from .cards_item_abilities import raise_abilities_beside_gone_stats, _IAB_NOTES, render_iab_card, resolve_chip_marks
     from .cards_item_stats import render_cost_card
     from .cards_hero_stats import render_hs_card
     out = resolve_chip_marks(out)          # ability card headers: colour only what a row under the card names
     from .elements import mark_number_highlights
     out = mark_number_highlights(out)      # a highlighted number: text colour + dotted, not a strip (2026-10-25)
     out = re.sub(r'<!--HSCARD:(.*?)-->', lambda m: render_hs_card(m.group(1)), out)
+    from .general_rows import attr_row_first
+    out = attr_row_first(out)              # a new main attribute first in General, over the stats card's rows (11-06)
     out = re.sub(r'<!--COSTCARD:(.*?)-->', lambda m: render_cost_card(m.group(1)), out)
     out = re.sub(r'<!--IABCARD:(.*?)-->', lambda m: render_iab_card(m.group(1)), out)
+    out = raise_abilities_beside_gone_stats(out)
+    from .value_tables import value_tables
+    out = value_tables(out)                # a card's values as a table (owner 2026-11-05)
+    from .card_pairs import pair_new_cards, single_cards_right
+    _stem = os.path.splitext(os.path.basename(filename))[0]
+    from .card_sections import card_sections, drop_upgrade_rows_said_below, hide_rows_the_aghs_card_says
+    out = hide_rows_the_aghs_card_says(out)   # an Aghanim's row its old -> new card shows already (2026-11-06)
+    out = drop_upgrade_rows_said_below(out)   # a card's upgrade row the Aghanim's card below shows (2026-11-06)
+    out = card_sections(out, _stem)        # rows led by an ability's icon: lines between, a head each (2026-11-06)
+    out = pair_new_cards(out, _stem)       # two new cards side by side (2026-11-06)
+    from .card_pairs import pair_replaced_facets
+    out = pair_replaced_facets(out, _stem)  # a lost facet left, the new one with its card right (2026-11-06)
+    out = single_cards_right(out, _stem)   # a lone one to the right of its block, a line to it (2026-11-06)
+    if TAG_MARK_PAGES is None or _stem in TAG_MARK_PAGES:
+        from .tag_marks import terrain_rows_tagged
+        out = terrain_rows_tagged(out)     # a terrain row: its tag as a tile, no number
+        out = out.replace('<body class="patch-page">', '<body class="patch-page tag-marks">', 1)
     out = re.sub(r'<!--IABNOTE:(.*?)-->', lambda m: _IAB_NOTES.get(m.group(1), ''), out)
     out = out.replace('<!--INLINETIP-->', '').replace('<!--/INLINETIP-->', '')
     out = out.replace('<!--TIP-->', '').replace('<!--/TIP-->', '')

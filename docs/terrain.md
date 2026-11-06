@@ -785,10 +785,11 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
 - A terrain row with a % (a `b()` badge on the patch page: 7.40 "Watcher night vision range decreased from 800 to
   450" -44%) tints its number chip lightly in the %'s colour, green / red like the text BUFF / NERF chips
   (`patch/elements.terrain_num_chip`, `.badge.tnum.tnum-buff/-nerf`). Rows with a text tag only keep the gold number.
-- Notes the map files can't show yet (owner's todo 2026-10-27: find out what changed; checked against the gridnav, the entities and the trees): 7.38c "Fixed unnecessary
-  pathing blockers at the left of the entrance to the Dire Base through the team only gate" (no cell or entity near
-  the Dire gates changed), 7.39b "Fixed some locations that were incorrectly blocked for warding" (the gridnav of
-  7.39 and 7.39b are identical, cell for cell) — no picture. Test: `tests/test_terrain_notes_1027.py`.
+- 7.38c "Fixed unnecessary pathing blockers at the left of the entrance to the Dire Base through the team only gate": two gridnav cells,
+  centres (7136, 2272) and (7136, 2336), went from blocked and no-ward (16) to free (1); the only changed cells in that quarter of the
+  map (the first check, 2026-10-27, missed them). Its picture draws them through the `nowards` layer.
+- 7.39b "Fixed some locations that were incorrectly blocked for warding": the gridnav, the map's physics and visibility files and the
+  no-ward zones of 7.39 and 7.39b are the same byte for byte, so the map files show nothing and the row has no picture. Test: `tests/test_terrain_notes_1027.py`.
 
 ## Two colours, one meaning (owner 2026-10-28)
 

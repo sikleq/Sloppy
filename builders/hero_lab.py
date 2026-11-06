@@ -1401,7 +1401,7 @@ def render_html() -> str:
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SIKLE | Hero Lab</title>
+<title>s/kle - Hero Lab</title>
 {_site.head_common()}
 <link rel="stylesheet" href="styles.css?v={av}">
 </head>
@@ -1446,7 +1446,7 @@ def render_html() -> str:
 </div>
 </div>
 </div>
-<script defer src="src/scripts.js?v={av}"></script>
+<script defer src="src/scripts-lab.js?v={av}"></script>
 </body>
 </html>
 """

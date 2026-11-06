@@ -24,7 +24,8 @@ sys.path.insert(0, ROOT)
 
 from patch.kv import parse_kv  # noqa: E402
 from patch.ability_kv import _hero_blocks  # noqa: E402
-from patch.aghs_text import _FLAGS, _HEADER_LABELS, _KEYS, _granted, _num, _values, _with_kin_values, aghs_text  # noqa: E402
+from patch.aghs_text import (_FLAGS, _HEADER_LABELS, _KEYS, _granted, _num, _total, _values,  # noqa: E402
+                             _with_kin_values, aghs_text)
 from patch.meta import RELEASE_HISTORY, _prev_patch_version  # noqa: E402
 from patch import game_files  # noqa: E402
 from patch.loc_history import tooltip  # noqa: E402
@@ -103,7 +104,12 @@ def audit(version):
                     continue                                      # a flag: "+1" = on
                 if not (tooltip(f"DOTA_Tooltip_ability_{slug}_{key}", version) or _HEADER_LABELS.get(key.lower())):
                     continue                                      # the game shows no label for it either
-                if not re.search(rf"(?<![\d.]){re.escape(n.lstrip('-+'))}(?!\d|\.\d)", text):
+                # the card says the value with the upgrade ("to 16%", owner 2026-11-06): the bonus or that total
+                av = b.get("AbilityValues") if isinstance(b.get("AbilityValues"), dict) else {}
+                entry = av.get(key) if isinstance(av.get(key), dict) else {}
+                total = _total(entry.get("value"), raw) if entry.get("value") else None
+                said = lambda x: re.search(rf"(?<![\d.]){re.escape(x.lstrip('-+'))}(?!\d|\.\d)", text)
+                if not said(n) and not (total and said(total)):
                     problems.append(f"{slug} {kind}: {key}={raw} not in the text")
     mates, gaps = _hero_mates(version), []
     for slug, kind in notext:

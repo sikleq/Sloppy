@@ -255,7 +255,7 @@ def build():
     subnav = _site.render_materials_subnav("terrain_stats")
     page = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        '<title>SIKLE | Terrain Stats</title>\n'
+        '<title>s/kle - Terrain Stats</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={ASSET_VERSION}">\n'
         '</head>\n<body>\n'
@@ -269,7 +269,7 @@ def build():
         '<div class="tf-head">Every map file</div>\n'
         f'{table_html(files, pages)}\n'
         '</div>\n</div>\n</div>\n'
-        f'<script defer src="src/scripts.js?v={ASSET_VERSION}"></script>\n'
+        f'<script defer src="src/scripts-table.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n')
     _os.makedirs(_site.DIST_DIR, exist_ok=True)
     out = _os.path.join(_site.DIST_DIR, "terrain_stats.html")

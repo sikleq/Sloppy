@@ -154,8 +154,6 @@ ul.changes li.aghanim-shard.li-formula {
    share the same horizontal-button rhythm so labels align under each other. */
 .legend-stack {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
   /* Symmetric with .toolbar-patch-info (both flex:1 1 0) so the search box in
      the middle stays optically centred. NO min-width:0 → the implicit
      min-width:auto floors the column at its badges' width, so the tag rows can
@@ -213,10 +211,11 @@ body.cat-filter-active .cat-hide { display: none !important; }
   font-family: inherit;
   font-size: 11px;
   padding: 2px 9px;
+  filter: brightness(1.15);             /* a little brighter (owner 2026-11-06: "фильтры-теги чуть-чуть ярче") */
   transition: filter 0.12s, transform 0.12s;
 }
 .legend-tags .badge.filter-btn:hover {
-  filter: brightness(1.18);
+  filter: brightness(1.3);
   transform: translateY(-1px);
 }
 .legend-tags .badge.filter-btn.active {

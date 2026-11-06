@@ -33,6 +33,12 @@ def head_common(prefix=""):
             + preload + favicon_links(prefix))
 
 
+# The site's name (owner 2026-11-05): "s/kle", the slash marked like the cut in the avatar
+BRAND_HTML = ('<span class="nav-brand-sikle">s</span><span class="nav-brand-slash">/</span>'
+              '<span class="nav-brand-sikle">kle</span>')
+SITE_NAME = "s/kle"
+
+
 def favicon_links(prefix=""):
     """Render the shared favicon <link> block. `prefix` is "" for root pages
     and "../" for files under /patches/ so paths resolve correctly."""
@@ -176,26 +182,22 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
                     a separate strip below it.
     """
     prefix = "../" if patch_context else ""
-    # Header now carries a brand block (helmet logo + pixel-font title) instead
+    # Header now carries a brand block (the avatar logo + pixel-font title) instead
     # of inline nav tabs. The full nav list lives on the main hub page.
     if active == "main":
         brand = (
             f'<span class="nav-brand">'
-            f'<img class="nav-brand-logo" src="{prefix}icons/logo_knight.png" '
+            f'<img class="nav-brand-logo" src="{prefix}icons/logo_sikle.png" '
             f'alt="" loading="eager">'
-            f'<span class="nav-brand-text">'
-            f'<span class="nav-brand-sikle">sikle</span> | dota.vpk'
-            f'</span>'
+            f'<span class="nav-brand-text">{BRAND_HTML}</span>'
             f'</span>'
         )
     else:
         brand = (
             f'<a class="nav-brand" href="{prefix}index.html" aria-label="Home">'
-            f'<img class="nav-brand-logo" src="{prefix}icons/logo_knight.png" '
+            f'<img class="nav-brand-logo" src="{prefix}icons/logo_sikle.png" '
             f'alt="" loading="eager">'
-            f'<span class="nav-brand-text">'
-            f'<span class="nav-brand-sikle">sikle</span> | dota.vpk'
-            f'</span>'
+            f'<span class="nav-brand-text">{BRAND_HTML}</span>'
             f'</a>'
         )
     # Centre tabs: Patch Reader (→ latest patch) | Calendar | Materials. Shown

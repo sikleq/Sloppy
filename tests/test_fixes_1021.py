@@ -158,9 +158,15 @@ def test_aghanim_upgrade_goes_to_the_header_and_the_summary_keeps_the_stripe(mon
                              summary="Ability reworked.", tag="rework")
     assert '<span class="row-text">Ability reworked.<span class="aghanim-marker scepter"></span>' in html
     assert "ac-aghs" not in html and "Active (Aghanim" not in html
-    # "Aghanim's" is the upgrade's icon in the header (2026-10-27: one line)
+    # both sides granted by the Scepter (7.40 and 7.41 Overclocking): the summary's glyph says it once, the headers don't
+    # (owner 2026-11-06)
+    assert "granted by" not in html
+    # one side only: its header says so, "Aghanim's" as the upgrade's icon (2026-10-27: one line)
+    one = cards_ability_change.ability_change(old=dict(name="X", slug="rattletrap_overclocking", desc=["Active (Aghanim's Scepter upgrade). A."]),
+                            new=dict(name="Y", slug="rattletrap_battery_assault", desc=["B."]),
+                            summary="Ability reworked.", tag="rework")
     assert ('– granted by <span class="aghanim-marker scepter" role="img" aria-label="Aghanim\'s"></span>Scepter'
-            in html)
+            in one)
 
 
 def test_aghanim_upgrade_words_move_from_card_text_to_its_summary():

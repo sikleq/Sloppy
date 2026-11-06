@@ -612,3 +612,24 @@ other rows don't explain) gives it one where the match database has the patch (7
 - a neutral item entering the pool ("Now is a Tier N Neutral Artifact", 17 rows) = 0 net, mirror of "cycled out";
   brand-new items are "is-new" blocks and were 0 already (`_item_debut` guards the rest).
 34 hero cells changed.
+
+## Gradient boosting checked (2026-11-05)
+
+Question (owner): could XGBoost learn the weights better? Walk-forward test on every patch window in time order: 734 hero
+cells, 16 windows tested (7.38 → 7.41f), each predicted only from windows before it with one window left out as a gap
+(the "after" of one patch and the "before" of the next share matches); signal R taken out of `w` (it is fitted on the
+same pick shifts). Weighted Spearman ρ with the 21-day pick-share shift, mean over windows, 95 % bootstrap over windows:
+
+| model | mean ρ | 95 % |
+|---|---|---|
+| site formula (w without R) | 0.137 | 0.017 … 0.244 |
+| ridge, all cell features (counts and sizes by type, context shares, w, v) | 0.039 | −0.058 … 0.137 |
+| XGBoost, same features | 0.079 | −0.025 … 0.194 |
+| XGBoost, w only | 0.161 | 0.068 … 0.250 |
+| XGBoost − ridge | +0.040 | −0.038 … +0.113 |
+| XGBoost − formula | −0.058 | −0.136 … +0.017 |
+
+No real gain (the bar was +0.08 over ridge with the interval clear of 0). More features only add noise: XGBoost fits 0.45
+in-sample and 0.08 on new patches. In 4 of 16 windows even the formula goes the other way (7.39c −0.37). The site needs a
+weight per row, which an additive (linear) score gives and trees do not. Not adopted; Fable 5.1's independent read agreed.
+Scripts and per-window numbers were kept outside the repository (session scratchpad).

@@ -55,13 +55,12 @@ def _minify_assets(dist: Path):
         print("  [skip] rcssmin not installed -- CSS not minified")
     try:
         import rjsmin
-        js = dist / "src" / "scripts.js"
-        if js.exists():
+        for js in sorted((dist / "src").glob("scripts*.js")):
             raw = js.read_text(encoding="utf-8")
             mini = rjsmin.jsmin(raw)
             js.write_text(mini, encoding="utf-8")
             pct = (1 - len(mini) / len(raw)) * 100 if raw else 0
-            print(f"  minified scripts.js: {len(raw):,} -> {len(mini):,} ({pct:.0f}% smaller)")
+            print(f"  minified {js.name}: {len(raw):,} -> {len(mini):,} ({pct:.0f}% smaller)")
     except ImportError:
         print("  [skip] rjsmin not installed -- JS not minified")
 
@@ -201,8 +200,10 @@ def main() -> int:
             ignore = {"icons": ("ref",), "src": ("js", "css")}[name]       # src/js and src/css are glued below
             shutil.copytree(src, dst, ignore=shutil.ignore_patterns(*ignore))
     from patch.css_bundle import read_css
-    from patch.js_bundle import read_js
+    from patch.js_bundle import JS_PAGES, read_js
     (_dist / "src" / "scripts.js").write_text(read_js(), encoding="utf-8")
+    for kind in JS_PAGES:
+        (_dist / "src" / f"scripts-{kind}.js").write_text(read_js(kind), encoding="utf-8")
     (_dist / "styles.css").write_text(read_css(), encoding="utf-8")
     # Minify CSS and JS copies in dist/ (source files stay readable)
     _minify_assets(_dist)

@@ -2,7 +2,7 @@
 import pytest
 
 import tools.generate_patch_code_v2 as g
-from patch import ability_kv, elements
+from patch import ability_kv, cards_facets
 from patch.cards_aghs import _AGHS_REWORK_RE
 
 
@@ -33,7 +33,7 @@ def test_control_conveniences_are_qol(text):
 
 
 def test_a_card_summary_does_not_repeat_its_header():
-    """The header says what the ability levels with ("Passive – shares level with Duel"); the summary is the canonical
+    """The header says what the ability levels with ("Passive – levels with Duel"); the summary is the canonical
     "Innate reworked." / "Ability reworked." (owner 2026-10-27, Outfight Them! 7.39 said "levels up with Duel" twice)."""
     import ast
     import glob
@@ -107,10 +107,10 @@ def test_a_facet_card_takes_the_kind_of_the_ability_it_changes(monkeypatch):
     monkeypatch.setattr(ability_kv, "_hero_blocks", lambda v: blocks)
     assert ability_kv.facet_ability("disruptor_conduit", "7.39") == "disruptor_electromagnetic_repulsion"
     monkeypatch.setattr("patch.aghs_text.ability_name", lambda s, v: "Electromagnetic Repulsion")
-    head, _ = elements._facet_pane(["Increases the max level of Electromagnetic Repulsion to 4."], "disruptor_conduit",
+    head, _ = cards_facets._facet_pane(["Increases the max level of Electromagnetic Repulsion to 4."], "disruptor_conduit",
                                    "7.39")
     # the kind and the name of the ability the facet changes (owner 2026-10-27, Old Blood: "Active: Bloodrage")
     assert '<b class="iab-kind">Passive:</b> <span class="iab-name">Electromagnetic Repulsion</span>' in head
     # the text's own kind wins
-    head, _ = elements._facet_pane(["Active. Pushes enemies away."], "disruptor_conduit", "7.39")
+    head, _ = cards_facets._facet_pane(["Active. Pushes enemies away."], "disruptor_conduit", "7.39")
     assert '<b class="iab-kind">Active:</b>' in head and "Passive" not in head

@@ -270,28 +270,30 @@
 }
 /* Flat purchase price for a basic (no-recipe) new item — same bordered box as
    the components() build, with the gold value on the right like a recipe total. */
-.item-cost-box {
-  display: flex;
+.item-icon-cost {
+  display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-  margin: 6px 0 4px;
-  padding: 8px 14px;
-  background: var(--muted-04);
-  border: 1px solid var(--line-soft);
-  border-radius: 6px;
+  gap: 2px;
+  height: 15px;
+  padding: 0 4px 0 2px;
+  border-radius: 3px;
+  background: var(--bg-deep-97);
+  box-shadow: 0 0 0 1px rgba(240, 198, 116, 0.45);
+  color: #f0c674;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-.item-cost-label {
-  color: var(--text-dim);
-  font-size: 13px;
-  font-weight: 600;
+.item-icon-cost::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: url('icons/misc/gold.png') center / contain no-repeat;
 }
-.item-cost-val {
-  color: #f0c674;
-  font-size: 14px;
-  font-weight: 700;
-}
+.item-icon { position: relative; }
+.entity-icon > .item-icon-cost { position: absolute; right: -5px; bottom: -5px; }
+.ec-ver-label > .item-icon-cost { margin-left: 8px; }
 .provides-box .provides-row {
   padding: 2px 0;
   line-height: 1.5;

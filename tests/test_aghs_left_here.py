@@ -11,7 +11,7 @@ NEW = {"abaddon_aphotic_shield": "75% of absorbed damage is dealt to nearby enem
 def _setup(monkeypatch):
     monkeypatch.setattr(aghs_text, "holders", lambda hero, kind, v: sorted(
         (OLD if v == "7.38c" else NEW) if kind == "shard" else {}))
-    monkeypatch.setattr(aghs_text, "aghs_text", lambda s, kind, v: (OLD if v == "7.38c" else NEW).get(s))
+    monkeypatch.setattr(aghs_text, "aghs_text", lambda s, kind, v, *_: (OLD if v == "7.38c" else NEW).get(s))
     monkeypatch.setattr(aghs_text, "ability_name", lambda s, v: {"abaddon_death_coil": "Mist Coil",
                                                                  "abaddon_aphotic_shield": "Aphotic Shield"}[s])
     monkeypatch.setattr(_State, "current_patch_version", "7.39")
@@ -39,7 +39,7 @@ def test_no_card_under_the_ability_that_lost_it(monkeypatch):
     _setup(monkeypatch)
     monkeypatch.setattr(_State, "current_ability_slug", "abaddon_death_coil")
     assert cards_aghs._aghs_removed_row("No longer upgraded with Aghanim's Shard") == \
-        "Removed Aghanim's Shard bonus from this ability."
+        "Removed Aghanim's Shard."
     monkeypatch.setattr(_State, "aghs_part_slug", ("abaddon_death_coil", "abaddon"))
     assert cards_aghs._aghs_parts_cards() == ""
 

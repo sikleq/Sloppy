@@ -39,13 +39,18 @@ def test_7_38_rows_get_the_tag_of_their_effect(text, tag):
     ("Quill Sprays that were released by the ability now deal damage that is classified as reflection damage", "REWORK"),
     ("Affected units no longer take increased magical and pure damage bonus from Winter Wyvern by default", "DEL"),
     ("Skill points can now be spent on All Attributes starting at level 2 instead of level 6", "REWORK"),
-    ("Now has the same effect for both Arc Warden and Tempest Double", "REWORK"),
     ("Hookshot: Now requires at least one other allied hero to be within a 350 radius of the Hookshot target", "NEW"),
 ])
 def test_the_owners_answers_on_7_38(text, tag):
     assert g._guess_tag(text) == tag
     row = re.search(re.escape(text) + r'", t\("(\w+)"\)', _p738())
     assert row and row.group(1) == tag
+
+
+def test_arc_wardens_same_effect_is_rework_on_its_cards():
+    # the row became the summary of a card (owner 2026-11-05): patch/two_selves.py writes the tag
+    from patch.two_selves import SAME_EFFECT
+    assert g._guess_tag(SAME_EFFECT) == "REWORK"
 
 
 def test_a_hero_has_his_facets_then_his_abilities_on_every_page():
@@ -134,7 +139,19 @@ def test_runes_named_in_a_card_row_get_their_icons():
     out = rune_name_chips("Level 3 - Invisibility, Arcane and Haste Runes")
     for key in ("invisibility", "arcane", "haste"):
         assert f"icons/runes/{key}.png" in out
-    assert out.endswith("Haste Runes") and "Invisibility, " in out
+    # a list: the icons alone by commas, the names on hover (owner 2026-11-06)
+    assert "Runes" not in out.replace('Rune"', "") and out.count("</span>, <span") == 2
+    assert 'data-tooltip="Haste Rune"' in out
+    one = rune_name_chips("Level 1 - Invisibility Rune")
+    assert one.startswith("Level 1 - <span") and one.endswith("</span>")
+    # inside a sentence too (owner 2026-11-06, 7.41 Runic Infusion); "or" stays, "and" is a comma
+    inside = rune_name_chips("Infused with the bonuses of Power Runes for 10s")
+    assert "icons/runes/power.png" in inside and inside.endswith("</span> for 10s") and "Power Runes" not in inside
+    either = rune_name_chips("Duration is reduced by 33% for activating Bounty or Water Runes.")
+    assert "</span> or <span" in either and either.endswith("</span>.") and "Water Runes" not in either
+    assert rune_name_chips(inside) == inside                              # a second pass changes nothing
+    buff = rune_name_chips("Arc Warden gains the Regeneration Rune buff for 4s")
+    assert 'data-tooltip="Regeneration Rune"' in buff and "</span> buff for 4s" in buff
     plain = "Tornado pulls enemies. Any rune nearby"
     assert rune_name_chips(plain) == plain
     note = "Text<!--TIP-->Automatic Regeneration Rune effect<!--/TIP-->"
@@ -168,7 +185,7 @@ def test_the_blocks_those_notes_moved_to_exist():
 
 def test_a_basic_ability_turned_innate_is_a_card():
     src = _p738()
-    assert 'summary="Succubus is now an innate ability."' in src
+    assert 'summary="Now is an innate ability."' in src
     assert 'li("Now is an innate ability", t("REWORK"), covered=True)' in src
 
 
@@ -189,5 +206,7 @@ def test_a_chips_hidden_name_takes_no_width():
 
 def test_a_long_card_header_wraps_on_a_phone():
     # 7.38 Demonic Cleanse "Active – granted by Shard, shares level with Demonic Purge" made a 375 px page 471 px wide
+    # 2026-11-06: the title wraps everywhere (the values stay on the first line); on a phone the values may go under it
     css = read_css()
-    assert re.search(r"@media \(max-width: 640px\) \{ \.iab-title \{ white-space: normal; \} \}", css)
+    assert ".iab-title { white-space: normal;" in css
+    assert re.search(r"@media \(max-width: 640px\) \{ \.iab-head \{ flex-wrap: wrap; \} \}", css)

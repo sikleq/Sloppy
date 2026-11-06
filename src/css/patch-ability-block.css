@@ -64,6 +64,17 @@
   padding: 6px;
   box-shadow: 0 0 0 1px var(--line-soft), 0 2px 6px var(--shadow-40);
 }
+/* GENERAL with several stats: their icons whole and small in the square (owner 2026-11-06, variant C; patch/page.py
+   _stat_mosaic): 2 side by side the full height, 3 two over one in the middle, 4 two by two: symmetric (owner
+   2026-11-06: "симметрия важна"); more than four: the General icon, as before */
+.ability-block.other-block > .ability-icon-wrap > .stat-mosaic { display: grid; gap: 1px; padding: 0; overflow: hidden;
+  background: var(--line-soft); grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.stat-mosaic > .sm-cell { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 0;
+  background: #1d1a17; }
+.stat-mosaic > .sm-cell > img { width: 20px; height: 20px; object-fit: contain; }
+.ability-block.other-block > .ability-icon-wrap > .stat-mosaic.n2 { grid-template-rows: 1fr; }
+.stat-mosaic.n2 > .sm-cell > img { width: 22px; height: 22px; }
+.stat-mosaic.n3 > .sm-cell:last-child { grid-column: span 2; }
 /* Formula tables INSIDE .ability-block — extend back to entity-block left edge,
    not just within content column (else they look right-aligned past the icon). */
 .ability-block ul.changes li > .formula-table {

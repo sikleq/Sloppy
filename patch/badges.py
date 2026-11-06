@@ -1,5 +1,8 @@
 """Badge and percentage-change helpers: b, br, bf, t, gradient_class, facet_badge, scale_pill."""
 
+import functools
+import json
+import pathlib
 import re
 
 
@@ -520,7 +523,7 @@ FACETS = {
     "drow_ranger_sidestep":          ("Sidestep",         "Blue1"),
     "invoker_wex_focus":             ("Mind of Tornarus", "Purple0"),
     "kez_flutter":                   ("Flutter",          "Yellow1"),
-    "kez_shadowhawk":                ("Shadowhawk",       "Blue2"),
+    "kez_shadowhawk":                ("Shadowhawk",       "Blue3"),
     "legion_commander_spoils_of_war":("Spoils of War",    "Red0"),
     "pudge_fresh_meat":              ("Fresh Meat",       "Red0"),
     "skeleton_king_facet_bone_guard":("Bone Guard",       "Yellow0"),
@@ -545,7 +548,7 @@ FACETS = {
     "pangolier_double_jump":            ("Double Jump",         "Red1"),
     "pangolier_thunderbolt":            ("Thunderbolt",         "Yellow1"),
     "phantom_lancer_divergence":        ("Divergence",          "Blue2"),
-    "phantom_lancer_lancelot":          ("Lancelot",            "Yellow0"),   # = renamed Convergence
+    "phantom_lancer_lancelot":          ("Lancelot",            "Yellow1"),   # = renamed Convergence
     "riki_contract_killer":             ("Contract Killer",     "Gray3"),
     "riki_exterminator":                ("Exterminator",        "Purple2"),
     "slark_leeching_leash":             ("Leeching Leash",      "Green2"),
@@ -554,7 +557,7 @@ FACETS = {
     "spectre_twist_the_knife":          ("Twist the Knife",     "Purple2"),
     "treant_primeval_power":            ("Primeval Power",      "Yellow2"),
     "treant_sapling":                   ("Sapling",             "Green2"),
-    "marci_fleeting_fury":              ("Fleeting Fury",       "Red1"),      # COLOUR GUESSED
+    "marci_fleeting_fury":              ("Fleeting Fury",       "Yellow0"),      # COLOUR GUESSED
     # --- Other current facets referenced in patch text but never emitted as a
     #     standalone hero_facet subsection in the datafeed (so fetch_facets
     #     can't see them). Colours pulled from prior-name datafeed snapshots
@@ -770,6 +773,33 @@ _FACET_COLOR_GRADIENT = {
 }
 
 
+@functools.lru_cache(maxsize=1)
+def _facet_history():
+    """{slug: [[first patch, colour, icon], ...]}, written from the game's files by scripts/gen/gen_facet_history.py."""
+    path = pathlib.Path(__file__).resolve().parent.parent / "data" / "rules" / "facet_history.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def facet_look(slug, version=None):
+    """(name, colour, icon) of a facet as its patch had it: the game changes them (Batrider's Arsonist is Red up to 7.38c, Yellow
+    from 7.39). The page's own patch when no version is given; FACETS alone for a facet the game's files do not have."""
+    from .images import _FACET_ICONS
+    from .meta import RELEASE_HISTORY
+    from .state import _State
+    name, colour = FACETS[slug]
+    known = _FACET_ICONS.get(slug)
+    icon = known[1] if isinstance(known, list) and len(known) > 1 else None
+    runs = _facet_history().get(slug)
+    if runs:
+        order = [p["version"] for p in reversed(RELEASE_HISTORY)]
+        version = version or _State.current_patch_version
+        run = runs[-1]
+        if version in order:
+            run = next((r for r in reversed(runs) if order.index(r[0]) <= order.index(version)), runs[0])
+        colour, icon = run[1], run[2] or icon
+    return name, colour, icon
+
+
 def facet_badge(facet_slug):
     """Render the facet pill for a Valve facet slug like
     "broodmother_necrotic_webs". Looks up name + color in FACETS and emits
@@ -785,7 +815,7 @@ def facet_badge(facet_slug):
             f"Unknown facet slug {facet_slug!r}. Add it to FACETS — "
             f"run scripts/fetch/fetch_facets.py <patch> to grab the live data."
         )
-    name, color = FACETS[facet_slug]
+    name, color, _icon = facet_look(facet_slug)
     grad = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray1"])
     return (f'<span class="badge facet-badge" '
             f'style="background-image:{grad}">{name}</span>')

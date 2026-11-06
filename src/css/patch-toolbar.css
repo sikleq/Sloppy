@@ -9,7 +9,6 @@
   margin: 0;
   padding: 0;
   background: var(--bg-panel-3);
-  border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   font-size: 13px;
   color: var(--text-dim);
@@ -127,16 +126,13 @@
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 6px 12px;
-  color: var(--text-main);
   font-family: inherit;
   font-size: 13px;
   transition: border-color 0.15s;
 }
-.search-box input::placeholder { color: var(--text-dimmer); }
 .search-box input:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(227, 196, 106, 0.2);
 }
 /* Inside the patch toolbar the search is ALWAYS expanded — a full-width
    pill with the magnifier icon on the left and the placeholder visible. */
@@ -146,11 +142,7 @@
   cursor: text;
   color: var(--text-main);
   text-align: center;
-  background-image:
-    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="%2398a2b0" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 L13.6 13.6" stroke-linecap="round"/></svg>');
   background-repeat: no-repeat;
-  background-position: 11px center;
-  background-size: 15px 15px;
 }
 .toolbar .search-box input::placeholder { color: var(--text-dimmer); }
 .toolbar .search-box input:focus { text-align: left; }
@@ -182,6 +174,12 @@
   border-bottom: 1px solid var(--bg-panel-4);
 }
 .search-results .result-item:last-child { border-bottom: none; }
+/* the block a search jumped to: a gold frame and glow that fade out (owner 2026-11-06, src/js/patch-page.js jumpTo) */
+.search-hit { animation: search-hit 2.6s ease-out; border-radius: 6px; }
+@keyframes search-hit {
+  0%, 55% { box-shadow: 0 0 0 2px #e3c46a, 0 0 18px rgba(227, 196, 106, 0.35); background-color: rgba(227, 196, 106, 0.10); }
+  100% { box-shadow: 0 0 0 2px transparent, 0 0 18px transparent; background-color: transparent; }
+}
 .search-results .result-item:hover,
 .search-results .result-item.active {
   background: rgba(227, 196, 106, 0.1);
@@ -195,6 +193,15 @@
   background: var(--bg-panel-4);
   flex-shrink: 0;
 }
+.search-results .result-item .result-facet {
+  display: flex;
+  justify-content: center;
+  width: 32px;
+  height: 18px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.search-results .result-item .result-facet > img { width: 18px; background: none; }
 .search-results .result-item .kind {
   margin-left: auto;
   font-size: 10.5px;

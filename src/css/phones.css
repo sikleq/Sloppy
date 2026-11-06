@@ -19,8 +19,8 @@
     row-gap: 0;
     padding: 4px 8px 0;
   }
-  .nav-brand { grid-area: brand; gap: 6px; padding: 2px 6px 2px 0; }
-  .nav-brand-logo { width: 38px; height: 38px; }
+  .nav-brand { grid-area: brand; gap: 6px; padding: 0 6px 0 0; margin: -4px 0 0 -8px; }
+  .nav-brand-logo { width: 46px; height: 46px; }
   .nav-brand-text { font-size: 19px; white-space: nowrap; }
   .nav-context { grid-area: ctx; }
   .nav-tabs {
@@ -153,6 +153,12 @@
     text-align: left;
   }
 
+  .selves-table { display: grid; font-size: 11.5px; max-width: calc(100% + 2 * var(--px, 0px)); overflow-x: auto; }
+  .value-table { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .value-table > .vt-l, .value-table > .vt-v { padding: 3px 6px; overflow-wrap: anywhere; }
+  .selves-table > span { padding: 2px 3px; }
+  .selves-table > .selves-head { font-size: 10px; }
+  .selves-table > .selves-chips { flex-direction: column; row-gap: 2px; }
   /* Before -> after cards: the two panes stack (old, arrow down, new) */
   .properties-change,
   .properties-change.new-only,
@@ -170,6 +176,10 @@
   .ability-change,
   .ability-change.is-in-place,
   .ability-change.unified-panes.is-single-new { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+  .card-pair, .card-pair.card-trio { grid-template-columns: minmax(0, 1fr); }      /* a phone: one under the other */
+  .single-right { grid-template-columns: minmax(0, 1fr); }   /* the card under its block, no line */
+  .single-right > .ability-change { margin-top: 0; }
+  .sr-line { display: none; }
   .ability-change-arrow { transform: rotate(90deg); }
   /* item / ability card header: the cast range / mana / cooldown values wrap instead of widening the card */
   .properties-change .properties-pane { min-width: 0; }

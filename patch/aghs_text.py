@@ -75,10 +75,48 @@ _HEADER_LABELS = {"abilitycooldown": "Cooldown", "abilitymanacost": "Mana cost",
 _SECONDS = {"abilitycooldown", "abilitychargerestoretime", "abilityduration", "abilitycastpoint", "abilitychanneltime"}
 
 
-def _value_lines(block, kind, slug, version, tooltip):
+def _is_pct(label, v):
+    """A percent: the label starts with "%", or the game shows the value as a percentage (display_type "kManaPercentage":
+    7.41 Mana Break's "Max mana burned per hit" read "+1.5", owner 2026-11-06)."""
+    return label.lstrip().startswith("%") or (isinstance(v, dict) and "Percentage" in str(v.get("display_type", "")))
+
+
+def _fmt(x):
+    return f"{round(x, 2):g}"
+
+
+def _total(base, raw):
+    """The value with the upgrade, not the bonus (owner 2026-11-06: "не +X, а to X"): base "1.6 2.4 3.2 4.0" + "+1.5" ->
+    "3.1/3.9/4.7/5.5"; "=6" sets it, "x1.8" multiplies, "-50%" on a value that is no percent is a share of it (7.41 Pugna).
+    None when it can't be said (no numeric base, lists of different lengths)."""
+    raw = str(raw).strip()
+    try:
+        bs = [float(x) for x in str(base or "").split()]
+        rs = [float(x.lstrip("+=x").rstrip("%")) for x in raw.split()]
+    except ValueError:
+        return None
+    if not bs or not rs or (len(bs) != len(rs) and 1 not in (len(bs), len(rs))):
+        return None
+    n = max(len(bs), len(rs))
+    bs, rs = (bs * n)[:n] if len(bs) == 1 else bs, (rs * n)[:n] if len(rs) == 1 else rs
+    if raw.startswith("="):
+        out = rs
+    elif raw.startswith("x"):
+        out = [b * r for b, r in zip(bs, rs)]
+    elif raw.endswith("%"):
+        out = [b * (1 + r / 100) for b, r in zip(bs, rs)]
+    else:
+        out = [b + r for b, r in zip(bs, rs)]
+    vals = [_fmt(x) for x in out]
+    return vals[0] if len(set(vals)) == 1 else "/".join(vals)
+
+
+def _value_lines(block, kind, slug, version, tooltip, totals=True):
     """The upgrade's own numbers as the game lists them under the description ("RADIUS: 600 (+100)"): every value the
-    upgrade sets that has a label -> "Radius: +100." (a bonus on a base value keeps its sign, an upgrade-only value is
-    bare; "%LABEL" = a percent)."""
+    upgrade sets that has a label -> "Radius: =700." — the value with the upgrade, "=" marking a total that the card says
+    as "to 700" (owner 2026-11-06); a bonus whose base can't be added keeps its sign ("+100": a value growing with hero
+    level), an upgrade-only value is bare; a percent ("%LABEL", display_type) gets "%". totals=False: the bonus as the
+    game lists it ("+100"), to compare two patches' upgrades whatever their base values did."""
     out = []
     req = "RequiresScepter" if kind == "scepter" else "RequiresShard"
     av = block.get("AbilityValues")
@@ -97,13 +135,14 @@ def _value_lines(block, kind, slug, version, tooltip):
         n = _num(raw) if raw is not None else None
         if not label or n is None or not re.search(r"[A-Za-z]", label) or not _nonzero(n):
             continue                                     # "+0": the upgrade no longer sets it (Sven 7.41 armor)
-        pct = label.lstrip().startswith("%")
+        pct = _is_pct(label, v)
         label = re.sub(r"^[%$+\s]+|[:\s]+$", "", label).strip().capitalize()
         base = _num(v.get("value", "")) if "value" in v else None
         signed = not only and base is not None and _nonzero(base)
         sign = "-" if str(raw).strip().startswith("-") else "+"
-        val = (sign + n.lstrip("-")) if signed else n
-        unit = "%" if pct else "s" if k.lower() in _SECONDS and not n.endswith("%") else ""
+        total = _total(v.get("value"), raw) if signed and totals and "hero_levelup" not in v else None
+        val = "=" + total if total is not None else (sign + n.lstrip("-")) if signed else n
+        unit = "%" if pct else "s" if k.lower() in _SECONDS and (total is not None or not n.endswith("%")) else ""
         out.append(f"{label}: {val}{unit}.")
     # before 7.31 ("AbilitySpecial"): a value the upgrade sets is its own entry marked "RequiresScepter" / "RequiresShard"
     # ("damage_scepter" 200, 7.08-7.30) — the game lists it bare
@@ -178,10 +217,12 @@ def _granted_text(slug, kind, version, block):
     return f"Grants this ability: {text}" if text else None
 
 
-def _per_level(base, inc, pct=""):
-    """"10% + 1% per level"; a value that shrinks with level: "6.9 - 0.1 per level" (7.41 Weave)."""
+def _per_level(base, inc, pct="", every=None):
+    """"10% + 1% per level"; a value that shrinks with level: "6.9 - 0.1 per level" (7.41 Weave); a step every few levels
+    ("levelup_interval" 5): "40% + 5% per 5 levels" (7.41 Essence Flux read "per level", owner 2026-11-05)."""
     sign = "-" if str(inc).startswith("-") else "+"
-    return f"{base}{pct} {sign} {str(inc).lstrip('-')}{pct} per level"
+    step = f"per {every} levels" if every and str(every) != "1" else "per level"
+    return f"{base}{pct} {sign} {str(inc).lstrip('-')}{pct} {step}"
 
 
 def ability_text(slug, version, kind="base"):
@@ -193,15 +234,15 @@ def ability_text(slug, version, kind="base"):
     if not isinstance(block, dict) or not desc:
         return None
     av = block.get("AbilityValues")
-    grow = {k.lower(): (_num(v.get("value", "0")), _num(v["hero_levelup"]))
+    grow = {k.lower(): (_num(v.get("value", "0")), _num(v["hero_levelup"]), _num(v.get("levelup_interval", "")))
             for k, v in (av.items() if isinstance(av, dict) else ()) if isinstance(v, dict) and "hero_levelup" in v}
 
     def per_level(m):
-        base, inc = grow.get(m.group(1).lower(), (None, None))
+        base, inc, every = grow.get(m.group(1).lower(), (None, None, None))
         if base is None or inc is None:
             return m.group(0)
         pct = "%" if m.group(2) else ""
-        return _per_level(base, inc, pct)
+        return _per_level(base, inc, pct, every)
     filled = _fill(re.sub(r"%([A-Za-z_]\w*)%(%%)?", per_level, desc),
                    _with_kin_values(desc, _values(block, kind), slug, kind, version))
     text = _clean(filled).replace("%%", "%") if filled is not None else ""      # "0%%" the file writes bare
@@ -227,10 +268,10 @@ def ability_text(slug, version, kind="base"):
         n = _num((v.get("value") or v.get(f"special_bonus_{kind}", "")) if isinstance(v, dict) else v)
         if not label or not re.search(r"[A-Za-z]", label) or n is None:
             continue
-        pct = "%" if label.lstrip().startswith("%") else ""
+        pct = "%" if _is_pct(label, v) else ""
         label = re.sub(r"^[%$+\s]+|[:\s]+$", "", label).strip().capitalize()
-        base, inc = grow.get(k.lower(), (None, None))
-        val = _per_level(n, inc, pct) if inc else f"{n}{pct}"
+        base, inc, every = grow.get(k.lower(), (None, None, None))
+        val = _per_level(n, inc, pct, every) if inc else f"{n}{pct}"
         if inc or _nonzero(n):
             lines.append(f"{label}: {val}.")
     return text + ("\n" + " ".join(lines) if lines else "")
@@ -286,9 +327,10 @@ def _with_kin_values(desc, vals, slug, kind, version):
     return {**vals, **{k: next(iter(v)) for k, v in found.items() if len(v) == 1}}
 
 
-def aghs_text(slug, kind, version):
+def aghs_text(slug, kind, version, totals=True):
     """The upgrade text of `slug` ("scepter" / "shard") in `version`: the description, then (after a line break) its
-    numbers "Radius: +100. Barrier duration: 6." — or None. An ability the upgrade grants: "Grants <name>: …"."""
+    numbers "Radius: =700. Barrier duration: 6." ("=": the value with the upgrade, _value_lines) — or None. An ability
+    the upgrade grants: "Grants <name>: …". totals=False: the bonuses as the game lists them, to compare patches."""
     if not slug or not version or kind not in _KEYS:
         return None
     block = _blocks(version).get(slug)
@@ -307,5 +349,5 @@ def aghs_text(slug, kind, version):
     if not text:
         return None
     text += "" if text.endswith((".", "!")) else "."
-    values = _value_lines(block, kind, slug, version, tooltip)
+    values = _value_lines(block, kind, slug, version, tooltip, totals)
     return text + ("\n" + " ".join(values) if values else "")      # the numbers: a line of their own

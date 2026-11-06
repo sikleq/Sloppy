@@ -139,7 +139,8 @@ def test_quick_wit_card_highlights_the_new_attack_speed():
     if not page.exists():
         pytest.skip("site not built")
     html = page.read_text(encoding="utf-8")
-    assert '<span class="iab-hl iab-hl-new">Also provides Dark Seer with' in html
+    # in a card only numbers are coloured now (owner 2026-10-25, 2026-11-06): the sentence stays, plain
+    assert "Also provides Dark Seer with" in html and '<span class="iab-hl iab-hl-new">Also provides Dark Seer' not in html
     assert "Aggrandize renamed to Quick Wit" not in html
 
 

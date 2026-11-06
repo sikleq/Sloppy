@@ -11,12 +11,12 @@ html.cb-mode ul.changes li.li-notext[data-tag*="new"]::before { background: rgba
 html.cb-mode ul.changes li.li-notext[data-tag*="del"]::before { background: rgba(94, 31, 55, 0.11); color: #bb3e6d; border-color: rgba(94, 31, 55, 0.38); }
 html.cb-mode ul.changes li.li-notext[data-tag*="rework"]::before { background: rgba(216, 153, 188, 0.08); border-color: rgba(216, 153, 188, 0.22); }
 html.cb-mode ul.changes li.li-notext[data-tag*="swap"]::before { background: rgba(40, 150, 120, 0.08); color: #31b994; border-color: rgba(40, 150, 120, 0.27); }
-html.cb-mode .badge.rework { background: rgba(216, 153, 188, 0.08); border: 1px solid rgba(216, 153, 188, 0.22); }
-html.cb-mode .badge.swap { background: rgba(40, 150, 120, 0.08); color: #31b994; border: 1px solid rgba(40, 150, 120, 0.27); }
+html.cb-mode .badge.rework { border: 1px solid rgba(216, 153, 188, 0.22); }
+html.cb-mode .badge.swap { border: 1px solid rgba(40, 150, 120, 0.27); }
 html.cb-mode .badge.misc { background: rgba(198, 198, 198, 0.09); }
 html.cb-mode .badge.qol { background: rgba(45, 91, 193, 0.09); color: #6a8ddc; border: 1px solid rgba(45, 91, 193, 0.30); }
-html.cb-mode .badge.new { background: rgba(245, 225, 90, 0.09); color: #dabf0d; border: 1px solid rgba(245, 225, 90, 0.33); }
-html.cb-mode .badge.del { background: rgba(94, 31, 55, 0.11); color: #bb3e6d; border: 1px solid rgba(94, 31, 55, 0.38); }
+html.cb-mode .badge.new { border: 1px solid rgba(245, 225, 90, 0.33); }
+html.cb-mode .badge.del { border: 1px solid rgba(94, 31, 55, 0.38); }
 html.cb-mode .badge.buff1 { background: rgba(157, 211, 242, 0.15); color: #98d1f2; border: 1px solid rgba(157, 211, 242, 0.39); }
 html.cb-mode .badge.buff2 { background: rgba(152, 209, 242, 0.20); color: #9cd3f2; border: 1px solid rgba(152, 209, 242, 0.48); }
 html.cb-mode .badge.buff3 { background: rgba(148, 207, 241, 0.26); color: #9ad2f2; border: 1px solid rgba(148, 207, 241, 0.57); }

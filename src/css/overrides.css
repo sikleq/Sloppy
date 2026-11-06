@@ -182,12 +182,12 @@ body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { paddi
 section.ec-patch .entity-block.ec-item-inject { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(227, 196, 106, 0.18); }
 /* one filter row: Tags | Show | Ability */
 .legend-tags.ec-filters { flex-wrap: wrap; row-gap: 5px; }
-.ec-vsep { width: 1px; height: 16px; margin: 0 8px; background: var(--line-bright, rgba(255,255,255,0.18)); flex: 0 0 auto; }
+.ec-vsep { width: 1px; height: 16px; flex: 0 0 auto; }
 /* ability chips: gold, so they do not blend with the blue Show filters */
 .ec-ab-btn {
-  cursor: pointer; user-select: none; font-family: inherit; font-size: 11px; padding: 3px 9px; border-radius: 3px;
+  cursor: pointer; user-select: none; padding: 3px 9px; border-radius: 3px;
   background: rgba(227, 196, 106, 0.06); color: #c9b57a; border: 1px solid rgba(227, 196, 106, 0.28);
-  text-transform: uppercase; letter-spacing: 0.4px; transition: background 0.12s, border-color 0.12s, color 0.12s;
+  text-transform: uppercase; transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 .ec-ab-btn:hover { background: rgba(227, 196, 106, 0.13); border-color: rgba(227, 196, 106, 0.5); color: #f0dfa6; }
 .ec-ab-btn.active { background: rgba(227, 196, 106, 0.26); border-color: rgba(227, 196, 106, 0.75); color: #fff; }
