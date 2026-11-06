@@ -598,7 +598,7 @@ def build():
     W(hero_header("Sniper"))
     W(ability("Concussive Grenade", slug="sniper_concussive_grenade"))
     W(ul_open())
-    W(li("Can now be cast while rooted, but will not knock Sniper back if he is under the effect of root", t("BUFF")))
+    W(li("Can now be cast while rooted, but will not knock Sniper back if he is under the effect of root", t("NEW")))
     W(ul_close())
 
     # Spectre

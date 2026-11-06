@@ -554,7 +554,7 @@ def build():
     W(hero_header("Venomancer"))
     W(ability("Septic Shock", slug="venomancer_sepsis", innate=True))
     W(ul_open())
-    W(li("Now counts one debuff per unique ability/item (e.g. Shiva's Guard will count as 1 debuff instead of 3)", t("NERF")))
+    W(li("Now counts one debuff per unique ability/item (e.g. Shiva's Guard will count as 1 debuff instead of 3)", t("NERF"), examples={"Shiva's Guard": "Shiva's Guard"}))
     W(ul_close())
 
     # Viper

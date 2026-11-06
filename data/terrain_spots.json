@@ -56,7 +56,8 @@
     {"match": "Several trees have been removed from the Radiant high ground leading to the Bottom Roshan Pit", "spots": [[1792, -3392]], "r": 700},
     {"match": "Trees have been added around the Dire Bottom Tier 1 tower", "spots": [[5817, -1700]], "r": 800},
     {"match": "The Watcher above the secret shop has been repositioned", "spots": [[3346, -818]], "r": 1100},
-    {"match": "The Top Lane creep paths have been slightly adjusted", "spots": [[-6100, 5000]], "r": 1000, "show": ["lanes"]}
+    {"match": "The Top Lane creep paths have been slightly adjusted", "spots": [[-6100, 5000]], "r": 1000, "show": ["lanes"]},
+    {"match": "Fixed unnecessary pathing blockers at the left of the entrance to the Dire Base", "spots": [[7136, 2304]], "r": 500, "show": ["nowards"], "phrase": "pathing blockers"}
   ],
   "7.39": [
     {"match": "Several trees between the two neutrals camps on the easternmost region", "spots": [[8256, 1003]]},

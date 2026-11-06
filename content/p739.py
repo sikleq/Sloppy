@@ -1008,7 +1008,7 @@ def build():
     W(ul_close())
     W(subgroup("Abilities"))
     W(ability_change(
-        summary="Slugger is now an innate ability.",
+        summary="Now is an innate ability.",
         tag="rework",
         old=dict(
             name="Spirit Cairn",
@@ -1025,12 +1025,12 @@ def build():
                 "Enemies killed with Enchant Totem or Earthshaker's other abilities are sent flying, dealing damage to enemies they hit. "
                 + inline_note("Almost no values were changed, still improves with Echo Slam"),
             ],
-        )))
-    W(ul_open())
-    # the card's summary says it, its note is in the card: the row stays hidden for the weights
-    W(li("Now is an innate ability", t("REWORK"), covered=True))
-    W(li("Damage (Creep Death) decreased from 40/60/80/100 to 30/45/60/75", b([40, 60, 80, 100], [30, 45, 60, 75])))
-    W(ul_close())
+        ),
+        rows_first=lambda: [
+            # the card's summary says it, its note is in the card: the row stays hidden for the weights
+            li("Now is an innate ability", t("REWORK"), covered=True),
+            li("Damage (Creep Death) decreased from 40/60/80/100 to 30/45/60/75", b([40, 60, 80, 100], [30, 45, 60, 75])),
+        ]))
     W(ability("Aftershock", slug="earthshaker_aftershock"))
     W(ul_open())
     W(li("Radius decreased from 350 to 300", b(350, 300)))
@@ -1790,16 +1790,17 @@ def build():
     # a basic ability -> the innate: old -> new from the game's texts, as Slugger above (owner 2026-10-27); the header
     # says what it levels with, the card that the values stayed — the row hides
     W(ability_change(
-        summary="Blur is now an innate ability.",
+        summary="Now is an innate ability.",
         tag="rework",
         old=dict(name="Blur", slug="phantom_assassin_blur", desc=game_ability_desc("phantom_assassin_blur", "7.38c")),
         new=dict(name="Blur", slug="phantom_assassin_blur", innate=True,
                  desc=game_ability_desc("phantom_assassin_blur")),
-    ))
+        rows_first=lambda: [
+            li("Now is an innate ability that improves with Coup de Grace level", t("REWORK"), extra=inline_note("Values were not changed"), covered=True),
+            li("No longer dispelled when near enemy Outposts, Watchers or base buildings (other than Towers/Ancient)", t("BUFF")),
+            li("Now dispelled when attacking Roshan or enemy Barracks", t("NERF")),
+        ]))
     W(ul_open())
-    W(li("Now is an innate ability that improves with Coup de Grace level", t("REWORK"), extra=inline_note("Values were not changed"), covered=True))
-    W(li("No longer dispelled when near enemy Outposts, Watchers or base buildings (other than Towers/Ancient)", t("BUFF")))
-    W(li("Now dispelled when attacking Roshan or enemy Barracks", t("NERF")))
     W(li("Aghanim's Shard: Decreases cooldown from 60/55/50/45s to 50/45/40/35s. Any time Phantom Assassin gets a hero kill, her ability cooldowns advance 60% of their max cooldown values", t("NEW")))
     W(ul_close())
     W(ability("Immaterial", slug="phantom_assassin_immaterial"))
@@ -1935,11 +1936,7 @@ def build():
 
     # Sand King
     W(hero_header("Sand King"))
-    W(facet_header("sand_king_sandshroud"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("sand_king_dust_devil"))
+    W(facet_group("sand_king_sandshroud", "sand_king_dust_devil"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -2010,11 +2007,7 @@ def build():
 
     # Silencer
     W(hero_header("Silencer"))
-    W(facet_header("silencer_irrepressible"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("silencer_reverberating_silence"))
+    W(facet_group("silencer_irrepressible", "silencer_reverberating_silence"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -2121,7 +2114,7 @@ def build():
                 "Granted by Aghanim's Scepter. Unit-targeted.",
                 "Barathrum gains 75% magic resistance and distorts reality around the selected hero, making any unit-targeted spells cast by enemy heroes on the target to get redirected towards Spirit Breaker. Can be cast on both allied and enemy heroes, but only spells cast by enemies of Spirit Breaker will be redirected. Cast Range: 700."
                 + inline_note("Io's Tether is the only exception that will ignore this effect."),
-                hl("Redirected spells are not considered as reflected. If Spirit Breaker is under effects such as Lotus Orb's Echo Shell, redirected spells will be reflected back to the enemy caster", "misc") + ".",
+                hl("Redirected spells are not considered as reflected. If Spirit Breaker is under effects such as " + mech_example("Lotus Orb's Echo Shell") + ", redirected spells will be reflected back to the enemy caster", "misc") + ".",
                 hl("If the redirected spell has different interactions for allies and enemies, Spirit Breaker will receive the enemy interaction", "rework")
                 + ". " + inline_note("Example: Oracle's Fate's Edict will disarm Spirit Breaker even if the ability was redirected from Oracle's ally"),
                 "Duration: " + hl("6s", "nerf") + ". " + hl("Dispellable only by Strong Dispel", "nerf") + ".",
@@ -2129,16 +2122,15 @@ def build():
         ),
         summary="Ability reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    # the card shows every change highlighted (old left, new right; cooldown and mana in its headers): rows hidden
-    W(li("Now dispellable only by Strong Dispel", t("NERF"), covered=True))
-    W(li("Cooldown increased from 20s to 25s", b(20, 25, l=True)))
-    W(li("Mana Cost increased from 75 to 100", b(75, 100, l=True)))
-    W(li("Duration decreased from 7s to 6s", b(7, 6), covered=True))
-    W(li("Redirected spells are not considered as reflected. If Spirit Breaker is under effects such as Lotus Orb's Echo Shell, redirected spells will be reflected back to the enemy caster", t("MISC"), covered=True))
-    W(li("If the redirected spell has different interactions for allies and enemies, Spirit Breaker will receive the enemy interaction", t("REWORK"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            # the card shows every change highlighted (old left, new right; cooldown and mana in its headers): rows hidden
+            li("Now dispellable only by Strong Dispel", t("NERF"), covered=True),
+            li("Cooldown increased from 20s to 25s", b(20, 25, l=True)),
+            li("Mana Cost increased from 75 to 100", b(75, 100, l=True)),
+            li("Duration decreased from 7s to 6s", b(7, 6), covered=True),
+            li("Redirected spells are not considered as reflected. If Spirit Breaker is under effects such as Lotus Orb's Echo Shell, redirected spells will be reflected back to the enemy caster", t("MISC"), covered=True),
+            li("If the redirected spell has different interactions for allies and enemies, Spirit Breaker will receive the enemy interaction", t("REWORK"), covered=True),
+        ]))
 
     # Techies
     W(hero_header("Techies"))

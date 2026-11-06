@@ -162,7 +162,7 @@ def build():
     W(subgroup("Tormentor"))
     W(ul_open())
     W(li("Cleared up some areas around the Tormentor locations", t("REWORK")))
-    W(li("Added additional blocks preventing flying movement around the edges of the map (e.g. the highground areas behind the Tormentors will no longer be accessible by Batrider during Firefly)", t("MISC")))
+    W(li("Added additional blocks preventing flying movement around the edges of the map (e.g. the highground areas behind the Tormentors will no longer be accessible by Batrider during Firefly)", t("MISC"), examples={"Firefly": "Batrider's Firefly"}))
     W(ul_close())
     W(subgroup("Other"))
     W(ul_open())
@@ -814,11 +814,7 @@ def build():
     W(li("Strength gain decreased from 3.7 to 3.2", b(3.7, 3.2)))
     W(li("Intelligence gain increased from 1.6 to 1.9", b(1.6, 1.9)))
     W(ul_close())
-    W(facet_header("brewmaster_roll_out_the_barrel"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("brewmaster_drunken_master"))
+    W(facet_group("brewmaster_roll_out_the_barrel", "brewmaster_drunken_master"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -1019,11 +1015,7 @@ def build():
 
     # Clinkz
     W(hero_header("Clinkz"))
-    W(facet_header("clinkz_suppressive_fire"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("clinkz_engulfing_step"))
+    W(facet_group("clinkz_suppressive_fire", "clinkz_engulfing_step"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -1068,10 +1060,9 @@ def build():
         ),
         summary="Returning as a base ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Skeleton Archers target the enemy attacked by Clinkz with Searing Arrows effect", t("NEW"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Skeleton Archers target the enemy attacked by Clinkz with Searing Arrows effect", t("NEW"), covered=True),
+        ]))
     W(ability("Death Pact", slug="clinkz_death_pact"))
     W(ul_open())
     W(li("No longer creates Skeleton Archers", t("DEL")))
@@ -1228,15 +1219,7 @@ def build():
     W(ul_open())
     W(li("Base Damage decreased by 6", bstat_h("Earth Spirit", "AttackDamageMin", "7.39e", -6), extra=note_box(hero="Earth Spirit", field="AttackDamageMin", before_patch="7.39e") + inline_note("Damage at level 1 decreased from 53–57 to 47–51")))
     W(ul_close())
-    W(facet_header("earth_spirit_resonance"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("earth_spirit_stepping_stone"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("earth_spirit_ready_to_roll"))
+    W(facet_group("earth_spirit_resonance", "earth_spirit_stepping_stone", "earth_spirit_ready_to_roll"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -1289,7 +1272,7 @@ def build():
     W(hero_header("Elder Titan"))
     W(ability("Astral Spirit", slug="elder_titan_ancestral_spirit"))
     W(ul_open())
-    W(li("Return Astral Spirit and Move Astral Spirit sub-abilities can now be used while Elder Titan is disabled", t("BUFF")))
+    W(li("Return Astral Spirit and Move Astral Spirit sub-abilities can now be used while Elder Titan is disabled", t("NEW")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -1601,11 +1584,7 @@ def build():
     W(li("Base Movement Speed decreased from 325 to 295", b(325, 295)))
     W(li("Base Damage increased by 4", bstat_h("Lone Druid", "AttackDamageMin", "7.39e", 4), extra=note_box(hero="Lone Druid", field="AttackDamageMin", before_patch="7.39e") + inline_note("Damage at level 1 increased from 38–42 to 42–46")))
     W(ul_close())
-    W(facet_header("lone_druid_bear_with_me"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("lone_druid_bear_necessities"))
+    W(facet_group("lone_druid_bear_with_me", "lone_druid_bear_necessities"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -1631,13 +1610,12 @@ def build():
         ),
         summary="Moved to an innate ability. Cannot be leveled up. Gift Bearer's effect is now a part of it",
         tag="rework",
-    ))
-    W(ul_open())
-    # both are in the card above with their notes: the rows stay hidden for the weights
-    W(li("Ability is moved to the 4th ability slot", t("MISC"), covered=True))
-    W(li("Spirit Bear now counts as a melee hero for most spells", t("REWORK"), covered=True))
-    W(li("Cooldown decreased from 150/140/130/120s to 120s", b([150, 140, 130, 120], 120, l=True)))
-    W(ul_close())
+        rows_first=lambda: [
+            # both are in the card above with their notes: the rows stay hidden for the weights
+            li("Ability is moved to the 4th ability slot", t("MISC"), covered=True),
+            li("Spirit Bear now counts as a melee hero for most spells", t("REWORK"), covered=True),
+            li("Cooldown decreased from 150/140/130/120s to 120s", b([150, 140, 130, 120], 120, l=True)),
+        ]))
     W(ability_change(
         old=None,
         new=dict(
@@ -2048,7 +2026,7 @@ def build():
     W(ul_close())
     W(ability("Hammer of Purity", slug="omniknight_hammer_of_purity"))
     W(ul_open())
-    W(li("No longer disabled by Silence", t("BUFF")))
+    W(li("No longer disabled by Silence", t("NEW")))
     W(ul_close())
     W(ability("Guardian Angel", slug="omniknight_guardian_angel"))
     W(ul_open())
@@ -2070,11 +2048,7 @@ def build():
 
     # Pangolier
     W(hero_header("Pangolier"))
-    W(facet_header("pangolier_double_jump"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("pangolier_thunderbolt"))
+    W(facet_group("pangolier_double_jump", "pangolier_thunderbolt"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -2125,11 +2099,7 @@ def build():
     W(ul_open())
     W(li("Agility gain increased from 2.8 to 3.4", b(2.8, 3.4)))
     W(ul_close())
-    W(facet_header("phantom_lancer_divergence"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("phantom_lancer_lancelot"))
+    W(facet_group("phantom_lancer_divergence", "phantom_lancer_lancelot"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -2247,11 +2217,7 @@ def build():
 
     # Riki
     W(hero_header("Riki"))
-    W(facet_header("riki_contract_killer"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("riki_exterminator"))
+    W(facet_group("riki_contract_killer", "riki_exterminator"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -2410,11 +2376,7 @@ def build():
 
     # Slark
     W(hero_header("Slark"))
-    W(facet_header("slark_leeching_leash"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("slark_dark_reef_renegade"))
+    W(facet_group("slark_leeching_leash", "slark_dark_reef_renegade"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -2437,13 +2399,12 @@ def build():
         ),
         summary="Now an innate ability. Barracuda's effect moved to the Ultimate",
         tag="rework",
-    ))
-    W(ul_open())
-    W(li_formula("Duration rescaled",
-                 "15/35/55/75s", "15s + 2.5s each time Slark levels up",
-                 rank_step([15, 35, 55, 75], ultimate=False), lambda L: 15 + 2.5 * (L - 1),
-                 value_fmt="{:g}s"))
-    W(ul_close())
+        rows_first=lambda: [
+            li_formula("Duration rescaled",
+                             "15/35/55/75s", "15s + 2.5s each time Slark levels up",
+                             rank_step([15, 35, 55, 75], ultimate=False), lambda L: 15 + 2.5 * (L - 1),
+                             value_fmt="{:g}s"),
+        ]))
     W(ability("Pounce", slug="slark_pounce"))
     W(ul_open())
     W(li("Now applies 1/2/3/4 Essence Shift stacks when leashing an enemy hero", t("NEW")))
@@ -2512,11 +2473,7 @@ def build():
     W(li("Base Attack Time worsened from 1.7s to 1.8s", b(1.7, 1.8, l=True)))
     W(li("Base Attack Speed increased from 90 to 110", b(90, 110)))
     W(ul_close())
-    W(facet_header("spectre_forsaken"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("spectre_twist_the_knife"))
+    W(facet_group("spectre_forsaken", "spectre_twist_the_knife"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -2537,13 +2494,12 @@ def build():
         ),
         summary="Now an innate ability.",
         tag="rework",
-    ))
-    W(ul_open())
-    W(li_formula("Damage rescaled",
-                 "25/40/55/70", "25 + 2 every time Spectre levels up",
-                 rank_step([25, 40, 55, 70], ultimate=False), lambda L: 25 + 2 * (L - 1),
-                 value_fmt="{:g}"))
-    W(ul_close())
+        rows_first=lambda: [
+            li_formula("Damage rescaled",
+                             "25/40/55/70", "25 + 2 every time Spectre levels up",
+                             rank_step([25, 40, 55, 70], ultimate=False), lambda L: 25 + 2 * (L - 1),
+                             value_fmt="{:g}"),
+        ]))
     W(ability("Spectral Dagger", slug="spectre_spectral_dagger"))
     W(ul_open())
     W(li("Mana Cost decreased from 110/120/130/140 to 100/110/120/130", b([110, 120, 130, 140], [100, 110, 120, 130], l=True)))
@@ -2752,11 +2708,7 @@ def build():
 
     # Treant Protector
     W(hero_header("Treant Protector"))
-    W(facet_header("treant_primeval_power"))
-    W(ul_open())
-    W(li("Removed", t("DEL")))
-    W(ul_close())
-    W(facet_header("treant_sapling"))
+    W(facet_group("treant_primeval_power", "treant_sapling"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
@@ -2792,10 +2744,9 @@ def build():
         ),
         summary="Ability reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    W(li("No longer has a creep penalty for healing", t("BUFF"), covered=True))   # the old card shows the penalty
-    W(ul_close())
+        rows_first=lambda: [
+            li("No longer has a creep penalty for healing", t("BUFF"), covered=True),  # the old card shows the penalty
+        ]))
     W(ability("Living Armor", slug="treant_living_armor"))
     W(ul_open())
     W(li("No longer grants bonus armor", t("DEL")))

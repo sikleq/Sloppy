@@ -263,11 +263,10 @@ def build():
         new=dict(name="Withering Mist", slug="abaddon_withering_mist", innate=True, desc=game_ability_desc("abaddon_withering_mist", "7.37", note="The debuff is always applied on the target but remains inactive if the target is above the health threshold")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Damaging enemies applies the Withering Mist debuff for 5s. Affected enemies have their HP regeneration, healing, lifesteal and spell lifesteal reduced by 35% if they are below 40% HP", t("NERF"), extra=inline_note("The debuff is always applied on the target but remains inactive if the target is above the health threshold"), covered=True))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Damaging enemies applies the Withering Mist debuff for 5s. Affected enemies have their HP regeneration, healing, lifesteal and spell lifesteal reduced by 35% if they are below 40% HP", t("NERF"), extra=inline_note("The debuff is always applied on the target but remains inactive if the target is above the health threshold"), covered=True),
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Borrowed Time", slug="abaddon_borrowed_time"))
     W(ul_open())
     W(li("Cooldown increased from 80/70/60s to 90/80/70s", b([80, 70, 60], [90, 80, 70], l=True)))
@@ -287,11 +286,10 @@ def build():
         new=dict(name="Persecutor", slug="antimage_persectur", innate=True, desc=game_ability_desc("antimage_persectur", "7.37", note="Illusions cause full effect")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New innate ability. Passive, scales with Mana Void", t("MISC"), covered=True))
-    W(li("Attacks slow enemies based on how much mana they are missing. 12.5/15/17.5/20% min slow at 50% mana, up to 25/30/35/40% maximum slow at 0% mana. Slow Duration: 0.75s", t("MISC"), extra=inline_note("Illusions cause full effect"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New innate ability. Passive, scales with Mana Void", t("MISC"), covered=True),
+            li("Attacks slow enemies based on how much mana they are missing. 12.5/15/17.5/20% min slow at 50% mana, up to 25/30/35/40% maximum slow at 0% mana. Slow Duration: 0.75s", t("MISC"), extra=inline_note("Illusions cause full effect"), covered=True),
+        ]))
     W(ability("Mana Break", slug="antimage_mana_break"))
     W(ul_open())
     W(li("Mana Burned per hit rescaled from 16/23/30/37/44 to 25/30/35/40", b([23, 30, 37, 44], [25, 30, 35, 40])))
@@ -339,11 +337,10 @@ def build():
         new=dict(name="Rugged", slug="beastmaster_rugged", innate=True, desc=game_ability_desc("beastmaster_rugged", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Beastmaster's melee hero damage block chance is increased from 50% to 100% versus non-hero units", b(50, 100), covered=True))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Beastmaster's melee hero damage block chance is increased from 50% to 100% versus non-hero units", b(50, 100), covered=True),
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Wild Axes", slug="beastmaster_wild_axes"))
     W(ul_open())
     W(li("Mana Cost increased from 50 to 50/55/60/65", b(50, [50, 55, 60, 65], l=True)))
@@ -397,11 +394,10 @@ def build():
         new=dict(name="Belligerent", slug="brewmaster_belligerent", innate=True, desc=game_ability_desc("brewmaster_belligerent", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Whenever Brewmaster respawns or comes out of Primal Split, he gains 20% attack damage bonus. Duration when respawning: 30s. Duration after coming out of Primal Split: 15s", t("MISC"), covered=True))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Whenever Brewmaster respawns or comes out of Primal Split, he gains 20% attack damage bonus. Duration when respawning: 30s. Duration after coming out of Primal Split: 15s", t("MISC"), covered=True),
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Thunder Clap", slug="brewmaster_thunder_clap"))
     W(ul_open())
     W(li("Cooldown increased from 13s to 16/15/14/13s", b(13, [16, 15, 14, 13], l=True)))
@@ -446,11 +442,10 @@ def build():
         new=dict(name="Prickly", slug="bristleback_prickly", innate=True, desc=game_ability_desc("bristleback_prickly", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(li("Hero has 10% damage and debuff duration amplification against enemy heroes that are behind him", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+            li("Hero has 10% damage and debuff duration amplification against enemy heroes that are behind him", t("MISC"), covered=True),
+        ]))
     W(ability("Bristleback", slug="bristleback_bristleback"))
     W(ul_open())
     W(li("Aghanim's Scepter Quill Spray count decreased from 6 to 5", b(6, 5)))
@@ -619,11 +614,10 @@ def build():
         new=dict(name="Spirit Cairn", slug="earthshaker_spirit_cairn", innate=True, desc=game_ability_desc("earthshaker_spirit_cairn", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("When Earthshaker dies, a 75 radius fissure is created where he died. This fissure blocks movement, provides vision and allows Earthshaker to gain experience around it", t("MISC"), covered=True))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("When Earthshaker dies, a 75 radius fissure is created where he died. This fissure blocks movement, provides vision and allows Earthshaker to gain experience around it", t("MISC"), covered=True),
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Aftershock", slug="earthshaker_aftershock"))
     W(ul_open())
     W(li("No longer an innate ability. Damage rescaled from 35/70/100/130/160 to 70/100/130/160", t("NERF"), extra=inline_note("Levels 1-4 unchanged; the 35 it had at level 0 as an innate is gone (now a basic ability)")))
@@ -637,11 +631,10 @@ def build():
         new=dict(name="Tip the Scales", slug="elder_titan_tip_the_scales", innate=True, desc=game_ability_desc("elder_titan_tip_the_scales", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Allied creeps and buildings affected by the Glyph of Fortification or Roshan's Banner deal 100% bonus damage", t("MISC"), covered=True))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Allied creeps and buildings affected by the Glyph of Fortification or Roshan's Banner deal 100% bonus damage", t("MISC"), covered=True),
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Momentum", slug="elder_titan_momentum"))
     W(ul_open())
     W(li("Movement Speed as Attack Speed decreased from 30% to 25%", b(30, 25)))
@@ -667,10 +660,11 @@ def build():
         new=dict(name="Immolation", slug="ember_spirit_immolation", innate=True, desc=game_ability_desc("ember_spirit_immolation", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
+        rows_first=lambda: [
+            li("New Innate ability. Passive, scales with Fire Remnant", t("MISC"), covered=True),
+            li("Ember Spirit deals 10/20/30/40 damage per second in a 175 AoE around him at all times", t("MISC"), covered=True),
+        ]))
     W(ul_open())
-    W(li("New Innate ability. Passive, scales with Fire Remnant", t("MISC"), covered=True))
-    W(li("Ember Spirit deals 10/20/30/40 damage per second in a 175 AoE around him at all times", t("MISC"), covered=True))
     W(li("Can be upgraded with Aghanim's Shard. Increases damage by 10, radius by 175, and grants Fire Remnants the current level of Immolation", t("MISC"), extra=inline_note("Enemy can be hit by both Flame Guard and Immolation at the same time, if they are within the smaller of the radiuses")))
     W(ul_close())
     W(ability("Searing Chains", slug="ember_spirit_searing_chains"))
@@ -692,11 +686,10 @@ def build():
         new=dict(name="Rabble-Rouser", slug="enchantress_rabblerouser", innate=True, desc=game_ability_desc("enchantress_rabblerouser", "7.37", note="Does not affect converted neutrals, Tormentor, or Roshan")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(li("All neutral camps deal more damage to enemy heroes. Damage increase is 10% + 3% per Enchantress's hero level", t("MISC"), extra=inline_note("Does not affect converted neutrals, Tormentor, or Roshan"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+            li("All neutral camps deal more damage to enemy heroes. Damage increase is 10% + 3% per Enchantress's hero level", t("MISC"), extra=inline_note("Does not affect converted neutrals, Tormentor, or Roshan"), covered=True),
+        ]))
     W(ability("Enchant", slug="enchantress_enchant"))
     W(ul_open())
     W(li("No longer grants a guaranteed Neutral Token Drop", t("DEL")))
@@ -794,11 +787,10 @@ def build():
         new=dict(name="Admiral's Rum", slug="kunkka_admirals_rum", innate=True, desc=game_ability_desc("kunkka_admirals_rum", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(li("Taking damage from a hero, building, or Roshan that would reduce Kunkka below 65% health automatically triggers Admiral’s Rum over 10s, providing 10% bonus movement speed and delaying 20% of the damage taken. Delayed damage is dealt evenly over 10s once the buff ends. Stacks additively with other sources of Admiral’s Rum. Cooldown: 60s", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+            li("Taking damage from a hero, building, or Roshan that would reduce Kunkka below 65% health automatically triggers Admiral’s Rum over 10s, providing 10% bonus movement speed and delaying 20% of the damage taken. Delayed damage is dealt evenly over 10s once the buff ends. Stacks additively with other sources of Admiral’s Rum. Cooldown: 60s", t("MISC"), covered=True),
+        ]))
     W(ability("Torrent", slug="kunkka_torrent"))
     W(ul_open())
     W(li("Radius increased from 225 to 250", b(225, 250)))
@@ -831,11 +823,10 @@ def build():
         new=dict(name="Outfight Them!", slug="legion_commander_outfight_them", innate=True, desc=game_ability_desc("legion_commander_outfight_them", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(li("Attacking an enemy hero that has a higher level than Legion Commander increases her HP regeneration, lifesteal, and incoming heals by 50% for 4s. Always applies when attacking a hero that is at max level", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+            li("Attacking an enemy hero that has a higher level than Legion Commander increases her HP regeneration, lifesteal, and incoming heals by 50% for 4s. Always applies when attacking a hero that is at max level", t("MISC"), covered=True),
+        ]))
     W(ability("Moment of Courage", slug="legion_commander_moment_of_courage"))
     W(ul_open())
     W(li("Lifesteal rescaled from 40/60/70/80/90% to 55/65/75/85%", b([60, 70, 80, 90], [55, 65, 75, 85])))
@@ -872,11 +863,10 @@ def build():
         new=dict(name="Combustion", slug="lina_combustion", innate=True, desc=game_ability_desc("lina_combustion", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Every 150 damage Lina does to an enemy hero causes them to overheat, dealing 10/20/30/40 damage to their allies in a 400 radius. Deals 10 damage if the target is an illusion. Dealing over 150 damage can cause this effect to trigger multiple times", t("MISC"), covered=True))
-    W(li("New Innate ability. Passive, scales with Laguna Blade", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Every 150 damage Lina does to an enemy hero causes them to overheat, dealing 10/20/30/40 damage to their allies in a 400 radius. Deals 10 damage if the target is an illusion. Dealing over 150 damage can cause this effect to trigger multiple times", t("MISC"), covered=True),
+            li("New Innate ability. Passive, scales with Laguna Blade", t("MISC"), covered=True),
+        ]))
     W(ability("Fiery Soul", slug="lina_fiery_soul"))
     W(ul_open())
     W(li("No longer a levelable innate ability", t("REWORK")))
@@ -906,11 +896,10 @@ def build():
         new=dict(name="Gift Bearer", slug="lone_druid_gift_bearer", innate=True, desc=game_ability_desc("lone_druid_gift_bearer", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Lone Druid can re-roll his Neutral Token once per tier", t("MISC"), covered=True))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Lone Druid can re-roll his Neutral Token once per tier", t("MISC"), covered=True),
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Summon Spirit Bear", slug="lone_druid_spirit_bear"))
     W(ul_open())
     W(li("Spirit Bear can no longer equip its own neutral items. Now copies and shares a cooldown with Lone Druid's currently equipped neutral item", t("REWORK")))
@@ -927,14 +916,13 @@ def build():
     W(li("Ability removed", t("DEL")))
     W(ul_close())
     W(ability_change(
-        summary="Lunar Blessing is now an innate ability.",
+        summary="Now is an innate ability.",
         tag="rework",
         old=dict(name="Lunar Blessing", slug="luna_lunar_blessing", desc=game_ability_desc("luna_lunar_blessing", "7.36c")),
         new=dict(name="Lunar Blessing", slug="luna_lunar_blessing", innate=True, desc=game_ability_desc("luna_lunar_blessing", "7.37")),
-    ))
-    W(ul_open())
-    W(li("Moved to innate ability. Can no longer be leveled", t("REWORK"), extra=inline_note("Grants 1 attack damage per level to Luna and allied heroes, and 400 bonus night vision + 20 per level to Luna only. Luna receives double the attack damage bonuses. At night, Lunar Blessing is global"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Moved to innate ability. Can no longer be leveled", t("REWORK"), extra=inline_note("Grants 1 attack damage per level to Luna and allied heroes, and 400 bonus night vision + 20 per level to Luna only. Luna receives double the attack damage bonuses. At night, Lunar Blessing is global"), covered=True),
+        ]))
     W(new_ability("Lunar Orbit", "luna_lunar_orbit", version="7.37"))
     W(ul_open())
     W(li("Now upgraded with Aghanim's Shard. Increases collision damage by 15%. Glaives also rotate 50% faster (160 to 240)", t("NEW")))
@@ -1195,11 +1183,10 @@ def build():
         new=dict(name="Illusory Armaments", slug="phantom_lancer_illusory_armaments", innate=True, desc=game_ability_desc("phantom_lancer_illusory_armaments", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(li("Items that grant bonus damage instead grant base damage for 65% of the original bonus damage amount", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+            li("Items that grant bonus damage instead grant base damage for 65% of the original bonus damage amount", t("MISC"), covered=True),
+        ]))
     W(ability("Spirit Lance", slug="phantom_lancer_spirit_lance"))
     W(ul_open())
     W(li("Illusion Damage decreased from 20% to 15%", b(20, 15)))
@@ -1584,10 +1571,9 @@ def build():
         new=dict(name="Third Eye", slug="templar_assassin_third_eye", innate=True, desc=game_ability_desc("templar_assassin_third_eye", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Meld", slug="templar_assassin_meld"))
     W(ul_open())
     W(li("Bonus damage and reductions are now applied when denying allies or traps", t("NEW")))
@@ -1682,11 +1668,10 @@ def build():
         new=dict(name="Battle Stance", slug="troll_warlord_switch_stance", innate=True, desc=game_ability_desc("troll_warlord_switch_stance", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New Innate ability. Toggle-able, can't be leveled up", t("MISC"), covered=True))
-    W(li("Allows Troll Warlord to swap between melee attacks with a 1.4 BAT or ranged attacks", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New Innate ability. Toggle-able, can't be leveled up", t("MISC"), covered=True),
+            li("Allows Troll Warlord to swap between melee attacks with a 1.4 BAT or ranged attacks", t("MISC"), covered=True),
+        ]))
     W(ability("Berserker's Rage", slug="troll_warlord_berserkers_rage"))
     W(ul_open())
     W(li("No longer an innate ability", t("REWORK")))
@@ -1716,11 +1701,10 @@ def build():
         new=dict(name="Invading Force", slug="abyssal_underlord_raid_boss", innate=True, desc=game_ability_desc("abyssal_underlord_raid_boss", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("New innate ability. Scales with Fiend's Gate", t("MISC"), covered=True))
-    W(li("After an allied hero teleports, they temporarily gain damage reduction and movement speed. Bonuses are doubled when teleporting via Fiend's Gate. Damage Reduction: 4/6/8/10%. Bonus Move Speed: 5/10/15/20%. Buff Duration: 5s", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("New innate ability. Scales with Fiend's Gate", t("MISC"), covered=True),
+            li("After an allied hero teleports, they temporarily gain damage reduction and movement speed. Bonuses are doubled when teleporting via Fiend's Gate. Damage Reduction: 4/6/8/10%. Bonus Move Speed: 5/10/15/20%. Buff Duration: 5s", t("MISC"), covered=True),
+        ]))
     W(ability("Atrophy Aura", slug="abyssal_underlord_atrophy_aura"))
     W(ul_open())
     W(li("No longer an innate ability. Damage Reduction rescaled from 0/6/14/22/30% to 6/14/22/30%", t("NERF"), extra=inline_note("Levels 1-4 unchanged; it had 0 at level 0 as an innate (now a basic ability)")))
@@ -1780,10 +1764,11 @@ def build():
         new=dict(name="Septic Shock", slug="venomancer_sepsis", innate=True, desc=game_ability_desc("venomancer_sepsis", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
+        rows_first=lambda: [
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ul_open())
     W(li("Can be upgraded with Aghanim's Scepter. Increases Septic Shock base damage per debuff from 10% to 20%. Plague Wards also deal Septic Shock damage based on their attack damage", b(10, 20)))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
     W(ul_close())
     W(ability("Poison Sting", slug="venomancer_poison_sting"))
     W(ul_open())
@@ -1827,11 +1812,10 @@ def build():
         new=dict(name="Lurker", slug="visage_lurker", innate=True, desc=game_ability_desc("visage_lurker", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Visage's ability cooldown durations are reduced as long as he's not taking damage. Grants a stack every 2s that Visage does not take damage. Each stack grants 2% cooldown speed with a max of 10 stacks. Stacks fade after 2s upon taking any damage", t("NERF"), covered=True))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Visage's ability cooldown durations are reduced as long as he's not taking damage. Grants a stack every 2s that Visage does not take damage. Each stack grants 2% cooldown speed with a max of 10 stacks. Stacks fade after 2s upon taking any damage", t("NERF"), covered=True),
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Gravekeeper's Cloak", slug="visage_gravekeepers_cloak"))
     W(ul_open())
     W(li("No longer an innate ability. Damage Reduction per layer rescaled from 4/8/12/16/20% to 8/12/16/20%", t("NERF"), extra=inline_note("Levels 1-4 unchanged; the 4 it had at level 0 as an innate is gone (now a basic ability)")))
@@ -1881,11 +1865,10 @@ def build():
         new=dict(name="Rewoven", slug="weaver_rewoven", innate=True, desc=game_ability_desc("weaver_rewoven", "7.37")),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Every time Weaver casts an ability, he gains 50 attack range for 7s. This effect stacks independently", t("MISC"), covered=True))
-    W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Every time Weaver casts an ability, he gains 50 attack range for 7s. This effect stacks independently", t("MISC"), covered=True),
+            li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True),
+        ]))
     W(ability("Geminate Attack", slug="weaver_geminate_attack"))
     W(ul_open())
     W(li("Cooldown rescaled from 10.5/8.5/6.5/4.5/2.5s to 9/7/5/3s", b([8.5, 6.5, 4.5, 2.5], [9, 7, 5, 3], l=True)))

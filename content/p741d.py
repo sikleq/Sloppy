@@ -17,7 +17,7 @@ def build():
     W(li("Self-Cast on Town Portal Scroll's Teleport and other similar abilities now place the hero slightly closer to the Ancient", t("QoL")))
     W(li("Town Portal Scroll's Teleport and other similar ability effects now partially follow the channeling unit even if they move after starting their teleport", t("QoL"),
          extra=inline_note(
-             "This makes it possible to track the real spot a hero teleported from while using a movement ability during the channel (e.g. Ball Lightning, Pounce, Sun Ray, etc.). "
+             "This makes it possible to track the real spot a hero teleported from while using a movement ability during the channel (e.g. " + mech_example("Storm Spirit's Ball Lightning", label="Ball Lightning") + ", " + mech_example("Slark's Pounce", label="Pounce") + ", " + mech_example("Phoenix's Sun Ray", label="Sun Ray") + ", etc.). "
              "Previously the teleport animation stayed in one place while the displaced hero actually landed somewhere else. "
              "Now the circle animation plays where the Town Portal Scroll was used, but the full animation and effects appear where the hero lands."
          )))

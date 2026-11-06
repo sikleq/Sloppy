@@ -1,0 +1,2446 @@
+{
+"abaddon_death_dude": [
+[
+"7.36",
+"Gray0",
+"cooldown"
+]
+],
+"abaddon_mephitic_shroud": [
+[
+"7.36",
+"Blue1",
+"barrier"
+]
+],
+"abaddon_mists_of_fate": [
+[
+"7.39",
+"Blue1",
+"phantom_ass_dagger"
+]
+],
+"abyssal_underlord_demons_reach": [
+[
+"7.36",
+"Green0",
+"area_of_effect"
+]
+],
+"abyssal_underlord_summons": [
+[
+"7.36",
+"Yellow3",
+"summons"
+]
+],
+"alchemist_dividends": [
+[
+"7.38",
+"Green2",
+"aghs"
+]
+],
+"alchemist_mixologist": [
+[
+"7.36",
+"Purple2",
+"cooldown"
+]
+],
+"alchemist_seed_money": [
+[
+"7.36",
+"Yellow0",
+"gold"
+]
+],
+"ancient_apparition_bone_chill": [
+[
+"7.36",
+"Gray3",
+"debuff"
+]
+],
+"ancient_apparition_exposure": [
+[
+"7.36",
+"Blue0",
+"area_of_effect"
+]
+],
+"antimage_magebanes_mirror": [
+[
+"7.36",
+"Purple1",
+"ricochet"
+]
+],
+"antimage_mana_thirst": [
+[
+"7.36",
+"Blue3",
+"mana"
+]
+],
+"arc_warden_disorder": [
+[
+"7.36",
+"Gray0",
+"arc_warden_alt"
+]
+],
+"arc_warden_order": [
+[
+"7.36",
+"Gray3",
+"arc_warden"
+]
+],
+"arc_warden_power_capture": [
+[
+"7.38",
+"Yellow1",
+"rune"
+]
+],
+"arc_warden_runed_replica": [
+[
+"7.38",
+"Blue1",
+"arc_warden_alt"
+]
+],
+"axe_call_out": [
+[
+"7.36",
+"Red2",
+"armor"
+]
+],
+"axe_one_man_army": [
+[
+"7.36",
+"Red0",
+"strength"
+]
+],
+"bane_dream_stalker": [
+[
+"7.36",
+"Gray0",
+"damage"
+]
+],
+"bane_sleepwalk": [
+[
+"7.36",
+"Purple1",
+"movement"
+]
+],
+"batrider_arsonist": [
+[
+"7.36",
+"Red0",
+"siege"
+],
+[
+"7.39",
+"Yellow1",
+"damage"
+]
+],
+"batrider_buff_on_displacement": [
+[
+"7.36",
+"Yellow1",
+"speed"
+],
+[
+"7.39",
+"Red0",
+"nuke"
+]
+],
+"beastmaster_beast_mode": [
+[
+"7.36",
+"Yellow1",
+"damage"
+]
+],
+"beastmaster_wild_hunt": [
+[
+"7.36",
+"Red1",
+"summons"
+]
+],
+"bloodseeker_arterial_spray": [
+[
+"7.36",
+"Red1",
+"movement"
+]
+],
+"bloodseeker_bloodrush": [
+[
+"7.36",
+"Gray1",
+"speed"
+]
+],
+"bloodseeker_old_blood": [
+[
+"7.39",
+"Gray1",
+"debuff"
+]
+],
+"bounty_hunter_mugging": [
+[
+"7.36",
+"Yellow0",
+"gold"
+]
+],
+"bounty_hunter_shuriken": [
+[
+"7.36",
+"Red0",
+"nuke"
+]
+],
+"brewmaster_brewmaster": [
+[
+"7.40",
+"Yellow1",
+"bubbles"
+]
+],
+"brewmaster_drunken_master": [
+[
+"7.36",
+"Yellow1",
+"speed"
+]
+],
+"brewmaster_roll_out_the_barrel": [
+[
+"7.36",
+"Red1",
+"nuke"
+]
+],
+"bristleback_berserk": [
+[
+"7.36",
+"Red0",
+"damage"
+],
+[
+"7.37",
+"Yellow0",
+"damage"
+]
+],
+"bristleback_seeing_red": [
+[
+"7.37",
+"Red0",
+"no_vision"
+]
+],
+"bristleback_snot_rocket": [
+[
+"7.36",
+"Green3",
+"snot"
+],
+[
+"7.37",
+"Green0",
+"snot"
+]
+],
+"broodmother_feeding_frenzy": [
+[
+"7.36",
+"Red0",
+"summons"
+]
+],
+"broodmother_necrotic_webs": [
+[
+"7.36",
+"Gray0",
+"debuff"
+],
+[
+"7.38",
+"Gray0",
+"web"
+]
+],
+"centaur_counter_strike": [
+[
+"7.36",
+"Red1",
+"nuke"
+]
+],
+"centaur_horsepower": [
+[
+"7.36",
+"Gray3",
+"speed"
+]
+],
+"chaos_knight_cloven_chaos": [
+[
+"7.38",
+"Red0",
+"ricochet"
+]
+],
+"chaos_knight_facet_fundamental_forging": [
+[
+"7.38",
+"Yellow1",
+"item"
+]
+],
+"chaos_knight_irrationality": [
+[
+"7.36",
+"Gray0",
+"rng"
+]
+],
+"chaos_knight_strong_illusions": [
+[
+"7.36",
+"Red1",
+"illusion"
+]
+],
+"chen_centaur_convert": [
+[
+"7.36",
+"Blue3",
+"area_of_effect"
+],
+[
+"7.38",
+"Yellow3",
+"area_of_effect"
+]
+],
+"chen_frog_convert": [
+[
+"7.38",
+"Blue3",
+"bubbles"
+]
+],
+"chen_hellbear_convert": [
+[
+"7.36",
+"Red0",
+"slow"
+]
+],
+"chen_satyr_convert": [
+[
+"7.36",
+"Purple1",
+"mana"
+]
+],
+"chen_troll_convert": [
+[
+"7.36",
+"Green0",
+"summons"
+]
+],
+"chen_wolf_convert": [
+[
+"7.36",
+"Yellow2",
+"damage"
+]
+],
+"clinkz_clinkz": [
+[
+"7.40",
+"Yellow0",
+"nuke"
+]
+],
+"clinkz_engulfing_step": [
+[
+"7.36",
+"Yellow0",
+"teleport"
+]
+],
+"clinkz_suppressive_fire": [
+[
+"7.36",
+"Gray3",
+"no_vision"
+]
+],
+"crystal_maiden_arcane_overflow": [
+[
+"7.38",
+"Blue2",
+"mana"
+]
+],
+"crystal_maiden_cold_comfort": [
+[
+"7.36",
+"Blue2",
+"mana"
+]
+],
+"crystal_maiden_frozen_expanse": [
+[
+"7.36",
+"Gray1",
+"area_of_effect"
+]
+],
+"crystal_maiden_glacial_guard": [
+[
+"7.38",
+"Gray3",
+"armor"
+]
+],
+"dark_seer_atkspd": [
+[
+"7.36",
+"Gray3",
+"damage"
+]
+],
+"dark_seer_movespd": [
+[
+"7.36",
+"Purple2",
+"speed"
+]
+],
+"dark_willow_shattering_crown": [
+[
+"7.38",
+"Green4",
+"barrier"
+]
+],
+"dark_willow_thorny_thicket": [
+[
+"7.36",
+"Green4",
+"area_of_effect"
+]
+],
+"dark_willow_throwing_shade": [
+[
+"7.36",
+"Purple1",
+"damage"
+]
+],
+"dawnbreaker_blaze": [
+[
+"7.38",
+"Red1",
+"fist"
+]
+],
+"dawnbreaker_gleaming_hammer": [
+[
+"7.36",
+"Yellow1",
+"dawnbreaker_hammer"
+]
+],
+"dawnbreaker_hearthfire": [
+[
+"7.38",
+"Yellow1",
+"Speed"
+]
+],
+"dawnbreaker_solar_charged": [
+[
+"7.36",
+"Gray3",
+"cooldown"
+]
+],
+"dazzle_facet_nothl_boon": [
+[
+"7.36",
+"Red1",
+"armor"
+]
+],
+"dazzle_poison_bloom": [
+[
+"7.36",
+"Purple0",
+"ricochet"
+]
+],
+"death_prophet_delayed_damage": [
+[
+"7.37",
+"Red1",
+"healing"
+]
+],
+"death_prophet_ghosts": [
+[
+"7.36",
+"Green1",
+"spirit"
+]
+],
+"death_prophet_suppress": [
+[
+"7.36",
+"Purple2",
+"slow"
+]
+],
+"disruptor_conduit": [
+[
+"7.39",
+"Gray0",
+"vortex_out"
+]
+],
+"disruptor_line_walls": [
+[
+"7.36",
+"Blue1",
+"fence"
+]
+],
+"disruptor_thunderstorm": [
+[
+"7.36",
+"Red1",
+"area_of_effect"
+]
+],
+"doom_bringer_boost_selling": [
+[
+"7.36",
+"Yellow0",
+"gold"
+]
+],
+"doom_bringer_gluttony": [
+[
+"7.36",
+"Red0",
+"meat"
+]
+],
+"doom_bringer_impending_doom": [
+[
+"7.37",
+"Gray0",
+"cooldown"
+]
+],
+"dragon_knight_corrosive_dragon": [
+[
+"7.36",
+"Green0",
+"dragon_poison"
+]
+],
+"dragon_knight_fire_dragon": [
+[
+"7.36",
+"Red1",
+"dragon_fire"
+]
+],
+"dragon_knight_frost_dragon": [
+[
+"7.36",
+"Blue0",
+"dragon_frost"
+]
+],
+"drow_ranger_high_ground": [
+[
+"7.36",
+"Gray1",
+"damage"
+]
+],
+"drow_ranger_sidestep": [
+[
+"7.36",
+"Blue1",
+"multi_arrow"
+]
+],
+"earth_spirit_earth_spirit": [
+[
+"7.40",
+"Green0",
+"spinning"
+]
+],
+"earth_spirit_ready_to_roll": [
+[
+"7.37",
+"Yellow1",
+"spinning"
+]
+],
+"earth_spirit_resonance": [
+[
+"7.36",
+"Green0",
+"damage"
+]
+],
+"earth_spirit_stepping_stone": [
+[
+"7.36",
+"Gray2",
+"cooldown"
+]
+],
+"earthshaker_reverberating_ridge": [
+[
+"7.39",
+"Gray2",
+"ricochet"
+]
+],
+"earthshaker_slugger": [
+[
+"7.36",
+"Yellow1",
+"movement"
+]
+],
+"earthshaker_tectonic_buildup": [
+[
+"7.36",
+"Red1",
+"area_of_effect"
+]
+],
+"elder_titan_boost_atkspd": [
+[
+"7.36",
+"Yellow0",
+"damage"
+]
+],
+"elder_titan_deconstruction": [
+[
+"7.36",
+"Blue2",
+"armor_broken"
+]
+],
+"ember_spirit_chain_gang": [
+[
+"7.36",
+"Yellow1",
+"debuff"
+]
+],
+"ember_spirit_double_impact": [
+[
+"7.36",
+"Red0",
+"fist"
+]
+],
+"enchantress_overprotective_wisps": [
+[
+"7.36",
+"Green0",
+"healing"
+]
+],
+"enchantress_spellbound": [
+[
+"7.36",
+"Yellow2",
+"range"
+]
+],
+"enigma_fragment": [
+[
+"7.36",
+"Purple0",
+"summons"
+]
+],
+"enigma_gravity": [
+[
+"7.36",
+"Gray3",
+"slow"
+]
+],
+"faceless_void_chronosphere": [
+[
+"7.37",
+"Green0",
+"area_of_effect"
+]
+],
+"faceless_void_temporal_impunity": [
+[
+"7.36",
+"Green0",
+"armor"
+]
+],
+"faceless_void_time_zone": [
+[
+"7.36",
+"Purple1",
+"chrono_cube"
+]
+],
+"furion_ironwood_treant": [
+[
+"7.36",
+"Blue2",
+"siege"
+]
+],
+"furion_natures_profit": [
+[
+"7.39",
+"Yellow2",
+"gold"
+]
+],
+"furion_soothing_saplings": [
+[
+"7.36",
+"Green0",
+"healing"
+]
+],
+"grimstroke_fine_art": [
+[
+"7.36",
+"Red1",
+"brush"
+]
+],
+"grimstroke_inkstigate": [
+[
+"7.36",
+"Gray0",
+"area_of_effect"
+]
+],
+"gyrocopter_afterburner": [
+[
+"7.36",
+"Yellow1",
+"speed"
+]
+],
+"gyrocopter_secondary_strikes": [
+[
+"7.36",
+"Red0",
+"nuke"
+]
+],
+"hoodwink_hipshot": [
+[
+"7.38",
+"Green0",
+"cooldown"
+]
+],
+"hoodwink_hunter": [
+[
+"7.36",
+"Yellow0",
+"range"
+]
+],
+"hoodwink_treebounce_trickshot": [
+[
+"7.36",
+"Green0",
+"tree"
+]
+],
+"huskar_bloodbath": [
+[
+"7.36",
+"Red0",
+"area_of_effect"
+]
+],
+"huskar_cauterize": [
+[
+"7.38",
+"Red0",
+"broken_chain"
+]
+],
+"huskar_nothl_conflagration": [
+[
+"7.37",
+"Yellow0",
+"damage"
+]
+],
+"huskar_nothl_transfusion": [
+[
+"7.36",
+"Blue2",
+"healing"
+]
+],
+"invoker_agnostic": [
+[
+"7.36",
+"Purple0",
+"invoker_passive"
+]
+],
+"invoker_elitist": [
+[
+"7.36",
+"Gray0",
+"invoker_active"
+]
+],
+"invoker_exort_focus": [
+[
+"7.38",
+"Yellow0",
+"invoker_exort"
+]
+],
+"invoker_quas_focus": [
+[
+"7.38",
+"Blue0",
+"invoker_quas"
+]
+],
+"invoker_wex_focus": [
+[
+"7.38",
+"Purple0",
+"invoker_wex"
+]
+],
+"jakiro_fire": [
+[
+"7.36",
+"Red0",
+"nuke"
+]
+],
+"jakiro_ice": [
+[
+"7.36",
+"Blue1",
+"snowflake"
+]
+],
+"jakiro_ice_breaker": [
+[
+"7.38",
+"Blue1",
+"snowflake"
+]
+],
+"jakiro_twin_terror": [
+[
+"7.38",
+"Red0",
+"damage"
+]
+],
+"juggernaut_agigain": [
+[
+"7.36",
+"Red2",
+"agility"
+]
+],
+"juggernaut_bladestorm": [
+[
+"7.36",
+"Yellow1",
+"spinning"
+]
+],
+"keeper_of_the_light_facet_recall": [
+[
+"7.36",
+"Gray3",
+"teleport"
+]
+],
+"keeper_of_the_light_facet_solar_bind": [
+[
+"7.36",
+"Yellow1",
+"slow"
+]
+],
+"kez_default": [
+[
+"7.37e",
+"Blue3",
+"kez"
+]
+],
+"kez_flutter": [
+[
+"7.38",
+"Yellow1",
+"kez_flutter"
+]
+],
+"kez_shadowhawk": [
+[
+"7.38",
+"Blue3",
+"kez_shadowhawk"
+]
+],
+"kunkka_grog": [
+[
+"7.36",
+"Yellow2",
+"armor"
+]
+],
+"kunkka_high_tide": [
+[
+"7.36",
+"Blue2",
+"cooldown"
+]
+],
+"largo_largo": [
+[
+"7.40",
+"Green1",
+"guitar"
+]
+],
+"legion_commander_spoils_of_war": [
+[
+"7.36",
+"Red0",
+"damage"
+]
+],
+"legion_commander_stonehall_plate": [
+[
+"7.36",
+"Yellow1",
+"armor"
+]
+],
+"leshrac_attacks_mana": [
+[
+"7.36",
+"Blue1",
+"mana"
+]
+],
+"leshrac_misanthropy": [
+[
+"7.36",
+"Purple0",
+"nuke"
+]
+],
+"lich_cryophobia": [
+[
+"7.39",
+"Red0",
+"vision"
+]
+],
+"lich_frostbound": [
+[
+"7.36",
+"Blue0",
+"snowflake"
+]
+],
+"lich_growing_cold": [
+[
+"7.36",
+"Gray0",
+"cooldown"
+]
+],
+"life_stealer_fleshfeast": [
+[
+"7.38",
+"Gray0",
+"full_heart"
+]
+],
+"life_stealer_gorestorm": [
+[
+"7.38",
+"Red0",
+"area_of_effect"
+]
+],
+"life_stealer_maxhp_gain": [
+[
+"7.36",
+"Yellow3",
+"armor"
+]
+],
+"life_stealer_rage": [
+[
+"7.37",
+"Yellow3",
+"lifestealer_rage"
+]
+],
+"life_stealer_rage_dispell": [
+[
+"7.36",
+"Red0",
+"broken_chain"
+]
+],
+"lina_dot": [
+[
+"7.36",
+"Red0",
+"nuke"
+]
+],
+"lina_supercharge": [
+[
+"7.36",
+"Yellow0",
+"damage"
+]
+],
+"lion_essence_eater": [
+[
+"7.36",
+"Purple2",
+"nuke"
+]
+],
+"lion_fist_of_death": [
+[
+"7.36",
+"Red2",
+"fist"
+]
+],
+"lone_druid_bear_necessities": [
+[
+"7.37",
+"Gray1",
+"item"
+]
+],
+"lone_druid_bear_with_me": [
+[
+"7.36",
+"Green1",
+"healing"
+]
+],
+"lone_druid_lone_druid": [
+[
+"7.40",
+"Green1",
+"overshadow"
+]
+],
+"lone_druid_unbearable": [
+[
+"7.36",
+"Yellow1",
+"overshadow"
+]
+],
+"luna_lunar_orbit": [
+[
+"7.36",
+"Gray3",
+"armor"
+]
+],
+"luna_moonshield": [
+[
+"7.37",
+"Gray3",
+"armor"
+]
+],
+"luna_moonstorm": [
+[
+"7.36",
+"Blue1",
+"damage"
+]
+],
+"lycan_alpha_wolves": [
+[
+"7.37",
+"Green2",
+"wolf"
+]
+],
+"lycan_pack_leader": [
+[
+"7.36",
+"Gray1",
+"wolf"
+],
+[
+"7.37",
+"Gray1",
+"summons"
+]
+],
+"lycan_spirit_wolves": [
+[
+"7.36",
+"Red0",
+"spirit"
+]
+],
+"magnataur_diminishing_return": [
+[
+"7.38",
+"Blue2",
+"ricochet"
+]
+],
+"magnataur_eternal_empowerment": [
+[
+"7.38",
+"Gray1",
+"empower"
+]
+],
+"magnataur_reverse_polarity": [
+[
+"7.37",
+"Gray3",
+"vortex_in"
+]
+],
+"magnataur_reverse_reverse_polarity": [
+[
+"7.36",
+"Gray0",
+"vortex_out"
+]
+],
+"magnataur_run_through": [
+[
+"7.36",
+"Gray3",
+"movement"
+]
+],
+"marci_bodyguard": [
+[
+"7.36",
+"Blue1",
+"ricochet"
+]
+],
+"marci_buddy_system": [
+[
+"7.38",
+"Blue1",
+"twin_hearts"
+]
+],
+"marci_fleeting_fury": [
+[
+"7.38",
+"Yellow0",
+"fist"
+]
+],
+"marci_pickmeup": [
+[
+"7.38",
+"Purple0",
+"ricochet"
+]
+],
+"marci_sidekick": [
+[
+"7.36",
+"Gray3",
+"healing"
+]
+],
+"mars_arena": [
+[
+"7.36",
+"Yellow0",
+"no_vision"
+]
+],
+"mars_victory_feast": [
+[
+"7.36",
+"Red2",
+"healing"
+]
+],
+"medusa_engorged": [
+[
+"7.36",
+"Green1",
+"snake"
+]
+],
+"medusa_mana_pact": [
+[
+"7.36",
+"Blue1",
+"mana"
+]
+],
+"medusa_slow_attacks": [
+[
+"7.37",
+"Yellow2",
+"slow"
+]
+],
+"medusa_undulation": [
+[
+"7.38",
+"Red0",
+"speed"
+]
+],
+"meepo_codependent": [
+[
+"7.38",
+"Yellow1",
+"illusion"
+]
+],
+"meepo_more_meepo": [
+[
+"7.36",
+"Blue2",
+"summons"
+]
+],
+"meepo_pack_rat": [
+[
+"7.36",
+"Yellow1",
+"item"
+]
+],
+"mirana_leaps_and_bounds": [
+[
+"7.38",
+"Gray3",
+"slow"
+]
+],
+"mirana_moonlight": [
+[
+"7.36",
+"Blue1",
+"moon"
+]
+],
+"mirana_starstruck": [
+[
+"7.38",
+"Blue1",
+"no_vision"
+]
+],
+"mirana_sunlight": [
+[
+"7.36",
+"Gray3",
+"sun"
+]
+],
+"monkey_king_simian_stride": [
+[
+"7.36",
+"Green4",
+"tree"
+]
+],
+"monkey_king_transfiguration": [
+[
+"7.39",
+"Red2",
+"summons"
+]
+],
+"monkey_king_wukongs_faithful": [
+[
+"7.36",
+"Red2",
+"summons"
+]
+],
+"morphling_agi": [
+[
+"7.36",
+"Green0",
+"agility"
+]
+],
+"morphling_str": [
+[
+"7.36",
+"Red0",
+"strength"
+]
+],
+"muerta_dance_of_the_dead": [
+[
+"7.36",
+"Green1",
+"spirit"
+]
+],
+"muerta_ofrenda": [
+[
+"7.36",
+"Yellow0",
+"teleport"
+]
+],
+"muerta_slingshot": [
+[
+"7.39",
+"Red1",
+"ricochet"
+]
+],
+"naga_siren_active_riptide": [
+[
+"7.36",
+"Green2",
+"nuke"
+]
+],
+"naga_siren_passive_riptide": [
+[
+"7.36",
+"Yellow2",
+"armor_broken"
+]
+],
+"necrolyte_profane_potency": [
+[
+"7.36",
+"Yellow2",
+"area_of_effect"
+]
+],
+"necrolyte_rapid_decay": [
+[
+"7.36",
+"Green3",
+"speed"
+]
+],
+"nevermore_lasting_presence": [
+[
+"7.36",
+"Gray0",
+"armor_broken"
+]
+],
+"nevermore_shadowmire": [
+[
+"7.36",
+"Red0",
+"slow"
+]
+],
+"night_stalker_blinding_void": [
+[
+"7.36",
+"Blue0",
+"no_vision"
+]
+],
+"night_stalker_dayswap": [
+[
+"7.36",
+"Gray0",
+"moon"
+]
+],
+"night_stalker_voidbringer": [
+[
+"7.38",
+"Blue0",
+"area_of_effect"
+]
+],
+"nyx_assassin_burn_mana": [
+[
+"7.36",
+"Blue3",
+"nuke"
+]
+],
+"nyx_assassin_scuttle": [
+[
+"7.36",
+"Red2",
+"speed"
+]
+],
+"obsidian_destroyer_obsidian_decimator": [
+[
+"7.36",
+"Blue0",
+"mana"
+]
+],
+"obsidian_destroyer_overwhelming_devourer": [
+[
+"7.36",
+"Blue2",
+"healing"
+]
+],
+"ogre_magi_fat_chance": [
+[
+"7.36",
+"Red0",
+"rng"
+]
+],
+"ogre_magi_learning_curve": [
+[
+"7.36",
+"Blue1",
+"ogre"
+]
+],
+"omniknight_dmgheals": [
+[
+"7.36",
+"Yellow0",
+"healing"
+]
+],
+"omniknight_omnipresent": [
+[
+"7.36",
+"Gray3",
+"damage"
+]
+],
+"oracle_facet_dmg": [
+[
+"7.36",
+"Red2",
+"nuke"
+]
+],
+"oracle_facet_heal": [
+[
+"7.36",
+"Green1",
+"healing"
+]
+],
+"pangolier_double_jump": [
+[
+"7.36",
+"Red1",
+"double_bounce"
+]
+],
+"pangolier_pangolier": [
+[
+"7.40",
+"Blue1",
+"cooldown"
+]
+],
+"pangolier_thunderbolt": [
+[
+"7.36",
+"Yellow1",
+"speed"
+]
+],
+"phantom_assassin_methodical": [
+[
+"7.36",
+"Gray0",
+"damage"
+],
+[
+"7.38",
+"Gray0",
+"skull"
+]
+],
+"phantom_assassin_sweet_release": [
+[
+"7.38",
+"Red0",
+"phantom_ass_dagger"
+]
+],
+"phantom_assassin_veiled_one": [
+[
+"7.36",
+"Blue3",
+"mana"
+]
+],
+"phantom_lancer_convergence": [
+[
+"7.36",
+"Yellow1",
+"illusion"
+]
+],
+"phantom_lancer_divergence": [
+[
+"7.36",
+"Blue2",
+"summons"
+]
+],
+"phantom_lancer_lancelot": [
+[
+"7.38",
+"Yellow1",
+"phantom_lance"
+]
+],
+"phantom_lancer_lancer": [
+[
+"7.40",
+"Yellow2",
+"phantom_lance"
+]
+],
+"phoenix_facet_immolate": [
+[
+"7.36",
+"Red2",
+"barrier"
+]
+],
+"phoenix_hotspot": [
+[
+"7.36",
+"Red1",
+"nuke"
+]
+],
+"primal_beast_ferocity": [
+[
+"7.36",
+"Yellow3",
+"area_of_effect"
+]
+],
+"primal_beast_provoke_the_beast": [
+[
+"7.38",
+"Red0",
+"broken_chain"
+]
+],
+"primal_beast_romp_n_stomp": [
+[
+"7.36",
+"Red0",
+"speed"
+]
+],
+"puck_curveball": [
+[
+"7.36",
+"Blue2",
+"curve_ball"
+]
+],
+"puck_jostling_rift": [
+[
+"7.36",
+"Purple0",
+"movement"
+]
+],
+"pudge_flayers_hook": [
+[
+"7.36",
+"Red0",
+"pudge_hook"
+]
+],
+"pudge_fresh_meat": [
+[
+"7.36",
+"Green3",
+"meat"
+],
+[
+"7.38",
+"Red0",
+"meat"
+]
+],
+"pudge_rotten_core": [
+[
+"7.38",
+"Green3",
+"fist"
+]
+],
+"pugna_rewards_of_ruin": [
+[
+"7.36",
+"Purple2",
+"siege"
+]
+],
+"pugna_siphoning_ward": [
+[
+"7.36",
+"Green0",
+"healing"
+]
+],
+"queenofpain_facet_bondage": [
+[
+"7.38",
+"Blue0",
+"twin_hearts"
+]
+],
+"queenofpain_lifesteal": [
+[
+"7.36",
+"Blue0",
+"healing"
+]
+],
+"queenofpain_selfdmg": [
+[
+"7.36",
+"Red0",
+"nuke"
+]
+],
+"rattletrap_expanded_armature": [
+[
+"7.36",
+"Red2",
+"area_of_effect"
+]
+],
+"rattletrap_hookup": [
+[
+"7.36",
+"Gray2",
+"cooldown"
+]
+],
+"rattletrap_junk_mail": [
+[
+"7.39",
+"Yellow1",
+"armor"
+]
+],
+"razor_spellamp": [
+[
+"7.36",
+"Blue0",
+"nuke"
+]
+],
+"razor_thunderhead": [
+[
+"7.36",
+"Gray0",
+"barrier"
+]
+],
+"riki_contract_killer": [
+[
+"7.36",
+"Gray3",
+"xp"
+]
+],
+"riki_exterminator": [
+[
+"7.36",
+"Purple2",
+"agility"
+]
+],
+"riki_riki": [
+[
+"7.40",
+"Purple2",
+"execute"
+]
+],
+"ringmaster_carny_classics": [
+[
+"7.38",
+"Yellow1",
+"whoopee_cushion"
+]
+],
+"ringmaster_default": [
+[
+"7.37c",
+"Gray3",
+"item"
+]
+],
+"ringmaster_sideshow_secrets": [
+[
+"7.38",
+"Red0",
+"pie"
+]
+],
+"rubick_arcane_accumulation": [
+[
+"7.36",
+"Green0",
+"area_of_effect"
+]
+],
+"rubick_frugal_filch": [
+[
+"7.36",
+"Purple2",
+"mana"
+]
+],
+"sand_king_dust_devil": [
+[
+"7.36",
+"Yellow1",
+"speed"
+]
+],
+"sand_king_obscurity": [
+[
+"7.39",
+"Yellow3",
+"no_vision"
+]
+],
+"sand_king_pinpoint": [
+[
+"7.39",
+"Red1",
+"area_of_effect"
+]
+],
+"sand_king_sandshroud": [
+[
+"7.36",
+"Gray3",
+"vision"
+]
+],
+"shadow_demon_facet_soul_mastery": [
+[
+"7.36",
+"Purple0",
+"illusion"
+]
+],
+"shadow_demon_promulgate": [
+[
+"7.36",
+"Gray0",
+"nuke"
+]
+],
+"shadow_shaman_cluster_cluck": [
+[
+"7.36",
+"Yellow1",
+"chicken"
+]
+],
+"shadow_shaman_massive_serpent_ward": [
+[
+"7.36",
+"Red1",
+"snake"
+]
+],
+"shadow_shaman_voodoo_hands": [
+[
+"7.38",
+"Yellow1",
+"chicken"
+]
+],
+"shredder_second_chakram": [
+[
+"7.36",
+"Red1",
+"spinning"
+]
+],
+"shredder_shredder": [
+[
+"7.36",
+"Green0",
+"tree"
+]
+],
+"silencer_irrepressible": [
+[
+"7.36",
+"Purple1",
+"silencer"
+]
+],
+"silencer_oppressive_silence": [
+[
+"7.39",
+"Gray3",
+"debuff"
+]
+],
+"silencer_reverberating_silence": [
+[
+"7.36",
+"Gray3",
+"debuff"
+]
+],
+"silencer_spread_the_knowledge": [
+[
+"7.39",
+"Purple1",
+"ricochet"
+]
+],
+"skeleton_king_facet_bone_guard": [
+[
+"7.36",
+"Yellow0",
+"summons"
+]
+],
+"skeleton_king_facet_cursed_blade": [
+[
+"7.36",
+"Red0",
+"damage"
+]
+],
+"skywrath_mage_shield": [
+[
+"7.36",
+"Blue0",
+"armor"
+]
+],
+"skywrath_mage_staff": [
+[
+"7.36",
+"Yellow2",
+"cooldown"
+]
+],
+"slardar_brineguard": [
+[
+"7.36",
+"Purple1",
+"armor"
+]
+],
+"slardar_leg_day": [
+[
+"7.36",
+"Red2",
+"speed"
+]
+],
+"slark_dark_reef_renegade": [
+[
+"7.36",
+"Blue2",
+"cooldown"
+]
+],
+"slark_leeching_leash": [
+[
+"7.36",
+"Green2",
+"agility"
+]
+],
+"slark_slark": [
+[
+"7.40",
+"Blue2",
+"broken_chain"
+]
+],
+"snapfire_full_bore": [
+[
+"7.36",
+"Red0",
+"range"
+]
+],
+"snapfire_ricochet_ii": [
+[
+"7.36",
+"Gray3",
+"ricochet"
+]
+],
+"sniper_ghillie_suit": [
+[
+"7.36",
+"Yellow0",
+"vision"
+]
+],
+"sniper_scattershot": [
+[
+"7.36",
+"Red0",
+"nuke"
+]
+],
+"spectre_forsaken": [
+[
+"7.36",
+"Gray0",
+"spectre"
+]
+],
+"spectre_spectre": [
+[
+"7.40",
+"Gray0",
+"spirit"
+]
+],
+"spectre_twist_the_knife": [
+[
+"7.36",
+"Purple2",
+"nuke"
+]
+],
+"spirit_breaker_bull_rush": [
+[
+"7.36",
+"Red1",
+"speed"
+]
+],
+"spirit_breaker_bulls_hit": [
+[
+"7.38",
+"Blue2",
+"rng"
+]
+],
+"spirit_breaker_imbalanced": [
+[
+"7.36",
+"Blue2",
+"movement"
+]
+],
+"storm_spirit_shock_collar": [
+[
+"7.36",
+"Blue1",
+"nuke"
+]
+],
+"storm_spirit_static_slide": [
+[
+"7.36",
+"Gray3",
+"movement"
+]
+],
+"sven_heavy_plate": [
+[
+"7.36",
+"Blue0",
+"armor"
+]
+],
+"sven_strscaling": [
+[
+"7.36",
+"Red0",
+"strength"
+]
+],
+"techies_atk_range": [
+[
+"7.36",
+"Gray0",
+"range"
+]
+],
+"techies_backpack": [
+[
+"7.36",
+"Blue1",
+"item"
+]
+],
+"techies_spleens_secret_sauce": [
+[
+"7.36",
+"Red0",
+"nuke"
+]
+],
+"templar_assassin_hidden_reach": [
+[
+"7.38",
+"Blue1",
+"range"
+]
+],
+"templar_assassin_refractor": [
+[
+"7.36",
+"Purple0",
+"damage"
+]
+],
+"templar_assassin_voidblades": [
+[
+"7.36",
+"Gray3",
+"slow"
+],
+[
+"7.37",
+"Gray3",
+"ricochet"
+]
+],
+"terrorblade_condemned": [
+[
+"7.36",
+"Gray0",
+"twin_hearts"
+]
+],
+"terrorblade_soul_fragment": [
+[
+"7.36",
+"Blue2",
+"illusion"
+]
+],
+"tidehunter_kraken_swell": [
+[
+"7.36",
+"Green2",
+"armor"
+]
+],
+"tidehunter_sizescale": [
+[
+"7.36",
+"Green0",
+"overshadow"
+]
+],
+"tinker_repair_bots": [
+[
+"7.36",
+"Blue2",
+"healing"
+]
+],
+"tinker_translocator": [
+[
+"7.36",
+"Yellow2",
+"movement"
+]
+],
+"tiny_crash_landing": [
+[
+"7.36",
+"Gray2",
+"nuke"
+]
+],
+"tiny_insurmountable": [
+[
+"7.36",
+"Green4",
+"armor"
+]
+],
+"treant_primeval_power": [
+[
+"7.36",
+"Yellow2",
+"damage"
+]
+],
+"treant_sapling": [
+[
+"7.36",
+"Green2",
+"tree"
+]
+],
+"treant_treant": [
+[
+"7.40",
+"Green2",
+"tree"
+]
+],
+"troll_warlord_bad_influence": [
+[
+"7.36",
+"Red1",
+"damage"
+]
+],
+"troll_warlord_insensitive": [
+[
+"7.36",
+"Blue2",
+"armor"
+]
+],
+"tusk_facet_fist_bump": [
+[
+"7.36",
+"Yellow0",
+"movement"
+]
+],
+"tusk_facet_tag_team": [
+[
+"7.36",
+"Blue3",
+"damage"
+]
+],
+"undying_ripped": [
+[
+"7.36",
+"Red1",
+"strength"
+]
+],
+"undying_rotting_mitts": [
+[
+"7.36",
+"Green4",
+"summons"
+]
+],
+"ursa_debuff_reduce": [
+[
+"7.36",
+"Blue0",
+"cooldown"
+]
+],
+"ursa_grudge_bearer": [
+[
+"7.36",
+"Red0",
+"damage"
+]
+],
+"vengefulspirit_avenging_missile": [
+[
+"7.36",
+"Purple2",
+"nuke"
+]
+],
+"venomancer_patient_zero": [
+[
+"7.36",
+"Green0",
+"snot"
+]
+],
+"venomancer_plague_carrier": [
+[
+"7.36",
+"Yellow0",
+"summons"
+]
+],
+"viper_caustic_bath": [
+[
+"7.36",
+"Yellow2",
+"armor"
+]
+],
+"viper_poison_burst": [
+[
+"7.36",
+"Green0",
+"area_of_effect"
+]
+],
+"visage_faithful_followers": [
+[
+"7.36",
+"Blue2",
+"summons"
+]
+],
+"visage_gold_assumption": [
+[
+"7.37",
+"Yellow0",
+"gold"
+]
+],
+"visage_sepulchre": [
+[
+"7.36",
+"Gray0",
+"area_of_effect"
+]
+],
+"void_spirit_aether_artifice": [
+[
+"7.37",
+"Gray3",
+"illusion"
+]
+],
+"void_spirit_phys_barrier": [
+[
+"7.36",
+"Gray3",
+"nuke"
+]
+],
+"void_spirit_sanctuary": [
+[
+"7.36",
+"Purple1",
+"armor"
+]
+],
+"vvengefulspirit_melee": [
+[
+"7.36",
+"Blue1",
+"fist"
+]
+],
+"warlock_golem": [
+[
+"7.36",
+"Red0",
+"summons"
+]
+],
+"warlock_grimoire": [
+[
+"7.36",
+"Gray3",
+"xp"
+]
+],
+"weaver_hivemind": [
+[
+"7.36",
+"Blue1",
+"xp"
+]
+],
+"weaver_skitterstep": [
+[
+"7.36",
+"Red0",
+"speed"
+]
+],
+"windrunner_focusfire": [
+[
+"7.37",
+"Yellow2",
+"focus_fire"
+]
+],
+"windrunner_killshot": [
+[
+"7.38",
+"Green0",
+"execute"
+]
+],
+"windrunner_tailwind": [
+[
+"7.36",
+"Yellow2",
+"speed"
+]
+],
+"windrunner_tangled": [
+[
+"7.38",
+"Yellow2",
+"tree"
+]
+],
+"windrunner_whirlwind": [
+[
+"7.36",
+"Green0",
+"multi_arrow"
+]
+],
+"winter_wyvern_atk_range": [
+[
+"7.36",
+"Gray3",
+"damage"
+]
+],
+"winter_wyvern_heal_mana": [
+[
+"7.36",
+"Blue0",
+"mana"
+]
+],
+"winter_wyvern_recursive": [
+[
+"7.38",
+"Blue0",
+"ricochet"
+]
+],
+"winter_wyvern_winterproof": [
+[
+"7.38",
+"Blue2",
+"tower"
+]
+],
+"wisp_kritzkrieg": [
+[
+"7.36",
+"Blue3",
+"damage"
+]
+],
+"wisp_medigun": [
+[
+"7.36",
+"Gray3",
+"armor"
+]
+],
+"witch_doctor_cleft_death": [
+[
+"7.36",
+"Purple0",
+"death_ward"
+]
+],
+"witch_doctor_headhunter": [
+[
+"7.36",
+"Gray3",
+"ricochet"
+]
+],
+"witch_doctor_malpractice": [
+[
+"7.39",
+"Red2",
+"nuke"
+]
+],
+"witch_doctor_voodoo_festeration": [
+[
+"7.36",
+"Red2",
+"nuke"
+]
+],
+"zuus_divine_rampage": [
+[
+"7.36",
+"Gray3",
+"nuke"
+]
+],
+"zuus_livewire": [
+[
+"7.36",
+"Blue1",
+"range"
+]
+]
+}

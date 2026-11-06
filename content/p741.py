@@ -318,17 +318,13 @@ def build():
     W(ul_close())
 
     W(plain_header("Basic Items", dynamics=False, sublabel=True))
-    W(item_header("Chasm Stone", new="New Miscellaneous Item"))
-    W(item_cost(800))
+    W(item_header("Chasm Stone", new="New Miscellaneous Item", cost=800))
     W(provides('+40 Area of Effect ' + info_tip("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack")))
-    W(item_header("Shawl", new="New Miscellaneous Item"))
-    W(item_cost(450))
+    W(item_header("Shawl", new="New Miscellaneous Item", cost=450))
     W(provides('+10% Magic Resistance'))
-    W(item_header("Splintmail", new="New Equipment Item"))
-    W(item_cost(950))
+    W(item_header("Splintmail", new="New Equipment Item", cost=950))
     W(provides('+7 Armor'))
-    W(item_header("Wizard Hat", new="New Miscellaneous Item"))
-    W(item_cost(250))
+    W(item_header("Wizard Hat", new="New Miscellaneous Item", cost=250))
     W(provides('+125 Mana'))
     W(item_header("Chainmail"))
     W(ul_open())
@@ -375,7 +371,7 @@ def build():
                  recipe=('Recipe', 700), total=2600))
     W(provides('+15% Magic Resistance, +250 Health, +6 All Attributes'))
     W(ul_open())
-    W(li("Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whenever the wearer takes damage from a player-controlled unit or Roshan, all stacks are removed to create an all-damage barrier for 7s that absorbs 120 damage per removed stack (up to 360). If the wearer reached a max amount of stacks at least once in a game, regaining a stack provides a non-stacking buff that increases movespeed by 20% for 7s", t("NEW"), extra=inline_note("Has no damage threshold, but doesn't proc from Health Loss damage (like Heartstopper Aura)<br>Can't gain stacks for 3s after taking damage from Roshan or player-controlled sources")))
+    W(li("Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whenever the wearer takes damage from a player-controlled unit or Roshan, all stacks are removed to create an all-damage barrier for 7s that absorbs 120 damage per removed stack (up to 360). If the wearer reached a max amount of stacks at least once in a game, regaining a stack provides a non-stacking buff that increases movespeed by 20% for 7s", t("NEW"), extra=inline_note("Has no damage threshold, but doesn't proc from Health Loss damage (like " + mech_example("Necrophos' Heartstopper Aura", label="Heartstopper Aura") + ")<br>Can't gain stacks for 3s after taking damage from Roshan or player-controlled sources")))
     W(ul_close())
     W(item_header("Crella's Crozier", new="New Magical Item"))
     W(components(('Ghost Scepter', 1500), ('Soul Booster', 3000),
@@ -1529,11 +1525,10 @@ def build():
         ),
         summary="Inner Beast is now the innate ability.",
         tag="rework",
-    ))
-    W(ul_open())
-    W(li_formula("Bonus Attack Speed changed", "10/30/50/70", "7 + 3 per level",
-                 rank_step([10.0, 30.0, 50.0, 70.0], ultimate=False), lambda L: 7.0 + 3.0 * L))
-    W(ul_close())
+        rows_first=lambda: [
+            li_formula("Bonus Attack Speed changed", "10/30/50/70", "7 + 3 per level",
+                             rank_step([10.0, 30.0, 50.0, 70.0], ultimate=False), lambda L: 7.0 + 3.0 * L),
+        ]))
     W(ability("Wild Axes"))
     W(ul_open())
     W(li("Damage per axe increased from 30/65/100/135 to 40/80/120/160", b([30, 65, 100, 135], [40, 80, 120, 160])))
@@ -1573,18 +1568,20 @@ def build():
                 "Mana Cost: 50. Cooldown: " + hl("30s", "buff") + ".",
             ],
         ),
-        summary="New ability.",
-        tag="new",
-    ))
+        # the same ability renamed (patch/cards_ability_change.renamed), not a new one (owner 2026-11-06)
+        summary="Ability reworked.",
+        tag="rework",
+        rows_first=lambda: [
+            li("Cooldown decreased from 45/40/35/30s to 30s", b([45, 40, 35, 30], 30, l=True), covered=True),
+            # damage and root are highlighted in the cards (old left, new right): those rows stay hidden for the weights
+            li("Dive Damage increased from 50/80/110/140 to 60/95/130/165", b([50, 80, 110, 140], [60, 95, 130, 165]), covered=True),
+            li("Root Duration increased from 0.25/0.5/0.75/1s to 0.4/0.6/0.8/1s", b([0.25, 0.5, 0.75, 1], [0.4, 0.6, 0.8, 1]),
+                     covered=True),
+            li("Hawk armor increased by 1",
+                     bstat_u("npc_dota_beastmaster_hawk", "ArmorPhysical", "7.40c", 1),
+                     extra=note_box(unit="npc_dota_beastmaster_hawk", field="ArmorPhysical", before_patch="7.40c")),
+        ]))
     W(ul_open())
-    W(li("Cooldown decreased from 45/40/35/30s to 30s", b([45, 40, 35, 30], 30, l=True), covered=True))
-    # damage and root are highlighted in the cards (old left, new right): those rows stay hidden for the weights
-    W(li("Dive Damage increased from 50/80/110/140 to 60/95/130/165", b([50, 80, 110, 140], [60, 95, 130, 165]), covered=True))
-    W(li("Root Duration increased from 0.25/0.5/0.75/1s to 0.4/0.6/0.8/1s", b([0.25, 0.5, 0.75, 1], [0.4, 0.6, 0.8, 1]),
-         covered=True))
-    W(li("Hawk armor increased by 1",
-         bstat_u("npc_dota_beastmaster_hawk", "ArmorPhysical", "7.40c", 1),
-         extra=note_box(unit="npc_dota_beastmaster_hawk", field="ArmorPhysical", before_patch="7.40c")))
     W(li("No longer upgraded with Aghanim's Shard", t("DEL"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
@@ -1812,9 +1809,10 @@ def build():
             innate=True,
             desc=[
                 "Passive and active components. Improves with game's time.",
-                "When Chen respawns, he is joined in battle by a Zealot — a melee creep warrior with the Martyrdom ability. Zealot has the same stats as the current melee creeps on his team (including super or mega form), but has 125 attack range, base damage increased by " + _zealot_pill + ", base health regen increased from 0.5 to 2.5, and doesn't have Runty attack type. Zealot respawns after 60s dead.",
-                "<b>Martyrdom:</b> 500-range unit-targeted ability on the Zealot creep, targeting either an enemy or ally. When cast, the Zealot sacrifices itself, firing a projectile at 1000 speed dealing damage to enemies or healing allies. Damage = 25 + 20% of the Zealot's current health; healing = 50% of these values.",
-                "Can also be cast on a controlled unit to teleport it to Chen after a 6s delay. Self-targeting teleports all controlled units."
+                # the numbers as tables (owner 2026-11-06: "попробуй тоже с таблицей сделать")
+                "When Chen respawns, he is joined in battle by a Zealot — a melee creep warrior with the Martyrdom ability. Zealot has the same stats as the current melee creeps on his team (including super or mega form) and doesn't have Runty attack type. Attack range: 125. Bonus base damage: " + _zealot_pill + ". Base health regen: 2.5 (creeps: 0.5). Respawn time: 60s.",
+                "<b>Martyrdom:</b> unit-targeted ability on the Zealot creep, targeting either an enemy or ally. When cast, the Zealot sacrifices itself, firing a projectile that damages enemies or heals allies. Cast range: 500. Projectile speed: 1000. Damage: 25 + 20% of the Zealot's current health. Healing: 50% of the damage.",
+                "Can also be cast on a controlled unit to teleport it to Chen after a delay. Self-targeting teleports all controlled units. Teleport delay: 6s."
                 + inline_note("Mechanics moved from Divine Favor without any changes."),
             ],
             tables=[_zealot_table],
@@ -1924,16 +1922,15 @@ def build():
         ),
         summary="Ability reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    # the card above shows every change highlighted: the rows stay hidden for the weights and the tag filters
-    W(li("Duration increased from 13s to 18s", b(13, 18), covered=True))
-    W(li("Now also increases Battery Assault radius to 330", t("NEW"), covered=True))
-    W(li("Now also increases Power Cogs radius to 330 and provides 25% bonus armor to Clockwerk while he is near cogs", t("NEW"), covered=True))
-    W(li("Now increases Rocket Flare damage, vision and slow duration by 35%", t("NEW"), covered=True))
-    W(li("No longer increases Clockwerk's attack speed while inside Power Cogs", t("DEL"), covered=True))
-    W(li("No longer decreases Rocket Flare cooldown to 3.5s", t("DEL"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            # the card above shows every change highlighted: the rows stay hidden for the weights and the tag filters
+            li("Duration increased from 13s to 18s", b(13, 18), covered=True),
+            li("Now also increases Battery Assault radius to 330", t("NEW"), covered=True),
+            li("Now also increases Power Cogs radius to 330 and provides 25% bonus armor to Clockwerk while he is near cogs", t("NEW"), covered=True),
+            li("Now increases Rocket Flare damage, vision and slow duration by 35%", t("NEW"), covered=True),
+            li("No longer increases Clockwerk's attack speed while inside Power Cogs", t("DEL"), covered=True),
+            li("No longer decreases Rocket Flare cooldown to 3.5s", t("DEL"), covered=True),
+        ]))
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent +0.4s Rocket Flare Slow Duration replaced with +1.5 Mana Regen", t("SWAP")))
@@ -2003,12 +2000,11 @@ def build():
         ),
         summary="Innate reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    # the card shows the changes highlighted and the new name by its arrow: the rows stay hidden for the weights
-    W(li("Max Health and Mana Restore base value decreased from 10% to 8.5%", b(10, 8.5), covered=True))
-    W(li("Now also provides Dark Seer +1 attack speed from each point of Intelligence", t("NEW"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            # the card shows the changes highlighted and the new name by its arrow: the rows stay hidden for the weights
+            li("Max Health and Mana Restore base value decreased from 10% to 8.5%", b(10, 8.5), covered=True),
+            li("Now also provides Dark Seer +1 attack speed from each point of Intelligence", t("NEW"), covered=True),
+        ]))
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 15 Talent Ion Shell Provides +250 Max Health replaced with -1.5s Surge Cooldown", t("SWAP")))
@@ -2158,14 +2154,15 @@ def build():
         ),
         summary="Ability reworked.",
         tag="rework",
-    ))
+        rows_first=lambda: [
+            # the card above shows every change highlighted: the rows stay hidden for the weights and the tag filters
+            li("Cast Range increased from 1050 to 1200", b(1050, 1200), covered=True),
+            li('Cooldown decreased from <span class="wrong-word">20/18/16/14s</span> to 14s', b([20, 17, 14, 11], 14, l=True), covered=True,
+                     extra=note_box('This change is wrongly stated. Before it had 2 charges restored every 20/17/14/11s (since 7.38)')),
+            li("Duration increased from 2.6/3.2/3.8/4.4s to 4.4s", b([2.6, 3.2, 3.8, 4.4], 4.4), covered=True),
+            li("Formation Delay increased from 0.4s to 1s", b(0.4, 1, l=True), covered=True),
+        ]))
     W(ul_open())
-    # the card above shows every change highlighted: the rows stay hidden for the weights and the tag filters
-    W(li("Cast Range increased from 1050 to 1200", b(1050, 1200), covered=True))
-    W(li('Cooldown decreased from <span class="wrong-word">20/18/16/14s</span> to 14s', b([20, 17, 14, 11], 14, l=True), covered=True,
-         extra=note_box('This change is wrongly stated. Before it had 2 charges restored every 20/17/14/11s (since 7.38)')))
-    W(li("Duration increased from 2.6/3.2/3.8/4.4s to 4.4s", b([2.6, 3.2, 3.8, 4.4], 4.4), covered=True))
-    W(li("Formation Delay increased from 0.4s to 1s", b(0.4, 1, l=True), covered=True))
     W(li("Aghanim's Shard: Now grants this ability. No longer shares level with Kinetic Field. Has only one level instead", t("NEW"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
@@ -2286,14 +2283,15 @@ def build():
         ),
         summary="Ability reworked.",
         tag="rework",
-    ))
+        rows_first=lambda: [
+            # the card shows every change highlighted (old values left, new right): the rows stay hidden for the weights
+            li("Bonus Move Speed increased from 20 to 25/30/35", b(20, [25, 30, 35]), covered=True),
+            li("Now also increases cast range of all abilities by 350", t("NEW"), covered=True,
+                     extra=inline_note("Doesn't affect items")),
+            li("No longer provides bonus attack damage", t("DEL"), covered=True),
+        ]))
     W(ul_open())
-    # the card shows every change highlighted (old values left, new right): the rows stay hidden for the weights
-    W(li("Bonus Move Speed increased from 20 to 25/30/35", b(20, [25, 30, 35]), covered=True))
-    W(li("Now also increases cast range of all abilities by 350", t("NEW"), covered=True,
-         extra=inline_note("Doesn't affect items")))
     W(li("Aghanim's Scepter Black Dragon stats slightly rescaled", t("REWORK"), covered=True))
-    W(li("No longer provides bonus attack damage", t("DEL"), covered=True))
     W(li("Aghanim's Scepter no longer improves Wyrm's Wrath effectiveness while in Dragon Form", t("DEL"), covered=True))
     W(ul_close())
     W(ability("Fireball"))
@@ -2544,16 +2542,15 @@ def build():
         ),
         summary="Innate reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    # the card shows every change highlighted (old left, new right): the rows stay hidden for the weights
-    W(li("Enemy attack projectile speed slow rescaled from 35/40/45/50% to 40%", b([35, 40, 45, 50], 40), covered=True))
-    W(li("Max slow distance rescaled from 600 around Faceless Void to 500 around the targeted hero", t("REWORK"),
-         covered=True))
-    W(li("Now only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him", t("NERF"),
-         covered=True))
-    W(li("No longer levels with Chronosphere", t("REWORK"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            # the card shows every change highlighted (old left, new right): the rows stay hidden for the weights
+            li("Enemy attack projectile speed slow rescaled from 35/40/45/50% to 40%", b([35, 40, 45, 50], 40), covered=True),
+            li("Max slow distance rescaled from 600 around Faceless Void to 500 around the targeted hero", t("REWORK"),
+                     covered=True),
+            li("Now only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him", t("NERF"),
+                     covered=True),
+            li("No longer levels with Chronosphere", t("REWORK"), covered=True),
+        ]))
     W(ability("Time Walk"))
     W(ul_open())
     W(li("Aghanim's Scepter now also provides Reverse Time Walk sub-ability", t("NEW")))
@@ -3518,19 +3515,18 @@ def build():
         ),
         summary="Ability reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    # the card shows every change highlighted (old left, new right): the rows stay hidden for the weights
-    W(li("Max Level increased from 3 to 4", b(3, 4), covered=True))
-    W(li("Level requirement rescaled from 4/11/18 to 3/10/17/24", t("REWORK"), covered=True))
-    W(li("Meepo gains 100% of the experience from Hero Kills or Assists as long as at least one Meepo is in range", t("REWORK"),
-         covered=True))
-    W(li("All other experience gained by any Meepo is divided by the number of Meepos", t("REWORK"), covered=True))
-    W(li("No longer has a penalty for Strength, Agility, or Intelligence gained from items", t("BUFF"), covered=True))
-    W(li("Clones can't use consumable shared items on the main Meepo", t("NERF"), covered=True))
-    W(li("Clones no longer gain 30% experience independently", t("DEL"), covered=True))
-    W(li("No longer passively grants Magic Resistance", t("DEL"), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            # the card shows every change highlighted (old left, new right): the rows stay hidden for the weights
+            li("Max Level increased from 3 to 4", b(3, 4), covered=True),
+            li("Level requirement rescaled from 4/11/18 to 3/10/17/24", t("REWORK"), covered=True),
+            li("Meepo gains 100% of the experience from Hero Kills or Assists as long as at least one Meepo is in range", t("REWORK"),
+                     covered=True),
+            li("All other experience gained by any Meepo is divided by the number of Meepos", t("REWORK"), covered=True),
+            li("No longer has a penalty for Strength, Agility, or Intelligence gained from items", t("BUFF"), covered=True),
+            li("Clones can't use consumable shared items on the main Meepo", t("NERF"), covered=True),
+            li("Clones no longer gain 30% experience independently", t("DEL"), covered=True),
+            li("No longer passively grants Magic Resistance", t("DEL"), covered=True),
+        ]))
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 25 Talent Health increased from +350 to +400", b(350, 400)))
@@ -3832,14 +3828,15 @@ def build():
         ),
         summary="New innate ability.",
         tag="new",
-    ))
+        rows_first=lambda: [
+            li_formula("Move Speed bonus changed",
+                             "22/28/34/40%", "24% + 2% per 3 levels",
+                             rank_step([22.0, 28.0, 34.0, 40.0], ultimate=False), lambda L: 24.0 + 2.0 * (L // 3)),
+            li_formula("Attack Speed bonus changed",
+                             "20/40/60/80", "38 + 2 per level",
+                             rank_step([20.0, 40.0, 60.0, 80.0], ultimate=False), lambda L: 38.0 + 2.0 * L),
+        ]))
     W(ul_open())
-    W(li_formula("Move Speed bonus changed",
-                 "22/28/34/40%", "24% + 2% per 3 levels",
-                 rank_step([22.0, 28.0, 34.0, 40.0], ultimate=False), lambda L: 24.0 + 2.0 * (L // 3)))
-    W(li_formula("Attack Speed bonus changed",
-                 "20/40/60/80", "38 + 2 per level",
-                 rank_step([20.0, 40.0, 60.0, 80.0], ultimate=False), lambda L: 38.0 + 2.0 * L))
     W(li("Aghanim's Scepter: Increases bonus Movement Speed by 15% and bonus Attack Speed by 50. Killing an enemy hero resets cooldowns of all basic abilities", t("NEW")))
     W(li("No longer upgraded with Aghanim's Shard", t("DEL")))
     W(ul_close())
@@ -4029,19 +4026,18 @@ def build():
                                                "Determinator, aka Obsequious Deliberator, aka Ornery Deconstructor, aka "
                                                "Obnubilated Delineator, aka Omniscient Desiderator") + ". New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li_formula("For regular abilities Max Mana Restoration changed",
-                 "25/35/45/55%", "40% + 5% per 5 levels",
-                 lambda L: 25.0 if L < 3 else 35.0 if L < 5 else 45.0 if L < 7 else 55.0,
-                 lambda L: 40.0 + 5.0 * (L // 5),
-                 levels=[1, 5, 10, 15, 20, 25, 30]))
-    W(li_formula("For attack modifiers that spend mana Max Mana Restoration changed",
-                 "25/35/45/55%", "25% + 5% per 5 levels",
-                 lambda L: 25.0 if L < 3 else 35.0 if L < 5 else 45.0 if L < 7 else 55.0,
-                 lambda L: 25.0 + 5.0 * (L // 5),
-                 levels=[1, 5, 10, 15, 20, 25, 30]))
-    W(ul_close())
+        rows_first=lambda: [
+            li_formula("For regular abilities Max Mana Restoration changed",
+                             "25/35/45/55%", "40% + 5% per 5 levels",
+                             lambda L: 25.0 if L < 3 else 35.0 if L < 5 else 45.0 if L < 7 else 55.0,
+                             lambda L: 40.0 + 5.0 * (L // 5),
+                             levels=[1, 5, 10, 15, 20, 25, 30]),
+            li_formula("For attack modifiers that spend mana Max Mana Restoration changed",
+                             "25/35/45/55%", "25% + 5% per 5 levels",
+                             lambda L: 25.0 if L < 3 else 35.0 if L < 5 else 45.0 if L < 7 else 55.0,
+                             lambda L: 25.0 + 5.0 * (L // 5),
+                             levels=[1, 5, 10, 15, 20, 25, 30]),
+        ]))
     W(new_ability("Objurgation", "obsidian_destroyer_objurgation",
                   note="Barrier can be dispelled. Multiple instances of Objurgation barrier stack."))
     W(ul_open())
@@ -4474,12 +4470,11 @@ def build():
         ),
         summary="Ability reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    # both values are highlighted in the cards (old left, new right): the rows stay hidden for the weights
-    W(li("Bonus Attack Speed decreased from 40/55/70/85 to 35/50/65/80", b([40, 55, 70, 85], [35, 50, 65, 80]), covered=True))
-    W(li("Bonus Move Speed decreased from 5/7/9/11% to 4/6/8/10%", b([5, 7, 9, 11], [4, 6, 8, 10]), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            # both values are highlighted in the cards (old left, new right): the rows stay hidden for the weights
+            li("Bonus Attack Speed decreased from 40/55/70/85 to 35/50/65/80", b([40, 55, 70, 85], [35, 50, 65, 80]), covered=True),
+            li("Bonus Move Speed decreased from 5/7/9/11% to 4/6/8/10%", b([5, 7, 9, 11], [4, 6, 8, 10]), covered=True),
+        ]))
     W(ability("Requiem of Souls", slug="nevermore_requiem"))
     W(ul_open())
     W(li("Now can't use more than 20 souls per cast", t("NERF")))
@@ -5342,10 +5337,9 @@ def build():
         ),
         summary="New innate ability.",
         tag="new",
-    ))
-    W(ul_open())
-    W(li("Poison Sting is now an innate ability (previously a basic ability)", t("REWORK")))
-    W(ul_close())
+        rows_first=lambda: [
+            li("Poison Sting is now an innate ability (previously a basic ability)", t("REWORK")),
+        ]))
     W(ability("Venomous Gale"))
     W(ul_open())
     W(li("Aghanim's Shard reworked: Increases cast range and projectile speed by 25%. Creates 2 Plague Wards around every enemy hero hit", t("REWORK")))
@@ -5386,15 +5380,14 @@ def build():
         ),
         summary="Ability reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    # every value is highlighted in the cards (old left, new right): the rows stay hidden for the weights
-    W(li("Mana Cost decreased from 200/300/400 to 200/250/300", b([200, 300, 400], [200, 250, 300], l=True), covered=True))
-    W(li("Duration decreased from 5s to 4s", b(5, 4), covered=True))
-    W(li("Initial Damage decreased from 200/300/400 to 150/200/250", b([200, 300, 400], [150, 200, 250]), covered=True))
-    W(li("Spread Radius decreased from 800 to 700", b(800, 700), covered=True))
-    W(li("Max HP as damage decreased from 3/4/5% to 2/3/4%", b([3, 4, 5], [2, 3, 4]), covered=True))
-    W(ul_close())
+        rows_first=lambda: [
+            # every value is highlighted in the cards (old left, new right): the rows stay hidden for the weights
+            li("Mana Cost decreased from 200/300/400 to 200/250/300", b([200, 300, 400], [200, 250, 300], l=True), covered=True),
+            li("Duration decreased from 5s to 4s", b(5, 4), covered=True),
+            li("Initial Damage decreased from 200/300/400 to 150/200/250", b([200, 300, 400], [150, 200, 250]), covered=True),
+            li("Spread Radius decreased from 800 to 700", b(800, 700), covered=True),
+            li("Max HP as damage decreased from 3/4/5% to 2/3/4%", b([3, 4, 5], [2, 3, 4]), covered=True),
+        ]))
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 15 Talent Poison Sting Slow increased from +5% to +7%", b(5, 7)))
@@ -5457,14 +5450,15 @@ def build():
         ),
         summary="New innate ability.",
         tag="new",
-    ))
+        rows_first=lambda: [
+            li("Mana Cost decreased from 115 to 50", b(115, 50, l=True)),
+            li_formula("Cooldown changed",
+                             "45s", "45.75s - 0.75s per level",
+                             lambda L: 45.0, lambda L: 45.75 - 0.75 * L,
+                             l=True, value_fmt="{:.2f}s"),
+        ]))
     W(ul_open())
     W(li("Silent as the Grave is now an innate ability (previously granted by Aghanim's Scepter)", t("REWORK")))
-    W(li("Mana Cost decreased from 115 to 50", b(115, 50, l=True)))
-    W(li_formula("Cooldown changed",
-                 "45s", "45.75s - 0.75s per level",
-                 lambda L: 45.0, lambda L: 45.75 - 0.75 * L,
-                 l=True, value_fmt="{:.2f}s"))
     W(ul_close())
     W(ability("Summon Familiars"))
     W(ul_open())
@@ -5511,20 +5505,19 @@ def build():
         ),
         summary="Innate reworked.",
         tag="rework",
-    ))
-    W(ul_open())
-    # the card shows these changes highlighted (old left, new right): the rows stay hidden for the weights
-    W(li("No longer provides increased Armor or Magic Resistance", t("DEL"), covered=True))
-    W(li("Now provides increased Attack Speed per point of Agility", t("NEW"), covered=True))
-    W(li("Attack damage per attribute multiplier increased from 0.45 to 0.5175", b(0.45, 0.5175), covered=True))
-    W(li("Secondary bonuses increased from 25% to 30%", b(25, 30), covered=True))
-    W(li("The result of these changes:", t("MISC"),
-         extra=inline_note(
-             "Damage at level 1 is unchanged at 52–56."
-             "<br>Damage gain per level increased from 3.6 to 4.1 — " + b(3.6, 4.1) +
-             "<br>Damage at level 30 increased from 174–178 to 192–196 — " + br(174, 178, 192, 196)
-         )))
-    W(ul_close())
+        rows_first=lambda: [
+            # the card shows these changes highlighted (old left, new right): the rows stay hidden for the weights
+            li("No longer provides increased Armor or Magic Resistance", t("DEL"), covered=True),
+            li("Now provides increased Attack Speed per point of Agility", t("NEW"), covered=True),
+            li("Attack damage per attribute multiplier increased from 0.45 to 0.5175", b(0.45, 0.5175), covered=True),
+            li("Secondary bonuses increased from 25% to 30%", b(25, 30), covered=True),
+            li("The result of these changes:", t("MISC"),
+                     extra=inline_note(
+                         "Damage at level 1 is unchanged at 52–56."
+                         "<br>Damage gain per level increased from 3.6 to 4.1 — " + b(3.6, 4.1) +
+                         "<br>Damage at level 30 increased from 174–178 to 192–196 — " + br(174, 178, 192, 196)
+                     )),
+        ]))
     W(ability("Aether Remnant"))
     W(ul_open())
     W(li("Aghanim's Shard True Sight no longer reveals wards", t("DEL")))
