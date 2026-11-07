@@ -276,7 +276,53 @@ def value_tables(html):
         out.append(html[pos:m.start()] + row + tail)
         pos = tail_end
     out.append(html[pos:])
-    return formulas_under_their_rows("".join(out))
+    return tables_beside_single_cards(formulas_under_their_rows("".join(out)))
+
+
+# a one-sided card with this many values or more keeps them in a block of their own in its empty half (owner 2026-11-07,
+# 7.38 Throw, variant A: "когда значений внутри карточки много … они отдельным соседним блоком-таблицей идут")
+SIDE_TABLE_ROWS = 5
+_SINGLE_CARD_RE = re.compile(r'<div class="ability-change unified-panes is-single-new"')
+_VTABLE_RE = re.compile(r'<div class="value-table">')
+
+
+_FOLD_RE = re.compile(r'<div class="acr-fold[ "]')
+_FOLD_BODY = '<div class="acr-fold-body">'
+
+
+def _unfold(card):
+    """A card's folded rows as plain rows again (cards_rows.fold_long_rows)."""
+    m = _FOLD_RE.search(card)
+    if not m:
+        return card
+    end = _div_end(card, m.start())
+    b = card.index(_FOLD_BODY, m.start())
+    inner = card[b + len(_FOLD_BODY):_div_end(card, b) - len("</div>")]
+    return card[:m.start()] + inner + card[end:]
+
+
+def tables_beside_single_cards(html):
+    """The first table of SIDE_TABLE_ROWS values or more of a one-sided card goes out of its text into a block beside
+    it (.vt-side, the card's right column; under the text where the card has one column)."""
+    out, pos = [], 0
+    for c in _SINGLE_CARD_RE.finditer(html):
+        if c.start() < pos:
+            continue
+        end = _div_end(html, c.start())
+        card = html[c.start():end]
+        t = next((t for t in _VTABLE_RE.finditer(card)
+                  if card[t.start():_div_end(card, t.start())].count('<div class="vt-l') >= SIDE_TABLE_ROWS), None)
+        if t:
+            table = card[t.start():_div_end(card, t.start())]
+            card = card[:t.start()] + card[t.start() + len(table):]
+            card = card[:-len("</div>")] + f'<div class="vt-side">{table}</div></div>'
+            card = card.replace('class="ability-change unified-panes is-single-new"',
+                                'class="ability-change unified-panes is-single-new has-vt-side"', 1)
+            card = _unfold(card)          # its weight was the table's rows (cards_rows._side_weight): the text is short
+        out.append(html[pos:c.start()] + card)
+        pos = end
+    out.append(html[pos:])
+    return "".join(out)
 
 
 _BODY_OPEN_RE = re.compile(r'<div class="ability-change-body">')

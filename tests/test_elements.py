@@ -390,22 +390,22 @@ class TestAghsLine:
 
 class TestNoteBox:
     def test_plain_text_note(self):
-        from patch.elements import note_box
+        from patch.note_boxes import note_box
         result = note_box("Some note text")
         assert "Some note text" in result
 
     def test_returns_string(self):
-        from patch.elements import note_box
+        from patch.note_boxes import note_box
         result = note_box("Note")
         assert isinstance(result, str)
 
     def test_plain_text_wrapped_in_inlinetip(self):
-        from patch.elements import note_box
+        from patch.note_boxes import note_box
         result = note_box("Correction text")
         assert "<!--INLINETIP-->" in result
 
     def test_note_header_present(self):
-        from patch.elements import note_box
+        from patch.note_boxes import note_box
         result = note_box("text")
         assert "Note:" in result
 

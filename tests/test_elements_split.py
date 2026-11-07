@@ -10,6 +10,8 @@ import pytest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CARDS = ("cards_hero_stats", "cards_item_abilities", "cards_item_stats", "cards_aghs", "cards_ability_change",
          "cards_facets")
+# topic modules cut out of elements on 2026-11-07 (2408 lines -> about 1460)
+TOPICS = ("enchants", "row_scores", "terrain_notes", "formula_rows", "captains_mode", "note_boxes")
 
 
 def _lines(name):
@@ -18,11 +20,12 @@ def _lines(name):
 
 
 def test_elements_stays_cut():
-    assert _lines("elements") < 2600
+    assert _lines("elements") < 1600
     assert all(_lines(m) < 1200 for m in CARDS)
+    assert all(_lines(m) < 600 for m in TOPICS)
 
 
-@pytest.mark.parametrize("first", ("elements", "api") + CARDS)
+@pytest.mark.parametrize("first", ("elements", "api") + CARDS + TOPICS)
 def test_any_module_can_be_imported_first(first):
     code = f"import patch.{first}; from patch.api import ability_change, item_abilities_change, hero_stat_card, li"
     r = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True)

@@ -18,6 +18,8 @@ import tools.generate_patch_code_v2 as g
     ("Can now be disassembled", "NEW"),
     ("Now also grants 10% evasion", "NEW"),
     ("Added a new passive component", "NEW"),
+    # owner 2026-11-07, 7.38 Earth Spirit
+    ("Rolling Boulder: Bonus movespeed is also granted to Earth Spirit when rolling over an allied hero", "NEW"),
     # DEL
     ("Removed from Captains Mode", "DEL"),
     ("No longer provides bonus damage", "DEL"),
@@ -522,6 +524,24 @@ def test_twin_rows_with_same_info_merge_into_one():
     assert len(out) == 1
     assert "Tier 4 Neutral Items are available, and Greater Lotuses after Tier 5" in out[0]
     assert out[0].count("inline_note(") == 1
+
+
+def test_one_change_to_several_abilities_is_one_row_with_their_icons():
+    # owner 2026-11-07, 7.38 Corrosive Dragon: "встречается в 4 строчках, объедини их … с реворк тегом и 4 иконками"
+    from tools.patchgen.post_general import _postprocess_same_change_rows
+    lines = ['    W(hero_header("Dragon Knight"))',
+             '    W(li("Breathe Fire: Damage type changed to Physical", t("REWORK")))',
+             '    W(li("Dragon Tail: Damage type changed to Physical", t("REWORK")))',
+             '    W(li("Wyrm\'s Wrath: Corrosive Breath Damage type changed to Physical", t("REWORK")))',
+             '    W(li("Fireball: Damage type changed to Physical", t("REWORK")))',
+             '    W(li("Fireball: Radius decreased", t("NERF")))']
+    out = _postprocess_same_change_rows(lines)
+    # the icons first, then the change ("сначала иконки способностей подряд")
+    assert out[1] == ('    W(li(" ".join(mech_example("Dragon Knight\'s " + a) for a in ("Breathe Fire", "Dragon Tail", '
+                      '"Wyrm\'s Wrath", "Fireball",)) + " Damage type changed to Physical", t("REWORK")))')
+    assert out[2] == lines[5] and len(out) == 3
+    # two rows read fine one by one
+    assert _postprocess_same_change_rows(lines[:3]) == lines[:3]
 
 
 def test_removed_thing_gets_own_subgroup_above_new_block():

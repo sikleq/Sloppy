@@ -345,7 +345,8 @@ def _drop_empty_lists(out):
     return out
 
 
-_EXAMPLE_RE = re.compile(r"(?:such as|e\.g\.|for example,?|\blike) (?P<list>[A-Z][^.;:)]*)")
+# "like those granted by Gleipnir" (7.38 Ice Wall) names its example after the words about it
+_EXAMPLE_RE = re.compile(r"(?:such as|e\.g\.|for example,?|\blike(?: those (?:granted by|from|of))?) (?P<list>[A-Z][^.;:)]*)")
 _EXAMPLE_NAME_RE = re.compile(r"[A-Z][\w'\u2019-]*(?: (?:of|the|[A-Z][\w'\u2019-]*))*")
 _EXAMPLE_ROW_RE = re.compile(r'^(?P<head>\s*W\(li\("(?P<text>(?:[^"\\]|\\.)*)",.*?)(?P<tail>\)\))\s*$')
 
@@ -531,6 +532,111 @@ def _postprocess_new_block_label(lines):
     for i, r, old in reversed(moves):
         row = out.pop(r)
         out[i:i] = [f'W(subgroup("{old}"))', 'W(ul_open())', row, 'W(ul_close())']
+    return out
+
+
+_HERO_HEADER_RE = re.compile(r'^\s*W\(hero_header\("([^"]+)"')
+_ABIL_ROW_RE = re.compile(r"^(?P<abil>[A-Z][A-Za-z' ]{1,30}): (?P<rest>.+)$")
+SAME_CHANGE_MIN = 3           # two rows read fine one by one
+
+
+def _common_tail(texts):
+    """The words every text ends with."""
+    words = [t.split(" ") for t in texts]
+    k = 0
+    while k < min(map(len, words)) and len({w[-1 - k] for w in words}) == 1:
+        k += 1
+    return " ".join(words[0][len(words[0]) - k:]) if k else ""
+
+
+def _postprocess_same_change_rows(lines):
+    """Rows in a row that make one change to several of the hero's abilities ("Breathe Fire: Damage type changed to
+    Physical", "Dragon Tail: …", "Fireball: …", 7.38 Corrosive Dragon) are one row: each ability's icon, then the
+    change (owner 2026-11-07: "встречается в 4 строчках, объедини их … с реворк тегом и 4 иконками способностей";
+    "сначала иконки способностей подряд, потом Damage type changed to Physical").
+    Only tag-rows without a note, the same tag, SAME_CHANGE_MIN or more, ending with the same 4+ words."""
+    out, hero, i = [], None, 0
+    while i < len(lines):
+        h = _HERO_HEADER_RE.match(lines[i])
+        if h:
+            hero = h.group(1)
+        run = []
+        while i + len(run) < len(lines):
+            m = _ROW_RE.match(lines[i + len(run)].strip())
+            a = m and not m.group("note") and _ABIL_ROW_RE.match(m.group("text"))
+            if not a or (run and m.group("tag") != run[0][0]):
+                break
+            run.append((m.group("tag"), a.group("abil"), a.group("rest")))
+        tail = _common_tail([r[2] for r in run]) if len(run) >= SAME_CHANGE_MIN else ""
+        if hero and len(tail.split(" ")) >= 4:
+            indent = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
+            names = ", ".join(f'"{abil}"' for _, abil, _ in run)
+            out.append(f'{indent}W(li(" ".join(mech_example("{hero}\'s " + a) for a in ({names},)) '
+                       f'+ " {tail[:1].upper() + tail[1:]}", t("{run[0][0]}")))')
+            i += len(run)
+            continue
+        out.append(lines[i])
+        i += 1
+    return out
+
+
+_UMBRELLA_RE = re.compile(r'^(?P<head>\s*W\(li\("\+(?P<a>\d+(?:\.\d+)?)% [^"]*?Amplifications? replaced with '
+                          r'\+(?P<b>\d+(?:\.\d+)?)% Health Restoration")(?P<tag>, t\("REWORK"\))(?P<tail>\)\)\s*)$')
+
+
+def _postprocess_umbrella_stat_rows(lines):
+    """"+25% Lifesteal and Health Regen Amplifications replaced with +20% Health Restoration" (7.39 Sange, Abyssal
+    Blade, S&Y, K&S) is no rework: Health Restoration takes over the very same amplifications, now smaller — a NERF
+    with its % (owner 2026-11-07: "а разве это не nerf? учитывая изменения Health Restoration"). A bigger new number
+    would be a BUFF the same way; b() decides."""
+    out = []
+    for line in lines:
+        m = _UMBRELLA_RE.match(line)
+        if m and m.group("a") != m.group("b"):
+            line = f'{m.group("head")}, b({m.group("a")}, {m.group("b")}){m.group("tail")}'
+        out.append(line)
+    return out
+
+
+_LOST_HEAL_CUT_RE = re.compile(
+    r'^(?P<head>\s*W\(li\("(?P<text>[^"]*?(?:[Ii]nstead of reducing Healing, Health Regen, Lifesteal,? and Spell Lifesteal'
+    r'[^"]*?now reduces Health Restoration by [^"]*|Healing, Health Regen, Lifesteal and Spell Lifesteal reductions '
+    r'replaced with a new [^"]*Health Restoration reduction[^"]*))")(?P<tag>, t\("MISC"\))(?P<tail>\)\)\s*)$')
+LOST_HEAL_CUT_NOTE = "Health Restoration does not reduce incoming healing (it does since 7.41): the healing cut is gone"
+
+
+def _postprocess_lost_heal_cut_rows(lines):
+    """7.39: a debuff that cut Healing, Health Regen, Lifesteal and Spell Lifesteal now cuts Health Restoration only
+    (Orb of Frost, Orb of Corrosion, Crossbow's Hobble, Withering Mist, Frost Arrows' Aghanim's, Rot's Aghanim's, Frost
+    Dragon). Health Restoration did not touch incoming heals before 7.41, so the healing cut is lost: a NERF, not MISC
+    (owner 2026-11-07: "другие случаи тоже проверь"). The ones that also cut Heal Amplification (Skadi, Shiva's, Spirit
+    Vessel) keep the healing cut and stay MISC."""
+    out = []
+    for line in lines:
+        m = _LOST_HEAL_CUT_RE.match(line)
+        if m and "Heal Amplification" not in m.group("text"):
+            line = f'{m.group("head")}, t("NERF"), extra=inline_note("{LOST_HEAL_CUT_NOTE}"){m.group("tail")}'
+        out.append(line)
+    return out
+
+
+_NEUTRAL_CAST_RE = re.compile(r'^\s*W\(li\("(?P<text>Neutrals will (?:auto)?cast\b(?:[^"\\]|\\.)*)", t\("MISC"\)\)\)\s*$')
+_DESC_ROW_RE = re.compile(r'^(?P<head>\s*W\(li\("(?:Active|Passive|Toggle|Autocast)\b(?:[^"\\]|\\.)*")\)\)\s*$')
+
+
+def _postprocess_neutral_cast_notes(lines):
+    """"Neutrals will cast this ability on …" under a neutral creep's ability is not a change but how the camp's
+    creeps use it: it goes under the [?] of the ability's description row above (owner 2026-11-07, 7.38 Boglet,
+    Marshmage: "это по сути не изменение, а доп. информация механики нейтральных крипов"). Only right after a
+    description row (Active: / Passive: …) with no note of its own; elsewhere the row stays MISC."""
+    out = []
+    for line in lines:
+        m = _NEUTRAL_CAST_RE.match(line)
+        d = _DESC_ROW_RE.match(out[-1]) if m and out else None
+        if d:
+            out[-1] = f'{d.group("head")}, extra=inline_note("{m.group("text")}")))'
+            continue
+        out.append(line)
     return out
 
 

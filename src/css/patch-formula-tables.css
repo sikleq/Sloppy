@@ -265,7 +265,9 @@ body.cat-filter-active .cat-hide { display: none !important; }
    VISIBLE while filtering so each surviving group is labelled with its category.
    Empty sections are collapsed wholesale by refreshPatchFilterLayout()
    (section.cat-panel → f-hide), so only non-empty sections keep their header. */
-body.filter-active h4.subgroup { display: none; }
+/* ... and a list label (Abilities, Facets) goes; a heading naming its rows (7.38 Lotus Pools) stays, the JS hides it
+   with its rows (owner 2026-11-07: "при включении фильтра new исчезли названия") */
+body.filter-active h4.subgroup:not(.subgroup-named) { display: none; }
 body.filter-active ul.subnotes { display: none; }
 /* Hide filtered elements via .f-hide class set by JS */
 .f-hide { display: none !important; }

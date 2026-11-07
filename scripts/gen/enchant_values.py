@@ -1,6 +1,6 @@
 """data/rules/enchant_values.json — the Enchantment chips' hover text in each patch, from that patch's items.txt
 (owner 2026-10-17, 7.41: the chips took one table for every patch, so their hover said Vital +2.25 while the row
-said +2). The labels are patch/elements.py _ENCHANT_DESC's; the numbers are the patch's own, in the KV order, the
+said +2). The labels are patch/enchants.py _ENCHANT_DESC's; the numbers are the patch's own, in the KV order, the
 tiers it lists. A line whose numbers don't fit is reported and left out of the version (the chip falls back to the
 table), never guessed.
 
@@ -15,7 +15,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 sys.path.insert(0, _ROOT)
 sys.path.insert(0, os.path.join(_ROOT, "tools"))
 from patch.item_ability_text import _items  # noqa: E402
-from patch.elements import _ENCHANT_DESC  # noqa: E402
+from patch.enchants import _ENCHANT_DESC  # noqa: E402
 
 OUT = os.path.join(_ROOT, "data", "rules", "enchant_values.json")
 # {version: {enchantment: {kv key: value}}} where the local items.txt isn't that patch's build. Empty since

@@ -95,13 +95,13 @@
   .nav-back-arrow,
   .back-to-top,
   .dyn-w-fab,
-  .search-fab { width: 38px; height: 38px; bottom: 10px; }
+  .search-fab,
+  .filter-fab { width: 38px; height: 38px; bottom: 10px; }
   .nav-back-arrow { left: 10px; }
   .dyn-w-fab { right: 10px; bottom: 10px; }
   .search-fab { right: 56px; bottom: 10px; }
   .back-to-top { right: 10px; }
   .back-to-top:has(+ .dyn-w-fab) { right: 56px; bottom: 10px; }
-  .back-to-top.has-search { right: 102px; bottom: 10px; }
   .search-pop { right: 10px; bottom: 58px; width: calc(100vw - 20px); }
 
   /* ---- Change rows ---- */
@@ -179,6 +179,9 @@
   .card-pair, .card-pair.card-trio { grid-template-columns: minmax(0, 1fr); }      /* a phone: one under the other */
   .single-right { grid-template-columns: minmax(0, 1fr); }   /* the card under its block, no line */
   .single-right > .ability-change { margin-top: 0; }
+  .ability-change.unified-panes.is-single-new > .vt-side,
+  .single-right > .ability-change.unified-panes.is-single-new.has-vt-side > .vt-side { grid-column: 1; grid-row: auto; }
+  .single-right > .ability-change.unified-panes.is-single-new.has-vt-side { grid-template-columns: minmax(0, 1fr); }
   .sr-line { display: none; }
   .ability-change-arrow { transform: rotate(90deg); }
   /* item / ability card header: the cast range / mana / cooldown values wrap instead of widening the card */

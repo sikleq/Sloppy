@@ -8,8 +8,8 @@ from .elements import (  # noqa: E402
     _SLIM_CACHE,
     _State,
     _close_ability_block,
-    _dyn_record_card,
 )
+from .row_scores import _dyn_record_card
 from .number_tips import _facet_attr_rows  # noqa: E402
 from .cards_item_abilities import _pane_parts  # noqa: E402
 

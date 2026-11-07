@@ -5,11 +5,15 @@ from .badges import b, br, bf, t, gradient_class, facet_badge, scale_pill, rank_
 from .cards_facets import facet_change, new_facet
 from .elements import (
     hero_header, item_header, unit_header, ability, facet_header, section, subgroup, li,
-    ul_open, ul_close, li_formula, enchant_header, enchant_attr_row, enchant_tier_box, souvenir_chip, plain_header,
-    components, provides, auto_components_change, formula_change, inline_note, inline_list, info_tip,
-    show_list, subnote, section_intro, note_box, cm_draft, attr_change, creep_ref, camp_table, enchant_list_head,
-    enchant_row, sub_ability, hl, bug_note
+    ul_open, ul_close, plain_header,
+    components, provides, auto_components_change, inline_note, inline_list, info_tip,
+    show_list, attr_change, creep_ref, camp_table, sub_ability, hl
 )
+from .enchants import (enchant_header, enchant_attr_row, enchant_tier_box, souvenir_chip, enchant_list_head,
+                       enchant_row)
+from .formula_rows import li_formula, formula_change
+from .captains_mode import cm_draft
+from .note_boxes import subnote, section_intro, note_box, bug_note
 from .ability_group import ability_group, facet_group
 from .two_selves import two_selves_change
 from .scaling_card import scaling_rework

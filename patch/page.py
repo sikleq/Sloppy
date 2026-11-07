@@ -27,21 +27,7 @@ def write_head(version, date):
     _State.current_section_slug = None
     _State.terrain_anchor = False
     nav = _render_top_nav(active="changelogs", current_version=version, date=date, patch_context=True)
-    # Patch info block in the toolbar — three discrete labelled facts on a
-    # single right-aligned row: release date, gap from the previous patch,
-    # how long this version has been live (or how long it ran). Plain text,
-    # no pill / no border.
-    prev_part, age_part = _patch_meta_parts(version)
-    parts = [f'<span class="ti-released">Released: '
-             f'<a class="ti-official" href="https://www.dota2.com/patches/{version}" target="_blank" rel="noopener" '
-             f'title="Official {version} notes on dota2.com"><b>{date}</b></a></span>']
-    if prev_part:
-        parts.append(f'<span class="ti-after">{prev_part}</span>')
-    if age_part:
-        parts.append(f'<span class="ti-live">{age_part}</span>')
-    patch_info_html = (
-        '<div class="toolbar-patch-info">' + ''.join(parts) + '</div>'
-    )
+    _State.patch_info = patch_info_html(version, date)
     W(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,26 +40,60 @@ def write_head(version, date):
 
 {nav}
 <a class="nav-back-arrow" href="../calendar.html" aria-label="Back to calendar" title="Back to calendar"></a>
-<div class="toolbar">
-  <div class="toolbar-inner">
-    <div class="legend-stack">
-      <div class="legend-tags">
-        <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
-        <button class="badge nerf-text filter-btn" data-filter="nerf">NERF</button>
-        <button class="badge new filter-btn" data-filter="new">NEW</button>
-        <button class="badge del filter-btn" data-filter="del">DEL</button>
-        <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
-        <button class="badge swap filter-btn" data-filter="swap">SWAP</button>
-        <button class="badge misc filter-btn" data-filter="misc">MISC</button>
-        <button class="badge qol filter-btn" data-filter="qol">QoL</button>
-      </div>
-      <div class="legend-categories"><!--CATEGORIES_BAR--></div>
-    </div>
-    {patch_info_html}
-  </div>
-</div>
 <div class="container">
 ''')
+
+
+def patch_info_html(version, date):
+    """The patch's official notes link, release date, how long it ran (or is live) and how long after the previous one,
+    in a card like the filters' above them, folded at first; a tab with a pixel arrow in the middle of the filters'
+    top edge opens it (owner 2026-11-07, mock "Вариант 1": "Official notes и другую инфу сделать в таком же блоке,
+    только выше панели фильтров тегов и тоже добавить кнопку, только в центр верхней кромки панели тегов-фильтров").
+    It stood on a plate in the first section's header before."""
+    prev_part, age_part = _patch_meta_parts(version)
+    rows = [f'<a class="pi-official" href="https://www.dota2.com/patches/{version}" target="_blank" rel="noopener">'
+            f'Official notes<i class="pi-out" aria-hidden="true"></i></a>',
+            f'<div class="pi-row"><span>Released</span><span class="pi-val"><b>{date}</b></span></div>']
+    if age_part:
+        key, value = age_part.split(":", 1)
+        rows.append(f'<div class="pi-row"><span>{key}</span><span class="pi-val">{value.strip()}</span></div>')
+    if prev_part:
+        days, after = prev_part.split(" after ", 1)          # "<b>55</b> days", "<b>7.38c</b>"
+        rows.append(f'<div class="pi-row"><span>After {re.sub(r"</?b>", "", after)}</span>'
+                    f'<span class="pi-val">{days}</span></div>')
+    # open at first (owner 2026-11-07: "official notes блок пусть тоже по умолчанию включен"); the tab folds it
+    return '<div class="pinfo-card" id="pinfo-card">' + "".join(rows) + '</div>'
+
+
+# the tags of the filter window: (data-filter, the badge's colour class, the word)
+FILTER_TAGS = (("buff", "buff-text", "BUFF"), ("nerf", "nerf-text", "NERF"), ("new", "new", "NEW"), ("del", "del", "DEL"),
+               ("rework", "rework", "REWORK"), ("swap", "swap", "SWAP"), ("misc", "misc", "MISC"), ("qol", "qol", "QoL"))
+
+
+# the filters' switch: a round button of the corner stack, above the search, in its look (owner 2026-11-07: "иконку
+# фильтров всё же вынеси сюда и адаптируй"; it stood in the header beside the colour-blind one; icon:
+# tools/pixel_icons/filter_icon.py)
+FILTER_FAB = ('<button class="filter-fab" id="filter-fab" type="button" aria-expanded="true" aria-controls="filter-pop" '
+              'aria-label="Filters"></button>')
+
+
+def filter_pop_html():
+    """The filters in a window of their own behind a round button of the corner stack (owner 2026-11-07, mock "Вариант
+    3", "без слова Filters, иконки-закладки, рамка в стиле нашего сайта, панель появляется при нажатии на кнопку"):
+    a narrow column at the page's right edge, apart from the button ("панель должна появляться отдельно от кнопки …
+    списком, чтобы было узко … по правому краю лаконично"): each tag its tile (as in the rows) and its word, then the
+    sections' words."""
+    # a box to tick before each word, in the tag's colour (owner 2026-11-07, look 6 "галочки в рамке": the CSS draws it)
+    tags = "".join(f'<button class="badge {cls} filter-btn" data-filter="{key}" type="button">'
+                   f'<span class="fp-word">{word}</span></button>' for key, cls, word in FILTER_TAGS)
+    # a card at the page's right edge, out from the start (owner 2026-11-07: "фильтры включены по умолчанию и давай
+    # их по правому краю"); filter-fab.js puts it away when it would cover the text. Above it the patch's own card
+    # (patch_info_html) behind the tab on its top edge.
+    info, _State.patch_info = _State.patch_info, ""
+    tab = ('<button type="button" class="pinfo-tab" aria-expanded="true" aria-controls="pinfo-card" '
+           'aria-label="Patch info"><i aria-hidden="true"></i></button>') if info else ""
+    return ('<div class="filter-pop" id="filter-pop">' + info + tab + '<div class="filter-rail"><div class="legend-tags">'
+            + tags + '</div><div class="legend-categories"><!--CATEGORIES_BAR--></div></div></div>')
 
 
 def write_footer():
@@ -82,17 +102,22 @@ def write_footer():
     if _State.section_panel_open:
         W('</section>')
         _State.section_panel_open = False
-    # Corner stack, bottom -> top: weights, search, back-to-top (appears on scroll).
-    # no hover tips on the corner buttons (owner 2026-09-28) — the loupe keeps only its key, "Search (\)"
-    W('<button class="back-to-top has-search" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
-    W('<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>')
-    # Search = a round loupe button above the weights; the field slides out to its left
-    # ("/" opens it, Esc closes). It used to be a toolbar field that never lined up with the chips.
-    W('<button class="search-fab" id="search-fab" type="button" aria-label="Search heroes, items, abilities" '
-      'aria-expanded="false" aria-controls="search-pop" title="Search (\\ or /)" aria-keyshortcuts="Backslash Slash"></button>')
+    # The corner buttons in one framed panel, bottom right, filters open or not (owner 2026-11-07, mock "Вариант A"):
+    # top, filters, search, weights. No hover tips on them (owner 2026-09-28) — the loupe keeps only its key.
+    # "Top" jumps at once, no ride up ("чтобы телепортировало наверх, а не везло").
+    W('<div class="corner-dock">'
+      '<button class="back-to-top at-top btt-wait" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:\'instant\'})">'
+      '</button>' + FILTER_FAB +
+      '<button class="search-fab" id="search-fab" type="button" aria-label="Search heroes, items, abilities" '
+      'aria-expanded="false" aria-controls="search-pop" title="Search (\\ or /)" aria-keyshortcuts="Backslash Slash">'
+      '</button><button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>'
+      '</div>')
+    # the search field opens above the panel ("/" opens it, Esc closes)
     W('<div class="search-pop" id="search-pop" hidden><div class="search-box">'
       '<input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">'
       '<div class="search-results" id="search-results"></div></div></div>')
+    # the filters' card at the right edge, middle of the screen; the panel's filter button hides it
+    W(filter_pop_html())
     W(f'<script defer src="../src/scripts-base.js?v={_ASSET_VERSION}"></script>')
     W('</div></body></html>')
 
@@ -105,17 +130,6 @@ def save_assets():
 
 _LI_RE = re.compile(r'<li\b([^>]*)>(.*?)</li>', re.S)
 _UL_CHANGES_RE = re.compile(r'(<ul class="changes">)(.*?)(</ul>)', re.S)
-_CARD_LINE = ('<svg class="ability-change-connector under-rows-connector" viewBox="0 0 100 100" '
-              'preserveAspectRatio="none" aria-hidden="true"><path d="" /></svg>')
-
-
-def _right_under_ability_title(html, pos):
-    """Does the list at `pos` stand right under an ability's title (not an item's or a section's)?"""
-    if not html[max(0, pos - 16):pos].rstrip().endswith('</h4>'):
-        return False
-    return html.startswith('<h4 class="ability-title"', html.rfind('<h4', 0, pos))
-
-
 def _wrap_ability_boxes(html):
     """For each <ul class="changes">, walk its <li> sequence and assign:
       - ability-row-start  : first li of an ability description
@@ -192,10 +206,9 @@ def _wrap_ability_boxes(html):
             if role in ('solo', 'cont-end'):
                 cur = False
 
-        # An ability described only by its boxes (a new creep's, 7.38 Boglet) is a card like any other: under the
-        # icon's left edge with the line from the icon (owner 2026-11-04: "нет единого положения карточек").
-        if all(roles) and not any(tagged) and _right_under_ability_title(m.string, m.start()):
-            head = _CARD_LINE + head.replace('class="changes"', 'class="changes ability-card-rows"')
+        # An ability described only by its boxes (a new creep's, 7.38 Riverborn Aura) stands beside the icon under its
+        # name, as one with a row below its box (owner 2026-11-07: "не лучше Riverborn Aura расположить также, как
+        # Water Bubble (Large)?"; from 2026-11-04 such a card stood under the icon with a line from it).
 
         def aug_role(it, i, cls):
             return aug_class(it, cls + (' ability-box-tagged' if tagged[i] else ''))
@@ -241,7 +254,7 @@ _STAT_DETECT_SKIP_PHRASES = (
 
 # Rows' tags as small tiles with an icon where the tags stood (owner 2026-11-06, mock "Плитка 22x18"; the bookmarks on
 # the panel's left line before them are gone) — the pages it runs on; None = every page. CSS src/css/patch-tag-marks.css
-TAG_MARK_PAGES = {"7.41f", "7.38"}           # the trial pages (owner 2026-11-06: "тестируем ещё на 7.38")
+TAG_MARK_PAGES = None   # every page (owner 2026-11-07: "Плитки тегов на все патчи разворачивай"; trial was 7.41f + 7.38)
 
 # tiles in a GENERAL block's icon; more stats changed: the General icon as before (owner 2026-11-06: "Если изменённых
 # характеристик >4 (не =4), то ставим иконку General как раньше стояла. Если <=4, то показываем те 4")
@@ -372,14 +385,26 @@ def _li_rank(li_html):
     return 8
 
 
+_IABCARD_RE = re.compile(r'<!--IABCARD:.*?-->')
+
+
+def drop_cards_hiding_nothing(html):
+    """An item's abilities card whose item rows all stay shown repeats them: no card (owner 2026-11-07, 7.38 Bloodthorn:
+    "излишне тут карточки, т.к предмет особо не менялся" — one True Strike line with its note, and a QoL row)."""
+    def keep(m):
+        nxt = html.find('<div class="entity-block', m.end())
+        block = html[m.end():len(html) if nxt < 0 else nxt]
+        return m.group(0) if "iab-covered" in block or "<li" not in block else ""
+    return _IABCARD_RE.sub(keep, html)
+
+
 def _story_rank(li_html):
-    """A mech_story has no chip to rank it by: its tag decides, so it opens a list with lesser tags (7.38 Roshan)."""
+    """A unit's numbers and a mech_story open their list, before the rows of every tag (owner 2026-11-07, 7.38 Roshan:
+    "Now has +25% base Slow Resistance" stood above the REWORK story, "должна быть там, где и другие")."""
     head = li_html[:li_html.index(">")]
-    if 'class="unit-sheet"' in head:
-        return 1          # a unit's numbers open its list
-    if " mech-story" not in head:
-        return None
-    return 1 if re.search(r'data-tag="[^"]*\bnew\b', head) else 2
+    if 'class="unit-sheet"' in head or " mech-story" in head:
+        return 0.5        # 0 would read as "no rank" in the sort's `or`
+    return None
 
 
 def _sort_changes_li(html):
@@ -413,12 +438,12 @@ def _categories_bar_html():
         return ''
     btns = []
     for s in _State.current_sections:
+        # words only (owner 2026-11-07: "иконки у категорий категорически не нужны")
         btns.append(
-            f'<button class="badge cat-filter-btn" data-category="{s["slug"]}">'
-            f'{s["label"]}</button>'
+            f'<button class="cat-filter-btn" data-category="{s["slug"]}" type="button">'
+            f'<span class="fp-word">{s["label"]}</span></button>'
         )
-    # no "Group:" label — a thin vertical line parts the group chips from the tags
-    return '<span class="ec-vsep" aria-hidden="true"></span>' + ''.join(btns)
+    return ''.join(btns)
 
 
 _THUMB_RE = re.compile(r'src="\.\./icons/(heroes|items|abilities)/([^"?/]+)\.png"')
@@ -558,6 +583,7 @@ def save_html(filename):
     from .general_rows import attr_row_first
     out = attr_row_first(out)              # a new main attribute first in General, over the stats card's rows (11-06)
     out = re.sub(r'<!--COSTCARD:(.*?)-->', lambda m: render_cost_card(m.group(1)), out)
+    out = drop_cards_hiding_nothing(out)
     out = re.sub(r'<!--IABCARD:(.*?)-->', lambda m: render_iab_card(m.group(1)), out)
     out = raise_abilities_beside_gone_stats(out)
     from .value_tables import value_tables

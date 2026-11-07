@@ -37,7 +37,13 @@ Helpers are imported in every `content/p*.py` via `from patch.api import *`.
 |---|---|
 | `patch/images.py` | CDN constants, `HERO_SLUG` / `ITEM_SLUG`, `_LOCAL_ABIL_ICONS` |
 | `patch/badges.py` | `gradient_class()`, `b()`, `br()`, `bf()`, `t()`, `scale_pill()` |
-| `patch/elements.py` | HTML helpers: `hero_header()`, `item_header()`, `section()`, `ability()`, `li()`, `subnote()`, … |
+| `patch/elements.py` | HTML helpers: `hero_header()`, `item_header()`, `section()`, `ability()`, `li()` (its steps `_li_text` … `_li_inner`), `info_tip()`, … |
+| `patch/enchants.py` | enchantments, cut out of `elements.py` (2026-11-07): `enchant_list_head`, `enchant_row`, `enchant_header` with its tier table, `enchant_tier_box` chips, `souvenir_chip`; `elements` imports `_ench_covered` back at its end |
+| `patch/row_scores.py` | the rows' tallies and scores in the patch dynamics (`_dyn_record_li`, `_dyn_record_card`, rows counted once per block: damage, replacements, components panel, signal R), cut out of `elements.py` (2026-11-07) |
+| `patch/terrain_notes.py` | a terrain note's words (`note_phrase`, `wrap_phrase`) and, cut out of `elements.py` (2026-11-07), its pictures, button and number chip (`terrain_note`, `terrain_button`, `terrain_num_chip`) |
+| `patch/formula_rows.py` | `formula_change`, `li_formula`, cut out of `elements.py` (2026-11-07) |
+| `patch/captains_mode.py` | `cm_draft`, cut out of `elements.py` (2026-11-07) |
+| `patch/note_boxes.py` | `note_box`, `bug_note`, `subnote`, `section_intro`, cut out of `elements.py` (2026-11-07) |
 | `patch/cards_*.py` | the cards, cut out of `elements.py` (audit 2026-10-26 #8): `cards_hero_stats` (hero stat card), `cards_aghs` (Aghanim's), `cards_item_abilities` (`item_abilities_change`), `cards_item_stats` (`properties_change`, `components_change`), `cards_ability_change` (`ability_change`, `new_ability`), `cards_facets` (`new_facet`, `facet_change`, 2026-11-06; `patch/api.py` takes them from it). They import their helpers from `elements` (or the helpers' own modules), which imports the others back at its end; `patch/__init__.py` loads `elements` first |
 | `patch/site_common.py`, `kv.py`, `game_files.py`, `loc_history.py`, `terrain_index.py` | the core every builder shares: site header, the KV parser, the game-files store, old tooltips, which patches get a Terrain page. `patch/` imports nothing from `builders/` or `tools/` (`tests/test_layers.py`) |
 | `patch/output.py` / `patch/state.py` | `W()` writer accumulator + `_State` build singleton |

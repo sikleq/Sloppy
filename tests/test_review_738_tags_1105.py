@@ -358,7 +358,7 @@ def test_tempest_double_is_a_card_from_the_games_files(page):
 
 def test_the_line_to_a_second_card_starts_under_the_first():
     js = (ROOT / "src" / "js" / "patch-page.js").read_text(encoding="utf-8")
-    part = js[js.index("svg.under-rows-connector"):js.index("Aghanim's cards are top-anchored")]
+    part = js[js.index("svg.under-rows-connector"):js.index("Two sides standing from one top edge")]
     assert "before.classList.contains('ability-change')" in part and "connectorPath(blockRect, start, paneRect)" in part
 
 

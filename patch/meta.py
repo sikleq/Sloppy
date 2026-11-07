@@ -251,7 +251,8 @@ def _dropdown_options_html(current_version, patch_context=False):
     return "".join(items)
 
 
-def _render_top_nav(active="changelogs", current_version=None, date=None, patch_context=False, centre_tabs=True):
+def _render_top_nav(active="changelogs", current_version=None, date=None, patch_context=False, centre_tabs=True,
+                    colour_blind=True):
     """Render the top nav by delegating to site_common.render_top_nav. This
     wrapper builds the patch-page version picker (prev/next arrows + version
     dropdown + release-info) and passes it as picker_html; the shared module
@@ -310,7 +311,7 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
     return _site.render_top_nav(active, latest_href,
                                 patch_context=patch_context,
                                 picker_html=picker_html,
-                                centre_tabs=centre_tabs)
+                                centre_tabs=centre_tabs, colour_blind=colour_blind)
 
 
 def _current_version():

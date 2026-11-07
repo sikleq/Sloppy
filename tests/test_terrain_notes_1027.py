@@ -3,28 +3,28 @@ around camps" had a new side with nothing on it), and two rows with the same wor
 "Several additional tree and visual adjustments have been made to this area") each take their own spot."""
 import pytest
 
-from patch import elements
+from patch import terrain_notes
 from patch.state import reset_page_state
 
 
 def test_same_worded_rows_take_their_own_spots(monkeypatch):
     rows = [("Several additional tree", ["738c_5.webp"], "tree"), ("Several additional tree", ["738c_9.webp"], "tree")]
-    monkeypatch.setattr(elements, "_terrain_spot_index", lambda: {"7.38c": rows})
+    monkeypatch.setattr(terrain_notes, "_terrain_spot_index", lambda: {"7.38c": rows})
     reset_page_state()
     text = "Several additional tree and visual adjustments have been made to this area"
-    assert "738c_5.webp" in elements.terrain_note("7.38c", text)[1]
-    assert "738c_9.webp" in elements.terrain_note("7.38c", text)[1]
+    assert "738c_5.webp" in terrain_notes.terrain_note("7.38c", text)[1]
+    assert "738c_9.webp" in terrain_notes.terrain_note("7.38c", text)[1]
     reset_page_state()                                          # the next page counts from the first again
-    assert "738c_5.webp" in elements.terrain_note("7.38c", text)[1]
+    assert "738c_5.webp" in terrain_notes.terrain_note("7.38c", text)[1]
 
 
 def test_a_second_row_without_a_spot_of_its_own_gets_none(monkeypatch):
     rows = [("Several additional tree", ["738c_5.webp"], "tree")]
-    monkeypatch.setattr(elements, "_terrain_spot_index", lambda: {"7.38c": rows})
+    monkeypatch.setattr(terrain_notes, "_terrain_spot_index", lambda: {"7.38c": rows})
     reset_page_state()
     text = "Several additional tree and visual adjustments have been made to this area"
-    assert elements.terrain_note("7.38c", text)[1]
-    assert elements.terrain_note("7.38c", text) == ("", "")      # Bottom Lane's: all its trees are in other pictures
+    assert terrain_notes.terrain_note("7.38c", text)[1]
+    assert terrain_notes.terrain_note("7.38c", text) == ("", "")      # Bottom Lane's: all its trees are in other pictures
 
 
 def _red(img, xy):
@@ -62,15 +62,15 @@ def test_a_terrain_row_with_a_percent_tints_its_number():
     """7.40 "Watcher night vision range decreased from 800 to 450" -44% (owner 2026-10-27): the number chip lightly in
     the % colour; a row with a text tag only keeps the plain number."""
     from patch.badges import b
-    assert elements.terrain_num_chip(4, b(800, 450)) == '<span class="badge tnum tnum-nerf">4</span>'
-    assert elements.terrain_num_chip(5, b(450, 800)) == '<span class="badge tnum tnum-buff">5</span>'
+    assert terrain_notes.terrain_num_chip(4, b(800, 450)) == '<span class="badge tnum tnum-nerf">4</span>'
+    assert terrain_notes.terrain_num_chip(5, b(450, 800)) == '<span class="badge tnum tnum-buff">5</span>'
     tag = '<span class="badge del" data-tag="del" data-overall="nerf">DEL</span>'
-    assert elements.terrain_num_chip(1, tag) == '<span class="badge tnum">1</span>'
+    assert terrain_notes.terrain_num_chip(1, tag) == '<span class="badge tnum">1</span>'
 
 
 def test_the_738c_gate_row_opens_the_picture_of_its_two_cells():
     # the row had no picture until 2026-11-05: two gridnav cells at the left of the Dire gate were blocked in 7.38b
     reset_page_state()
-    phrase, shots = elements.terrain_note("7.38c", "Fixed unnecessary pathing blockers at the left of the entrance to the Dire Base through the team only gate")
+    phrase, shots = terrain_notes.terrain_note("7.38c", "Fixed unnecessary pathing blockers at the left of the entrance to the Dire Base through the team only gate")
     assert phrase == "pathing blockers"
     assert "738c_11.webp" in shots

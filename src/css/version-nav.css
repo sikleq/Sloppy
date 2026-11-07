@@ -42,10 +42,9 @@
   background-color: var(--shadow-45);
   filter: brightness(1.2);
 }
-/* Tactile nudge: the chevron drifts a hair in the arrow's own direction
-   on hover, suggesting where the click will take you. */
-.version-nav-arrow.is-prev:hover { background-position: 45% center; }
-.version-nav-arrow.is-next:hover { background-position: 55% center; }
+/* both arrows only light up on hover: the old nudge (45% / 55%) moved the left one 0.6px, unseen, and the right one a
+   whole pixel, a jerk (owner 2026-11-07: "если на стрелочку влево наводить … подсвечивается. если на правую, то
+   дёргается") */
 .version-nav-arrow.is-disabled {
   opacity: 0.3;
   cursor: default;

@@ -26,7 +26,9 @@ def build():
     W(li("Base barrier decreased from 2100 to 2000", b(2100, 2000)))
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
-    W(ability("Strength of the Immortal", icon_url="../icons/misc/innate_icon.png"))
+    # hidden (roshan_devotion), no picture of its own: the game's placeholder until a build gives it one (owner
+    # 2026-11-07, scripts/fetch/extract_vpk_boss_icons.py PLACEHOLDER)
+    W(ability("Strength of the Immortal", icon_url="../icons/abilities/roshan_devotion.png"))
     W(ul_open())
     W(li_formula("Armor Bonus per minute increased",
                  "0.375 per minute", "0.4 per minute",
@@ -179,20 +181,20 @@ def build():
     W(ul_close())
     W(item_header("Sange"))
     W(ul_open())
-    W(li("+20% Lifesteal and Health Regen Amplifications replaced with +16% Health Restoration", t("REWORK")))
+    W(li("+20% Lifesteal and Health Regen Amplifications replaced with +16% Health Restoration", b(20, 16)))
     W(ul_close())
     W(item_header("Abyssal Blade"))
     W(ul_open())
-    W(li("+25% Lifesteal and Health Regen Amplifications replaced with +20% Health Restoration", t("REWORK")))
+    W(li("+25% Lifesteal and Health Regen Amplifications replaced with +20% Health Restoration", b(25, 20)))
     W(ul_close())
     W(item_header("Sange and Yasha"))
     W(ul_open())
     W(li("Status Resistance bonus decreased from +20% to +15%", b(20, 15)))
-    W(li("+25% Lifesteal and Health Regen Amplifications replaced with +20% Health Restoration", t("REWORK")))
+    W(li("+25% Lifesteal and Health Regen Amplifications replaced with +20% Health Restoration", b(25, 20)))
     W(ul_close())
     W(item_header("Kaya and Sange"))
     W(ul_open())
-    W(li("+25% Lifesteal, Spell Lifesteal and Health Regen Amplifications replaced with +20% Health Restoration", t("REWORK")))
+    W(li("+25% Lifesteal, Spell Lifesteal and Health Regen Amplifications replaced with +20% Health Restoration", b(25, 20)))
     W(ul_close())
     W(item_header("Orb of Frost"))
     # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
@@ -200,7 +202,7 @@ def build():
         old=["Passive: Frost. Your attacks slow the target's movement by -13% (-6% against melee targets) and reduces heals, health regeneration, lifesteal and Spell lifesteal by 13%. Lasts for 3 seconds."],
         new=["Passive: Frost. Your attacks slow the target's movement by -13% (-6% against melee targets), and reduces Health Restoration by 13%. Lasts for 3 seconds."]))
     W(ul_open())
-    W(li("Frost instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 13%, now reduces Health Restoration by 13%", t("MISC")))
+    W(li("Frost instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 13%, now reduces Health Restoration by 13%", t("NERF"), extra=inline_note("Health Restoration does not reduce incoming healing (it does since 7.41): the healing cut is gone")))
     W(li("Cost increased from 250 to 300", b(250, 300, l=True)))
     W(li("Frost's slow and health restoration reduction no longer stack with Orb of Corrosion and Eye of Skadi", t("DEL")))
     W(ul_close())
@@ -211,7 +213,7 @@ def build():
         old=["Passive: Corrosion. Your attacks reduce the target's armor by -2, slows their movement by -16% (-8% against melee targets), and reduces heals, health regeneration, lifesteal and Spell lifesteal by 16% for 3 seconds."],
         new=["Passive: Corrosion. Your attacks reduce the target's armor by -2, slows their movement by -16% (-8% against melee targets), and reduces Health Restoration by 16%. Lasts for 3 seconds."]))
     W(ul_open())
-    W(li("Corrosion instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 16%, now reduces Health Restoration by 16%", t("MISC")))
+    W(li("Corrosion instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 16%, now reduces Health Restoration by 16%", t("NERF"), extra=inline_note("Health Restoration does not reduce incoming healing (it does since 7.41): the healing cut is gone")))
     W(li("Total Cost increased from 1000 to 1050", b(1000, 1050, l=True)))
     W(li("Corrosion's slow and health restoration reduction no longer stack with Orb of Frost and Eye of Skadi", t("DEL")))
     W(ul_close())
@@ -440,7 +442,7 @@ def build():
         new=["Active: Hobble. Hits an enemy for 75 damage, then slows them by 80% and reduces Health Restoration by 40% for 4 seconds. The slow gradually fades over the duration of the spell. Cast Range: 800. Mana Cost: 50. Cooldown: 12s"]))
     W(ul_open())
     W(li("Dormant Curio increases Health Restoration reduction from 40% to 52%", t("NEW")))
-    W(li("Hobble 40% Healing, Health Regen, Lifesteal and Spell Lifesteal reductions replaced with a new 40% Health Restoration reduction stat", t("MISC")))
+    W(li("Hobble 40% Healing, Health Regen, Lifesteal and Spell Lifesteal reductions replaced with a new 40% Health Restoration reduction stat", t("NERF"), extra=inline_note("Health Restoration does not reduce incoming healing (it does since 7.41): the healing cut is gone")))
     W(ul_close())
     W(item_header("Dezun Bloodrite", new="New Tier 4 Artifact"))
     W(ul_open())
@@ -572,7 +574,7 @@ def build():
         desc=f"Mist Coil also deals 40/60/80/100% attack damage and applies effects from items and abilities. Self damage when cast on an enemy is increased from 40% to 70%. {inline_note("Self damage is not affected by attack damage. This is exactly how it was with the previous Aghanim's Shard effect")}"))
     W(ability("Withering Mist", slug="abaddon_withering_mist"))
     W(ul_open())
-    W(li("Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 35%, now reduces Health Restoration by 35%", t("MISC")))
+    W(li("Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 35%, now reduces Health Restoration by 35%", t("NERF"), extra=inline_note("Health Restoration does not reduce incoming healing (it does since 7.41): the healing cut is gone")))
     W(ul_close())
     W(ability("Mist Coil", slug="abaddon_death_coil"))
     W(ul_open())
@@ -980,14 +982,14 @@ def build():
     W(hero_header("Dragon Knight"))
     W(facet_header("dragon_knight_frost_dragon"))
     W(ul_open())
-    W(li("Wyrm's Wrath: Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 14/21/28/35%, now reduces Health Restoration by 14/21/28/35%", t("MISC")))
+    W(li("Wyrm's Wrath: Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 14/21/28/35%, now reduces Health Restoration by 14/21/28/35%", t("NERF"), extra=inline_note("Health Restoration does not reduce incoming healing (it does since 7.41): the healing cut is gone")))
     W(ul_close())
 
     # Drow Ranger
     W(hero_header("Drow Ranger"))
     W(ability("Frost Arrows", slug="drow_ranger_frost_arrows"))
     W(ul_open())
-    W(li("Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 10% per stack, now reduces Health Restoration by 10% per stack", t("MISC")))
+    W(li("Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 10% per stack, now reduces Health Restoration by 10% per stack", t("NERF"), extra=inline_note("Health Restoration does not reduce incoming healing (it does since 7.41): the healing cut is gone")))
     W(ul_close())
     W(ability("Glacier", slug="drow_ranger_glacier"))
     W(ul_open())
@@ -1419,7 +1421,9 @@ def build():
     W(ul_open())
     W(li("Now levels up with Duel", t("REWORK"), covered=True))
     W(li("Now applies when attacking enemy heroes that are equal or higher level than you, instead of only higher level enemy heroes", t("BUFF"), covered=True))
-    W(li("Instead of increasing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 50%, now increases Health Restoration by 30/40/50/60%", t("REWORK"), covered=True))
+    # REWORK on the page, a nerf in the weights: 50% -> 30/40/50/60% and the healing part gone (owner 2026-11-07:
+    # "оставить rework, но вообще стоило бы в весах учитывать и как нерф")
+    W(li("Instead of increasing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 50%, now increases Health Restoration by 30/40/50/60%", t("REWORK"), covered=True, force_tag="rework nerf"))
     W(ul_close())
 
     # Leshrac
@@ -1858,7 +1862,7 @@ def build():
     W(hero_header("Pudge"))
     W(ability("Rot", slug="pudge_rot"))
     W(ul_open())
-    W(li("Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 20%, now reduces Health Restoration by 20%", t("MISC")))
+    W(li("Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 20%, now reduces Health Restoration by 20%", t("NERF"), extra=inline_note("Health Restoration does not reduce incoming healing (it does since 7.41): the healing cut is gone")))
     W(ul_close())
 
     # Pugna

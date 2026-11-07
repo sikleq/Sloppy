@@ -395,7 +395,87 @@
 }
 .search-fab:hover { transform: translateY(-2px); filter: brightness(1.12); }
 .search-fab[aria-expanded="true"] { box-shadow: 0 0 10px rgba(255, 150, 40, 0.45), 0 5px 16px var(--shadow-55); }
-.back-to-top.has-search { bottom: 126px; }
+/* the filters' round button above it, in its look, the pixel sliders in gold (owner 2026-11-07: "иконку фильтров всё
+   же вынеси сюда и адаптируй"); the card open: the search's glow; a filter on: a gold ring that glows */
+.filter-fab {
+  position: fixed; right: 22px; bottom: 126px;
+  width: 42px; height: 42px; box-sizing: border-box; padding: 0;
+  appearance: none; -webkit-appearance: none;
+  border-radius: 50%; border: 2px solid var(--gold);
+  box-shadow: 0 5px 16px var(--shadow-55);
+  background: url('icons/ui/gothic/icon_filter.png') center / 22px 22px no-repeat,
+              linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  image-rendering: pixelated;
+  cursor: pointer; z-index: 100;
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+.filter-fab:hover { transform: translateY(-2px); filter: brightness(1.12); }
+.filter-fab[aria-expanded="true"] { box-shadow: 0 0 10px rgba(255, 150, 40, 0.45), 0 5px 16px var(--shadow-55); }
+.filter-fab.has-active { box-shadow: 0 0 0 2px #ff9a2a, 0 0 12px rgba(255, 150, 40, 0.7), 0 5px 16px var(--shadow-55); }
+/* Patch pages: the four corner buttons in one panel in the filters' frame, always in the bottom-right corner, filters
+   open or not; square cells, no round rings (owner 2026-11-07, mock "Вариант A": "панель этих кнопок всегда справа
+   внизу, даже если открыты фильтры-теги", "круглую рамку может можно и убрать"). Left to right: top, filters,
+   search, weights; "top" always has its place. */
+.corner-dock {
+  position: fixed; right: 10px; bottom: 14px; z-index: 100; display: flex; gap: 4px; padding: 6px;
+  background: var(--px-panel); border: 2px solid #6d5c3a;
+  box-shadow: 0 0 0 2px var(--px-press), inset 0 0 0 1px var(--bg-warm-darker), 0 6px 16px var(--shadow-55);
+}
+.corner-dock > button {
+  position: static; display: block; width: 34px; height: 34px; margin: 0; border: 0; border-radius: 0;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.45), inset 0 -2px 0 var(--px-press); transform: none;
+}
+.corner-dock > button:hover { transform: none; filter: brightness(1.25); }
+.corner-dock > .filter-fab[aria-expanded="true"],
+.corner-dock > .search-fab[aria-expanded="true"] { box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.6); }
+.corner-dock > .filter-fab.has-active { box-shadow: inset 0 0 0 2px #ff9a2a, 0 0 8px rgba(255, 150, 40, 0.6); }
+.corner-dock > .dyn-w-fab.active { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+/* at the page's top "top" has nothing to do: grey and dim ("тусклой/серой, если я наверху страницы уже") */
+.corner-dock > .back-to-top.at-top { filter: grayscale(1); opacity: 0.4; cursor: default; }
+/* until the script knows where the page is (a reload puts it back only after load), no colour at all */
+.corner-dock > .back-to-top.btt-wait { visibility: hidden; }
+.corner-dock ~ .search-pop { right: 10px; bottom: 74px; }
+/* Patch pages: the filters as a framed card at the page's right edge, out from the start, the header's sliders put it
+   away (owner 2026-11-07: "включены по умолчанию … по правому краю", look 6 of the mock "галочки в рамке"; patch/page.py
+   filter_pop_html, src/js/filter-fab.js). A box to tick before each word: a tag's box in its colour, a section's in
+   gold, below a dashed line; a ticked box fills. The words stand on one line. */
+.filter-pop {   /* at the right edge, in the middle of the screen's height (owner 2026-11-07: "центрировано на странице") */
+  position: fixed; right: 10px; top: 50%; transform: translateY(-50%); z-index: 95; width: 168px;
+}
+.filter-pop[hidden] { display: none; }
+.filter-rail {
+  display: flex; flex-direction: column; box-sizing: border-box; padding: 12px 14px;
+  background: var(--px-panel); border: 2px solid #6d5c3a;
+  box-shadow: 0 0 0 2px var(--px-press), inset 0 0 0 1px var(--bg-warm-darker), 0 6px 16px var(--shadow-55);
+}
+.filter-rail .legend-tags, .filter-rail .legend-categories { display: flex; flex-direction: column; gap: 3px; }
+.filter-rail .legend-categories { border-top: 1px dashed var(--px-line); margin-top: 8px; padding-top: 8px; }
+.filter-rail .legend-categories:empty { display: none; }
+.filter-rail .legend-tags .badge.filter-btn, .filter-rail .cat-filter-btn {
+  display: flex; align-items: center; justify-content: flex-start; gap: 10px;
+  width: 100%; height: 24px; margin: 0; padding: 0; box-sizing: border-box;
+  border: 0; border-radius: 0; outline: none; filter: none; text-shadow: none; text-transform: none;
+  background: none; box-shadow: none; cursor: pointer; position: relative;
+}
+.filter-rail .cat-filter-btn { color: var(--px-on); }
+.filter-rail .legend-tags .badge.filter-btn::before, .filter-rail .cat-filter-btn::before {
+  content: ""; flex: none; width: 14px; height: 14px; border: 2px solid currentColor; border-radius: 3px; }
+.filter-rail .legend-tags .badge.filter-btn.active, .filter-rail .cat-filter-btn.active {
+  background: none; box-shadow: none; filter: none; text-shadow: none; }
+.filter-rail .cat-filter-btn.active::before { background: currentColor; box-shadow: inset 0 0 0 2px var(--px-panel); }
+/* a ticked tag is its row tile: the box filled with the tag's colour, the tag's own dark icon in it (owner 2026-11-07:
+   "вместо галочек, когда выбран фильтр можно вставлять иконку тега"; the icons: --tm, scripts/gen/gen_tag_marks_css.py) */
+.filter-rail .legend-tags .badge.filter-btn.active::before { background: currentColor; }
+.filter-rail .legend-tags .badge.filter-btn.active::after {
+  content: ""; position: absolute; left: 3px; top: 6px; width: 12px; height: 12px; background: #15120f;
+  -webkit-mask: var(--tm) center / contain no-repeat; mask: var(--tm) center / contain no-repeat; }
+.filter-rail .legend-tags .badge.filter-btn[data-filter="rework"].active::after { left: 2px; top: 5px; width: 14px;
+  height: 14px; }
+.filter-rail .fp-word {
+  font-family: var(--font-j10); font-size: 18px; font-weight: 400; line-height: 1; letter-spacing: 0.3px;
+  color: var(--px-text-soft); white-space: nowrap; }
+.filter-rail .filter-btn:hover .fp-word, .filter-rail .cat-filter-btn:hover .fp-word,
+.filter-rail .filter-btn.active .fp-word, .filter-rail .cat-filter-btn.active .fp-word { color: var(--px-hi); }
 .search-pop {
   position: fixed; right: 74px; bottom: 76px; width: min(360px, calc(100vw - 110px));
   z-index: 101;

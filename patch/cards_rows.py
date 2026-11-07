@@ -173,6 +173,10 @@ FOLD_CHARS = 600                 # a card side longer than this folds (owner 202
                                   # sides of 569 in 7.37–7.41, 7.37 Drunken Brawler's 733 the first)
 _INTRO_SHARE = 0.45               # a first row this short a part of the whole stays open as the intro
 FOLD_WHOLE_CHARS = 800           # a side with no short intro folds whole past this (Roshan's Throw 700 stays open)
+# the sides are measured by height, not by characters only (owner 2026-11-07, 7.38 Arcane Curse: "надо ещё судить не
+# только по кол-ву символов, а по высоте … карточка достаточно высокая"): a value table's row is ~28px against a text
+# line's ~21px, and a line holds ~70 characters, so a table row weighs as 95 characters, whatever its own words
+TABLE_ROW_CHARS = 95
 
 
 def _without_popups(html):
@@ -197,6 +201,21 @@ def _plain_len(html):
     return len(re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", _without_popups(html)))).strip())
 
 
+_ROW_INNER_RE = re.compile(r'^<div class="ability-change-row(?: [^"]*)?">(.*)</div>$', re.S)
+
+
+def _side_weight(row):
+    """A card row's height in characters: its words, and the values the page turns into a table (patch/value_tables.py,
+    applied later to the saved page) by their rows, TABLE_ROW_CHARS each."""
+    from .value_tables import MIN_VALUES, _split
+    m = _ROW_INNER_RE.match(row.strip())
+    split = _split(m.group(1), MIN_VALUES) if m and "<div" not in m.group(1) else None
+    if not split:
+        return _plain_len(row)
+    before, pairs, after = split
+    return _plain_len(before) + _plain_len(after) + len(pairs) * TABLE_ROW_CHARS
+
+
 def fold_long_rows(rows):
     """A long card side folds: its intro row stays (the first one when it is short), the rest shows its first lines
     fading out under soft glass, a click opens it (owner 2026-10-30: "для таких длинных описаний может сделаем
@@ -204,14 +223,14 @@ def fold_long_rows(rows):
     обратно"). A side with no short intro folds whole and shows more lines. src/scripts.js opens and folds it and
     redraws the card's connectors."""
     texts = [r for r in rows if isinstance(r, str)]
-    total = sum(_plain_len(r) for r in texts)
+    total = sum(_side_weight(r) for r in texts)
     if total <= FOLD_CHARS or any("acr-fold" in r for r in texts):
         return rows
     k = [i for i, r in enumerate(rows) if isinstance(r, str)]
     # no short intro to keep open: the side stays as it is (owner 2026-10-30, 7.38 Roshan's Throw, 700 characters: "как
     # будто можно и не сворачивать") — unless it is much longer: then it folds whole (owner 2026-11-06, 7.38 Nothl
     # Projection, 947: "генератор не определил, что такую карточку надо свернуть")
-    intro = len(k) > 1 and _plain_len(rows[k[0]]) <= _INTRO_SHARE * total
+    intro = len(k) > 1 and _side_weight(rows[k[0]]) <= _INTRO_SHARE * total
     if not intro and not (len(k) > 1 and total > FOLD_WHOLE_CHARS):
         return rows
     first, last = (k[1] if intro else k[0]), k[-1]

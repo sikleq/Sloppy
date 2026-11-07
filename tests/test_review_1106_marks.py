@@ -9,20 +9,43 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 
-def test_a_terrain_row_gets_its_tag_back_and_its_number_in_the_text():
+def test_a_terrain_row_has_a_gold_diamond_and_no_tag_or_number():
     from patch.tag_marks import terrain_rows_tagged
     row = ('<li data-tag="del nerf" class="terrain-row"><span class="badge tnum">2</span>'
            '<span class="row-text">Corner outposts have been removed</span></li>')
     out = terrain_rows_tagged(row)
-    assert '<span class="badge del" data-tag="del" data-overall="nerf">DEL</span>' in out
-    # no number in the text either (owner 2026-11-06: "отказываемся от нумерации в подобных случаях")
-    assert '<span class="row-text">Corner outposts' in out
-    assert "badge tnum" not in out and "2." not in out
-    # a row with a % keeps BUFF / NERF; a row outside a terrain block is left alone
+    # 2026-11-07: "убери теги"; "буквально такие же [ромбики] … только золотые. Без цифр"
+    assert out.startswith('<li data-tag="del nerf" class="terrain-row"><span class="tnum-dia tnum-nerf" role="img" '
+                          'aria-label="2 on the map"></span><span class="row-text">Corner outposts')
+    assert "badge" not in out
+    # the outposts are an object taken off the map: red ("Corner outposts … красим ромбик в красный")
+    assert '<span class="tnum-dia tnum-nerf" role="img" aria-label="2 on the map"></span>' in out
+    # a row with a % in its colour ("Watcher night vision range decreased … ромбик красный")
     pct = '<li data-tag="nerf" class="terrain-row"><span class="badge tnum tnum-nerf">1</span><span class="row-text">X</span></li>'
-    assert 'class="badge nerf-text" data-tag="nerf"' in terrain_rows_tagged(pct)
+    assert '<span class="tnum-dia tnum-nerf" role="img" aria-label="1 on the map"></span>' in terrain_rows_tagged(pct)
+    up = '<li data-tag="buff" class="terrain-row"><span class="badge tnum tnum-buff">1</span><span class="row-text">X</span></li>'
+    assert 'class="tnum-dia tnum-buff"' in terrain_rows_tagged(up)
+    # trees taken away are the map's ground, no object: gold; a removed display, no object either
+    trees = ('<li data-tag="del nerf" class="terrain-row"><span class="badge tnum">1</span><span class="row-text">'
+             'Several trees have been removed</span></li>')
+    assert '<span class="tnum-dia" role="img"' in terrain_rows_tagged(trees)
+    watchers = ('<li data-tag="del nerf" class="terrain-row"><span class="badge tnum">1</span><span class="row-text">'
+                'The watchers near the small water camps have been removed</span></li>')
+    assert 'class="tnum-dia tnum-nerf"' in terrain_rows_tagged(watchers)
+    ring = ('<li data-tag="del nerf" class="terrain-row"><span class="badge tnum">1</span><span class="row-text">'
+            'Watchers no longer display the green AoE ring</span></li>')
+    assert '<span class="tnum-dia" role="img"' in terrain_rows_tagged(ring)
     other = '<li data-tag="rework"><span class="badge tnum">1</span><span class="row-text">X</span></li>'
     assert terrain_rows_tagged(other) == other
+
+
+def test_a_terrain_diamond_stands_in_the_tag_column():
+    from pathlib import Path
+    css = Path(__file__).resolve().parents[1].joinpath("src", "css", "patch-tag-marks.css").read_text(encoding="utf-8")
+    assert ".tag-marks ul.changes > li.terrain-row > .tnum-dia { position: absolute; left: 8px;" in css
+    # the small solid diamond of the 06.11 mock, gold
+    # the mock's ◆ glyph at 8px, gold ("там были маленькие")
+    assert 'color: var(--gold); font-size: 8px;' in css and '.tnum-dia::before { content: "\\25C6"; }' in css
 
 
 def test_a_rows_kinds_come_before_the_filters_aliases():
@@ -81,15 +104,20 @@ def test_tiles_are_solid_with_a_dark_icon():
     # a little brighter than the first try (owner 2026-11-06: "чуть-чуть ярче")
     assert "background: color-mix(in srgb, currentColor 94%, #000); }" in css and "background: #15120f;" in css
     assert css.count("viewBox='0 0 14 14'") == 7
-    # REWORK is a gear (owner 2026-11-06: "Rework тег иконки сделай шестерёнку"), filled on its own grid
-    rework = css.split('.tag-marks .badge[data-tag~="rework"] {', 1)[1].split("\n", 1)[0]
-    assert "viewBox='0 0 256 256' fill='black'" in rework and "M237.94,107.21" in rework
+    # REWORK is a filled gear like the owner's reference picture (2026-11-07; pixel gears were "маленькая и толстая",
+    # "опять ужасная"), shown 16px: a ring, 8 teeth, a hole
+    rework = css.split('.filter-btn[data-filter="rework"] {', 1)[1].split("\n", 1)[0]
+    assert "viewBox='0 0 16 16' fill='black'" in rework and "crispEdges" not in rework
+    from scripts.gen.gen_tag_marks_css import gear_path
+    d = gear_path()
+    assert d.count("z") == 10 and d.count("A") == 4          # ring + 8 teeth + hole
+    assert '.badge[data-tag~="rework"]::before { width: 16px; height: 16px; }' in css
     src = (ROOT / "patch" / "page.py").read_text(encoding="utf-8")
     assert "terrain_rows_tagged(out)" in src
 
 
 def test_neutral_ai_rows_are_misc():
-    from patchgen.tags import _guess_tag
+    from tools.patchgen.tags import _guess_tag
     assert _guess_tag("Neutrals will cast this ability on the closest enemy if there are three or more enemies") == "MISC"
     p738 = (ROOT / "content" / "p738.py").read_text(encoding="utf-8")
     assert not re.search(r'li\("Neutrals will [^"]*", t\("(?:NEW|NERF)"\)', p738)

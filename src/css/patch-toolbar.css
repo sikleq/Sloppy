@@ -37,54 +37,32 @@
   width: 320px;
   min-width: 0;
 }
-/* Patch info — three labelled facts on the right of the toolbar. No pill,
-   no border: plain inline text with bullet separators between the parts. */
-.toolbar-patch-info {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 0;
-  white-space: nowrap;
-  line-height: 1.2;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-               "Helvetica Neue", Arial, sans-serif;
-  font-size: 12.5px;
-  color: #a5a197;
-}
-.toolbar-patch-info > span { padding: 0 10px; }
-.toolbar-patch-info > span:first-child { padding-left: 0; }
-.toolbar-patch-info > span:last-child { padding-right: 0; }
-.toolbar-patch-info > span + span {
-  border-left: 1px solid var(--blue-18);
-}
-.toolbar-patch-info b {
-  color: var(--text-bright);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.toolbar-patch-info .ti-released b {
-  font-size: 13px;
-  letter-spacing: 0.2px;
-}
-/* the release date links out to the official patch notes on dota2.com — subtle hint, gold on hover */
-.toolbar-patch-info .ti-official {
-  text-decoration: none;
-  color: inherit;
-  border-bottom: 1px dashed rgba(213, 173, 95, 0.4);
-  transition: color 0.12s ease, border-color 0.12s ease;
-}
-.toolbar-patch-info .ti-official:hover,
-.toolbar-patch-info .ti-official:hover b {
-  color: #e3c46a;
-  border-bottom-color: rgba(227, 196, 106, 0.85);
-}
-/* On narrow viewports the patch meta-info (date / days live) competes with
-   the search box. Hide it below 640px — filters and search are the primary
-   tools; the date facts are secondary. */
+/* The patch's official link, date, run and days after the previous one in a card like the filters', above them,
+   folded at first; a tab with a pixel arrow in the middle of the filters' top edge opens it (owner 2026-11-07, mock
+   "Вариант 1"; patch/page.py patch_info_html, src/js/filter-fab.js). The filters stay where they are: the card grows
+   upward from 22px over them. */
+.pinfo-card { position: absolute; left: 0; right: 0; bottom: calc(100% + 22px); box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 4px; padding: 10px 12px;
+  background: var(--px-panel); border: 2px solid #6d5c3a;
+  box-shadow: 0 0 0 2px var(--px-press), inset 0 0 0 1px var(--bg-warm-darker), 0 6px 16px var(--shadow-55);
+  font-family: var(--font-j10); font-size: 17px; line-height: 1.15; letter-spacing: 0.3px; color: #d8b9a6; }
+.pinfo-card[hidden] { display: none; }
+.pinfo-card .pi-row { display: flex; justify-content: space-between; gap: 8px; }
+.pinfo-card b { color: var(--text-bright); font-weight: 400; }
+.pinfo-card .pi-official { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 8px 4px;
+  margin-bottom: 2px; color: #1a0f08; background: var(--gold); text-decoration: none; }
+.pinfo-card .pi-official:hover { background: var(--px-hi); }
+/* a pixel arrow out of a box: the link leaves the site */
+.pinfo-card .pi-out { width: 11px; height: 11px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11' shape-rendering='crispEdges'%3E%3Cpath d='M5 0h6v6H9V3.4L4.7 7.7 3.3 6.3 7.6 2H5zM0 2h3v2H2v5h5V8h2v3H0z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11' shape-rendering='crispEdges'%3E%3Cpath d='M5 0h6v6H9V3.4L4.7 7.7 3.3 6.3 7.6 2H5zM0 2h3v2H2v5h5V8h2v3H0z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.pinfo-tab { position: absolute; left: 50%; top: -14px; transform: translateX(-50%); z-index: 2; width: 34px;
+  height: 14px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  border: 2px solid #6d5c3a; border-bottom: 0; background: var(--px-panel); color: var(--gold); }
+.pinfo-tab:hover { color: var(--px-hi); }
+.pinfo-tab i { width: 11px; height: 7px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 7' shape-rendering='crispEdges'%3E%3Cpath d='M0 5h2v2H0zM2 3h2v2H2zM4 1h3v2H4zM7 3h2v2H7zM9 5h2v2H9z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 7' shape-rendering='crispEdges'%3E%3Cpath d='M0 5h2v2H0zM2 3h2v2H2zM4 1h3v2H4zM7 3h2v2H7zM9 5h2v2H9z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.pinfo-tab[aria-expanded="true"] i { transform: scaleY(-1); }
 @media (max-width: 640px) {
-  .toolbar-patch-info { display: none; }
   .toolbar .search-box { flex: 1 1 auto; width: auto; }
 }
 .legend-tags {
@@ -202,6 +180,10 @@
   flex-shrink: 0;
 }
 .search-results .result-item .result-facet > img { width: 18px; background: none; }
+/* whose ability it is, quietly under its name (owner 2026-11-07: four Riverborn Auras of 7.38 "непонятно, какая к чему") */
+/* whose it is, beside the name in brackets (owner 2026-11-07: "не снизу пиши а рядом в скобках тем же цветом и
+   шрифтом") */
+.search-results .result-item .result-owner { font-size: 11.5px; line-height: 1.2; color: var(--text-dim); white-space: nowrap; }
 .search-results .result-item .kind {
   margin-left: auto;
   font-size: 10.5px;

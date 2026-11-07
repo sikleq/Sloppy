@@ -39,8 +39,9 @@ def test_abilities_with_the_same_sentence_share_one_row_of_icons():
     assert ('<span class="mech-abil-row mech-head"><span class="mech-cell mech-label">Change</span>'
             '<span class="mech-cell">Items and abilities</span></span>') in row
     assert row.count('class="mech-cell mech-icons"') == 2
-    assert 'data-tooltip="Nullifier&#x27;s Nullify"' in row and "icons/items/nullifier.png" in row
-    assert 'data-tooltip="Dark Seer&#x27;s Vacuum"' in row and "dark_seer_vacuum.png" in row
+    # the ability's own name on hover, its item's icon (2026-11-07: "только название способности (везде в таких случаях)")
+    assert 'data-tooltip="Nullify"' in row and "icons/items/nullifier.png" in row
+    assert 'data-tooltip="Vacuum"' in row and "dark_seer_vacuum.png" in row
     same = row.split('<span class="mech-cell mech-label">Can no longer target invulnerable units')[1]
     same = same.split('class="mech-abil-row"')[0]
     assert "nullifier.png" in same and "ogre_magi_bloodlust.png" in same and "sniper_assassinate.png" in same
@@ -147,7 +148,7 @@ def test_every_mechanic_list_of_7_41_is_a_table_on_the_page():
         pytest.skip("site not built")
     html = open(page, encoding="utf-8").read()
     assert html.count('class="mech-abils mech-cols-icons"') == 4
-    assert "Tormentor&#x27;s Reflect" in html and 'Reflected Damage <span class="subgroup-new-type">' in html
+    assert 'data-tooltip="Reflect"' in html and 'Reflected Damage <span class="subgroup-new-type">' in html
 
 
 def test_the_icons_column_says_what_its_icons_are():

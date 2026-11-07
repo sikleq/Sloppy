@@ -81,7 +81,7 @@ def test_a_renamed_ability_is_one_ability_and_a_replaced_one_is_not():
 
 
 def test_a_removed_upgrade_ability_gets_its_own_block():
-    from patchgen.post_facets import _removed_innate_block
+    from tools.patchgen.post_facets import _removed_innate_block
     out = _removed_innate_block("bloodseeker", "Blood Mist", None, "7.37e", "    ")
     assert out[0] == '    W(ability("Blood Mist", slug="bloodseeker_blood_mist"))' and 'li("Removed", t("DEL"))' in out[2]
     text = (ROOT / "content" / "p738.py").read_text(encoding="utf-8")
@@ -121,7 +121,7 @@ def test_a_phrase_in_a_card_is_never_coloured_a_number_is():
 
 
 def test_the_two_selves_columns_are_the_games_labels():
-    from patchgen.post_cards import _selves_columns
+    from tools.patchgen.post_cards import _selves_columns
     kv = ("Summons a Spark Wraith.\nActivation delay: 2. Damage: 100/180/260/340. Wraith speed: 400. Slow duration: "
           "0.6/0.8/1/1.2. Activation delay: 1. Damage: 75/140/205/270. Wraith speed: 725. Slow duration: 0.4/0.5/0.6/0.7.")
     cols = _selves_columns("Spark Wraith", kv,
@@ -138,7 +138,7 @@ def test_the_two_selves_columns_are_the_games_labels():
 
 def test_a_formula_on_another_variable_is_scaling_reworked():
     from patch.scaling_card import variable
-    from patchgen.post_items import _scaling_cards
+    from tools.patchgen.post_items import _scaling_cards
     assert variable("1900 + (20 per minute of game time)") == "minute" and variable("2500 + (200 per death)") == "death"
     assert variable("Increased by 5") is None
     icons = {"Reflect": "../icons/abilities/miniboss_reflect.png"}
@@ -221,7 +221,7 @@ def test_a_general_block_shows_the_icons_of_all_its_stats():
 
 
 def test_a_row_going_on_with_the_rework_above_joins_it():
-    from patchgen.post_general import _postprocess_rework_continuation
+    from tools.patchgen.post_general import _postprocess_rework_continuation
     lines = ['    W(li("Both are now available. They have a shared cooldown", t("REWORK")))',
              '    W(li("This results in swapping special attacks: Frost first", t("REWORK")))',
              '    W(li("As a result of the changes, X", t("REWORK")))']
@@ -253,14 +253,15 @@ def test_aghanim_rows_stay_by_their_ability_without_saying_so():
     assert 'class="ability-change-row aghanim-scepter acr-aghs"' in html and "aghanim-marker scepter" in html
 
 
-def test_tags_as_tiles_run_on_the_trial_pages_only():
+def test_tags_as_tiles_run_on_every_page():
     from patch import page
     from patch.css_bundle import read_css
-    assert "7.41f" in page.TAG_MARK_PAGES
+    assert page.TAG_MARK_PAGES is None
     css = read_css()
     for tag in ("buff", "nerf", "new", "del", "swap", "rework"):
-        assert f'.tag-marks .badge[data-tag~="{tag}"] {{ --tm: url("data:image/svg+xml,' in css
-    assert css.index('[data-tag~="nerf"]') < css.index('[data-tag~="del"] {')     # "del nerf" shows the cross
+        assert (f'.tag-marks .badge[data-tag~="{tag}"], .filter-btn[data-filter="{tag}"] '
+                f'{{ --tm: url("data:image/svg+xml,') in css
+    assert css.index('[data-tag~="nerf"]') < css.index('[data-tag~="del"], ')     # "del nerf" shows the cross
 
 
 def test_a_section_heads_icon_carries_no_innate_star_and_both_kinds_are_said():
@@ -290,7 +291,7 @@ def test_a_removed_ability_with_its_icon_and_a_reworked_facet_ability_as_a_card(
 
 
 def test_a_removed_part_or_sub_ability_finds_its_home():
-    from patchgen.post_facets import _removed_ability_home, _slug_dname
+    from tools.patchgen.post_facets import _removed_ability_home, _slug_dname
     from patch.ability_kv import _hero_blocks
     import pytest
     if "pudge_eject" not in _hero_blocks("7.37e"):
@@ -406,10 +407,10 @@ def test_a_cards_upgrade_row_the_aghanim_card_below_shows_goes():
     assert "Allows casting while disabled" not in out and "Can be cast while disabled" in out and "Text." in out
 
 
-def test_tag_marks_run_on_two_trial_pages():
-    # variant A (30px on the line) gave way to the solid bookmarks, tests/test_review_1106_marks.py (owner 2026-11-06)
+def test_tag_marks_run_on_every_patch_page():
+    # the trial on 7.41f + 7.38 rolled out to all patches (owner 2026-11-07)
     from patch import page
-    assert page.TAG_MARK_PAGES == {"7.41f", "7.38"}
+    assert page.TAG_MARK_PAGES is None
 
 
 def test_a_head_never_moves_its_values_to_another_line():
@@ -499,7 +500,7 @@ def test_three_cards_in_a_line_start_their_parts_on_one_line_and_do_not_fold():
 def test_added_values_for_levels_put_their_numbers_under_the_tip():
     # owner 2026-11-06, 7.38 E.M.P. / Sun Strike: "Added Mana Burned values for levels 9 and 10 of Wex: 700/775 - забыл
     # числа под [?]"
-    from patchgen.rows import _emit_li
+    from tools.patchgen.rows import _emit_li
     out = _emit_li("Added Mana Burned values for levels 9 and 10 of Wex: 700/775")
     assert out == ('W(li("Added values for levels 9 and 10", t("NEW"), '
                    'extra=inline_note("Mana Burned for levels 9 and 10 of Wex is 700/775")))')
@@ -526,8 +527,8 @@ def test_a_shard_row_after_the_same_abilitys_scepter_row_gets_its_own_head():
 def test_generator_hero_rules_of_2026_11_06():
     # owner 2026-11-06: a new main attribute first in General; "Added three orb-centered facets…" hidden under the
     # facet cards; an ability gaining an active part -> old > new card (7.38 Special Delivery); Dauntless REWORK
-    from patchgen.post_hero import _postprocess_attr_change_first, _postprocess_facets_summary_covered
-    from patchgen.tags import _guess_tag
+    from tools.patchgen.post_hero import _postprocess_attr_change_first, _postprocess_facets_summary_covered
+    from tools.patchgen.tags import _guess_tag
     lines = ['    W(hero_header("X"))', "    W(ul_open())", "    W(hero_stat_card())", '    W(li("Base damage", t("BUFF")))',
              '    W(li(attr_change("Universal", "Intelligence"), t("REWORK")))', "    W(ul_close())"]
     out = _postprocess_attr_change_first(lines)
@@ -573,7 +574,7 @@ def test_a_lone_cards_block_rows_go_under_the_card():
 def test_one_row_of_several_abilities_with_their_own_notes_stands_once():
     # owner 2026-11-06, 7.38 Tornado, E.M.P. …: "имеют общий текст, поэтому их можно в одну строку, а иконки по
     # аналогии с Attribute Shift"; each [?] under its ability's name in one
-    from patchgen.notes import _postprocess_same_change_abilities
+    from tools.patchgen.notes import _postprocess_same_change_abilities
     lines = ['    W(ability("Tornado", slug="invoker_tornado"))', "    W(ul_open())",
              '    W(li("Added values for levels 9 and 10", t("NEW"), extra=inline_note("Damage for levels 9 and 10 of '
              'Wex is 405/450")))', "    W(ul_close())",
@@ -607,7 +608,7 @@ def test_a_lost_facet_and_the_new_one_stand_side_by_side():
 def test_one_row_three_abilities_share_stands_once_after_the_orbs():
     # owner 2026-11-06, 7.38 Invoker: "все способности можно указать и убрать соответствующую строку у каждой из них.
     # Те способности, что получали ещё изменения оставить … Поставить строку со всеми способностями после Exort блока"
-    from patchgen.post_shared import _postprocess_shared_row_group
+    from tools.patchgen.post_shared import _postprocess_shared_row_group
     row = '    W(li("Added values for levels 9 and 10", t("NEW"), extra=inline_note("{} for levels 9 and 10 of Wex is 1/2")))'
     lines = ['    W(hero_header("Invoker"))',
              '    W(ability("Exort", slug="invoker_exort"))', "    W(ul_open())", '    W(li("Orb", t("NEW")))', "    W(ul_close())",

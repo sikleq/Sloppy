@@ -902,7 +902,7 @@ _TAG_CLS = {
 
 def _change_li(text, tag, note=None, patch=None, num=None):
     _cls, tid, overall = _TAG_CLS[tag]
-    from patch.elements import terrain_note, terrain_button, terrain_num_chip
+    from patch.terrain_notes import terrain_note, terrain_button, terrain_num_chip
     phrase, shots = terrain_note(patch, text, prefix="")
     # data-tag carries the primary tag plus its filter-overall (NEW→buff,
     # DEL→nerf) so a future filter surfaces them correctly; dedupe so BUFF/NERF
@@ -1381,8 +1381,8 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
     """Build one terrain HTML page: patch ``ver``'s map file against the patch
     before's (``step``, None when there's no pair → fallback), its own notes
     (``notes`` = {patch: rows}) and what moved (``diff``)."""
-    from patch.elements import _TSPOT_SEEN
-    _TSPOT_SEEN.clear()                 # a page counts its own same-worded rows (patch/elements.terrain_note)
+    from patch.terrain_notes import _TSPOT_SEEN
+    _TSPOT_SEEN.clear()                 # a page counts its own same-worded rows (patch/terrain_notes.terrain_note)
     nav = _site.render_top_nav('materials', _latest_href(),
                                patch_context=False,
                                subtabs_active='terrain',

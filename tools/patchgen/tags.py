@@ -231,6 +231,9 @@ CANONICAL_TAGS = [
     (re.compile(r'\bstill result in\b.*\bcan benefit from\b', re.I), 'REWORK'),
     (re.compile(r"^[A-Z][\w']*(?: [\w']+){0,2} now (?:also )?(?:grants|provides|drops|gives)\b"), 'NEW'),
     (re.compile(r'\bAdded to Captains Mode\b', re.I),               'NEW'),
+    # a bonus that now reaches someone it didn't (owner 2026-11-07, 7.38 Earth Spirit "Bonus movespeed is also granted
+    # to Earth Spirit when rolling over an allied hero" — new, not a buff of a number)
+    (re.compile(r'\bis (?:now )?also (?:granted|given|applied) to\b', re.I), 'NEW'),
     (re.compile(r'\bCan now be disassembled\b', re.I),              'NEW'),
     (re.compile(r'\bno longer disjointable\b', re.I),               'DEL'),
     (re.compile(r'^Now (?:also )?(?:passively |actively )?(?:grants|provides|gains?|adds?|applies?|deals?|increases|fires?|spawns?|summons?)', re.I), 'NEW'),

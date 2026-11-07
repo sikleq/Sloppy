@@ -371,6 +371,18 @@ body.patch-page .entity-block.item-block:not(.is-new) ul.changes li.ability-box-
 .value-table > .vt-f .formula-table-wrap { margin: 0; }
 .value-table > .vt-f .formula-table:not([hidden]) { margin: 0; border-top: 1px solid var(--line-soft); }
 .vt-after { display: block; margin-top: 6px; }
+/* a one-sided card's many values as a block of their own in its empty half, framed like the card (owner 2026-11-07,
+   7.38 Throw, variant A; patch/value_tables.py tables_beside_single_cards); where the card has one column, under it */
+.vt-side { align-self: start; min-width: 0; background: var(--muted-04); border: 1px solid var(--line-soft);
+  border-radius: 6px; overflow: hidden; }
+.vt-side > .value-table { margin: 0; border-top: 0; --px: 10px; }
+.ability-change.unified-panes.is-single-new > .vt-side { grid-column: 3; grid-row: 1; }
+.card-pair .ability-change.unified-panes.is-single-new > .vt-side { grid-column: 1; grid-row: auto; margin-top: 8px; }
+/* ... a lone card that stood right of its block's name goes under it, its text left and its values right, as in the
+   mock (7.38 Throw) */
+.single-right > .ability-change.unified-panes.is-single-new.has-vt-side { grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; }
+.single-right > .ability-change.unified-panes.is-single-new.has-vt-side > .vt-side { grid-column: 2; }
 /* Rows each led by an ability's icon stand like a table's rows: a line over each, edge to edge of the card (owner
    2026-11-06, patch/card_sections.py); a facet changing two abilities gives each its head: icon, Active / Passive, name */
 .ability-change-row.acr-sec { border-top: 1px solid var(--line-soft); margin: 0 calc(-1 * var(--px, 0px));

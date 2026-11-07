@@ -34,7 +34,8 @@ def test_an_example_in_a_text_is_its_icon_with_the_name_on_hover():
     # owner 2026-11-06: "Lifestealer's Feast... убираем название и оставляем иконку которая подписана при наведении"
     from patch.mech_abilities import mech_example
     html = mech_example("Lifestealer's Feast")
-    assert 'class="ability-chip chip-word" data-tooltip="Lifestealer&#x27;s Feast"' in html
+    # the ability's own name on hover, not its hero's (2026-11-07: "только название способности")
+    assert 'class="ability-chip chip-word" data-tooltip="Feast"' in html
     assert "ac-sub-name" not in html and "life_stealer_feast" in html
 
 

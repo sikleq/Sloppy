@@ -1,5 +1,7 @@
 """HTML builder functions — li, ul, section, ability, item, hero headers, etc. The cards live in their own modules
-(cards_hero_stats, cards_aghs, cards_item_abilities, cards_item_stats, cards_ability_change; audit 2026-10-26 #8)."""
+(cards_hero_stats, cards_aghs, cards_item_abilities, cards_item_stats, cards_ability_change; audit 2026-10-26 #8), and
+so do the enchantments, row scoring, terrain notes, formulas, Captains Mode and note boxes (2026-11-07,
+docs/architecture.md)."""
 
 import html as _html
 import json as _json
@@ -9,9 +11,12 @@ import re
 
 from .images import (ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG, hero_img,
                      item_img, _LOCAL_ABIL_ICONS)
-from .state import _State, page_cache
+from .state import _State
 from .mech_abilities import LIST_TIPS, TIP_RAW, ability_chip, lift_ability_lists, row_examples, rune_row_chip
-from .terrain_notes import note_phrase, wrap_phrase
+from .row_scores import (_TOTAL_UNCHANGED_RE, _cost_panel_covered, _dyn_record_li, _flush_cell_rows, _flush_cost_panel,
+                         _flush_damage_rows, _flush_rework, _note_cell_row, _note_damage_row, _row_ctx,
+                         _score_folded_damage)
+from .terrain_notes import terrain_button, terrain_note, terrain_num_chip
 
 try:
     with open(_os.path.join(_os.path.dirname(__file__), '..', 'data', 'abilities_slim.json'),
@@ -24,6 +29,8 @@ except Exception:
 TALENT_ICON_URL  = "../icons/misc/talents.svg"
 INNATE_ICON_URL  = "../icons/misc/innate_icon.png"
 MISSING_ICON_URL = "../icons/misc/missing.svg"
+# subgroup headings that only label a list: hidden under a tag filter (src/css/patch-formula-tables.css)
+GENERIC_SUBGROUPS = {"abilities", "facets", "talents", "general"}
 OTHER_ICON_URL   = "../icons/other.svg"
 
 STAT_ICONS = {
@@ -116,40 +123,6 @@ _PROP_TAG_CSS = {
     'QOL':    'qol',
     'NEW':    'new',
     'DEL':    'del',
-}
-
-# ---- Enchantment data ----
-_ATTR_ICON = {
-    "str": "../icons/strength.webp",
-    "agi": "../icons/agility.webp",
-    "int": "../icons/intelligence.webp",
-    "uni": "../icons/universal.webp",
-}
-_ATTR_LABEL = {
-    "str": "Strength", "agi": "Agility",
-    "int": "Intelligence", "uni": "Universal",
-}
-
-_ENCHANT_DESC = {
-    "Alert":      {1: ["+7 Attack Speed"], 2: ["+15 Attack Speed", "+125 Bonus Night Vision"], 3: ["+23 Attack Speed", "+175 Bonus Night Vision"], 4: ["+31 Attack Speed", "+225 Bonus Night Vision", "+80 Attack Range"]},
-    "Brawny":     {1: ["+110 Health"], 2: ["+150 Health", "+3 Health Regen"], 3: ["+190 Health", "+6 Health Regen"], 4: ["+230 Health", "+9 Health Regen", "+25% Slow Resistance"]},
-    "Tough":      {1: ["+7 Damage"], 2: ["+10 Damage", "+4 Armor"], 3: ["+13 Damage", "+6 Armor"], 4: ["+16 Damage", "+8 Armor", "+40% Knockback Resistance"]},
-    "Mystical":   {1: ["+1 Mana Regen"], 2: ["+1.75 Mana Regen", "+10% Magic Resistance"], 3: ["+2.5 Mana Regen", "+13% Magic Resistance"], 4: ["+3.25 Mana Regen", "+16% Magic Resistance", "+15% Mana Cost/Loss Reduction"]},
-    "Quickened":  {1: ["+15 Movement Speed"], 2: ["+20 Movement Speed", "+100 Mana"], 3: ["+25 Movement Speed", "+160 Mana"], 4: ["+30 Movement Speed", "+220 Mana", "+15% Evasion"]},
-    "Vital":      {1: ["+2.25 Health Regen"]},
-    "Greedy":     {2: ["+75 GPM", "+200 Mana", "−30 Attack Damage"], 3: ["+100 GPM", "+250 Mana", "−60 Attack Damage"]},
-    "Crude":      {2: ["+10% Health Restoration", "+8% BAT Reduction", "−6% Intelligence"], 3: ["+15% Health Restoration", "+12% BAT Reduction", "−6% Intelligence"], 4: ["+20% Health Restoration", "+16% BAT Reduction", "−6% Intelligence", "Also modifies incoming healing"]},
-    "Nimble":     {2: ["+6% Movement Speed", "+10 Damage", "−1.5 Health Regen"], 3: ["+8% Movement Speed", "+15 Damage", "−2.25 Health Regen"], 4: ["+10% Movement Speed", "+20 Damage", "−3 Health Regen"]},
-    "Keen-Eyed":  {2: ["+125 Cast Range", "+1 Mana Regen", "−10% Max Mana"], 3: ["+135 Cast Range", "+1.5 Mana Regen", "−12% Max Mana"], 4: ["+145 Cast Range", "+2 Mana Regen", "−14% Max Mana"]},
-    "Titanic":    {2: ["+8% Attack Damage", "+10% Status Resistance", "−9% Attack Speed"], 3: ["+12% Attack Damage", "+12% Status Resistance", "−9% Attack Speed"], 4: ["+16% Attack Damage", "+14% Status Resistance", "−9% Attack Speed"]},
-    "Timeless":   {4: ["+10% Debuff Amplification", "+8% Spell Amplification"], 5: ["+15% Debuff Amplification", "+16% Spell Amplification"]},
-    "Vampiric":   {5: ["+30% Lifesteal", "+20% Spell Lifesteal", "+300 Bonus Night Vision"]},
-    "Evolved":    {5: ["+40 Primary Stat", "(+24 All Attributes for Universal heroes)"]},
-    "Fleetfooted":{5: ["+115 Movement Speed", "Does not stack with boots"]},
-    "Hulking":    {5: ["+5% Max Health", "+1.5% Max Health Regen", "−30% Attack Speed"]},
-    "Audacious":  {5: ["+100 Attack Speed", "+80 Magic Attack Damage", "+10% Incoming Damage"]},
-    "Feverish":   {5: ["+15% Cooldown Reduction", "+7% Mana Cost/Loss Increase"]},
-    "Manic":      {5: ["−18% Base Attack Time", "+20% Cast Speed", "−20% Vision"]},
 }
 
 # ---- Ability display-name → CDN slug overrides ----
@@ -392,47 +365,6 @@ def _close_ability_block():
     return cards
 
 
-_DYN_TAG_WHITELIST = {"buff", "nerf", "new", "del", "rework", "swap", "misc", "qol"}
-
-
-def _dyn_record_li(tags, extra_keys=None, scores=(0.0, 0.0)):
-    """Tally the row's tags per (entity, patch); `scores` = (net, volume) from
-    patch/weights.row_scores, summed into the bucket under "w" and "v"."""
-    if _State.dyn_skip_li:
-        return
-    pv = _State.current_patch_version
-    if not pv:
-        return
-    all_keys = []
-    if _State.current_entity_key:
-        all_keys.append(_State.current_entity_key)
-    if extra_keys:
-        for ek in (extra_keys if isinstance(extra_keys, list) else [extra_keys]):
-            if ek and ek not in all_keys:
-                all_keys.append(ek)
-    for ek in all_keys:
-        rec = _State.dynamics.get(ek)
-        if rec is None:
-            parts = ek.split('|', 1)
-            if len(parts) == 2:
-                kind, slug = parts
-                name = slug.replace('-', ' ').title()
-                rec = _State.dynamics.setdefault(ek, {"name": name, "kind": kind, "patches": {}})
-            else:
-                continue
-        patch_bucket = rec["patches"].setdefault(pv, {})
-        for tag in tags:
-            if tag in _DYN_TAG_WHITELIST:
-                patch_bucket[tag] = patch_bucket.get(tag, 0) + 1
-        net, vol = scores
-        if not net and tags & {"rework", "swap"} and ek == _State.current_entity_key                 and ek.startswith(("item|", "hero|")):
-            _note_rework(ek, pv)
-        if net:
-            patch_bucket["w"] = round(patch_bucket.get("w", 0.0) + net, 3)
-        if vol:
-            patch_bucket["v"] = round(patch_bucket.get("v", 0.0) + vol, 3)
-
-
 def _entity_link(folder, name):
     """Patch page -> the entity's Changes page (builders/entity_changes.py), same slug as its
     dyn id: ../heroes/<slug>.html / ../items/<slug>.html."""
@@ -640,172 +572,6 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
     return out + head + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}{label}</div>{link_html}</div>'
 
 
-_ENCHANT_TIERS = (1, 2, 3, 4, 5)
-
-
-def enchant_list_head():
-    """The column titles over a list of enchantments drawn as one table (owner 2026-09-28, 7.38 "List of
-    Neutral Enchantments"): Tier 1 … Tier 5 above the value columns of every enchant_row below."""
-    cells = "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS)
-    return (_open_block("enchant-list-head")
-            + f'<div class="ench-name-h">Enchantment</div><div class="ench-tiers ench-tiers-h">'
-              f'<span class="ench-stat-h">Bonus</span>{cells}</div><div class="ench-dyn-h">Patches</div>')
-
-
-def enchant_row(name, stats, tiers, slug=None, new=True):
-    """One enchantment as a row of that table: icon + name | its bonuses, a value per tier it can be rolled at
-    (an empty cell: not offered at that tier) | the patch squares. `stats` = [(label, values, negative)],
-    values one per tier in `tiers` (a single value = the same at every tier; 0 = no such bonus at that tier).
-    The row stays an entity block of its own — the patch squares and the enchantment's Changes page read it.
-    Replaces the per-enchantment rows and the repeated "Available at Tiers 1, 2, 3, and 4"."""
-    if slug is None:
-        slug = name.lower().replace(" ", "_").replace("-", "_").replace("'", "")
-    icon = f"{ITEM_CDN}enhancement_{slug}.png"
-    eid = _register_entity("enchant", name)
-    href = _entity_link("items", "enchantment " + name)
-    lines = []
-    for label, values, negative in stats:
-        vals = list(values) if len(values) > 1 else list(values) * len(tiers)
-        by_tier = dict(zip(tiers, vals))
-        cells = []
-        for t in _ENCHANT_TIERS:
-            v = by_tier.get(t)
-            if v is None:
-                cells.append('<span class="ench-v ench-off"></span>')
-            elif re.fullmatch(r"[+\-]?0(?:\.0+)?%?", str(v)):
-                cells.append('<span class="ench-v ench-zero">—</span>')
-            else:
-                cells.append(f'<span class="ench-v{" ench-neg" if negative else ""}">{v}</span>')
-        cls = " ench-neg" if negative else ""
-        lines.append(f'<span class="ench-stat{cls}">{label}</span>{"".join(cells)}')
-    tag = ' data-tag="new"' if new else ""
-    # the tier titles again, shown only where the table's head row isn't (the enchantment's Changes page)
-    own_head = ('<span class="ench-row-h"><span class="ench-stat-h"></span>'
-                + "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS) + "</span>")
-    lines.insert(0, own_head)
-    return (_open_block(("is-new " if new else "") + "item-block enchant-list-row", ' data-new-tag="NEW"' if new else "")
-            + f'''<div class="entity item-entity"{eid}>
-  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{icon}" alt="{name}" loading="lazy"></a></div>
-  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a></div>
-</div><div class="ench-tiers"{tag}>{"".join(lines)}</div>''')
-
-
-def enchant_header(name, slug=None, new=False, removed=None):
-    if slug is None:
-        slug = name.lower().replace(" ", "_").replace("-", "_").replace("'", "")
-    icon = f"{ITEM_CDN}enhancement_{slug}.png"
-    if removed:
-        type_label, extra_cls = _removed_label(removed)
-        block_data_attr = ''
-    elif new:
-        type_text = new if isinstance(new, str) else ''
-        type_label = (f' <span class="entity-new-type">{type_text}</span>'
-                      if type_text else '')
-        extra_cls = 'is-new'
-        block_data_attr = ' data-new-tag="NEW"'
-    else:
-        type_label = ''
-        extra_cls = ''
-        block_data_attr = ''
-    eid = _register_entity("enchant", name)
-    href = _entity_link("items", "enchantment " + name)
-    table = "" if removed else _enchant_change(name)
-    return _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
-  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{icon}" alt="{name}" loading="lazy"></a></div>
-  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>{type_label}</div>
-</div>''' + table
-
-
-_ENCHANT_TABLES = None
-
-
-def _enchant_tables():
-    global _ENCHANT_TABLES
-    if _ENCHANT_TABLES is None:
-        try:
-            with open(_os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
-                                    "data", "rules", "enchant_tables.json"), encoding="utf-8") as f:
-                _ENCHANT_TABLES = _json.load(f)
-        except OSError:
-            _ENCHANT_TABLES = {}
-    return _ENCHANT_TABLES
-
-
-def _ench_num(v):
-    m = re.search(r"\d+(?:\.\d+)?", v or "")
-    return float(m.group(0)) if m else 0.0
-
-
-def _ench_cell(old, new, penalty, brand_new, added_line=False):
-    """One tier's cell: the value; "was → now" coloured by what it does to the owner; a tier it has only now gold
-    (a whole new penalty red: Titanic 7.41 "Now also provides -10/12/14% Attack Speed", NERF), one it lost struck in
-    the DEL colour; "—" for no such bonus at that tier."""
-    zero = lambda v: v is not None and _ench_num(v) == 0
-    if old is None and new is None:
-        return '<span class="ench-v ench-off"></span>'
-    if new is not None and (brand_new or old == new or (zero(old) and zero(new))):
-        return '<span class="ench-v ench-zero">—</span>' if zero(new) else f'<span class="ench-v">{new}</span>'
-    if new is None or zero(new):
-        if old is None or zero(old):
-            return '<span class="ench-v ench-zero">—</span>'
-        return f'<span class="ench-v"><span class="iab-lv iab-del">{old}</span></span>'
-    if old is None or zero(old):
-        tone = "nerf" if added_line and penalty else "new"
-        return f'<span class="ench-v"><span class="iab-lv iab-{tone}">{new}</span></span>'
-    up = _ench_num(new) > _ench_num(old)
-    d = "nerf" if up == penalty else "buff"
-    # the new value dotted, its % on hover / tap, in that %'s own shade — as the item cards' values (owner
-    # 2026-10-17: "подчеркнуть пунктиром новые значения, а при нажатии видеть % разницы")
-    from .badges import b
-    pct = b(_ench_num(old), _ench_num(new), l=penalty)
-    tone = _tone_cls(pct)
-    value = _iab_hint(new, f'<span class="iab-tip-pct">{pct}</span>')
-    return (f'<span class="ench-v ench-chg"><span class="ench-was">{old}</span><span class="ench-arrow">→</span>'
-            f'<span class="iab-lv iab-{d}{" " + tone if tone else ""}">{value}</span></span>')
-
-
-def _enchant_change(name):
-    """An enchantment's bonuses by tier, before → after (owner 2026-10-17, 7.41: "Vital is written as a bare row… a
-    table? a card?" — variant A: the 7.38 table, a changed cell "was → now" in colour). Data:
-    data/rules/enchant_tables.json (scripts/gen/enchant_table.py). The number rows under it go into it
-    (_ench_covered); "Now is a guaranteed option …" rows stay."""
-    ent = _enchant_tables().get(_State.current_patch_version or "", {}).get(name)
-    _State.ench_card = None
-    if not ent or not ent["stats"]:
-        return ""
-    _State.ench_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version,
-                        "labels": [s["label"] for s in ent["stats"]]}
-    head = ('<span class="ench-row-h"><span class="ench-stat-h">Stats</span>'
-            + "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS) + "</span>")
-    lines = [head]
-    for s in ent["stats"]:
-        gone = not any(_ench_num(v) for v in s["new"].values())
-        added = not ent["brand_new"] and not any(_ench_num(v) for v in s["old"].values())
-        cells = "".join(_ench_cell(s["old"].get(str(t)), s["new"].get(str(t)), s["penalty"], ent["brand_new"], added)
-                        for t in _ENCHANT_TIERS)
-        cls = (" ench-neg" if s["penalty"] else "") + (" ench-gone" if gone else " ench-added" if added else "")
-        lines.append(f'<span class="ench-stat{cls}">{s["label"]}</span>{cells}')
-    return f'<div class="ench-tiers ench-change">{"".join(lines)}</div>'
-
-
-def _ench_covered(text):
-    """A number row of an enchantment whose table (above) shows that bonus, or a "Tiers changed …" row: hidden,
-    still counted by the tag filters (like the item cards' rows)."""
-    card = getattr(_State, "ench_card", None)
-    if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
-        return False
-    plain = re.sub(r"<[^>]+>", " ", re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S))
-    low = plain.lower()
-    if "guaranteed" in low:
-        return False
-    if re.search(r"\btiers? changed from\b", low):
-        return True
-    if not re.search(r"\d", low):
-        return False
-    words = _iab_stems(low)
-    return any(_iab_stems(lab.lower()) & words for lab in card["labels"])
-
-
 def section(title):
     _State.current_hero = None
     _State.current_unit = None
@@ -815,8 +581,8 @@ def section(title):
     out = _close_block()
     if _State.section_panel_open:
         out += '</section>'
-    out += (f'<section class="cat-panel">'
-            f'<h2 class="section" data-section="{slug}">{title}</h2>')
+    # (the patch's date and official link left the first header for a card above the filters, page.patch_info_html)
+    out += f'<section class="cat-panel"><h2 class="section" data-section="{slug}">{title}</h2>'
     _State.section_panel_open = True
     return out
 
@@ -854,7 +620,11 @@ def subgroup(title, new=None, one_box=False):
                       f'<div class="ability-block talents-block">'
                       f'<div class="ability-icon-wrap">{icon}</div>')
     label = f' <span class="subgroup-new-type">{new}</span>' if new else ''
-    return out + f'<h4 class="subgroup">{title}{label}</h4>'
+    # a heading that names what its rows are about (7.38 "Lotus Pools", "Shrines of Wisdom") stays under a filter;
+    # only the list labels (Abilities, Facets, General) go (owner 2026-11-07: "при включении фильтра new исчезли
+    # названия")
+    named = "" if title.lower() in GENERIC_SUBGROUPS else " subgroup-named"
+    return out + f'<h4 class="subgroup{named}">{title}{label}</h4>'
 
 
 def _hero_ability_slug(hero, title):
@@ -1102,381 +872,6 @@ def ul_close():
 
 # "Level 25 Talent is +4s Burning Spears Duration instead of +6s" → "Level 25 Talent: +4s …", not "Talent: is +4s"
 _TALENT_PREFIX_RE = re.compile(r'^(Level \d+ Talent) (?!:)(?:is )?')
-_TALENT_LEVEL_RE = re.compile(r'^\s*Level (\d+)(?: Talent)?\s*:', re.I)
-
-
-def _row_ctx(text):
-    """Where the row lives — drives the weights context multiplier (patch/weights.py)."""
-    ek = _State.current_entity_key or ""
-    m = _TALENT_LEVEL_RE.match(re.sub(r'<[^>]+>', '', text))
-    return {
-        "kind": ek.split("|", 1)[0] if ek else "",
-        "item": (_State.dynamics.get(ek) or {}).get("icon") if ek.startswith("item|") else None,
-        "version": _State.current_patch_version,
-        "hero": _State.current_hero,
-        "base_stat": bool(_State.in_stats_ul),
-        "facet": bool(_State.current_block_is_facet),
-        "ability": _State.current_ability_slug,
-        "innate": bool(_State.current_ability_innate),
-        "talent": int(m.group(1)) if m else None,
-        "scepter": "Aghanim's Scepter" in text,
-        "shard": "Aghanim's Shard" in text,
-    }
-
-
-def _dyn_record_card(tags, text="", badge="", **ctx_over):
-    """Tally + score a change that is not an li() row (ability/facet cards, item property panes).
-    Before 2026-09-25 these were tallied with scores (0, 0): a reworked ability or an item's
-    "+6 -> +7 Armor" pane moved neither the net balance nor the volume."""
-    ctx = dict(_row_ctx(text), **ctx_over)
-    scores = _row_scores(text, tags, badge, ctx=ctx)
-    _dyn_record_li(tags, scores=scores)
-    _note_cell_row(text, tags, scores, ctx)
-
-
-# ---- A hero block's replacements (owner 2026-09-27: "a replaced facet can be better or worse") ----
-# By text alone a replacement has no direction, so it nets 0 and signal R (the pro pick-share shift the
-# hero's other rows don't explain) gives it one where the match database has the patch (7.35c+):
-#  - a whole ability / facet / innate removed AND one added in the same block (±WHOLE_W cancel);
-#  - an Aghanim's Shard / Scepter upgrade that moved to another ability: the "no longer upgraded with"
-#    DEL is cancelled by its NEW partner (or set to 0 next to a REWORK "... reworked" partner);
-#  - a DEL row about an ability that the same block removes whole (Anti-Mage 7.40 "Aghanim's Shard no
-#    longer provides Counterspell Ally ability" + "Ability removed") counts once.
-_AGHS_LOST_RE = re.compile(r"no longer upgraded with aghanim's (shard|scepter)"
-                           r"|aghanim's (shard|scepter)(?: upgrade)?\b[^.]*?\bno longer\b", re.I)
-
-
-def _note_cell_row(text, tags, scores, ctx):
-    ek, pv = _State.current_entity_key or "", _State.current_patch_version
-    if not (ek.startswith("hero|") and pv and not _State.dyn_skip_li and tags & {"new", "del", "rework"}):
-        return
-    rows = _State.cell_rows
-    if not rows or (rows["ek"], rows["pv"]) != (ek, pv):
-        _flush_cell_rows()
-        rows = _State.cell_rows = {"ek": ek, "pv": pv, "rows": [], "ctx": _row_ctx("")}
-    from . import weights
-    plain = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', text or '')).strip()
-    rows["rows"].append({"text": plain, "tags": set(tags), "net": scores[0], "ability": (ctx or {}).get("ability"),
-                         "whole": weights.is_whole_new_del(plain, set(tags), ctx)})
-
-
-def _ability_names(slug):
-    """Words a row may use for an ability slug: its trailing words ("antimage_counterspell_ally" ->
-    "counterspell ally"), at least two words or one of 6+ letters."""
-    words = (slug or "").split("_")
-    out = []
-    for i in range(1, len(words)):
-        tail = words[i:]
-        if len(tail) >= 2 or len(tail[0]) >= 6:
-            out.append(" ".join(tail))
-    return out
-
-
-def _flush_cell_rows():
-    cell, _State.cell_rows = _State.cell_rows, None
-    if not cell or not cell["rows"]:
-        return
-    rows, delta, replaced = cell["rows"], 0.0, False
-    # 1. the same removal twice: a DEL row naming an ability this block removes whole
-    gone = [n for r in rows if r["whole"] and "del" in r["tags"] for n in _ability_names(r["ability"])]
-    for r in rows:
-        if "del" in r["tags"] and not r["whole"] and r["net"]:
-            low = r["text"].lower()
-            if any(n in low for n in gone if not (r["ability"] or "").endswith(n.replace(" ", "_"))):
-                delta -= r["net"]
-                r["net"] = 0.0
-    # 2. an Aghanim's upgrade that moved to another ability
-    used = set()
-    for r in rows:
-        m = _AGHS_LOST_RE.search(r["text"]) if "del" in r["tags"] else None
-        if not m or not r["net"]:
-            continue
-        item = (m.group(1) or m.group(2)).lower()
-        for j, p in enumerate(rows):
-            if j in used or p is r or not (p["tags"] & {"new", "rework"}) or p["ability"] == r["ability"]:
-                continue
-            if f"aghanim's {item}" in p["text"].lower():
-                new_net = -p["net"] if "new" in p["tags"] and "rework" not in p["tags"] else 0.0
-                delta += new_net - r["net"]
-                r["net"] = new_net
-                used.add(j)
-                replaced = True
-                break
-    # 3. a whole ability / facet / innate removed and another added: a replacement
-    if any(r["whole"] and "del" in r["tags"] for r in rows) and any(r["whole"] and "new" in r["tags"] for r in rows):
-        replaced = True
-    rec = _State.dynamics.get(cell["ek"])
-    if rec is not None and delta:
-        bucket = rec["patches"].setdefault(cell["pv"], {})
-        bucket["w"] = round(bucket.get("w", 0.0) + delta, 3)
-    if replaced:                                             # signal R gives the replacement a direction
-        pend = _State.pending_rework
-        if not (pend and (pend["ek"], pend["pv"]) == (cell["ek"], cell["pv"])):
-            _flush_rework()
-            _State.pending_rework = {"ek": cell["ek"], "pv": cell["pv"], "n": 1, "ctx": cell["ctx"]}
-
-
-_COST_STATED_RE = re.compile(r'total cost|^\s*(?:recipe\s+)?cost\b', re.I)
-
-
-def _note_cost_panel(total_old, total_new):
-    """An item's components panel (components_change / auto_components_change) changes its total
-    cost. It is scored once, as a "Total cost A -> B" row, when the item block ends — unless an
-    li() row of the block states the cost itself ("Total cost A -> B", "Total cost unchanged",
-    a basic item's "Cost A -> B"), which then wins (no double count). Not tallied as a tag."""
-    _flush_cost_panel()
-    ek = _State.current_entity_key or ""
-    if not ek.startswith("item|") or _State.dyn_skip_li or not _State.current_patch_version:
-        return
-    try:
-        old, new = float(total_old), float(total_new)
-    except (TypeError, ValueError):
-        return                                   # "2800/3950/..." (Dagon levels): no single total
-    if old != new:
-        _State.pending_cost_panel = {"ek": ek, "pv": _State.current_patch_version,
-                                     "old": old, "new": new, "ctx": _row_ctx("")}
-
-
-def _cost_panel_covered(score_text):
-    pend = _State.pending_cost_panel
-    if pend and pend["ek"] == _State.current_entity_key \
-            and _COST_STATED_RE.search(re.sub(r'<[^>]+>', ' ', score_text or '')):
-        _State.pending_cost_panel = None
-
-
-_DMG_ROW_RE = re.compile(r'^\s*(?:(base damage)|(damage (?:at|on) level 1(?!\d))|(damage gain per level)'
-                         r'|(damage at level 30))', re.I)
-
-
-def _note_damage_row(text, scores):
-    """Hero damage rows of one block, scored once (owner 2026-09-26, Dark Seer 7.38). "Damage at level 1"
-    / "at level 30" are the damage the hero really has (base + attributes x multiplier); a "Base Damage
-    increased by 26" next to them is one of their parts — 7.38 lowered the Universal multiplier 0.7 -> 0.45
-    and raised base damage to make up for it, so alone it means nothing. "Damage gain per level" is
-    (L30 - L1) / 29, i.e. the L30 row again. Such rows are taken back out at the end of the block."""
-    ek, pv = _State.current_entity_key or "", _State.current_patch_version
-    m = _DMG_ROW_RE.match(re.sub(r'<[^>]+>', ' ', text or ''))
-    if not (m and ek.startswith("hero|") and pv and not _State.dyn_skip_li):
-        return
-    rows = _State.damage_rows
-    if not rows or (rows["ek"], rows["pv"]) != (ek, pv):
-        _flush_damage_rows()
-        rows = _State.damage_rows = {"ek": ek, "pv": pv, "rows": []}
-    kind = ("base", "l1", "gain", "l30")[[i for i in range(4) if m.group(i + 1)][0]]
-    rows["rows"].append((kind, scores[0], scores[1]))
-
-
-_FOLDED_L1_RE = re.compile(r"Damage at level 1 (?:increased|decreased|changed|rescaled)(?:\s+by\s+[\d.\-–]+\s*\()?"
-                           r"\s*from\s+(\d+)[–\-](\d+)\s+to\s+(\d+)[–\-](\d+)", re.I)
-
-
-def _score_folded_damage(extra):
-    """A "Damage at level 1 …" line folded into its base attribute / base damage row's (?) (owner 2026-10-04,
-    generate_patch_code_v2.fold_damage_l1_src) still weighs what it weighed as its own row: the same br() score,
-    recorded with no tag (it is no row any more, so the tag tallies do not count it), and noted as the block's
-    level-1 damage, so a "Base Damage" row next to it drops out as before (damage rows counted once, 2026-09-26)."""
-    if not isinstance(extra, str) or "INLINETIP" not in extra:
-        return
-    from .badges import br as _br
-    for tip in re.findall(r"<!--INLINETIP-->(.*?)<!--/INLINETIP-->", extra, re.S):
-        plain = re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", tip)))
-        m = _FOLDED_L1_RE.search(plain)
-        if not m:
-            continue
-        badge = _br(*(int(x) for x in m.groups()))
-        text = m.group(0)
-        tags = set(re.findall(r'data-tag="(\w+)"', badge)) or set(re.findall(r'data-overall="(\w+)"', badge))
-        scores = _row_scores(text, tags, badge, ctx=_row_ctx(text))
-        _dyn_record_li(set(), scores=scores)
-        _note_damage_row(text, scores)
-
-
-def _flush_damage_rows():
-    rows, _State.damage_rows = _State.damage_rows, None
-    if not rows:
-        return
-    kinds = {k for k, _, _ in rows["rows"]}
-    drop = set()
-    if kinds & {"l1", "l30"}:
-        drop.add("base")
-    if "l30" in kinds:
-        drop.add("gain")
-    rec = _State.dynamics.get(rows["ek"])
-    if rec is None or not drop:
-        return
-    bucket = rec["patches"].setdefault(rows["pv"], {})
-    for k, net, vol in rows["rows"]:
-        if k in drop:
-            bucket["w"] = round(bucket.get("w", 0.0) - net, 3)
-            bucket["v"] = round(bucket.get("v", 0.0) - vol, 3)
-
-
-def _note_rework(ek, pv):
-    pend = _State.pending_rework
-    if pend and (pend["ek"], pend["pv"]) == (ek, pv):
-        pend["n"] += 1
-        return
-    _flush_rework()
-    _State.pending_rework = {"ek": ek, "pv": pv, "n": 1, "ctx": _row_ctx("")}
-
-
-def _flush_rework():
-    """Signal R: an item's / hero's REWORK rows get the pro adoption shift its other rows do not explain.
-    Runs after _flush_cost_panel, so the bucket's net already holds every other row of the item."""
-    pend, _State.pending_rework = _State.pending_rework, None
-    if not pend:
-        return
-    rec = _State.dynamics.get(pend["ek"])
-    if rec is None:
-        return
-    from . import weights
-    bucket = rec["patches"].setdefault(pend["pv"], {})
-    net = weights.rework_adoption_net(pend["ctx"], bucket.get("w", 0.0))
-    if net:
-        bucket["w"] = round(bucket.get("w", 0.0) + net, 3)
-        bucket["v"] = round(bucket.get("v", 0.0) + abs(net), 3)
-
-
-def _flush_cost_panel():
-    pend, _State.pending_cost_panel = _State.pending_cost_panel, None
-    if not pend:
-        return
-    verb = "decreased" if pend["new"] < pend["old"] else "increased"
-    text = f"Total cost {verb} from {pend['old']:g} to {pend['new']:g} (components panel)"
-    tags = {"buff"} if pend["new"] < pend["old"] else {"nerf"}
-    cur = _State.current_entity_key
-    _State.current_entity_key = pend["ek"]       # the next header already moved on; score as the item
-    try:
-        net, vol = _row_scores(text, tags, "", ctx=pend["ctx"])
-    finally:
-        _State.current_entity_key = cur
-    rec = _State.dynamics.get(pend["ek"])
-    if rec is None or not (net or vol):
-        return
-    bucket = rec["patches"].setdefault(pend["pv"], {})
-    if net:
-        bucket["w"] = round(bucket.get("w", 0.0) + net, 3)
-    if vol:
-        bucket["v"] = round(bucket.get("v", 0.0) + vol, 3)
-
-
-_TOTAL_UNCHANGED_RE = re.compile(r'total cost (?:is )?unchanged', re.I)
-_PROP_VALUE_RE = re.compile(r'^\s*([+\-]?\d[\d./]*%?)\s+(.+?)\s*$')
-
-
-def _prop_row_text(o, nw):
-    """Item property pane pair ("+10 Strength" -> "+26 Strength") as a patch-note sentence the
-    weights scorer understands: "Strength bonus changed from +10 to +26"."""
-    ot = re.sub(r'<[^>]+>', ' ', (o or ('', ''))[1] or '')
-    nt = re.sub(r'<[^>]+>', ' ', (nw or ('', ''))[1] or '')
-    mo, mn = _PROP_VALUE_RE.match(ot), _PROP_VALUE_RE.match(nt)
-    if mo and mn:
-        return f"{mn.group(2)} bonus changed from {mo.group(1)} to {mn.group(1)}"
-    return nt or ot
-
-
-_TERRAIN_SPOTS = None
-# (patch, row text) -> [how many such rows this page drew]: the n-th of two same-worded rows takes the n-th spot
-_TSPOT_SEEN: dict = page_cache({})
-
-
-def _terrain_spot_index():
-    """{patch: [(match, [picture file names])]} from data/terrain_spots.json, the pictures numbered in file order the
-    way scripts/gen/terrain_shots.py writes them (icons/terrain/<code>_<i>.webp)."""
-    global _TERRAIN_SPOTS
-    if _TERRAIN_SPOTS is None:
-        root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
-        try:
-            with open(_os.path.join(root, "data", "terrain_spots.json"), encoding="utf-8") as f:
-                raw = _json.load(f)
-        except (OSError, ValueError):
-            raw = {}
-        _TERRAIN_SPOTS = {}
-        for patch, entries in raw.items():
-            if patch.startswith("_"):
-                continue
-            code, i, rows = patch.replace(".", ""), 0, []
-            for e in entries:
-                n = len(e.get("spots", []))
-                names = [f"{code}_{k}.webp" for k in range(i, i + n)
-                         if _os.path.exists(_os.path.join(root, "icons", "terrain", f"{code}_{k}.webp"))]
-                rows.append((e["match"], names, e.get("phrase") or note_phrase(e["match"]), bool(e.get("part"))))
-                i += n
-            _TERRAIN_SPOTS[patch] = rows
-    return _TERRAIN_SPOTS
-
-
-TSHOT_W, TSHOT_H = 480, 238        # a note picture's css size (files: 360-px halves + a 6-px gap, 726 x 360)
-
-
-def terrain_note(patch, text, prefix="../"):
-    """(phrase, pictures) of a terrain note (the owner 2026-10-03: the terrain rows were "all under one tag, mush —
-    maybe micro-screenshots"): the old | new map squares around the change, only the note's own objects outlined,
-    in their own rounded, centred box under the row (hidden, so the lazy pictures load only when opened); a click on
-    one opens its large copy (<name>_lg.webp, data-large) over the page — the section's "View on map" button is the
-    way to the Terrain page. The phrase — the words naming the note's object ("tier 1 safe lane towers", spot
-    "phrase" or patch.terrain_notes.note_phrase) — becomes the button that opens them (terrain_button; the owner
-    2026-10-03: "no Show buttons in the tags' place: the screenshot opens from the name of the objective that
-    moved"). ('', '') for any other row."""
-    if not patch or not isinstance(text, str):
-        return "", ""
-    plain = re.sub(r"<[^>]+>", "", text).strip()
-
-    def imgs(names):
-        return "".join(
-            f'<img src="{prefix}icons/terrain/{n}" data-large="{prefix}icons/terrain/{n[:-5]}_lg.webp" '
-            f'width="{TSHOT_W}" height="{TSHOT_H}" alt="The old and the new map here" loading="lazy" '
-            f'decoding="async">' for n in names)
-    every = [s for s in _terrain_spot_index().get(patch, []) if plain.startswith(s[0])]
-    # one row, a picture under each of its words (owner 2026-10-28, 7.38 "Touched up the map in general. Slightly
-    # adjusted neutral camps, trees, and cliffs"): entries with "part" — a tuple of phrases, a box per phrase
-    parts = {}                                     # phrase -> its pictures, in file order (one entry per spot / scale)
-    every = [tuple(s) + (False,) * (4 - len(s)) for s in every]     # (match, names, phrase, part)
-    for s in every:
-        if s[3] and s[1]:
-            parts.setdefault(s[2], []).extend(s[1])
-    if parts:
-        return (tuple(parts),
-                "".join(f'<span class="tshots" data-part="{k}" hidden>{imgs(names)}</span>'
-                        for k, names in enumerate(parts.values())))
-    # the same words in two sections of a patch (7.38c "Several additional tree and visual adjustments have been made
-    # to this area", Dire Safe Lane Jungle and Bottom Lane): the n-th such row takes the n-th spot that matches
-    seen = _TSPOT_SEEN.setdefault((patch, plain), [0])
-    nth, seen[0] = seen[0], seen[0] + 1
-    hits = [s for s in every if not s[3]]
-    for _match, names, phrase, _part in hits[nth:nth + 1] if len(hits) > 1 or nth == 0 else []:
-        if names:
-            return phrase, f'<span class="tshots" hidden>{imgs(names)}</span>'
-    return "", ""
-
-
-def terrain_button(html, phrase):
-    """The row's html with its phrase as the pictures' button (unchanged, with a warning, when markup splits it).
-    A tuple of phrases (terrain_note "part" entries): each its own button, opening the box of its own number."""
-    if isinstance(phrase, tuple):
-        for k, p in enumerate(phrase):
-            out = wrap_phrase(html, p, lambda w, k=k: f'<button type="button" class="tshots-btn" data-part="{k}" '
-                                                      f'aria-expanded="false">{w}</button>')
-            if out is None:
-                print(f"  [warn] terrain note: {p!r} not found in its row — its pictures have no button")
-            else:
-                html = out
-        return html
-    out = wrap_phrase(html, phrase,
-                      lambda p: f'<button type="button" class="tshots-btn" aria-expanded="false">{p}</button>')
-    if out is None:
-        print(f"  [warn] terrain note: {phrase!r} not found in its row — its pictures have no button")
-        return html
-    return out
-
-
-def terrain_num_chip(n, badge=""):
-    """A terrain row's chip: its number in its category, in the tag chip's frame (the owner 2026-10-03: "the rows
-    are just numbered instead of tag chips"). A row with a % (its b() badge: buff / nerf) tints the chip lightly in
-    that colour (owner 2026-10-27, 7.40 "Watcher night vision range decreased from 800 to 450")."""
-    m = re.search(r'class="badge (buff|nerf)\d', badge or "")      # a b() badge's % tier, not a t() tag
-    tone = f" tnum-{m.group(1)}" if m else ""
-    return f'<span class="badge tnum{tone}">{n}</span>'
 
 
 def sub_ability(slug, name):
@@ -1532,39 +927,42 @@ def mark_number_highlights(html_text: str) -> str:
     return _HL_NUM_RE.sub(r'<span class="iab-hl \1 iab-hl-num"\2>\3</span>', html_text)
 
 
-def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False, covered=False,
-       facet=None, examples=None):
-    """covered=True: the card above already shows this change (highlighted) — the row is hidden but keeps its weight
-    and tag for the filters, like the item cards' covered rows (owner 2026-10-21, 7.41 Overclocking).
-    facet="<facet slug>": a facet's talent, written under the hero's Talents with the facet's chip before it."""
+def _li_text(text, badge, extra, examples):
+    """li() step 1, the row's own words: its terrain pictures, the talent prefix, its examples, a talent swap's colours.
+    (text, badge, extra, the plain words the weights read or None, the terrain phrase)."""
     _tphrase = ""
+    _plain_text = None
     if isinstance(text, str):
         # a terrain note's micro-screenshots ride along under its text, opened by the words naming its object
         _tphrase, _tshots = terrain_note(_State.current_patch_version, text)
         extra = (extra or "") + _tshots
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
         _plain_text = text                     # the weights read the words, not the highlight spans
-        text = row_examples(text, examples)
+        text, _aside = row_examples(text, examples)
+        if _aside:                             # the examples' aside in brackets: under the row's "?" (2026-11-07)
+            extra = inline_note(_aside) + (extra or "")
         text, badge, extra = _mark_talent_swap(text, badge, extra)
         if _State.in_stats_ul:
             _m = _FACET_INNATE_PREFIX_RE.match(text)
             if _m and _m.group(1) in _FACET_INNATE_NAMES:
                 print(f"  [warn] '{_m.group(1)}' is a known facet/innate but sits in "
                       f"STATS ({_State.current_hero}) — use facet_header()/ability() instead")
-    tags = set()
+    return text, badge, extra, _plain_text, _tphrase
+
+
+def _li_dyn_tags(badge, force_tag):
+    """li() step 2: the tags the row is tallied under."""
     if force_tag is not None:
-        dyn_tags = set(force_tag.split())
-    else:
-        primary = re.findall(r'data-tag="(\w+)"', badge)
-        if primary:
-            dyn_tags = set(primary)
-        else:
-            dyn_tags = set(re.findall(r'data-overall="(\w+)"', badge))
-    _score_text = _plain_text if isinstance(text, str) else ""
-    if isinstance(extra, str) and _TOTAL_UNCHANGED_RE.search(extra):
-        # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
-        _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
-    _cost_panel_covered(_score_text)
+        return set(force_tag.split())
+    primary = re.findall(r'data-tag="(\w+)"', badge)
+    if primary:
+        return set(primary)
+    return set(re.findall(r'data-overall="(\w+)"', badge))
+
+
+def _li_covered(text, _plain_text, dyn_tags, covered):
+    """li() step 3: whether a card above already shows the row (it is hidden then), and a removed Aghanim's row's
+    text. (text, covered)."""
     if isinstance(text, str) and _State.card_innate and re.fullmatch(
             rf"\s*{re.escape(_State.card_innate)} is now an innate ability(?: \(previously a basic ability\))?\.?\s*",
             _plain_text):
@@ -1583,6 +981,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         _granted_card(dyn_tags)                 # an upgrade-granted ability's new text: a card, the row stays
     if isinstance(text, str) and not covered and _aghs_removed_row(_plain_text):
         text = _aghs_removed_row(_plain_text)   # the weights still read the patch note's words (_plain_text)
+    return text, covered
+
+
+def _li_record(text, _plain_text, _score_text, extra, badge, dyn_tags, also_dyn):
+    """li() step 4: the row's scores and tag tallies in the patch dynamics; a removed item / enchantment notes the
+    patch it left in."""
     _ctx = _row_ctx(_plain_text if isinstance(text, str) else "")
     _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_ctx)
     _dyn_record_li(dyn_tags, extra_keys=also_dyn, scores=_scores)
@@ -1599,6 +1003,11 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
                 _rec = _State.dynamics.get(_ek)
                 if _rec is not None and _rec.get('kind') in ('item', 'enchant'):
                     _rec.setdefault('removed_in', _pv)
+
+
+def _li_tag_str(badge, force_tag):
+    """li() step 5: the row's data-tag, what the filters read."""
+    tags = set()
     if force_tag is not None:
         tag_str = force_tag
         for tok in force_tag.split():
@@ -1614,7 +1023,11 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             for cls in re.findall(r'badge (buff|nerf)\d+', badge):
                 tags.add(cls)
         tag_str = " ".join(sorted(tags))
+    return tag_str
 
+
+def _li_left_tag(text, badge, force_tag, covered):
+    """li() step 6: the chip in the row's tag column and the rest of its badge. (left_tag, rest)."""
     text_tag_re = re.search(
         r'<span class="badge (buff-text|nerf-text|rework|swap|misc|qol|new|del)"[^>]*>\w+</span>\s*',
         badge
@@ -1642,7 +1055,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # tag chips"); data-tag keeps the tag for the filters / weights
         _State.terrain_rows += 0 if covered else 1     # a hidden row takes no number: the first one seen is 1
         left_tag = terrain_num_chip(_State.terrain_rows, badge if force_tag is None else "")
+    return left_tag, rest
 
+
+def _li_classes(text, extra, badge, dyn_tags, covered, major, ability_row):
+    """li() step 7: the row's classes — terrain, major, Aghanim's, an ability row (an item's / unit's drawn as its
+    card), and the rows a card above covers (hidden). (classes, Aghanim's marker, text)."""
     classes = ["terrain-row"] if _State.terrain_rows is not None and isinstance(text, str) else []
     if major:                 # the change that sums up a patch (7.41 "Facets removed from the game"): a stand-out row
         classes.append("li-major")
@@ -1686,8 +1104,9 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     elif ability_row:
         classes.append("ability-row")
     # a number change the abilities card above already shows: hidden, its number coloured in the card
+    # a QoL row tells what no tooltip does (7.38 Bloodthorn: "silence visual … tinted red"): never the card's
     if (isinstance(text, str) and "iab-covered" not in classes and "item-ability" not in classes
-            and (_State.current_entity_key or "").startswith("item|")
+            and (_State.current_entity_key or "").startswith("item|") and "qol" not in dyn_tags
             and (_iab_covered_change(text, dyn_tags, extra, badge)
                  # the card shows it as text: an ability only one side has, or words a row without numbers
                  # describes (a row with a note keeps showing it)
@@ -1709,13 +1128,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if (isinstance(text, str) and "iab-covered" not in classes
             and (_State.current_entity_key or "").startswith("item|") and _cost_covered(text, extra)):
         classes += ["iab-covered", "covered-cost"]
-    cls_attr = f' class="{" ".join(classes)}"' if classes else ""
-    attr = f' data-tag="{tag_str}"' if tag_str else ""
-    if also_dyn:
-        # the row also belongs to these entities ("unit|melee-creep"): their squares count it (above) and their
-        # own pages show it under this patch (builders/entity_changes._collect) — owner 2026-10-06: the 7.41 lane
-        # creep rows sat in General Updates and the creep cards stayed unclickable
-        attr += f' data-also="{" ".join(also_dyn if isinstance(also_dyn, list) else [also_dyn])}"'
+    return classes, marker, text
+
+
+def _li_tips(text, extra):
+    """li() step 8: the (?) tips at the row's end, lifted out of its text and its extra, and a mechanic's tables of
+    abilities. (text without them, the tips, the tables, extra)."""
     trailing_tips = []
     if isinstance(text, str):
         text_base = text
@@ -1748,6 +1166,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             _end = "" if text_base.rstrip().endswith((".", ":", "!", "?")) else "."
             text_base = f'{text_base.rstrip()}{_end} <span class="mech-row-note">{_n}</span>'
     trailing_tips = merge_tips(trailing_tips)
+    return text_base, trailing_tips, _abil_rows, extra
+
+
+def _li_inner(text_base, trailing_tips, _abil_rows, classes, marker, _tphrase, facet):
+    """li() step 9: the row's text as drawn — the tips and the Aghanim's marker with its last word, the terrain
+    button, a facet's / ability's / rune's chip, the tables under it."""
     if not isinstance(text_base, str):
         text_inner = text_base
     elif trailing_tips and "item-ability" in classes:          # the (?) stays with the description's last word
@@ -1781,6 +1205,37 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         text_inner = rune_row_chip(text_inner)      # "Haste Rune: …" -> the rune's icon (owner 2026-10-28)
     if _abil_rows:
         text_inner += _abil_rows
+    return text_inner
+
+
+def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False, covered=False,
+       facet=None, examples=None):
+    """covered=True: the card above already shows this change (highlighted) — the row is hidden but keeps its weight
+    and tag for the filters, like the item cards' covered rows (owner 2026-10-21, 7.41 Overclocking).
+    facet="<facet slug>": a facet's talent, written under the hero's Talents with the facet's chip before it.
+    The steps, in this order: _li_text, _li_dyn_tags, _li_covered, _li_record, _li_tag_str, _li_left_tag,
+    _li_classes, _li_tips, _li_inner."""
+    text, badge, extra, _plain_text, _tphrase = _li_text(text, badge, extra, examples)
+    dyn_tags = _li_dyn_tags(badge, force_tag)
+    _score_text = _plain_text if isinstance(text, str) else ""
+    if isinstance(extra, str) and _TOTAL_UNCHANGED_RE.search(extra):
+        # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
+        _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
+    _cost_panel_covered(_score_text)
+    text, covered = _li_covered(text, _plain_text, dyn_tags, covered)
+    _li_record(text, _plain_text, _score_text, extra, badge, dyn_tags, also_dyn)
+    tag_str = _li_tag_str(badge, force_tag)
+    left_tag, rest = _li_left_tag(text, badge, force_tag, covered)
+    classes, marker, text = _li_classes(text, extra, badge, dyn_tags, covered, major, ability_row)
+    cls_attr = f' class="{" ".join(classes)}"' if classes else ""
+    attr = f' data-tag="{tag_str}"' if tag_str else ""
+    if also_dyn:
+        # the row also belongs to these entities ("unit|melee-creep"): their squares count it (above) and their
+        # own pages show it under this patch (builders/entity_changes._collect) — owner 2026-10-06: the 7.41 lane
+        # creep rows sat in General Updates and the creep cards stayed unclickable
+        attr += f' data-also="{" ".join(also_dyn if isinstance(also_dyn, list) else [also_dyn])}"'
+    text_base, trailing_tips, _abil_rows, extra = _li_tips(text, extra)
+    text_inner = _li_inner(text_base, trailing_tips, _abil_rows, classes, marker, _tphrase, facet)
     # An ability row with its own chip keeps the chip as the li's first child: page.py
     # marks its whole box `ability-box-tagged`, and the CSS moves the box right by the tag
     # column so the chip sits in the SAME column, size and height as every other row's
@@ -1875,17 +1330,6 @@ def info_tip(*lines, header=None):
     return out
 
 
-# The owner's bug silhouette (icons/ui/bug.png, background cut to alpha, 2026-10-22), drawn as a CSS mask so it
-# takes the box's colour; the hand-drawn pixel bugs read poorly at this size.
-_BUG_SVG = '<span class="bug-ico" aria-hidden="true"></span>'
-
-
-def bug_note(text):
-    """A game bug next to a row: the [?] box with a bug instead of "?", never merged with the row's [?] tips."""
-    return (f'<!--INLINETIP--><span class="info-tip bug-tip" tabindex="0" aria-label="Bug">{_BUG_SVG}'
-            f'<span class="info-pop"><span class="info-pop-h">Bug</span>{_pop_list(text)}</span></span><!--/INLINETIP-->')
-
-
 _TIP_RE = re.compile(r'<!--TIP--><span class="info-tip" tabindex="0">\?<span class="info-pop">(.*)</span></span>'
                      r'<!--/TIP-->', re.S)
 
@@ -1906,163 +1350,6 @@ def show_list(*items, summary='Show list'):
             f'<summary><span class="show-list-chevron">▸</span>'
             f'{summary} <span class="subnote-count">({len(items)})</span></summary>'
             f'<div class="show-list-body">{items_html}</div></details>')
-
-
-def _fmt_formula(expr):
-    expr = expr.replace('*', '×')
-    return re.sub(
-        r'[A-Za-z_]\w*|\d+(?:\.\d+)?',
-        lambda m: (f'<span class="f-var">{m.group(0)}</span>'
-                   if m.group(0)[0].isalpha() or m.group(0)[0] == '_'
-                   else f'<span class="f-num">{m.group(0)}</span>'),
-        expr)
-
-
-def _eval_formula(expr, env):
-    return eval(expr.replace('^', '**'), {"__builtins__": {}}, dict(env))
-
-
-def _num_fmt(x):
-    return f'{round(float(x), 1):g}'
-
-
-def _formula_pct_badge(o, n, lower=False):
-    from .badges import gradient_class
-    if o == 0 or n == o:
-        inner = '<span class="badge neutral">0%</span>'
-    else:
-        raw = (n - o) / o * 100
-        is_buff = (n < o) if lower else (n > o)
-        disp = ('+' if n > o else '-') + f'{round(abs(raw), 1):g}%'
-        inner = f'<span class="badge {gradient_class(abs(raw), is_buff)}">{disp}</span>'
-    return f'<span class="badge-group">{inner}</span>'
-
-
-def formula_change(name, old, new, *, tag="REWORK", vary=None, fixed=None,
-                   unit="", lower_better=False):
-    _TAG = {'NEW': ('new', 'new'), 'REWORK': ('rework', 'rework'), 'SWAP': ('swap', 'swap'),
-            'BUFF': ('buff-text', 'buff'), 'NERF': ('nerf-text', 'nerf'),
-            'DEL': ('del', 'del'), 'MISC': ('misc', 'misc'), 'QOL': ('qol', 'qol')}
-    badge_cls, tag_id = _TAG.get(tag.upper(), (tag.lower(), tag.lower()))
-    badge = f'<span class="badge {badge_cls}" data-tag="{tag_id}">{tag}</span>'
-    has_ex = bool(vary)
-    has_input = bool(vary and fixed)
-    input_html = ''
-    data_attrs = ''
-    if has_input:
-        var_name, label, values = vary
-        in_var = next(iter(fixed))
-        in_def = fixed[in_var]
-        def_disp = f'{in_def:,}' if isinstance(in_def, int) else f'{in_def:g}'
-        input_html = (
-            '<div class="formula-input-row">'
-            f'<span class="formula-input-label">Set <span class="fx-vname">{in_var}</span>:</span>'
-            '<input type="number" class="formula-input" min="0" inputmode="numeric" '
-            f'placeholder="By default: {def_disp}"></div>')
-        data_attrs = (
-            f' data-fx-old="{_html.escape(old, quote=True)}"'
-            f' data-fx-new="{_html.escape(new, quote=True)}"'
-            f' data-fx-invar="{in_var}" data-fx-default="{in_def}"'
-            f' data-fx-varyvar="{var_name}" data-fx-lower="{1 if lower_better else 0}"')
-
-    def _ex_table(this_is_old):
-        if not has_ex:
-            return ''
-        var_name, label, values = vary
-        th_pct = '' if this_is_old else '<th class="fx-pct-h">Δ%</th>'
-        head = f'<thead><tr><th>{label}</th><th>{unit}</th>{th_pct}</tr></thead>'
-        body = ''
-        for v in values:
-            env = dict(fixed or {})
-            env[var_name] = v
-            oval = _eval_formula(old, env)
-            nval = _eval_formula(new, env)
-            if this_is_old:
-                body += (f'<tr data-h="{v}"><td class="fx-k">{v}</td>'
-                         f'<td class="fx-gold">{_num_fmt(oval)}</td></tr>')
-            else:
-                body += (f'<tr data-h="{v}"><td class="fx-k">{v}</td>'
-                         f'<td class="fx-gold">{_num_fmt(nval)}</td>'
-                         f'<td class="fx-pct">{_formula_pct_badge(oval, nval, lower_better)}</td></tr>')
-        return f'<table class="formula-ex">{head}<tbody>{body}</tbody></table>'
-
-    def _pane(expr, cls, is_old):
-        return (f'<div class="formula-pane formula-pane-{cls}">'
-                f'<code class="formula-expr">{_fmt_formula(expr)}</code>'
-                f'{_ex_table(is_old)}</div>')
-
-    return (f'<div class="formula-change" data-tag="{tag_id}"{data_attrs}>'
-            f'<div class="formula-change-title">{badge}'
-            f'<span class="formula-change-name">{name}</span></div>'
-            f'{input_html}'
-            f'<div class="formula-change-panes">'
-            f'{_pane(old, "old", True)}'
-            f'<span class="ability-change-arrow">→</span>'
-            f'{_pane(new, "new", False)}'
-            f'</div></div>')
-
-
-def cm_draft(*phases, first_label="First pick", second_label="Second pick"):
-    if not phases:
-        return ''
-    full_old = ''.join(o for _, o, _ in phases)
-    full_new = ''.join(n for _, _, n in phases)
-    if len(full_new) != len(full_old):
-        raise ValueError('cm_draft: old and new draft sequences differ in length')
-
-    def _num(step, team, gr):
-        side = 'cm-to-left' if team == 'first' else 'cm-to-right'
-        return (f'<span class="cm-vnum {side}" '
-                f'style="grid-column:2;grid-row:{gr}">{step}</span>')
-
-    def _slot(team, kind, gr, span):
-        col = 1 if team == 'first' else 3
-        side = 'cm-left' if team == 'first' else 'cm-right'
-        gr_v = f'{gr}/span {span}' if span > 1 else f'{gr}'
-        return (f'<span class="cm-token {kind} {side}" '
-                f'style="grid-column:{col};grid-row:{gr_v}"></span>')
-
-    def _board(which):
-        seq = full_old if which == 'Old' else full_new
-        cells = [
-            f'<span class="cm-vhead" style="grid-column:1;grid-row:1">{first_label}</span>',
-            '<span class="cm-vnum cm-vnum-head" style="grid-column:2;grid-row:1"></span>',
-            f'<span class="cm-vhead" style="grid-column:3;grid-row:1">{second_label}</span>',
-        ]
-        def _team(ch):
-            return 'first' if ch in 'Ff' else 'second'
-        row = 2
-        i = 0
-        n = len(seq)
-        while i < n:
-            a = seq[i]
-            if a in 'fs':
-                if (i + 1 < n and seq[i + 1] in 'fs'
-                        and _team(seq[i + 1]) != _team(a)):
-                    b = seq[i + 1]
-                    cells.append(_num(i + 1, _team(a), row))
-                    cells.append(_num(i + 2, _team(b), row + 1))
-                    cells.append(_slot(_team(a), 'pick', row, 2))
-                    cells.append(_slot(_team(b), 'pick', row, 2))
-                    row += 2
-                    i += 2
-                else:
-                    cells.append(_num(i + 1, _team(a), f'{row}/span 2'))
-                    cells.append(_slot(_team(a), 'pick', row, 2))
-                    row += 2
-                    i += 1
-            else:
-                cells.append(_num(i + 1, _team(a), row))
-                cells.append(_slot(_team(a), 'ban', row, 1))
-                row += 1
-                i += 1
-        grid = f'<div class="cm-vgrid">{"".join(cells)}</div>'
-        return f'<div class="cm-board">{grid}</div>'
-
-    boards = (f'<div class="cm-boards">{_board("Old")}'
-              f'<span class="cm-arrow">→</span>'
-              f'{_board("New")}</div>')
-    return f'<div class="cm-draft"><div class="cm-scroll">{boards}</div></div>'
 
 
 def components(*parts, total, recipe=None):
@@ -2092,229 +1379,6 @@ def provides(*items):
         items = [s.strip() for s in items[0].split(',') if s.strip()]
     rows = ''.join(f'<div class="provides-row">{it}</div>' for it in items)
     return f'<div class="provides-box">{rows}</div>'
-
-
-_ENCHANT_VALUES = None
-
-
-def _enchant_desc(name, version):
-    """{tier: lines} of an enchantment in a patch: that patch's own numbers (data/rules/enchant_values.json,
-    scripts/gen/enchant_values.py — owner 2026-10-17, 7.41 Vital's hover said +2.25, its row +2), else the table."""
-    global _ENCHANT_VALUES
-    if _ENCHANT_VALUES is None:
-        try:
-            with open(_os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
-                                    "data", "rules", "enchant_values.json"), encoding="utf-8") as f:
-                _ENCHANT_VALUES = _json.load(f)
-        except OSError:
-            _ENCHANT_VALUES = {}
-    own = _ENCHANT_VALUES.get(version or "", {}).get(name)
-    return {int(t): lines for t, lines in own.items()} if own else _ENCHANT_DESC.get(name, {})
-
-
-def _enchant_tooltip(name, tiers):
-    desc = _enchant_desc(name, _State.current_patch_version)
-    if isinstance(tiers, int):
-        tiers = [tiers]
-    parts = []
-    multi = len([t for t in tiers if t in desc]) > 1
-    for t in tiers:
-        lines = desc.get(t)
-        if not lines:
-            continue
-        body = "\n".join(lines)
-        parts.append(f"Tier {t}\n{body}" if multi else body)
-    return "\n\n".join(parts) if parts else name
-
-
-def _enchant_chip(name, tiers):
-    slug = name.lower().replace(" ", "_").replace("'", "").replace("-", "_")
-    icon = f"{ITEM_CDN}enhancement_{slug}.png"
-    tooltip = _html.escape(_enchant_tooltip(name, tiers), quote=True)
-    return (f'<span class="enchant-chip" data-tooltip="{tooltip}">'
-            f'<img src="{icon}" alt="{name}" loading="lazy">'
-            f'<span>{name}</span></span>')
-
-
-def souvenir_chip(name, slug, removed=False, tooltip=None):
-    icon = f"{ABIL_CDN}{slug}.png"
-    cls = "enchant-chip souvenir-chip" + (" removed" if removed else "")
-    tip_attr = ''
-    if tooltip:
-        tip_attr = f' data-tooltip="{_html.escape(tooltip, quote=True)}"'
-    return (f'<span class="{cls}"{tip_attr}>'
-            f'<img src="{icon}" alt="" loading="lazy">'
-            f'<span>{name}</span></span>')
-
-
-def enchant_attr_row(attr, enchantments, tiers):
-    if attr == "all":
-        icons = ''.join(
-            f'<img src="{_ATTR_ICON[a]}" alt="">' for a in ("str", "agi", "int", "uni")
-        )
-        label = (f'<span class="enchant-attr-icons all-attrs">{icons}</span>'
-                 f'<span class="enchant-attr-name is-all">All Heroes</span>')
-    else:
-        label = (f'<img class="enchant-attr-ico" src="{_ATTR_ICON[attr]}" alt="">'
-                 f'<span class="enchant-attr-name is-{attr}">{_ATTR_LABEL[attr]}</span>')
-    chips = ''.join(_enchant_chip(e, tiers) for e in enchantments)
-    return (f'<div class="enchant-attr-row">'
-            f'<div class="enchant-attr-label">{label}</div>'
-            f'<div class="enchant-attr-list">{chips}</div>'
-            f'</div>')
-
-
-def enchant_tier_box(rows, tiers):
-    body = ''.join(enchant_attr_row(a, es, tiers) for a, es in rows)
-    return f'<div class="enchant-attr-grid">{body}</div>'
-
-
-_BULLET_SPLIT = re.compile(r'(?:^|<br>)+\s*\*\s+', re.I)
-
-
-def subnote(text):
-    parts = _BULLET_SPLIT.split(text)
-    intro_raw = parts[0] if parts else ''
-    items = [p.strip() for p in parts[1:] if p.strip()]
-    if len(items) >= 3:
-        intro = re.sub(r'<br>+\s*$', '', intro_raw).rstrip(' :').strip()
-        items_html = ''.join(f'<li>{it}</li>' for it in items)
-        summary = (intro if intro else 'Show list') + \
-                  f' <span class="subnote-count">({len(items)})</span>'
-        return ('<ul class="subnotes"><li>'
-                f'<details class="subnote-collapse">'
-                f'<summary>{summary}</summary>'
-                f'<ul class="subnote-items">{items_html}</ul>'
-                '</details></li></ul>')
-    return f'<ul class="subnotes"><li>{text}</li></ul>'
-
-
-def section_intro(text):
-    return f'<p class="section-intro">{text}</p>'
-
-
-def _days_ago(version):
-    if not version:
-        return None
-    from .meta import RELEASE_HISTORY
-    date_str = None
-    for row in RELEASE_HISTORY:
-        if row.get('version') == version:
-            date_str = row.get('date')
-            break
-    if not date_str:
-        return None
-    from datetime import datetime, date
-    try:
-        d = datetime.strptime(date_str, "%d.%m.%Y").date()
-    except Exception:
-        return None
-    return (date.today() - d).days
-
-
-def _patch_link(version):
-    if not version:
-        return ''
-    return f'<span class="patch-ref"><b>{version}</b></span>'
-
-
-def _format_age(days):
-    if days is None:
-        return None
-    if days < 365:
-        return f"{days} days ago"
-    years = days // 365
-    months = (days % 365) // 30
-    yr = f"{years} year{'s' if years != 1 else ''}"
-    if months == 0:
-        return f"{yr} ago"
-    mo = f"{months} month{'s' if months != 1 else ''}"
-    return f"{yr} {mo} ago"
-
-
-def _fmt_val(v):
-    if v is None:
-        return "?"
-    if isinstance(v, float) and v.is_integer():
-        return str(int(v))
-    return str(v)
-
-
-def note_box(text=None, *, hero=None, item=None, unit=None, field=None, before_patch=None,
-             prev_val=None, prev_patch=None, new_val=None, extra_note=None):
-    from .stats import stat_h, stat_i, stat_u, prev_change_patch_h, prev_change_patch_i, prev_change_patch_u
-    cur = _State.current_patch_version
-    if prev_val is None and (hero or item or unit):
-        if hero:
-            prev_val = stat_h(hero, field, before_patch)
-            prev_patch = prev_change_patch_h(hero, field, before_patch) or before_patch
-            if new_val is None and cur:
-                new_val = stat_h(hero, field, cur)
-        elif item:
-            prev_val = stat_i(item, field, before_patch)
-            prev_patch = prev_change_patch_i(item, field, before_patch) or before_patch
-            if new_val is None and cur:
-                new_val = stat_i(item, field, cur)
-        else:
-            prev_val = stat_u(unit, field, before_patch)
-            prev_patch = prev_change_patch_u(unit, field, before_patch) or before_patch
-            if new_val is None and cur:
-                new_val = stat_u(unit, field, cur)
-    show_val = new_val if new_val is not None else prev_val
-    if show_val is not None and prev_patch is not None:
-        if isinstance(prev_patch, str) and prev_patch.startswith("<"):
-            ver = prev_patch[1:]
-            tail = (f'Unchanged across all tracked patches '
-                    f'(since {_patch_link(ver)}) — first recorded change')
-        else:
-            ago_phrase = _format_age(_days_ago(prev_patch))
-            ago_str = f' <span class="days-ago">({ago_phrase})</span>' if ago_phrase else ''
-            tail = f'Before this patch it was changed in {_patch_link(prev_patch)}{ago_str}'
-        body = f"Now it's <b>{_fmt_val(show_val)}</b>. {tail}"
-        if extra_note:
-            body += f'<br>{extra_note}'
-        return f'<!--INLINETIP-->{info_tip(body)}<!--/INLINETIP-->'
-    note = text or ""
-    if extra_note:
-        note = f'{note}<br>{extra_note}' if note else extra_note
-    return f'<!--INLINETIP-->{info_tip(note, header="Note:")}<!--/INLINETIP-->'
-
-
-def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
-               rework_badge=True, inline_note_text=None, label=None,
-               force_rework=False, **bf_kwargs):
-    from .badges import bf
-    if label:
-        bf_kwargs.setdefault('axis_label', label)
-        bf_kwargs.setdefault('jump_at', None)
-    bf_kwargs.setdefault('extra_formulas', (old_formula,))   # old -> new steps: union of breakpoints
-    trigger, badge, table = bf(old_fn, new_fn, new_formula, l=l, **bf_kwargs)
-    if force_rework:
-        badge = '<span class="badge-group"></span>'
-    full_text = (f'{prefix} from <span class="formula-old">{old_formula}</span> '
-                 f'to {trigger}')
-    overall_match = re.search(r'data-overall="(buff|nerf)"', badge)
-    force_match = re.search(r'data-force-left="(buff|nerf)"', badge)
-    kind = (force_match.group(1) if force_match
-            else overall_match.group(1) if overall_match
-            else None)
-    if kind and not force_rework:
-        cls = "buff-text" if kind == "buff" else "nerf-text"
-        label = "BUFF" if kind == "buff" else "NERF"
-        full_badge = (f'<span class="badge {cls}" data-tag="{kind}" '
-                      f'data-overall="{kind}">{label}</span>' + badge)
-    elif bf_kwargs.get('effective_unchanged'):
-        full_badge = ('<span class="badge misc" data-tag="misc">MISC</span>'
-                      + badge)
-    elif rework_badge:
-        full_badge = ('<span class="badge rework" data-tag="rework">REWORK</span>'
-                      + badge)
-    else:
-        full_badge = badge
-    extra = table
-    if inline_note_text:
-        extra = inline_note(inline_note_text) + extra
-    return li(full_text, full_badge, extra=extra)
 
 
 def auto_components_change(item_display, this_version):
@@ -2384,13 +1448,10 @@ def auto_components_change(item_display, this_version):
 from .cards_hero_stats import _hs_covered  # noqa: E402
 from .cards_item_abilities import (  # noqa: E402
     _iab_covered_change,
-    _iab_hint,
     _iab_shown_in_card,
-    _iab_stems,
     _iab_text_change,
     _iab_unpaired_row,
     _item_ability_html,
-    _tone_cls,
     iab_attach_tail,
 )
 from .cards_item_stats import _cost_covered, components_change  # noqa: E402
@@ -2404,3 +1465,4 @@ from .cards_aghs import (  # noqa: E402
     _scale_card,
     _upgrade_wording_covered,
 )
+from .enchants import _ench_covered  # noqa: E402

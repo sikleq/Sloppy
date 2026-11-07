@@ -28,6 +28,7 @@ class _State:
     card_innate = None             # the ability_change card above shows this innate (its rows' "X is now innate")
     aghs_part_slug = None          # the open ability block's slug: its "whole old upgrade" card is still to draw
     section_panel_open = False       # True while inside a <section class="cat-panel"> wrapper
+    patch_info = ""                  # the patch's official link and dates: the card above the filters takes it
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
     seen_facets_subgroup = False     # set when first facet_header() emits "Facets" subgroup
     new_mech_header = False          # plain_header(new=…): the whole block is a new mechanic

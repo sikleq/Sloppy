@@ -374,7 +374,7 @@ def test_a_terrain_note_shows_its_micro_screenshots():
     moved — 'tier 1 safe lane towers' …; the rows are just numbered instead of tag chips", from 1 in each category);
     no link to the Terrain page — "View on map" is for that; a click opens the large copy; every picture exists
     twice."""
-    from patch.elements import terrain_note, _terrain_spot_index
+    from patch.terrain_notes import terrain_note, _terrain_spot_index
     row = "The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet"
     phrase, html = terrain_note("7.41", row)
     btn = '<button type="button" class="tshots-btn" aria-expanded="false">tier 1 safe lane towers</button>'
@@ -382,7 +382,7 @@ def test_a_terrain_note_shows_its_micro_screenshots():
     assert html.count("<img") == 2 and "<a " not in html and 'data-large="../icons/terrain/741_' in html
     assert 'width="480" height="238"' in html and "Show" not in html
     assert terrain_note("7.41", "Some row no spot matches") == ("", "")
-    from patch.elements import _TSPOT_SEEN
+    from patch.terrain_notes import _TSPOT_SEEN
     _TSPOT_SEEN.clear()                 # same words twice on one page are two rows (7.38c); each call here is its own
     li = terrain._change_li(row, "REWORK", None, "7.41", num=2)
     assert li.startswith('<li class="terrain-row" data-tag="rework"><span class="badge tnum">2</span>'
@@ -448,7 +448,7 @@ def test_the_button_is_the_name_of_what_changed():
     assert note_phrase("Watchers now can't be activated") == "Watchers"
     assert wrap_phrase('a <b class="ramp">ramp</b> ramps', "ramp", "[{}]".format) == 'a <b class="ramp">[ramp]</b> ramps'
     assert wrap_phrase("trampoline", "ramp", "[{}]".format) is None
-    from patch.elements import terrain_note
+    from patch.terrain_notes import terrain_note
     with open(os.path.join(_ROOT, "data", "terrain_spots.json"), encoding="utf-8") as f:
         spots = json.load(f)
     for patch, entries in spots.items():
@@ -519,7 +519,7 @@ def test_the_offlane_tower_note_shows_where_it_stands_and_where_it_moved():
     """The owner 2026-10-03 asked for pictures of 7.41's "Radiant offlane tier 2 tower has been adjusted slightly to
     the left": the map file moved it in 7.40, not 7.41. Two pictures: 7.40c → 7.41 with the tower marked white (it
     stands still), and 7.39e → 7.40 — a spot's third element names the patch whose maps it compares."""
-    from patch.elements import terrain_note
+    from patch.terrain_notes import terrain_note
     sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
     import terrain_shots as ts
     row = "Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides"

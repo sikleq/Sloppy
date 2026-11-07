@@ -16,7 +16,7 @@ def save_index_html():
     later. Title and structure mirror the other tabs so the header stays
     in step."""
     # Index hub: hide the centre nav tabs — they duplicate the tile grid below.
-    nav = _render_top_nav(active="main", patch_context=False, centre_tabs=False)
+    nav = _render_top_nav(active="main", patch_context=False, centre_tabs=False, colour_blind=False)
     # Landing page styled as a game inventory opened in a leather-bound book:
     # an ornate parchment panel with square slots; the filled slots are the
     # site's sections (gothic pixel-art icons), the rest are empty inventory

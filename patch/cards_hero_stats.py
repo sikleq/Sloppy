@@ -3,7 +3,8 @@
 import re
 
 from .state import _State, page_cache
-from .elements import _DMG_ROW_RE, info_tip
+from .elements import info_tip
+from .row_scores import _DMG_ROW_RE
 
 
 # ---- A hero's attack damage: starting damage + damage gain per level (owner 2026-09-28) ----

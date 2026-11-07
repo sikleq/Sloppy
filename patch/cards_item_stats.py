@@ -6,7 +6,8 @@ import re
 
 from .images import ITEM_CDN, ITEM_SLUG
 from .state import _State, page_cache
-from .elements import _PROP_TAG_CSS, _dyn_record_card, _note_cost_panel, _prop_row_text
+from .elements import _PROP_TAG_CSS
+from .row_scores import _dyn_record_card, _note_cost_panel, _prop_row_text
 from .cards_item_abilities import _iab_hint, _iab_note, _tone_cls
 
 

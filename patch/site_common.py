@@ -165,7 +165,7 @@ def cb_toggle(prefix=""):
 
 
 def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None,
-                   subtabs_active=None, subnav_in_header=True, centre_tabs=True):
+                   subtabs_active=None, subnav_in_header=True, centre_tabs=True, colour_blind=True):
     """Render the shared top nav.
 
     active        — one of the NAV_TABS keys ('main'/'changelogs'/...).
@@ -235,12 +235,16 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
             f'<div class="nav-context nav-context-flat '
             f'nav-context-{active}">{ver_html}</div>'
         )
+    # colour_blind=False: a page with nothing the colour-blind mode changes has no switch, the index hub and the calendar
+    # (owner 2026-11-07: "убрать с index фильтр дальтонизма, т.к там нет ничего для этого режима", "в календаре ещё
+    # кнопка, если там нечего перекрашивать — тоже убери")
+    cb_html = cb_toggle(prefix) if colour_blind else ""
     header = f'''<nav class="top-nav">
   {CB_EARLY_SCRIPT}
   <div class="nav-inner">
     {brand}
     {centre_html}
-    <div class="nav-end">{right_side}{cb_toggle(prefix)}</div>
+    <div class="nav-end">{right_side}{cb_html}</div>
   </div>
 </nav>
 '''

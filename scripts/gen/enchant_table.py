@@ -9,7 +9,7 @@ Where each number comes from:
   all), with enchant_values.CORRECTIONS (the local "7.41" file is the 7.41a build);
 - the tiers it is offered at now: the page's own enchant_tier_box() calls; before: the block's "Tiers changed from
   4/5 to 2-4" row, else the same tiers (the old values must then fit them, or the old side is left out);
-- the labels: patch/elements.py _ENCHANT_DESC lines matched to the KV keys in order; a key the table doesn't name
+- the labels: patch/enchants.py _ENCHANT_DESC lines matched to the KV keys in order; a key the table doesn't name
   (Mystical's 7.40 "bonus_cast_range") takes EXTRA_LABELS, else it is left out and reported — never guessed.
 """
 import ast
@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.join(_ROOT, "tools"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from patch.item_ability_text import _items  # noqa: E402
 from enchant_values import kv_values, _levels  # noqa: E402
-from patch.elements import _ENCHANT_DESC  # noqa: E402
+from patch.enchants import _ENCHANT_DESC  # noqa: E402
 
 OUT = os.path.join(_ROOT, "data", "rules", "enchant_tables.json")
 _NUM = re.compile(r"^([+\-−]?)(\d+(?:\.\d+)?)(%?)\s+(.+)$")

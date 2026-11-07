@@ -345,6 +345,22 @@
     }, isFacet && !head.querySelector('.ability-chip') ? facetLook(block.querySelector(':scope > .facet-icon-wrap')) : null));
   });
 
+  // An ability or facet says whose it is: 7.38 has Riverborn Aura on four creeps (owner 2026-11-07: "в поиске тоже
+  // непонятно, какая к чему")
+  entities.forEach(e => {
+    if (e.kind !== 'ability' && e.kind !== 'facet') return;
+    const eb = e.element.closest('.entity-block');
+    const nameEl = eb && eb.querySelector('.entity .entity-name');
+    if (!nameEl) return;
+    const clone = nameEl.cloneNode(true);
+    clone.querySelectorAll('.entity-new-type, .entity-changed-type').forEach(n => n.remove());
+    e.owner = clone.textContent.trim().replace(/\s+/g, ' ');
+    // "Dragon Knight's Breathe Fire" under Dragon Knight: the owner is said once, beside the name (owner 2026-11-07:
+    // "в поиске зачем-то пишется Dragon Knight's X ability, но ниже уже написан герой")
+    const own = e.owner + "'s ";
+    if (e.name.startsWith(own)) e.name = e.name.slice(own.length);
+  });
+
   function escapeHtml(s) { return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
   function highlight(name, q) {
     const idx = name.toLowerCase().indexOf(q.toLowerCase());
@@ -379,7 +395,9 @@
           : m.icon
           ? `<img src="${m.icon}" alt="" onerror="this.onerror=null;this.src='../icons/misc/missing.svg';">`
           : '<span style="width:32px;display:inline-block"></span>'
-      }<span>${highlight(m.name, query)}</span><span class="kind">${m.kind}</span></div>`
+      }<span class="result-name">${highlight(m.name, query)}${
+        m.owner ? ` <span class="result-owner">(${escapeHtml(m.owner)})</span>` : ''
+      }</span><span class="kind">${m.kind}</span></div>`
     ).join('');
     resultsBox.classList.add('show');
     activeIdx = -1;
@@ -501,7 +519,7 @@
       const path = svg.querySelector('path');
       const icon = block.querySelector(':scope > .ability-icon-wrap');
       let card = svg.nextElementSibling;
-      while (card && !card.classList.contains('ability-change') && !card.classList.contains('ability-card-rows')) {
+      while (card && !card.classList.contains('ability-change')) {
         card = card.nextElementSibling;
       }
       // a one-sided card (an upgrade added / removed) has only its new or old pane; a new creep's ability, its box
@@ -521,17 +539,24 @@
       const start = before ? { left: iconRect.left, width: iconRect.width, bottom: before.getBoundingClientRect().bottom } : iconRect;
       path.setAttribute('d', connectorPath(blockRect, start, paneRect));
     });
-    // Aghanim's cards are top-anchored (styles.css, 2026-10-26): the arrow stands at the middle of the OLD pane, not of
-    // the taller new side (owner, 7.41 Techies: "стрелочка теперь не соотносится к левой карточке"). On a phone the
-    // panes stack and the arrow sits between them: no shift.
-    document.querySelectorAll('.ability-change.aghs-change').forEach((card) => {
+    // Two sides standing from one top edge (Aghanim's cards, cards under an ability's rows): the arrow stands at the
+    // middle of the SHORTER side, it points at a card, never into the empty space beside the taller one (owner, 7.41
+    // Techies: "стрелочка теперь не соотносится к левой карточке"; 2026-11-07, 7.38 Mirana Leap: "стрелочка в пустоту
+    // указывает, а не блок новой карточки из-за разницы в размерах"). Centred sides keep the grid's centre. On a phone
+    // the panes stack and the arrow sits between them: no shift.
+    document.querySelectorAll('.ability-change.unified-panes').forEach((card) => {
       const arrow = card.querySelector(':scope > .ability-change-arrow');
       const oldPane = card.querySelector(':scope > .ability-change-old');
-      if (!arrow || !oldPane) return;
+      const newPane = card.querySelector(':scope > .ability-change-new');
+      if (!arrow || !oldPane || !newPane) return;
       arrow.style.marginTop = '';
+      arrow.style.alignSelf = '';
+      const o = oldPane.getBoundingClientRect();
+      const n = newPane.getBoundingClientRect();
+      if (!o.height || !n.height || Math.abs(o.top - n.top) > 2) return;   // centred sides, or stacked layout
+      const p = o.height <= n.height ? o : n;
+      arrow.style.alignSelf = 'start';
       const a = arrow.getBoundingClientRect();
-      const p = oldPane.getBoundingClientRect();
-      if (!p.height || a.top >= p.bottom) return;              // stacked layout
       arrow.style.marginTop = Math.max(0, p.top - a.top + (p.height - a.height) / 2) + 'px';
     });
   }

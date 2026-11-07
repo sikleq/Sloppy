@@ -19,7 +19,7 @@ JS_PARTS = (
     "terrain-stats-rows", "mana-items-filters", "hero-stats", "changes-filters", "changes-item-slots", "changes-index",
     "hero-lab", "hero-stats-divider", "mana-items-heatmap", "index-wall", "index-tiles", "formula-calculator", "terrain",
     "terrain-lightbox", "info-pop-placement", "aoe-increase", "dyn-offscreen", "creeps-scroll-guard", "search-layout",
-    "search-fab", "colorblind",
+    "search-fab", "filter-fab", "colorblind",
 )
 
 # What only some pages use, by the words its guard needs in the page's HTML (a regular expression).

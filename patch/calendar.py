@@ -401,7 +401,7 @@ def save_calendar_html():
 
     cur_v = _current_version()
     cur_date = next((r["date"] for r in RELEASE_HISTORY if r["version"] == cur_v), None)
-    nav = _render_top_nav(active="calendar", current_version=cur_v, date=cur_date)
+    nav = _render_top_nav(active="calendar", current_version=cur_v, date=cur_date, colour_blind=False)
     html = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
         '<meta charset="UTF-8">\n'

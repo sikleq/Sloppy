@@ -5,7 +5,8 @@ import re
 
 from .images import ABIL_CDN, _LOCAL_ABIL_ICONS
 from .state import _State
-from .elements import INNATE_ICON_URL, MISSING_ICON_URL, _close_ability_block, _dyn_record_card, inline_note
+from .elements import INNATE_ICON_URL, MISSING_ICON_URL, _close_ability_block, inline_note
+from .row_scores import _dyn_record_card
 from .number_tips import _pair_number_tips
 from .cards_item_abilities import _CARD_SEQ, _iab_meta_marks, _pane_parts, _pane_props, _pane_values
 from .cards_aghs import _GRANTED_CARDS, _aghs_inline, _granted_flag, _rework_diff_html, _shares_level

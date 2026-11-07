@@ -138,15 +138,12 @@ def test_gold_and_xp_have_the_colours_of_the_creeps_table():
     assert ".us-xp .us-v" in xp and ".camp-table .camp-xp" in xp
 
 
-def test_the_name_is_centred_on_the_icon_when_nothing_else_stands_beside_it():
+def test_an_ability_of_boxes_only_keeps_its_name_above_the_box():
+    # owner 2026-11-07: Riverborn Aura as Water Bubble (Large) — the name at the top beside the icon, the box under it
     css = read_css()
-    rule = re.search(r"\.ability-block\.ab-card-only > \.ability-title \{([^}]*)\}", css).group(1)
-    assert "align-self: center" in rule and "grid-row: 1" in rule
-    assert ".ability-block.ab-card-only > .ability-icon-wrap { grid-row: 1; }" in css
-    html = add_static_has_classes('<div class="ability-block"><h4 class="ability-title">Aura</h4><ul class="changes ability-card-rows"><li>x</li></ul></div>')
-    assert "ab-card-only" in html
-    plain = add_static_has_classes('<div class="ability-block"><h4 class="ability-title">Aura</h4><ul class="changes"><li>x</li></ul></div>')
-    assert "ab-card-only" not in plain
+    assert "ab-card-only" not in css
+    html = add_static_has_classes('<div class="ability-block"><h4 class="ability-title">Aura</h4><ul class="changes"><li>x</li></ul></div>')
+    assert "ab-card-only" not in html
 
 
 def test_camps_show_gold_and_xp_in_columns_and_no_question_mark():

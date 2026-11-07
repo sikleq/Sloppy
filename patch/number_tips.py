@@ -60,7 +60,10 @@ _ATTR_SKILL_RE = re.compile(r"^\s*(Number of times \+2 All Attributes can be ski
 
 
 def _facet_attr_rows(desc):
-    """(desc without its "+2 All Attributes" lines, those lines as rows' html)."""
+    """(desc without its "+2 All Attributes" lines, those lines as rows' html). A desc of one string is one text, not
+    a list: walking it gave one card row per letter (2026-11-07, 7.39 Malignant Mist "M / i / s / t …")."""
+    if isinstance(desc, str):
+        return desc, ""
     keep, rows = [], []
     for d in desc or []:
         m = _ATTR_SKILL_RE.match(d) if isinstance(d, str) else None

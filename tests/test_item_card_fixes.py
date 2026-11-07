@@ -10,7 +10,7 @@ import pytest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from patch import elements as e  # noqa: E402
+from patch import enchants as e  # noqa: E402
 from patch.badges import RANGE_FROM_LEVELS, b  # noqa: E402
 from patch import cards_item_abilities  # noqa: E402
 from patch import cards_item_stats  # noqa: E402

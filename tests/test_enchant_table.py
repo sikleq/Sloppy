@@ -3,7 +3,7 @@ own entity: patch squares, its Changes page), a value per tier it can be rolled 
 "Available at Tiers 1, 2, 3, and 4"."""
 import re
 
-from patch import elements as el
+from patch import enchants as el
 from patch.state import _State
 
 

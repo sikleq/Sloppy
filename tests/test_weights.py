@@ -31,7 +31,9 @@ def _cell(key, ver="7.41"):
 
 def test_ability_context_does_not_leak_into_the_next_entity(v741):
     """The previous hero's ability slug gave Tormentor rows Wraith King's ultimate x1.3."""
-    from patch.elements import _row_ctx, ability, enchant_header, hero_header
+    from patch.elements import ability, hero_header
+    from patch.enchants import enchant_header
+    from patch.row_scores import _row_ctx
     hero_header("Wraith King")
     ability("Reincarnation", slug="skeleton_king_reincarnation")
     assert _row_ctx("x")["ability"] == "skeleton_king_reincarnation"

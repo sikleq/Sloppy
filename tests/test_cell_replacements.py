@@ -1,6 +1,6 @@
 """Owner 2026-09-27: a hero block's replacements net 0 by text (signal R gives the direction);
 an Aghanim's upgrade that moved to another ability is not a loss; one removal counts once."""
-from patch import elements as el
+from patch import row_scores as el
 from patch.state import _State
 
 

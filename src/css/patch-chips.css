@@ -217,6 +217,13 @@
 .pop-li::before { content: "•"; position: absolute; left: 1px; color: var(--gold); }
 .pop-li.pop-sub { padding-left: 26px; margin-top: 1px; }
 .pop-li.pop-sub::before { content: "–"; left: 14px; color: var(--text-dim, #969289); }
+/* a talent swap's "?" as a small table (patch/talent_marks.py moves_table; owner 2026-11-07: "слишком подряд цифры
+   идут без каких-то разделений"): talent | level | value, a quiet head, lines between the rows, the cells apart */
+.tal-moves { display: grid; grid-template-columns: auto auto auto; column-gap: 14px; }
+.tal-moves > span { padding: 3px 0; border-top: 1px solid var(--line-soft); white-space: nowrap; }
+.tal-moves > .tm-h { border-top: 0; padding-top: 0; color: var(--text-dim); font-size: 12px; }
+.tal-moves > .tm-n { white-space: normal; max-width: 260px; }
+.tal-moves .tm-pct, .tal-moves .tm-same { color: var(--text-dim); font-size: 12px; }
 /* one "?" holding several notes of a row (patch/elements.py merge_tips): a thin line between them */
 .pop-part { display: block; }
 .pop-part + .pop-part { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(227, 196, 106, 0.18); }

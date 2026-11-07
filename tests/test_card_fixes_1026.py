@@ -129,9 +129,9 @@ def test_removed_items_grey_aghs_panes_on_top_and_a_gone_enchant_value_struck():
     assert not re.search(r"\.ench-gone::before \{[^}]*content", css)
     assert re.search(r"\.ench-change \.ench-stat\.ench-gone \{[^}]*line-through", css)
     assert re.search(r"\.ench-change \.ench-was \{[^}]*font-size: inherit", css)
-    # the Aghanim's card arrow stands at the old pane's middle (7.41 Techies)
+    # the arrow of a top-anchored card stands at its shorter side's middle (7.41 Techies; 2026-11-07 any such card)
     js = read_js()
-    assert ".ability-change.aghs-change" in js and "arrow.style.marginTop" in js
+    assert ".ability-change.unified-panes" in js and "arrow.style.marginTop" in js
 
 
 def test_older_enchant_tables_take_the_patchs_own_labels_and_tiers():

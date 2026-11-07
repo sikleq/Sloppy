@@ -14,12 +14,32 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def test_a_label_shows_the_words_of_the_text_with_the_icon_of_the_full_name():
     html = mech_example("Batrider's Firefly", label="Firefly")
     assert "batrider_firefly" in html
-    assert 'data-tooltip="Batrider&#x27;s Firefly"' in html     # the icon alone, the full name on hover (2026-11-06)
+    # the icon alone, the ability's name on hover, without "Batrider's" (2026-11-07: "только название способности")
+    assert 'data-tooltip="Firefly"' in html
 
 
 def test_row_examples_replaces_the_words_once():
-    html = row_examples("by Batrider during Firefly", {"Firefly": "Batrider's Firefly"})
-    assert html.startswith("by Batrider during <span")
+    html, note = row_examples("by Batrider during Firefly", {"Firefly": "Batrider's Firefly"})
+    assert html.startswith("by Batrider during <span") and note == ""
+
+
+def test_an_aside_naming_an_example_goes_under_the_question_mark_with_its_icon():
+    # owner 2026-11-07, 7.38 Ice Wall: "тут Gleipnir иконкой надо. И в целом эту часть в скобках можно под [?] сделать"
+    text, note = row_examples("Flat AoE bonuses (like those granted by Gleipnir) no longer increase radial thickness",
+                              {"Gleipnir": "Gleipnir"})
+    assert text == "Flat AoE bonuses no longer increase radial thickness"
+    assert note.startswith("Like those granted by <span") and "gungir" in note
+
+
+def test_li_puts_the_aside_into_its_note():
+    html = li("Flat AoE bonuses (like those granted by Gleipnir) no longer increase the wall", "",
+              examples={"Gleipnir": "Gleipnir"})
+    assert "(like" not in html and "INLINETIP" not in html and "Like those granted by" in html
+
+
+def test_generator_reads_like_those_granted_by():
+    out = _postprocess_example_icons(['W(li("Flat AoE bonuses (like those granted by Gleipnir) no longer", t("REWORK")))'])
+    assert out[0].endswith("examples={'Gleipnir': 'Gleipnir'}))")
 
 
 def test_row_examples_stops_on_words_the_row_does_not_have():

@@ -82,27 +82,15 @@ _BOX = '<li class="ability-row item-ability li-notag"><span class="row-text">Act
 _ROW = '<li data-tag="buff"><span class="badge buff">BUFF</span><span class="row-text">Damage</span></li>'
 
 
-def test_an_ability_told_only_by_boxes_is_a_card_with_the_line():
-    # 7.38 Boglet, Pollywog: the boxes stood right of the icon
+def test_an_ability_told_only_by_boxes_stands_beside_the_icon():
+    # 7.38 Riverborn Aura: as Water Bubble (Large), whose box has a row below it (owner 2026-11-07: "не лучше Riverborn
+    # Aura расположить также, как Water Bubble (Large)?") — no card under the icon, no line
     from patch.page import _wrap_ability_boxes
-    html = _wrap_ability_boxes(_TITLE + f'<ul class="changes">{_BOX}</ul></div>')
-    assert '<svg class="ability-change-connector under-rows-connector"' in html
-    assert '<ul class="changes ability-card-rows">' in html
-    assert html.index("<svg") < html.index("<ul")
-
-
-def test_boxes_under_an_item_or_beside_rows_stay_as_they_are():
-    from patch.page import _wrap_ability_boxes
-    item = _wrap_ability_boxes(f'<div class="entity"><h3>Orb</h3></div><ul class="changes">{_BOX}</ul>')
-    assert "ability-card-rows" not in item and "<svg" not in item
-    mixed = _wrap_ability_boxes(_TITLE + f'<ul class="changes">{_ROW}{_BOX}</ul></div>')
-    assert "ability-card-rows" not in mixed and "<svg" not in mixed
-
-
-def test_the_boxes_span_the_icon_column_and_the_line_reaches_them():
-    rule = re.search(r"\.ability-block > ul\.ability-card-rows \{([^}]*)\}", read_css())
-    assert rule and "grid-column: 1 / -1" in rule.group(1)
-    assert "'ability-card-rows'" in read_js()
+    alone = _wrap_ability_boxes(_TITLE + f'<ul class="changes">{_BOX}</ul></div>')
+    mixed = _wrap_ability_boxes(_TITLE + f'<ul class="changes">{_BOX}{_ROW}</ul></div>')
+    for html in (alone, mixed):
+        assert '<ul class="changes">' in html and "<svg" not in html
+    assert "ability-card-rows" not in read_css() and "ability-card-rows" not in read_js()
 
 
 def test_a_new_facet_card_has_the_line_too():

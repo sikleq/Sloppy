@@ -81,7 +81,8 @@ def test_talent_swap_marks_removed_new_and_moved_talents():
 
 
 def test_bug_note_is_a_bug_box_not_a_question_mark():
-    html = el.bug_note("Kept the old bonus")
+    from patch.note_boxes import bug_note
+    html = bug_note("Kept the old bonus")
     assert 'class="info-tip bug-tip"' in html and 'class="bug-ico"' in html and ">?<" not in html
     # the owner's silhouette as a CSS mask (2026-10-22); the picture must ship with the site
     from pathlib import Path
@@ -136,7 +137,8 @@ def test_game_checked_move_overrides_the_text_guess():
     _State.current_patch_version = "7.41"
     try:
         fate = tm.mark("Level 10 Talent: +165 Telekinesis Landing Damage replaced with -2s Telekinesis Cooldown", "Rubick")
-        assert fate[0] == "moved" and "Level 20" in fate[2]
+        # "10 → 20" in the Level column, the new level coloured (2026-11-07)
+        assert fate[0] == "moved" and '<span class="tm-c">10 → ' in fate[2] and ">20</span>" in fate[2]
     finally:
         del tm._content_file
         import importlib

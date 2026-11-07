@@ -39,10 +39,16 @@ _ABIL_RE = re.compile(r"((?:[A-Z][\w'\-!]*)(?: (?:of |the |of the |and )?[A-Z][\
 _OWNER_END_RE = re.compile(r"'s |(?<=s)' |: ")
 
 
+# "Batrider's Firefly" -> "Firefly": the ability's own name for a chip's tip, filled by _parse_line (owner 2026-11-07,
+# 7.40 Tormentor: "тут не надо Batrider's писать — только название способности (везде в таких случаях)"). The label
+# itself keeps the owner: the mechanic tables group their rows by it.
+_ABILITY_ONLY = {}
+
+
 def ability_chip(label, src):
     """An ability's icon as a small square, its name on hover only (facet rows, mechanic lists). A facet ("facet:<colour>:
     <icon>", from _icon_of_patch) is its coloured chip, as on every patch page (owner 2026-10-30: "фасеты … с цветами")."""
-    label = _html.escape(label)
+    label = _html.escape(_ABILITY_ONLY.get(label, label))
     if src.startswith("facet:"):
         from .badges import _FACET_COLOR_GRADIENT
         _f, colour, icon = src.split(":", 2)
@@ -290,6 +296,7 @@ def _parse_line(line):
             if icon:
                 cut = end.end() + len(name)
                 rest = line[cut:] if n < len(words) else line[m.end():]
+                _ABILITY_ONLY[line[:cut]] = name      # the tip shows the ability alone (ability_chip)
                 return line[:cut], icon, _sentence(rest), caveat
     return None
 
@@ -378,14 +385,35 @@ def _example_chip(name):
     return f'<span class="mech-ex-name">{name}</span>'
 
 
+# "(like those granted by Gleipnir)", "(e.g. Shiva's Guard will count as 1 debuff instead of 3)": an aside naming examples
+_EXAMPLE_ASIDE_RE = re.compile(r"\s*\(((?:like|such as|e\.g\.|for example)\b[^()]*)\)")
+
+
 def row_examples(text, examples):
     """A row's words with the examples it names as icons; examples: {words in the text: full name}. The row is written as a
-    plain literal (the Terrain page and kv_review read it from the source), so the icons are put in here, when it renders."""
-    for words, name in (examples or {}).items():
+    plain literal (the Terrain page and kv_review read it from the source), so the icons are put in here, when it renders.
+    Returns (text, note): an aside in brackets that names an example leaves the row for its "?" note, with the icon (owner
+    2026-11-07, 7.38 Ice Wall: "тут Gleipnir иконкой надо. И в целом эту часть в скобках можно под [?] сделать")."""
+    examples = examples or {}
+    for words in examples:
         if words not in text:
             raise ValueError(f"row_examples: {words!r} is not in the row {text[:60]!r}")
-        text = text.replace(words, mech_example(name, label=words), 1)
-    return text
+    notes = []
+
+    def aside(m):
+        inner = m.group(1)
+        named = [w for w in examples if w in inner]
+        if not named:
+            return m.group(0)
+        for words in named:
+            inner = inner.replace(words, mech_example(examples[words], label=words), 1)
+        notes.append(inner[:1].upper() + inner[1:])
+        return ""
+    text = _EXAMPLE_ASIDE_RE.sub(aside, text)
+    for words, name in examples.items():
+        if words in text:
+            text = text.replace(words, mech_example(name, label=words), 1)
+    return text, "<br>".join(notes)
 
 
 def mech_example(name, label=None):
@@ -499,7 +527,7 @@ def mech_table(head, rows, labels=True, wide_last=False):
 
 def mech_formula(expr):
     """A formula for a mech_table's cell, in the look of the site's formula blocks: variables and numbers coloured."""
-    from .elements import _fmt_formula
+    from .formula_rows import _fmt_formula
     return f'<code class="formula-expr">{_fmt_formula(expr)}</code>'
 
 
@@ -517,7 +545,7 @@ _STORY_TAGS = {"new": "buff new", "rework": "rework", "misc": "misc", "qol": "qo
 def _story_pictures(patch, match):
     """The <img> of each picture of the patch's spot entries with this "match". A name no entry has is an error: the
     picture would just be missing from the page."""
-    from .elements import _terrain_spot_index, TSHOT_H, TSHOT_W
+    from .terrain_notes import _terrain_spot_index, TSHOT_H, TSHOT_W
     rows = [s for s in _terrain_spot_index().get(patch, []) if s[0] == match]
     if not rows:
         raise ValueError(f"mech_story: no terrain_spots entry of {patch} with match {match!r}")

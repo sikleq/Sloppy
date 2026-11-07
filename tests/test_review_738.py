@@ -111,7 +111,7 @@ def test_precision_aura_is_a_table_by_hero_level():
 
 def test_precision_auras_tag_counts_every_hero_level_not_only_the_shown_columns():
     # owner 2026-11-02: NERF. 5% against 2% at level 1 is +150%, one of nine columns made the row BUFF; over all 30 levels -1.75%
-    from patch.elements import li_formula
+    from patch.formula_rows import li_formula
     shown = [1, 5, 6, 11, 12, 17, 18, 25, 30]
 
     def row(**kw):

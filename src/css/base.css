@@ -72,7 +72,8 @@ body.patch-page .container {
   background: none;
   padding-left: 0;
   padding-right: 0;
-  padding-top: 4px;
+  padding-top: 0;            /* the first section's bar right under the site's header (owner 2026-11-07: "между шапкой
+                                сайта и шапкой патча разве должно быть пространство?") */
 }
 /* Category wrapper = one continuous Valve-style changelog slab below the
    section title. This avoids "gaps" between neighbouring items/entities while

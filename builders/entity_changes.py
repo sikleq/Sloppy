@@ -124,7 +124,8 @@ def _collect():
 
 _LI_TAG_RE = _re.compile(r"<(/?)li\b[^>]*>")        # not _LI_RE: that name is taken further down
 _ALSO_RE = _re.compile(r'<li\b[^>]*\bdata-also="([^"]+)"[^>]*>')
-_SECTION_RE = _re.compile(r'<h2 class="section"[^>]*>(.*?)</h2>', _re.S)
+# the first header also holds the patch's date plate (patch/page.py patch_info_html): only the title counts
+_SECTION_RE = _re.compile(r'<h2 class="section[^"]*"[^>]*>(.*?)(?:<span class="sec-pinfo">.*?)?</h2>', _re.S)
 
 
 def _also_rows(page: str):
@@ -200,7 +201,7 @@ _TOOLBAR = '''<div class="toolbar">
 '''
 
 
-_SUBGROUP_RE = _re.compile(r'<h4 class="subgroup">([^<]+)</h4>')
+_SUBGROUP_RE = _re.compile(r'<h4 class="subgroup(?: subgroup-named)?">([^<]+)</h4>')
 _SCOPE_ORDER = ["general", "abilities", "talents", "facets", "other"]
 _SCOPE_LABEL = {"general": "General", "abilities": "Abilities", "talents": "Talents",
                 "facets": "Facets", "other": "Other"}
@@ -672,7 +673,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
                    f'<span class="ec-date">{_esc(p["date"])}</span>{label}{score}</h2>\n{body}\n</section>\n')
     # no hover tips on the corner buttons, as on the patch pages (owner 2026-09-28)
     out.append('<button class="back-to-top" aria-label="Back to top" '
-               'onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>'
+               'onclick="window.scrollTo({top:0, behavior:\'instant\'})"></button>'
                '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>'
                f'<script defer src="../src/scripts-entity.js?v={asset}"></script>\n</div></body></html>\n')
     return "".join(out)

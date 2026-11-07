@@ -25,6 +25,10 @@ from .post_general import (
     _postprocess_mechanic_rules_row,
     _postprocess_merge_twin_rows,
     _postprocess_minute_formula,
+    _postprocess_neutral_cast_notes,
+    _postprocess_umbrella_stat_rows,
+    _postprocess_lost_heal_cut_rows,
+    _postprocess_same_change_rows,
     _postprocess_misc_topics,
     _postprocess_new_block_label,
     _postprocess_new_units,
@@ -191,7 +195,11 @@ def generate(version):
     out = _postprocess_rework_continuation(out)       # "This results in …" goes on the REWORK row above (11-06)
     out = _postprocess_per_minute(out)                # "… upgrade per minute …" -> minute table
     out = _postprocess_merge_twin_rows(out)
+    out = _postprocess_same_change_rows(out)          # one change to 3+ abilities -> one row, their icons (11-07)
     out = _postprocess_new_units(out, version)        # a creep new in the game's files: its header and numbers
+    out = _postprocess_neutral_cast_notes(out)        # "Neutrals will cast …" -> [?] of the ability (owner 11-07)
+    out = _postprocess_umbrella_stat_rows(out)        # "+25% … Amplifications replaced with +20% HR" -> NERF (11-07)
+    out = _postprocess_lost_heal_cut_rows(out)        # a healing cut turned into a 7.39 HR cut -> NERF (11-07)
     out = _postprocess_rune_rows(out)                 # a rune reads as an ability: icon, name, rows (owner 2026-11-04)
     out = _postprocess_example_icons(out)             # an example named in a row carries its icon (owner 2026-11-04)
     out = _postprocess_courier_rows(out)              # Courier rows -> the unit's own category (owner 2026-11-04)

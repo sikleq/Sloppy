@@ -9,7 +9,7 @@ import pytest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts", "gen"))
-from patch import elements  # noqa: E402
+from patch import terrain_notes  # noqa: E402
 from patch.state import reset_page_state  # noqa: E402
 import terrain_hotspots as th  # noqa: E402
 
@@ -18,17 +18,17 @@ ROW = "Touched up the map in general. Slightly adjusted neutral camps, trees, an
 
 def test_every_word_opens_its_own_pictures():
     reset_page_state()
-    phrases, html = elements.terrain_note("7.38", ROW)
+    phrases, html = terrain_notes.terrain_note("7.38", ROW)
     assert phrases == ("the map", "neutral camps", "trees", "cliffs")
     assert all(f'class="tshots" data-part="{k}" hidden' in html for k in range(4))
-    row = elements.terrain_button(ROW, phrases)
+    row = terrain_notes.terrain_button(ROW, phrases)
     assert row.count('class="tshots-btn"') == 4
     assert '<button type="button" class="tshots-btn" data-part="3" aria-expanded="false">cliffs</button>' in row
 
 
 def test_a_row_without_parts_still_has_one_button():
     reset_page_state()
-    phrase, html = elements.terrain_note("7.38", "Roshan is back in the river, with one pit located near each sidelane")
+    phrase, html = terrain_notes.terrain_note("7.38", "Roshan is back in the river, with one pit located near each sidelane")
     assert phrase == "back in the river" and "data-part" not in html
 
 

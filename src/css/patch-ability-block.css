@@ -33,19 +33,6 @@
   grid-column: 2;
   margin-top: 0;
 }
-/* ... nothing stands beside the icon but the name (no tag row: Riverborn Aura): the name is centred on the icon
-   (owner 2026-11-04). */
-.ability-block.ab-card-only > .ability-icon-wrap { grid-row: 1; }
-.ability-block.ab-card-only > .ability-title { grid-row: 1; align-self: center; margin: 0; padding: 0; }
-/* An ability described only by its boxes (a new creep's, 7.38 Boglet): the boxes are its card, under the icon's left
-   edge and below the icon (the box itself keeps its 14px from the row above). */
-.ability-block > ul.ability-card-rows {
-  grid-column: 1 / -1;
-  min-width: 0;
-  margin-top: 0;
-  position: relative;
-  z-index: 1;
-}
 .ability-block > ul.subnotes {
   grid-column: 2;
   /* margin-left: 76px (inherited from base ul.subnotes) shifts it under the

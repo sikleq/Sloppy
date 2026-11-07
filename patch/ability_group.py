@@ -6,7 +6,8 @@ ability chips in the rows. The generator makes it (`_postprocess_same_change_abi
 import html as _html
 import math
 
-from .elements import MISSING_ICON_URL, _dyn_record_card, _facet_any, _open_facet_block, ability
+from .elements import MISSING_ICON_URL, _facet_any, _open_facet_block, ability
+from .row_scores import _dyn_record_card
 from .images import ABIL_CDN
 from .state import _State
 
