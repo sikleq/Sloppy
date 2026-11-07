@@ -38,7 +38,9 @@ def build():
                     if not isinstance(facet, dict) or facet.get("Deprecated"):
                         continue
                     colour = f"{facet.get('Color', 'Gray')}{facet.get('GradientID', '0')}"
-                    icon = facet.get("Icon", "")
+                    # the game writes "Speed" once (7.38 Hearthfire), the icon files are all lower case: a Linux
+                    # server finds no Speed.png (CI 2026-11-07)
+                    icon = facet.get("Icon", "").lower()
                     seen = runs.setdefault(slug, [])
                     if not seen or seen[-1][1:] != [colour, icon]:
                         seen.append([version, colour, icon])

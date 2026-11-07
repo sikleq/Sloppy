@@ -36,9 +36,11 @@ def test_a_facet_the_files_do_not_have_keeps_the_registry():
 
 
 def test_every_icon_of_the_history_is_on_disk():
+    # the name's case too: Windows found "Speed.png" as speed.png, the Linux CI did not (2026-11-07)
+    on_disk = set(os.listdir(ROOT / "icons" / "facets"))
     for slug, runs in _facet_history().items():
         for _first, _colour, icon in runs:
-            assert (ROOT / "icons" / "facets" / f"{icon}.png").exists(), (slug, icon)
+            assert f"{icon}.png" in on_disk, (slug, icon)
 
 
 def test_the_registry_colour_is_one_the_game_has_used():
