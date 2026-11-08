@@ -55,6 +55,11 @@ KNOWN_HISTORICAL_RENAMES = {
 KNOWN_NON_DATAFEED_ABILITIES = {
     # 7.38 innates that were renamed/removed later, so not in the current datafeed
     ("Beastmaster", "beastmaster_call_of_the_wild_hawk"),
+    # 7.38 abilities that live herodata no longer lists under these display names
+    ("Bloodseeker", "bloodseeker_blood_mist"),
+    ("Dazzle", "dazzle_bad_juju"),
+    ("Muerta", "muerta_parting_shot"),
+    ("Faceless Void", "faceless_void_time_zone"),
     ("Crystal Maiden", "crystal_maiden_blueheart_floe"),
     ("Drow Ranger", "drow_ranger_vantage_point"),
     ("Io", "wisp_essence_conduction"),
