@@ -642,3 +642,12 @@ def test_builds_are_counted_by_their_version_numbers(tmp_path):
     week = [w for w in bb.weekly_counts(builds, NOW) if w[1] or w[2]]
     assert [(w[1], w[2]) for w in week] == [(1, 9)]
     assert bb.nv(builds) == 10 and bb.versions(None, 5) == 1
+
+
+def test_739_is_dated_by_its_live_build():
+    # The site had 21.05.2025; the live client got 7.39 on 22.05.2025 at 22:12 UTC (owner 2026-11-10: fix the date)
+    from patch.meta import RELEASE_HISTORY
+    assert next(r["date"] for r in RELEASE_HISTORY if r["version"] == "7.39") == "22.05.2025"
+    rels = bb.releases(RELEASE_HISTORY)
+    moment, exact = bb.patch_moments(rels, bb.load_builds())["7.39"]
+    assert exact and moment.strftime("%d.%m.%Y %H:%M") == "22.05.2025 22:12"

@@ -2,7 +2,7 @@ from patch.api import *
 
 
 def build():
-    write_head("7.39", "21.05.2025")
+    write_head("7.39", "22.05.2025")
 
     # Auto-generated v2 scaffold for 7.39
     # Source: data/7.39_datafeed.json

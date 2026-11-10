@@ -150,10 +150,10 @@ def test_a_named_subgroup_stays_under_a_filter():
 def test_the_patch_info_card_is_folded_at_first():
     # "по умолчанию такая инфа свёрнута"; then "Вариант 1": a card above the filters
     from patch.page import patch_info_html
-    html = patch_info_html("7.39", "21.05.2025")
+    html = patch_info_html("7.39", "22.05.2025")
     # open at first since 2026-11-07 evening ("official notes блок пусть тоже по умолчанию включен")
     assert html.startswith('<div class="pinfo-card" id="pinfo-card">')
-    assert '<span>After 7.38c</span><span class="pi-val"><b>55</b> days</span>' in html
+    assert '<span>After 7.38c</span><span class="pi-val"><b>56</b> days</span>' in html   # 7.39 out 22.05.2025
     css = (ROOT / "src" / "css" / "patch-toolbar.css").read_text(encoding="utf-8")
     assert "sec-pinfo" not in css and ".pinfo-card[hidden] { display: none; }" in css
 

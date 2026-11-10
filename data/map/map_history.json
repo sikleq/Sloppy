@@ -2103,7 +2103,7 @@
 },
 {
 "patch": "7.39",
-"date": "2025-05-21",
+"date": "2025-05-22",
 "sha8": "d5517810",
 "changes": "trees +290 −297; camps moved: 5; towers moved: 4; watchers moved: 1; lotus pools moved: 2; Roshan pits moved: 2; bounty runes moved: 1",
 "n": {
