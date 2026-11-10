@@ -1,0 +1,103 @@
+/* ---- CALENDAR: Patches / Test servers tabs and the test servers' view (patch/branch_builds.py, 2026-11-10) ----
+   Same width as the current-year block (it breaks out by -140px); cards in the infographic's frame. */
+.cal-view-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 4px -140px 10px;
+}
+.cal-view-tab {
+  padding: 3px 16px 6px;
+  cursor: pointer;
+}
+.tb-panel {
+  margin: 4px -140px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tb-panel[hidden] { display: none; }
+@media (max-width: 1400px) {
+  .cal-view-tabs, .tb-panel { margin-left: 0; margin-right: 0; }
+}
+.tb-card {
+  padding: 12px 18px;
+  background: linear-gradient(180deg, rgba(36, 35, 33, 0.5) 0%, rgba(24, 23, 22, 0.5) 100%);
+  border: 1px solid rgba(213, 207, 195, 0.28);
+  border-radius: 6px;
+  min-width: 0;
+}
+.tb-lead .cal-ig-statline { flex-direction: row; flex-wrap: wrap; gap: 4px 22px; }
+.tb-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Server colours: Experimental ember, Staging pale gold */
+.tb-experimental { fill: #e3823a; background: #e3823a; color: #e3823a; }
+.tb-staging { fill: #f0d58c; background: #f0d58c; color: #f0d58c; }
+.tb-table th.tb-experimental-h { color: #e3823a; }
+.tb-table th.tb-staging-h { color: #f0d58c; }
+.tb-mark.is-untimed { fill-opacity: 0.35; }
+.tb-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: 1px; }
+.tb-keys { display: flex; justify-content: center; gap: 18px; margin-top: 6px; font-size: 12px; color: var(--text-dim); }
+
+/* Timeline: row names stay put, the chart scrolls sideways */
+.tb-timeline-wrap { display: flex; }
+.tb-row-names {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 10px 18px 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.tb-row-names > span { height: 26px; line-height: 26px; text-align: right; }
+.tb-timeline-scroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-color: transparent transparent;
+}
+.tb-timeline-scroll:hover { scrollbar-color: var(--px-line) transparent; }
+.tb-timeline { display: block; }
+.tb-row-band { fill: rgba(213, 207, 195, 0.03); }
+.tb-row-band.is-alt { fill: rgba(213, 207, 195, 0.06); }
+.tb-patch-line { stroke: var(--gold); stroke-width: 1; }
+.tb-patch-line.is-letter { stroke-opacity: 0.45; }
+.tb-patch-lbl { fill: var(--gold); font-size: 11px; font-family: inherit; font-weight: 700; }
+.tb-today-line { stroke: var(--text-dimmer); stroke-width: 1; stroke-dasharray: 3 3; }
+.tb-bars { display: block; width: 100%; height: auto; }
+
+/* Tables: centred, vertical lines between cells */
+.tb-table-scroll { overflow-x: auto; }
+.tb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+}
+.tb-table th, .tb-table td {
+  padding: 5px 10px;
+  text-align: center;
+  border-left: 1px solid var(--bg-panel-4);
+  white-space: nowrap;
+}
+.tb-table th:first-child, .tb-table td:first-child { border-left: 0; }
+.tb-table thead th {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--bg-panel-4);
+}
+.tb-table th.sortable { cursor: pointer; user-select: none; }
+.tb-table tbody tr:nth-child(even) { background: rgba(213, 207, 195, 0.03); }
+.tb-table tbody tr:hover { background: rgba(255, 138, 26, 0.06); }
+.tb-patch { font-weight: 700; color: var(--text-bright); }
+.tb-sub { display: block; font-size: 11px; font-weight: 400; color: var(--text-dimmer); }
+/* The list of every build is long: it scrolls inside its card under a sticky head */
+.tb-builds-scroll { max-height: 520px; overflow-y: auto; }
+.tb-builds thead { position: sticky; top: 0; z-index: 1; background: #1c1a18; }
+.tb-empty { padding: 10px; text-align: center; color: var(--text-dimmer); font-size: 13px; }
+
+@media (max-width: 760px) {
+  .tb-charts { grid-template-columns: 1fr; }
+  .tb-card { padding: 10px; }
+}

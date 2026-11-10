@@ -3,10 +3,24 @@
 import os
 import html as _html
 
+import patch.branch_builds as _builds
 import patch.site_common as _site
 
 from .meta import PATCHES, RELEASE_HISTORY, _current_version, _render_top_nav
 from .page import _ASSET_VERSION
+
+# The calendar's two views (owner 2026-11-10): the patches and the test servers' builds (patch/branch_builds.py).
+# calendar-builds.js switches them; #test-servers in the address opens the second.
+VIEW_TABS = (("patches", "Patches"), ("test-servers", "Test servers"))
+
+
+def view_tabs_html():
+    tabs = []
+    for i, (key, label) in enumerate(VIEW_TABS):
+        on = i == 0
+        tabs.append(f'<button type="button" class="cal-view-tab{" is-active" if on else ""}" role="tab" '
+                    f'data-view="{key}" aria-selected="{"true" if on else "false"}">{label}</button>')
+    return '<div class="cal-view-tabs" role="tablist">' + "".join(tabs) + '</div>'
 
 
 def save_calendar_html():
@@ -411,9 +425,11 @@ def save_calendar_html():
         '</head>\n<body>\n\n'
         + nav
         + '\n<div class="container calendar-page">\n'
-        + '\n'.join(body)
+        + view_tabs_html() + '\n'
+        + '\n'.join(body) + '\n'
+        + _builds.render_panel(_builds.load_builds(), RELEASE_HISTORY)
         + '\n</div>\n\n'
-        + f'<script defer src="src/scripts-base.js?v={_ASSET_VERSION}"></script>\n'
+        + f'<script defer src="src/scripts-calendar.js?v={_ASSET_VERSION}"></script>\n'
         + toggle_script + '\n'
         + '</body>\n</html>\n'
     )

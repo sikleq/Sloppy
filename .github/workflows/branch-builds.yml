@@ -1,0 +1,65 @@
+name: branch-builds
+
+# Dota 2's test servers (Experimental 247040, Staging 2305270) and the live game (570): Valve's keyless Web API
+# IGCVersion_<app>/GetClientVersion every 15 minutes, once a day also the muk-as/DOTA2_WEB log (fills any hours this job
+# missed). scripts/fetch/fetch_branch_builds.py; the last checks live in the Actions cache between runs, and main gets a
+# commit only per new build. A commit made with GITHUB_TOKEN starts no other workflow: the site shows the new builds at
+# its next deploy.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+    - cron: "41 3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: branch-builds
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # The newest saved state: restore-keys picks the latest cache whose key starts with the prefix
+      - name: Restore the last checks
+        uses: actions/cache/restore@v6
+        with:
+          path: .cache/branch_builds_state.json
+          key: branch-builds-state-${{ github.run_id }}
+          restore-keys: branch-builds-state-
+
+      - name: Poll Valve's Web API
+        env:
+          PYTHONIOENCODING: utf-8
+          DAILY: ${{ github.event.schedule == '41 3 * * *' || github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ "$DAILY" = "true" ]; then extra="--history"; else extra=""; fi
+          python scripts/fetch/fetch_branch_builds.py --state .cache/branch_builds_state.json $extra
+
+      - name: Save the last checks
+        uses: actions/cache/save@v6
+        with:
+          path: .cache/branch_builds_state.json
+          key: branch-builds-state-${{ github.run_id }}
+
+      - name: Commit new builds
+        run: |
+          before=$(git show HEAD:data/branch_builds.json | python -c "import json,sys; print(len(json.load(sys.stdin)['builds']))")
+          after=$(python -c "import json; print(len(json.load(open('data/branch_builds.json'))['builds']))")
+          if [ "$before" = "$after" ]; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/branch_builds.json
+          git commit -m "data: test-server builds ($after version changes)"
+          git pull --rebase origin main
+          git push origin HEAD:main
