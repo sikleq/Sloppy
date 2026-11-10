@@ -14,7 +14,7 @@
 ## ВАЖНО: source of truth
 
 `build_site.py` — **единственный entrypoint сборки**. Он запускает все builders (patches, creeps, mana items, hero lab, terrain, silent, …). `builders/build_patches.py` сам авто-обнаруживает `content/p*.py` — ручной регистрации нового патча в builders/ не требуется (только `patch/meta.py`).
-- `src/js/*.js` (41 часть, порядок склейки и файлы `dist/src/scripts-<вид страницы>.js` — `patch/js_bundle.py`: каждому виду страниц только его части, новую часть для немногих страниц вносить в `PART_MARKERS` и `JS_PAGES`, проверяет `tests/test_js_pages.py`) и `src/css/*.css` (склеиваются в `dist/styles.css`, `patch/css_bundle.py`) — единственный источник правды для стилей и поведения всех страниц (включая `index.html` и `calendar.html`). Редактируй напрямую — IDE/linter работают нормально. `build_site.py` минифицирует их в `dist/` при сборке.
+- `src/js/*.js` (42 части, порядок склейки и файлы `dist/src/scripts-<вид страницы>.js` — `patch/js_bundle.py`: каждому виду страниц только его части, новую часть для немногих страниц вносить в `PART_MARKERS` и `JS_PAGES`, проверяет `tests/test_js_pages.py`) и `src/css/*.css` (склеиваются в `dist/styles.css`, `patch/css_bundle.py`) — единственный источник правды для стилей и поведения всех страниц (включая `index.html` и `calendar.html`). Редактируй напрямую — IDE/linter работают нормально. `build_site.py` минифицирует их в `dist/` при сборке.
 - **Порядок частей `src/css` — это каскад, его не менять.** Правило добавлять в часть своего раздела. Чтобы изменить вид, править существующее объявление, а не дописывать новое ниже: `python tools/css_dead_rules.py` показывает объявления, которые уже ни на что не влияют. `colorblind.generated.css` пишет `scripts/gen/gen_colorblind_css.py`, руками не править.
 - Сгенерированные HTML (`dist/patches/7.41d.html` и т.д.) — результат запуска `python build_site.py`, не редактируй вручную.
 - Все патч-файлы лежат в `dist/patches/` (не в корне), поэтому их CSS/JS подключаются через `../styles.css`, `../src/scripts-<kind>.js` (kind: base, home, changes, entity, lab, table; `patch/js_bundle.py`).
@@ -48,5 +48,8 @@
 - `docs/captains-mode.md` — полное правило **Captains Mode** (`cm_draft`, кодировка `F/S/f/s`).
 - `docs/formula-change.md` — блок `formula_change` для важных **игровых формул** (Assist Gold, Experience…).
 - `docs/terrain.md` — полный план и TODO terrain-страницы.
+- Вкладка календаря **Test servers** (сборки Experimental/Staging): `patch/branch_builds.py`, данные
+  `data/branch_builds.json` от `scripts/fetch/fetch_branch_builds.py` (API Valve каждые 15 мин + журнал muk-as/DOTA2_WEB с 11.2023 + его канал t.me/DOTA_DM_SPAM с 10.2021,
+  `.github/workflows/branch-builds.yml`); источник и его пределы — `docs/agent-rules/pages-and-pipeline.md`.
 - `docs/todo.md` — отложенные задачи владельца (сравнение патчей, страница механик и проверка скрытых изменений).
   Только локально: в `.gitignore`, в публичный репозиторий не отправляется (владелец 2026-10-24).

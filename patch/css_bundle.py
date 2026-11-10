@@ -7,7 +7,7 @@ from pathlib import Path
 CSS_DIR = Path(__file__).resolve().parent.parent / "src" / "css"
 
 CSS_PARTS = (
-    "fonts", "tokens", "base", "nav", "index-book", "index-tiles", "version-nav", "calendar", "calendar-infographic",
+    "fonts", "tokens", "base", "nav", "index-book", "index-tiles", "version-nav", "calendar", "calendar-infographic", "calendar-builds",
     "patch-toolbar", "patch-dynamics", "patch-new-items", "patch-chips", "patch-entity-labels", "patch-ability-change",
     "patch-new-entity-rows", "patch-ability-block", "patch-subnotes", "patch-formula-rows", "patch-formula-tables",
     "creeps-table", "creeps-cells", "hero-dynamics", "tables-shared", "hero-lab", "hero-lab-inventory", "hero-lab-stats",

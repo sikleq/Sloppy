@@ -19,7 +19,7 @@ JS_PARTS = (
     "terrain-stats-rows", "mana-items-filters", "hero-stats", "changes-filters", "changes-item-slots", "changes-index",
     "hero-lab", "hero-stats-divider", "mana-items-heatmap", "index-wall", "index-tiles", "formula-calculator", "terrain",
     "terrain-lightbox", "info-pop-placement", "aoe-increase", "dyn-offscreen", "creeps-scroll-guard", "search-layout",
-    "search-fab", "filter-fab", "colorblind",
+    "search-fab", "filter-fab", "colorblind", "calendar-builds",
 )
 
 # What only some pages use, by the words its guard needs in the page's HTML (a regular expression).
@@ -43,6 +43,7 @@ PART_MARKERS = {
     "index-wall": r"inv-signatures",
     "index-tiles": r"inv-book|inv-cell-",
     "hero-lab": r"hero-lab-data",
+    "calendar-builds": r"tb-panel",
 }
 
 # The kinds of page and their parts beyond the common ones. hero-lab reads innateDpm of hero-stats and ecShopMarkup of changes-item-slots.
@@ -54,6 +55,7 @@ JS_PAGES = {
               "mana-items-filters", "mana-items-heatmap", "hero-stats", "hero-stats-divider", "terrain-stats-rows", "aoe-increase"),
     "lab": ("hero-stats", "changes-item-slots", "hero-lab"),
     "home": ("index-wall", "index-tiles"),
+    "calendar": ("calendar-builds",),
 }
 
 

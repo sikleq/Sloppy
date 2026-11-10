@@ -1,0 +1,215 @@
+/* ---- CALENDAR: Patches / Test servers tabs and the test servers' view (patch/branch_builds.py, 2026-11-10) ----
+   Same width as the current-year block (it breaks out by -140px); cards in the infographic's frame. Calm on purpose
+   (owner 2026-11-10: "непонятно, куда смотреть", "много шума"): built as the Patches view, the calendar of builds
+   on top, the answer in a strip under it, each patch's answer as a table; charts with their years below. */
+/* The two tabs are one width: the grid's equal columns take the wider one's (owner 2026-11-10: symmetry) */
+.cal-view-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  width: max-content;
+  gap: 8px;
+  margin: 4px -140px 10px;
+}
+.cal-view-tab {
+  padding: 3px 16px 6px;
+  cursor: pointer;
+  text-align: center;
+}
+.tb-panel {
+  margin: 4px -140px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tb-panel[hidden] { display: none; }
+/* The panel holds the view twice, without and with the Staging fixes; the switch shows one */
+.tb-view { display: flex; flex-direction: column; gap: 10px; }
+.tb-view[hidden] { display: none; }
+@media (max-width: 1400px) {
+  .cal-view-tabs, .tb-panel { margin-left: 0; margin-right: 0; }
+}
+.tb-card {
+  padding: 12px 18px;
+  background: linear-gradient(180deg, rgba(36, 35, 33, 0.5) 0%, rgba(24, 23, 22, 0.5) 100%);
+  border: 1px solid rgba(213, 207, 195, 0.28);
+  border-radius: 6px;
+  min-width: 0;
+}
+.tb-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* From / To years over the charts (above Builds per week) */
+.tb-years { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
+.tb-year { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dim); }
+.tb-year .cal-mode-select { min-width: 90px; padding: 0 26px 0 10px; }
+
+/* The answer under the calendar, in the Patches "Patch cadence" strip (.cal-infographic). The tab already breaks out
+   by -140px, so the strip keeps the tab's width; the first number (after the last Staging build) is the biggest */
+.tb-view > .cal-infographic { margin: 0; }
+/* Each number over its caption, centred: one size, one line across the strip (owner 2026-11-10) */
+.tb-ig-num { flex-direction: column; align-items: center; justify-content: flex-start; gap: 6px; text-align: center; }
+.tb-ig-num b {
+  font-family: var(--font-j10);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tb-ig-num span { font-size: 13px; color: var(--text-dim); }
+.tb-ig-num.is-key b { color: #ffe08a; }
+.tb-ig-num.is-key span { color: var(--text-main); }
+.tb-ig-num.is-key { box-shadow: inset 0 -2px 0 rgba(255, 224, 138, 0.55); padding-bottom: 10px; }
+.tb-ig-num.tb-experimental-t b { color: #d0603a; }
+.tb-ig-num.tb-staging-t b { color: #f0d58c; }
+
+/* Server colours: Experimental ember red (apart from the calendar's orange patches), Staging pale gold */
+.tb-experimental { fill: #d0603a; background: #d0603a; }
+.tb-staging { fill: #f0d58c; background: #f0d58c; }
+.tb-bar { fill-opacity: 0.85; }
+.tb-keys { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 8px; font-size: 12px; color: var(--text-dim); }
+.tb-key { display: inline-flex; align-items: center; gap: 6px; }
+.tb-key .tb-dot { display: inline-block; width: 8px; height: 8px; }
+
+/* A patch as a chip, coloured as on Patches: whole patches orange, letter patches grey */
+.tb-chip {
+  display: inline-block;
+  min-width: 44px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.tb-chip.is-major { background: rgba(222, 150, 62, 0.70); color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.30); }
+.tb-chip.is-sub { background: rgba(120, 117, 110, 0.4); color: var(--text-main); }
+/* A count of builds: a small pill in its server's colour */
+.tb-count {
+  display: inline-block;
+  min-width: 32px;
+  padding: 2px 8px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  color: #191410;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The calendar of builds: the Patches block itself (cal-year-block is-current, its picker, panes and footer). The tab
+   already breaks out by -140px, so the block keeps the tab's width instead of breaking out again */
+.tb-view > .cal-year-block.is-current { margin: 0; }
+.tb-cal-key { margin-top: 0; }
+/* The header's right corner: the key, then the Hide Staging fixes switch (where Patches has Compact) */
+.tb-cal-right { display: flex; align-items: center; gap: 24px; }
+.tb-sum-gap { display: inline-block; width: 18px; }
+.tb-sum-experimental { color: #d0603a; }
+.tb-sum-staging { color: #f0d58c; }
+/* A day with builds: a dot per server under its number, Experimental then Staging, bigger for 2 and 3+ builds (owner
+   2026-11-10 chose "Dots" of nine variants). A patch day keeps the Patches chip, its dots under the version */
+.tb-day { flex-direction: column; gap: 2px; }
+.tb-dots { display: flex; align-items: center; gap: 4px; height: 8px; }
+.tb-dot-e, .tb-dot-s { display: block; border-radius: 50%; flex: 0 0 auto; }
+.tb-dot-e { background: #d0603a; }
+.tb-dot-s { background: #f0d58c; }
+.tb-d1 { width: 4px; height: 4px; }
+.tb-d2 { width: 6px; height: 6px; }
+.tb-d3 { width: 8px; height: 8px; }
+.tb-day:is(.tb-e1, .tb-e2, .tb-e3, .tb-s1, .tb-s2, .tb-s3):not(.has-patch) { color: #e2d9c4; }
+.tb-cal-key .tb-key i { display: inline-block; }
+
+/* The tooltips' counts: a row per server in its colour */
+.tb-tip-table { border-collapse: collapse; margin-top: 3px; min-width: 120px; }
+.tb-tip-table td { padding: 2px 6px; }
+.tb-tip-table td + td { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tb-tip-table tr + tr td { border-top: 1px solid rgba(213, 207, 195, 0.15); }
+.tb-tip-table tr.tb-tip-experimental td { color: #e8845e; }
+.tb-tip-table tr.tb-tip-staging td { color: #f0d58c; }
+b + .tb-tip-table, .tb-tip-sub + .tb-tip-table { margin-top: 4px; }
+.tb-tip-sub { margin-left: 8px; color: var(--text-dimmer); font-size: 11px; }
+.tb-tip-table tr.tb-tip-key td { color: #ffe08a; }
+/* A patch day stands out from the coloured days around it: a ring in its own colour, above its neighbours */
+.tb-calblock .cal-full-day.has-patch { z-index: 2; box-shadow: 0 0 0 2px #1a1816, 0 0 0 3px rgba(226, 217, 196, 0.75); }
+.tb-calblock .cal-full-day.has-patch.major { box-shadow: 0 0 0 2px #1a1816, 0 0 0 4px var(--gold); }
+
+/* Each patch: a table (the site's rule: centred, vertical lines between cells, a line between rows). The gold column
+   (after the last Staging build) leads */
+.tb-plist { display: flex; flex-direction: column; }
+.tb-plist[hidden], .tb-pr[hidden] { display: none; }
+.tb-pr {
+  display: grid;
+  grid-template-columns: 170px 1fr 1fr 1fr 1fr 130px;
+  align-items: stretch;
+  border-top: 1px solid rgba(213, 207, 195, 0.14);
+}
+.tb-pr > * { padding: 7px 12px; }
+.tb-pr > * + * { border-left: 1px solid rgba(213, 207, 195, 0.14); }
+.tb-pr[data-patch]:hover, .tb-pr.is-on { background: rgba(255, 138, 26, 0.07); }
+.tb-pr-head { border-top: 0; border-bottom: 1px solid rgba(213, 207, 195, 0.22); font-size: 12px; font-weight: 600; color: var(--text-dim); }
+.tb-pr-head > * { padding-bottom: 8px; }
+.tb-pr-head .is-key { color: #f0d58c; }
+.tb-pr-name { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.tb-pr-name .tb-sub { font-size: 11px; color: var(--text-dimmer); white-space: nowrap; }
+.tb-pr-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0; text-align: center; }
+.tb-pr-cell b { font-size: 16px; font-weight: 700; color: var(--text-main); font-variant-numeric: tabular-nums; }
+.tb-pr-cell.is-key { background: rgba(240, 213, 140, 0.04); }
+.tb-pr-cell.is-key b { font-size: 20px; color: #f0d58c; }
+.tb-pr-bar { display: block; height: 4px; width: calc(100% * var(--p)); min-width: 2px; opacity: 0.8; }
+/* Longer than the 48 h scale: the bar ends in a cut */
+.tb-pr-bar.is-over { clip-path: polygon(0 0, 100% 0, calc(100% - 5px) 50%, 100% 100%, 0 100%); }
+.tb-pr-counts { flex-direction: row; gap: 6px; }
+.tb-pr-head .tb-pr-counts { display: flex; }
+.tb-empty { padding: 10px; text-align: center; color: var(--text-dimmer); font-size: 13px; }
+
+/* Builds per week: the whole history at full width, Experimental up from the middle line, Staging down */
+/* On a phone the chart keeps a readable size and scrolls sideways inside its card (scrollbar shows on hover) */
+.tb-weekly-scroll { overflow-x: auto; scrollbar-color: transparent transparent; }
+.tb-weekly-scroll:hover { scrollbar-color: var(--px-line) transparent; }
+.tb-weekly { display: block; width: 100%; height: auto; }
+.tb-weekly[hidden] { display: none; }
+.tb-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; margin-bottom: 6px; }
+.tb-card-head .cal-ig-h { margin-bottom: 0; }
+.tb-series { display: flex; gap: 6px; }
+/* Hover targets: a week's whole column, a strip around each patch line */
+.tb-hit { fill: transparent; pointer-events: all; }
+.tb-hit:hover { fill: rgba(255, 224, 138, 0.07); }
+.tb-patch-hit { cursor: default; }
+.tb-patch-hit.is-on { fill: rgba(227, 196, 106, 0.18); }
+/* A patch pointed at: its run-up weeks stay bright, the rest fade */
+.tb-weekly.is-focus .tb-bar { fill-opacity: 0.3; }
+/* Lines and text never catch the pointer: the week column or patch strip under them does */
+.tb-weekly line, .tb-weekly text { pointer-events: none; }
+.tb-weekly.is-focus .tb-bar.is-on { fill-opacity: 1; }
+.tb-bar-val { font-size: 10px; font-family: inherit; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tb-half-name { font-size: 12px; font-family: inherit; font-weight: 600; }
+.tb-ytick { fill: var(--text-dim); font-size: 11px; font-family: inherit; font-variant-numeric: tabular-nums; }
+.tb-patch-line { stroke: var(--gold); stroke-width: 1.2; stroke-opacity: 0.85; }
+.tb-patch-line.is-letter { stroke-width: 1; stroke-opacity: 0.45; stroke-dasharray: 2 3; }
+.tb-patch-lbl { fill: var(--gold); font-size: 12px; font-family: inherit; font-weight: 700; }
+.tb-month-tick { stroke: var(--text-dimmer); stroke-width: 1; }
+.cal-ig-spark-lbl.is-year { fill: var(--text-main); font-weight: 700; }
+.tb-today-line { stroke: var(--text-dimmer); stroke-width: 1; stroke-dasharray: 3 3; }
+.tb-today-lbl { fill: var(--text-dim); font-size: 11px; font-family: inherit; }
+.tb-bars { display: block; width: 100%; height: auto; }
+.tb-bars[hidden] { display: none; }
+.tb-bars line, .tb-bars text { pointer-events: none; }
+
+@media (max-width: 760px) {
+  .tb-charts { grid-template-columns: 1fr; }
+  .tb-view > .cal-infographic { flex-direction: column; gap: 10px; }
+  .tb-cal-right .tb-cal-key { display: none; }
+  .tb-weekly { width: 1300px; max-width: none; }
+  .tb-card { padding: 10px; }
+  /* A phone: the name across, the four durations 2 by 2 each with its own label (the header row is hidden), the
+     builds across */
+  .tb-pr { grid-template-columns: 1fr 1fr; }
+  .tb-pr-name { grid-column: 1 / -1; border-bottom: 1px solid rgba(213, 207, 195, 0.14); }
+  .tb-pr > .tb-pr-cell:nth-child(2), .tb-pr > .tb-pr-cell:nth-child(4) { border-left: 0; }
+  .tb-pr > .tb-pr-cell:nth-child(4), .tb-pr > .tb-pr-cell:nth-child(5) { border-top: 1px solid rgba(213, 207, 195, 0.14); }
+  .tb-pr-cell[data-label]::before { content: attr(data-label); font-size: 10.5px; color: var(--text-dimmer); }
+  .tb-pr-counts { grid-column: 1 / -1; border-left: 0; border-top: 1px solid rgba(213, 207, 195, 0.14); flex-wrap: wrap; justify-content: center; }
+  .tb-pr-counts::before { flex-basis: 100%; text-align: center; }
+  .tb-pr-head { display: none; }
+}

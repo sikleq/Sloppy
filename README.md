@@ -97,7 +97,11 @@ page's [Gothic Pixel UI](https://abyssowl.itch.io/gothic-pixel-ui) pack by **aby
 
 - Game-file history before our own snapshots:
   [SteamTracking/GameTracking-Dota2](https://github.com/SteamTracking/GameTracking-Dota2) (2016 – 2023) and
-  [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) (2023 – now).
+  [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) (2023 – now); GameTracking also feeds the daily
+  new-build watch.
+- Calendar's Test servers tab: Experimental and Staging builds from the log of
+  [muk-as/DOTA2_WEB](https://github.com/muk-as/DOTA2_WEB) (since November 2023) and the same author's channel
+  t.me/DOTA_DM_SPAM (October 2021 to November 2023); newer builds from Valve's Web API.
 - Game files read with [ValveResourceFormat](https://github.com/ValveResourceFormat/ValveResourceFormat) and
   [vpk](https://github.com/ValvePython/vpk).
 - Terrain page inspired by [devilesk](https://github.com/devilesk/dota-interactive-map).
