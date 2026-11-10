@@ -19,7 +19,7 @@ w, v       = Σ rows of the entity in that patch  →  _dynamics.json patches[ve
 | type | ordered regex table `CAT`, matched on the text **before the first verb** (increased/decreased/…); `replaced with …` rows use the new effect | bkb_pierce/chance demoted to the end; projectile before move_speed; `damage block` → armor |
 | weight | `data/rules/valve_weights.json` → `final` | consensus rank shrunk to `other` (0.40) when < 3 signals: `respawn 0.97→0.59`, `chance 0.93→0.58`, `bkb_pierce 0.90→0.57`; `cost 0.45`, `turn_rate 0.2`, `other 0.4` are manual |
 | context | `valve_weights.json` → `context` | ultimate 1.3 (slugs read from the latest KV `AbilityType ULTIMATE`, 151), ability/innate/scepter/base stat/item 1.0, shard 0.9, facet 0.8, talent 10/15/20/25 = 0.5/0.6/0.7/0.8 (lowered with signal J) |
-| direction | tags | buff +1, nerf −1, sole `new`/`del` ±1.0 for heroes/units (±0.5 items; whole ability/facet ±`WHOLE_W`; item leaving the game 0 — see "DEL and NEW rows"), rework/misc/qol 0 |
+| direction | tags | buff +1, nerf −1, sole `new`/`del` ±1.0 for heroes/units (unpriced item rows ±2, ×2 more without a number, since 2026-11-11; whole ability/facet ±`WHOLE_W`; item leaving the game 0 — see "DEL and NEW rows"), rework/misc/qol 0 |
 | magnitude | hybrid | GENERAL rows: `|Δ| / typical_step` (MS 5, base dmg 3, stats 2, stat gain 0.2, armor 1, HP regen 0.5, mana regen 0.25 …). Other rows: `mean|%| / typical_pct[type]` (signal C medians: cooldown 17.7, damage 17.8, health 25, cast_point 42.9 …); 0% badges count; "Recipe … Total cost …" uses the total. Cap 3. No badge → 1.0 |
 
 ## Signal J — Valve's exchange rate (done 2026-09-16)
@@ -590,7 +590,7 @@ creeps" (−0.19).
   unreplaced removal stays a clear nerf;
 - items / enchantments leaving the game ("Item cycled out", "removed from the game", "Removed") → 0 net, volume
   only: nobody holds a weaker item;
-- items otherwise unchanged (±0.5; priced stats in gold as before).
+- items otherwise unchanged (±0.5; priced stats in gold as before) — until 2026-11-11: ×2, see "Audit 2026-11-10".
 
 Result: inside DEL/NEW ρ −0.13 → **0.30**, all 200 rows −0.21 → 0.19; hero median |net| DEL 0.46, NEW 0.56.
 Signal R: the hero adoption fit on the new nets moves slope 0.129 → 0.132 (ρ 0.264 → 0.273) — kept, not refitted.
@@ -679,5 +679,33 @@ Phantom Lancer −4.83 → −7.83, 7.41 Monkey King +0.13 → +2.60, 7.39c Temp
 Checked and fine: identical rows of different heroes weigh the same (the only spread is skill priority); no
 BUFF row with a negative score or the reverse; item gold scale differences between items are by design (the same
 +25 Attack Speed is 4.24 on Orb of Corrosion and 0.77 on Gleipnir: a share of the item's cost).
-Not changed: signal R's fit (slope 0.135, drift 0.095) was made with the old nets; re-fitting it on the new ones
-is open.
+Signal R's fit was then redone on the new nets (below).
+
+### 2026-11-11 — talents, item effects, signal R refit
+
+6. **Talent numbers ×0.6** (`TALENT_VALUE_F`, buff/nerf rows with a talent context; SWAP rows untouched). The % of
+   "Level 20 Talent: Crippling Fear DPS +20 → +40" is of the talent, not of the ability, so it read like a doubled
+   spell. Measuring it against the ability's own value was the plan, but both blind samples grade almost every such
+   row 1 of 5 whatever its size (25 + 12 rows), so there is no ranking to gain — only the level. Agreement rises
+   steadily as talents go down (to ×0.35); ×0.6 sits between that and the mean-calibrated ×0.85. New sample 0.418 →
+   0.471, old sample 0.486 → 0.541. Night Stalker 7.40 "Crippling Fear DPS +20 → +40" +1.84 → +1.10.
+7. **Item effects gained / lost** (`ITEM_DELNEW_W` 2, `_sole_new_del`). A blind sample of 125 item rows (two Sonnet
+   judges, ρ 0.74 between them; scratchpad `items_*`) — stats priced in gold 40, actives 40, costs 15, mana costs 12,
+   enchantments 13, neutral 5: model vs judges ρ **0.217**. The worst gap: an unpriced sole NEW / DEL row (an active,
+   a passive, a condition) was ±0.5 × type weight × `ITEM_ABILITY_F` — "Removed Chain Lightning ability" (Gleipnir
+   7.38) −0.12, "Now also provides passive Behemoth's Blood" +0.12, both graded 4. Now × 2, × `NUMBERLESS_W` without a
+   number, × `NICHE_W` for a niche target or a stacking limit ("Burn no longer does extra damage to illusions",
+   "no longer stacks with other Kaya-based items"): ρ **0.217 → 0.424**; Gleipnir row −0.12 → −0.96. Priced stat
+   rows (gold) are unchanged. Tried and not taken: item mana costs ×1.5–3 (calibrated better, ranked worse:
+   0.425 → 0.415), `ITEM_ABILITY_F` 0.8–1.0 and `ITEM_GOLD_K` 6–8 (within ±0.01).
+8. **Signal R refit** (`tools/fit_signal_r.py`, new): a Theil-Sen line, like the first fit (it reproduces its hero
+   slope 0.131 ≈ 0.135 on the old nets), through the non-rework cells of the 24 patches. Heroes 0.135 × net + 0.095 →
+   **0.15 × net − 0.019** (n 597, ρ 0.27); items 0.41 × net + 0.127 → **0.211 × net + 0.022** (n 219, ρ 0.35). The old
+   drift came from the first 20 patches; on today's data an unchanged hero's pick share does not drift, so the old
+   value pulled every hero rework ~0.7 toward a nerf. R never enters the cells it is fitted on, so one pass is final;
+   run the tool after `build_site.py` whenever the weights or the adoption data change.
+
+Effect of 6–8 (on top of 1–5): 480 cells move by more than 0.1 (375 hero, 105 item). Largest: Guardian Greaves 7.40
++0.64 → −1.50 (three aura effects lost), Gleipnir 7.38 −0.25 → −2.18, Gunpowder Gauntlet 7.38b +0.37 → +2.23,
+Khanda 7.38 −1.84 → −3.33, Refresher Orb 7.41 +1.22 → 0.00 ("no longer refreshes items" −1.39), Treant Protector
+7.40 +7.37 → +6.21. `corr(w, buff − nerf)` 0.811 → 0.783.

@@ -561,12 +561,15 @@ _ADOPT = {"item": _load_adopt("item_adoption.json", "items"), "hero": _load_adop
 # number to read its direction from; Valve's prices and follow-up patches do not tell it either
 # (docs/weights.md "Reworks"). It gets the part of the Tier 1-2 pro adoption shift (the match database, 21 days
 # before vs after; items: share of player-games that bought it, heroes: that played it) the entity's
-# other rows do not explain. Fitted on the non-rework cells 7.35c-7.41f:
-#   items  dlog = 0.41 x net + 0.13 (n 171, rho 0.32), median |dlog| 0.21 (meta noise)
-#   heroes dlog = 0.135 x net + 0.095 (n 577, rho 0.27), median |dlog| 0.36
+# other rows do not explain. Fitted on the non-rework cells (first fit 2026-09-26: items 0.41 x net + 0.13,
+# heroes 0.135 x net + 0.095; refit below).
 # The unexplained shift is real, not noise: independent halves of the windows agree, rho 0.55 / 0.43.
-ADOPT_FIT = {"item": {"slope": 0.41, "drift": 0.127, "noise": 0.21, "min_n": 30},
-             "hero": {"slope": 0.135, "drift": 0.095, "noise": 0.36, "min_n": 20}}
+# Refit 2026-11-11 (tools/fit_signal_r.py, Theil-Sen like the first fit, on the weights of the 2026-11-10/11 audit
+# and 24 patches with 7.37 and 7.41): heroes n 597 rho 0.27, items n 219 rho 0.35. The old drift (0.095 / 0.127)
+# came from the first 20 patches; on today's data the share shift of an unchanged entity is ~0, so the old drift
+# pulled every hero rework ~0.7 toward a nerf. R never enters the cells it is fitted on: one pass is final.
+ADOPT_FIT = {"item": {"slope": 0.211, "drift": 0.022, "noise": 0.21, "min_n": 30},
+             "hero": {"slope": 0.15, "drift": -0.019, "noise": 0.37, "min_n": 20}}
 ADOPT_SHRINK_N = 50          # n / (n + 50), n = harmonic mean of the before / after counts: the SMALLER
                              # side decides how much of the shift is trusted (7.38 had ~100 matches after)
 ITEM_REWORK_CAP = 3.0        # cap of signal R for one entity per patch (items and heroes)
@@ -686,7 +689,17 @@ NUMBERLESS_W = 2.0
 def _row_value(text, badge_html, kind, ctx):
     """Unsigned value of a buff/nerf row on the common scale (before context)."""
     v = _row_value_raw(text, badge_html, kind, ctx)
+    if ctx and ctx.get("talent"):
+        v *= TALENT_VALUE_F
     return v * NICHE_W if _NICHE_RE.search(_plain(text)) else v
+
+
+# A talent's number changed ("Level 20 Talent: Crippling Fear DPS +20 -> +40"): its % is of the talent itself, not of
+# the ability, so +100 % reads like a doubled spell. Both blind samples grade almost every such row 1 of 5 whatever
+# its size (audit 2026-11-11, 25 + 12 rows), so there is nothing to rank them by the ability's value with; their
+# level is lowered instead. Agreement rises steadily down to x0.35 (new 0.418 -> 0.476, old 0.486 -> 0.542 at x0.55);
+# x0.6 sits between that and the mean-calibrated x0.85. SWAP rows (signal K) are not affected.
+TALENT_VALUE_F = 0.6
 
 
 def _row_value_raw(text, badge_html, kind, ctx):
@@ -885,6 +898,7 @@ def _row_scores(text, tags, badge_html="", ctx=None):
 # "an item ability = cost - priced stats" (negative for a third of items) — neither is done.
 DELNEW_HERO_W = 1.0       # direction of a sole NEW / DEL row of a hero / unit (was 0.5, like items still)
 WHOLE_W = 2.0             # a whole ability / facet / innate removed or added = a numberless NERF / BUFF
+ITEM_DELNEW_W = 2.0       # direction of an item's unpriced sole NEW / DEL row (was 0.5; audit 2026-11-11)
 _HERO_KINDS = ("hero", "unit", "creep-hero")
 # an item / enchantment that leaves the game is not a weaker item: 0 net, only volume
 _EXIT_RE = _re.compile(r"cycled out|removed from the game|^\s*removed\s*$", _re.I)
@@ -944,6 +958,18 @@ def _sole_new_del(text, tags, ctx, w, cm):
         return 0.0, round(w, 3)
     if ek in ("item", "enchant") and sign > 0 and _ENTER_RE.search(t):     # the mirror: back in the pool
         return 0.0, round(w, 3)
+    if ek in ("item", "enchant"):
+        # an item's effect gained / lost that has no gold price (an active, a passive, a condition): it was
+        # +-0.5 x the type weight x ITEM_ABILITY_F, so "Removed Chain Lightning ability" (Gleipnir 7.38) was -0.12
+        # and "Now also provides passive Behemoth's Blood" +0.12 — both graded 4 of 5 by two blind judges
+        # (audit 2026-11-11, 125 item rows: agreement 0.217 -> 0.425). Now x ITEM_DELNEW_W, x NUMBERLESS_W when the
+        # row has no number, like a hero's numberless row.
+        v = w * ITEM_DELNEW_W * (NUMBERLESS_W if not _re.search(r"\d", t) else 1.0)
+        # ... still x NICHE_W when it acts on a niche target ("Burn no longer does extra damage to illusions",
+        # Radiance 7.40) or only limits stacking with other items ("no longer stacks with other Kaya-based items")
+        if _NICHE_TARGET_RE.search(t) or _re.search(r"\bstacks? with\b", t, _re.I):
+            v *= NICHE_W
+        return round(sign * v, 3), round(v, 3)
     if ek not in _HERO_KINDS:
         return round(sign * w * 0.5, 3), round(w, 3)
     # a whole ability / facet / innate: the "Removed X ability / facet" row, or the card of a new one

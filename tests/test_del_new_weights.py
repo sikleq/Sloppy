@@ -1,4 +1,6 @@
 """Owner 2026-09-27: DEL / NEW row weights (blind judge 200 rows + devil's advocate + pro adoption)."""
+import pytest
+
 from patch import weights as w
 
 HERO = {"kind": "hero", "version": "7.38", "hero": "dazzle"}
@@ -35,12 +37,26 @@ def test_hero_del_is_doubled_but_a_lost_niche_target_is_halved():
     assert abs(creeps) < abs(part) * 1.01
 
 
-def test_an_item_leaving_the_game_is_not_a_nerf_and_items_keep_half():
+def test_an_item_leaving_the_game_is_not_a_nerf_and_lost_effects_weigh_in_full():
     net, vol = w.row_scores("Item cycled out", {"del"}, ctx={"kind": "item", "version": "7.40", "item": "x"})
     assert net == 0.0 and vol > 0
-    net, vol = w.row_scores("Eternal Chains no longer deals damage", {"del"},
-                            ctx={"kind": "item", "version": "7.38", "item": "gungir"})
-    assert net == -round(vol * 0.5, 3)
+    # audit 2026-11-11: "Removed Chain Lightning ability" was -0.12 (x0.5), blind judges graded it 4 of 5
+    ctx = {"kind": "item", "version": "7.38", "item": "gungir"}
+    base = w.weight_of(w.classify("Removed Chain Lightning ability")) * w.ITEM_ABILITY_F
+    net, vol = w.row_scores("Removed Chain Lightning ability", {"del"}, ctx=ctx)
+    assert net == pytest.approx(-base * w.ITEM_DELNEW_W * w.NUMBERLESS_W, abs=0.002) and vol == -net
+    assert net < -0.4
+    numbered, _ = w.row_scores("Chain Lightning no longer deals 160 damage", {"del"}, ctx=ctx)
+    assert numbered == pytest.approx(-w.weight_of("damage") * w.ITEM_ABILITY_F * w.ITEM_DELNEW_W, abs=0.002)
+    # a niche target or a stacking limit stays at half, as for heroes (Radiance 7.40, Kaya 7.37b)
+    rad = {"kind": "item", "version": "7.40", "item": "radiance"}
+    illu, _ = w.row_scores("Burn no longer does extra damage to illusions", {"del"}, ctx=rad)
+    assert illu == pytest.approx(-w.weight_of("damage") * w.ITEM_ABILITY_F * w.ITEM_DELNEW_W * w.NUMBERLESS_W
+                                 * w.NICHE_W, abs=0.002)
+    kaya = {"kind": "item", "version": "7.37b", "item": "kaya"}
+    stack, _ = w.row_scores("Mana Regen Amplification no longer stacks with other Kaya-based items", {"del"}, ctx=kaya)
+    full = w.weight_of(w.classify("Mana Regen Amplification no longer stacks")) * w.ITEM_ABILITY_F * 4
+    assert stack == pytest.approx(-full * w.NICHE_W, abs=0.002)
 
 
 def test_a_number_in_a_del_row_does_not_turn_it_into_minus_100_percent():

@@ -251,6 +251,34 @@ def test_adoption_window_runs_past_a_sub_patch_days_later():
     assert "Bb" not in got                                # its before-window is the short one
 
 
+def test_a_talent_number_change_weighs_less_than_the_same_change_of_a_spell():
+    """Blind judges grade almost every "Level N Talent: X +A -> +B" row 1 of 5 (audit 2026-11-11)."""
+    badge = b(20, 40)
+    text = "Level 20 Talent: Crippling Fear DPS increased from +20 to +40"
+    talent = W.row_scores(text, {"buff"}, badge, {"kind": "hero", "talent": 20})[0]
+    spell = W.row_scores("Crippling Fear DPS increased from 20 to 40", {"buff"}, badge, {"kind": "hero"})[0]
+    assert talent == pytest.approx(spell * W.context_multiplier({"talent": 20}) * W.TALENT_VALUE_F, abs=0.01)
+
+
+def test_signal_r_fit_is_a_robust_line_through_non_rework_cells():
+    pytest.importorskip("scipy")
+    import sys
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import math
+    import fit_signal_r as F
+    dyn = {"hero|a": {"patches": {"7.40": {"w": 2.0}, "7.41": {"w": 1.0, "rework": 1}}},
+           "hero|b": {"patches": {"7.40": {"w": -1.0}}}, "hero|c": {"patches": {"7.40": {"w": 0.0}}}}
+    adoption = {"7.40": {"games": [1000, 1000], "heroes": {"a": [99, 149], "b": [99, 79], "c": [99, 99]}},
+                "7.41": {"games": [1000, 1000], "heroes": {"a": [10, 90]}}}
+    pts = F.cell_points(dyn, adoption, "hero", "heroes", 20)
+    assert len(pts) == 3                                   # the rework cell is left out
+    got = F.fit(pts)
+    assert got["drift"] == pytest.approx(0.0, abs=1e-6)
+    assert got["slope"] == pytest.approx(math.log(1.5) / 2, abs=0.03)
+    # refit 2026-11-11: the old drift 0.095 pulled every hero rework toward a nerf
+    assert abs(W.ADOPT_FIT["hero"]["drift"]) < 0.05 and abs(W.ADOPT_FIT["item"]["drift"]) < 0.05
+
+
 def test_741_has_signal_r_data():
     import json
     for name in ("hero_adoption.json", "item_adoption.json"):

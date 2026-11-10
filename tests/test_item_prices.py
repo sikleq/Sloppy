@@ -275,7 +275,10 @@ def test_rework_row_takes_the_adoption_shift_the_other_rows_do_not_explain(monke
     net = W.rework_adoption_net(ctx, -3.84)
     assert 0 < net <= W.ITEM_REWORK_CAP
     # the same shift, fully explained by the other rows -> nothing left for the rework
-    assert W.rework_adoption_net(ctx, 2.2) == 0.0
+    import math
+    fit = W.ADOPT_FIT["item"]
+    explained = (math.log((121 / 1010) / (355 / 8447)) - fit["drift"]) / fit["slope"]
+    assert W.rework_adoption_net(ctx, explained) == 0.0
 
 
 def test_rework_row_without_adoption_data_stays_zero(monkeypatch):
