@@ -1,5 +1,6 @@
 /* ---- CALENDAR: Patches / Test servers tabs and the test servers' view (patch/branch_builds.py, 2026-11-10) ----
-   Same width as the current-year block (it breaks out by -140px); cards in the infographic's frame. */
+   Same width as the current-year block (it breaks out by -140px); cards in the infographic's frame. Calm on purpose
+   (owner 2026-11-10: "непонятно, куда смотреть"): four numbers first, one chart per question, the long list folded. */
 .cal-view-tabs {
   display: flex;
   gap: 8px;
@@ -26,44 +27,99 @@
   border-radius: 6px;
   min-width: 0;
 }
-.tb-lead .cal-ig-statline { flex-direction: row; flex-wrap: wrap; gap: 4px 22px; }
 .tb-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
+/* From / To years over the whole tab */
+.tb-years { display: flex; align-items: center; gap: 14px; }
+.tb-year { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dim); }
+.tb-year .cal-mode-select { min-width: 90px; padding: 0 26px 0 10px; }
+
+/* The four numbers: what to look at first */
+.tb-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.tb-tile {
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(36, 35, 33, 0.5) 0%, rgba(24, 23, 22, 0.5) 100%);
+  border: 1px solid rgba(213, 207, 195, 0.28);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tb-tile b {
+  font-family: var(--font-j10);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.tb-tile span { font-size: 12px; color: var(--text-dim); }
+.tb-tile.tb-experimental-t b { color: #e3823a; }
+.tb-tile.tb-staging-t b { color: #f0d58c; }
+
 /* Server colours: Experimental ember, Staging pale gold */
-.tb-experimental { fill: #e3823a; background: #e3823a; color: #e3823a; }
-.tb-staging { fill: #f0d58c; background: #f0d58c; color: #f0d58c; }
+.tb-experimental { fill: #e3823a; background: #e3823a; }
+.tb-staging { fill: #f0d58c; background: #f0d58c; }
 .tb-table th.tb-experimental-h { color: #e3823a; }
 .tb-table th.tb-staging-h { color: #f0d58c; }
-.tb-mark.is-untimed { fill-opacity: 0.35; }
+.tb-bar { fill-opacity: 0.85; }
 .tb-dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: 1px; }
 .tb-keys { display: flex; justify-content: center; gap: 18px; margin-top: 6px; font-size: 12px; color: var(--text-dim); }
 
-/* Timeline: row names stay put, the chart scrolls sideways */
-.tb-timeline-wrap { display: flex; }
-.tb-row-names {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  padding: 22px 10px 18px 0;
-  font-size: 12px;
-  color: var(--text-dim);
-}
-.tb-row-names > span { height: 26px; line-height: 26px; text-align: right; }
-.tb-timeline-scroll {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-color: transparent transparent;
-}
-.tb-timeline-scroll:hover { scrollbar-color: var(--px-line) transparent; }
-.tb-timeline { display: block; }
-.tb-row-band { fill: rgba(213, 207, 195, 0.03); }
-.tb-row-band.is-alt { fill: rgba(213, 207, 195, 0.06); }
-.tb-patch-line { stroke: var(--gold); stroke-width: 1; }
-.tb-patch-line.is-letter { stroke-opacity: 0.45; }
-.tb-patch-lbl { fill: var(--gold); font-size: 11px; font-family: inherit; font-weight: 700; }
+/* Builds per week: the whole history at full width, Experimental up from the middle line, Staging down */
+/* On a phone the chart keeps a readable size and scrolls sideways inside its card (scrollbar shows on hover) */
+.tb-weekly-scroll { overflow-x: auto; scrollbar-color: transparent transparent; }
+.tb-weekly-scroll:hover { scrollbar-color: var(--px-line) transparent; }
+.tb-weekly { display: block; width: 100%; height: auto; }
+.tb-weekly[hidden] { display: none; }
+.tb-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; margin-bottom: 6px; }
+.tb-card-head .cal-ig-h { margin-bottom: 0; }
+.tb-series { display: flex; gap: 6px; }
+/* Hover targets: a week's whole column, a strip around each patch line */
+.tb-hit { fill: transparent; pointer-events: all; }
+.tb-hit:hover { fill: rgba(255, 224, 138, 0.07); }
+.tb-patch-hit { cursor: default; }
+.tb-patch-hit.is-on { fill: rgba(227, 196, 106, 0.18); }
+/* A patch pointed at: its run-up weeks stay bright, the rest fade */
+.tb-weekly.is-focus .tb-bar { fill-opacity: 0.3; }
+/* Lines and text never catch the pointer: the week column or patch strip under them does */
+.tb-weekly line, .tb-weekly text { pointer-events: none; }
+.tb-weekly.is-focus .tb-bar.is-on { fill-opacity: 1; }
+.tb-half-name { font-size: 12px; font-family: inherit; font-weight: 600; }
+.tb-ytick { fill: var(--text-dim); font-size: 11px; font-family: inherit; font-variant-numeric: tabular-nums; }
+.tb-patch-line { stroke: var(--gold); stroke-width: 1.2; stroke-opacity: 0.85; }
+.tb-patch-line.is-letter { stroke-width: 1; stroke-opacity: 0.45; stroke-dasharray: 2 3; }
+.tb-patch-lbl { fill: var(--gold); font-size: 12px; font-family: inherit; font-weight: 700; }
+.tb-month-tick { stroke: var(--text-dimmer); stroke-width: 1; }
+.cal-ig-spark-lbl.is-year { fill: var(--text-main); font-weight: 700; }
 .tb-today-line { stroke: var(--text-dimmer); stroke-width: 1; stroke-dasharray: 3 3; }
+.tb-today-lbl { fill: var(--text-dim); font-size: 11px; font-family: inherit; }
 .tb-bars { display: block; width: 100%; height: auto; }
+.tb-bars[hidden] { display: none; }
+.tb-bars line, .tb-bars text { pointer-events: none; }
+
+/* Before each patch: a row per patch, two bars on their own scales with the number at the bar's end */
+.tb-lag { display: flex; flex-direction: column; }
+.tb-lag-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+.tb-lag-row:nth-child(even) { background: rgba(213, 207, 195, 0.03); }
+.tb-lag[hidden], .tb-lag-row[hidden] { display: none; }
+.tb-lag-row[data-patch]:hover, .tb-lag-row.is-on { background: rgba(255, 138, 26, 0.08); }
+.tb-lag-head { font-weight: 600; color: var(--text-dim); border-bottom: 1px solid var(--bg-panel-4); padding-bottom: 5px; }
+.tb-lag-name { font-weight: 700; color: var(--text-bright); text-align: right; }
+/* The number stands right after its bar; --p is the bar's share of the column (the number's room kept aside) */
+.tb-lag-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tb-lag-head .tb-lag-cell { display: block; text-align: center; }
+.tb-lag-bar { display: block; flex: 0 0 auto; height: 9px; width: calc((100% - 72px) * var(--p)); min-width: 2px; opacity: 0.85; }
+/* Longer than the 48 h scale: the bar ends in a cut */
+.tb-lag-bar.is-over { clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 50%, 100% 100%, 0 100%); }
+.tb-lag-val { color: var(--text-main); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* Tables: centred, vertical lines between cells */
 .tb-table-scroll { overflow-x: auto; }
@@ -92,12 +148,18 @@
 .tb-table tbody tr:hover { background: rgba(255, 138, 26, 0.06); }
 .tb-patch { font-weight: 700; color: var(--text-bright); }
 .tb-sub { display: block; font-size: 11px; font-weight: 400; color: var(--text-dimmer); }
-/* The list of every build is long: it scrolls inside its card under a sticky head */
+.tb-empty { padding: 10px; text-align: center; color: var(--text-dimmer); font-size: 13px; }
+
+/* Every build: folded under its heading, scrolls inside its card under a sticky head */
+.tb-more > summary { cursor: pointer; margin-bottom: 0; list-style-position: inside; }
+.tb-more[open] > summary { margin-bottom: 8px; }
+.tb-more > summary:hover { color: var(--px-hi); }
 .tb-builds-scroll { max-height: 520px; overflow-y: auto; }
 .tb-builds thead { position: sticky; top: 0; z-index: 1; background: #1c1a18; }
-.tb-empty { padding: 10px; text-align: center; color: var(--text-dimmer); font-size: 13px; }
 
 @media (max-width: 760px) {
   .tb-charts { grid-template-columns: 1fr; }
+  .tb-tiles { grid-template-columns: 1fr 1fr; }
+  .tb-weekly { width: 1300px; max-width: none; }
   .tb-card { padding: 10px; }
 }

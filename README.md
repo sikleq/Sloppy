@@ -141,8 +141,9 @@ license.
   [SteamTracking/GameTracking-Dota2](https://github.com/SteamTracking/GameTracking-Dota2) (2016 – 2023) and
   [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) (2023 – now); GameTracking also feeds the daily
   new-build watch.
-- Calendar's Test servers tab: the history of the Experimental and Staging client versions since November 2023 from
-  the log of [muk-as/DOTA2_WEB](https://github.com/muk-as/DOTA2_WEB); newer builds from Valve's own Web API.
+- Calendar's Test servers tab: the history of the Experimental and Staging client versions from the log of
+  [muk-as/DOTA2_WEB](https://github.com/muk-as/DOTA2_WEB) (since November 2023) and the same author's channel
+  t.me/DOTA_DM_SPAM (October 2021 to November 2023); newer builds from Valve's own Web API.
 - Game files read with [ValveResourceFormat](https://github.com/ValveResourceFormat/ValveResourceFormat) (Source2Viewer)
   and [vpk](https://github.com/ValvePython/vpk).
 - Terrain page: inspired by [devilesk](https://github.com/devilesk/dota-interactive-map); map pictures and data:

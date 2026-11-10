@@ -49,7 +49,7 @@
 - `docs/formula-change.md` — блок `formula_change` для важных **игровых формул** (Assist Gold, Experience…).
 - `docs/terrain.md` — полный план и TODO terrain-страницы.
 - Вкладка календаря **Test servers** (сборки Experimental/Staging): `patch/branch_builds.py`, данные
-  `data/branch_builds.json` от `scripts/fetch/fetch_branch_builds.py` (API Valve каждые 15 мин + журнал muk-as/DOTA2_WEB с 11.2023,
+  `data/branch_builds.json` от `scripts/fetch/fetch_branch_builds.py` (API Valve каждые 15 мин + журнал muk-as/DOTA2_WEB с 11.2023 + его канал t.me/DOTA_DM_SPAM с 10.2021,
   `.github/workflows/branch-builds.yml`); источник и его пределы — `docs/agent-rules/pages-and-pipeline.md`.
 - `docs/todo.md` — отложенные задачи владельца (сравнение патчей, страница механик и проверка скрытых изменений).
   Только локально: в `.gitignore`, в публичный репозиторий не отправляется (владелец 2026-10-24).

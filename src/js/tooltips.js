@@ -78,7 +78,8 @@ function ecPinnableTip(tip, show, hide, sel) {
   // ability icons in the Unit Abilities table).
   // + the Terrain fullscreen panel's compact change chips (icon + "7/28", the word hidden — the owner 2026-10-05):
   // the tooltip says what changed
-  const TIP_SEL = '.qhint, .abil-ico-hint, .hd-patch[data-tooltip], .tc-fsp-chips .tf-chip[data-tooltip]';
+  // + the calendar's Test servers charts (weeks, patch lines, the rows of "Before each patch")
+  const TIP_SEL = '.qhint, .abil-ico-hint, .hd-patch[data-tooltip], .tc-fsp-chips .tf-chip[data-tooltip], .tb-tip-target[data-tooltip]';
   // Click pins the tooltip (read it at leisure, select text); a click anywhere else unpins.
   const pin = ecPinnableTip(tip, show, hide, '.qhint');
   document.addEventListener('mouseover', (e) => {

@@ -32,6 +32,12 @@ API = "https://api.steampowered.com/IGCVersion_{app}/GetClientVersion/v1/"
 HISTORY_API = "https://api.github.com/repos/muk-as/DOTA2_WEB/contents/steam_api/_HISTORY_by_date.txt"
 HISTORY_SOURCE = "muk-as/DOTA2_WEB"
 POLL_SOURCE = "valve-api"
+# The same author's Telegram channel posts every change since 2021, also before the GitHub log (owner 2026-11-10):
+# "api_test_server_version_active [247040 - Dota 2 Test 2] | 6617 => 6618". Its public web preview, 20 posts a page.
+TG_SOURCE = "t.me/DOTA_DM_SPAM"
+TG_PAGE = "https://t.me/s/DOTA_DM_SPAM?before={before}"
+TG_CACHE = CACHE / "tg"
+TG_PAUSE_S = 1.0
 
 APPS = {247040: "experimental", 2305270: "staging", 570: "public"}
 HISTORY_NAMES = {"247040 - Dota 2 Experimental": "experimental", "2305270 - Dota 2 Staging": "staging", "570 - Dota 2": "public"}
@@ -71,7 +77,7 @@ def validate(data):
             raise ValueError(f"branch_builds.json: unknown branch in {b}")
         if not isinstance(b.get("version"), int) or not (b.get("from") is None or isinstance(b["from"], int)):
             raise ValueError(f"branch_builds.json: version is not a number in {b}")
-        if b.get("source") not in (HISTORY_SOURCE, POLL_SOURCE):
+        if b.get("source") not in (HISTORY_SOURCE, POLL_SOURCE, TG_SOURCE):
             raise ValueError(f"branch_builds.json: unknown source in {b}")
         datetime.strptime(b["time"], TIME_FMT)
         if b.get("after") is not None and b["after"] > b["time"]:
@@ -160,6 +166,61 @@ def poll_app(app):
     return res["active_version"]
 
 
+_TG_POST = re.compile(r'data-post="DOTA_DM_SPAM/(\d+)"(.*?)(?=data-post="DOTA_DM_SPAM/|\Z)', re.S)
+_TG_TIME = re.compile(r'datetime="(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)\+00:00"')
+_TG_LINE = re.compile(r"(api_\w*version_active)(?:\s*\[(\d+) - [^\]]+\])?\s*\|\s*(None|\d+) =&gt; (\d+)")
+# 2023-03 .. 2023-11 the lines are "● 2305270 - Dota 2 Staging | 2702 =&gt; 2705" (no key; the app's own number)
+_TG_BULLET = re.compile(r"●\s*(\d+) - [^|●<]+?\|\s*(None|\d+) =&gt; (\d+)")
+# Posts before 2022-08 name no app: the live game's line and the test one; the test numbers run on into 247040's
+# (6413 in 2021-10, 6545 in 2022-08, 6617 in 2023-03), so "test" is Experimental. Staging did not exist before 2023.
+_TG_UNNAMED = {"api_server_version_active": 570, "api_test_server_version_active": 247040}
+
+
+def parse_telegram_page(text):
+    """(post ids on the page, the version changes of the three apps in its posts). Only the "active" version: the one
+    Valve's GetClientVersion gives (the "deploy" lines are the dedicated servers')."""
+    ids, out = [], []
+    for m in _TG_POST.finditer(text):
+        ids.append(int(m[1]))
+        t = _TG_TIME.search(m[2])
+        if not t:
+            continue
+        body = re.sub(r"</?(?:b|code)>", "", m[2]).replace("&#9679;", "●")
+        lines = [(int(named) if named else _TG_UNNAMED.get(key), old, new) for key, named, old, new in _TG_LINE.findall(body)]
+        lines += [(int(app), old, new) for app, old, new in _TG_BULLET.findall(body)]
+        for app, old, new in lines:
+            if app in APPS and old != "None":
+                out.append({"branch": APPS[app], "from": int(old), "version": int(new), "time": t[1] + "Z",
+                            "source": TG_SOURCE, "timed": True})
+    return ids, out
+
+
+def fetch_telegram(before, stop_at=1, max_pages=None):
+    """Walk the channel's pages back from post `before` to `stop_at`, a page per TG_PAUSE_S, each page cached (a cached
+    page is never fetched again). Returns the version changes found."""
+    import time
+    TG_CACHE.mkdir(parents=True, exist_ok=True)
+    found, pages = [], 0
+    while before > stop_at and (max_pages is None or pages < max_pages):
+        cached = TG_CACHE / f"{before}.html"
+        if cached.exists():
+            text = cached.read_text(encoding="utf-8")
+        else:
+            req = urllib.request.Request(TG_PAGE.format(before=before), headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                text = r.read().decode("utf-8")
+            cached.write_text(text, encoding="utf-8")
+            time.sleep(TG_PAUSE_S)
+        ids, rows = parse_telegram_page(text)
+        found += rows
+        pages += 1
+        smaller = [i for i in ids if i < before]
+        if not smaller or min(smaller) <= stop_at:
+            break
+        before = min(smaller)
+    return found
+
+
 def fetch_history():
     return _get(HISTORY_API, "muk-as_steam_api_history.txt", accept="application/vnd.github.raw").decode("utf-8")
 
@@ -187,6 +248,9 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--offline", action="store_true", help="no network: check and re-sort the committed file")
     ap.add_argument("--history", action="store_true", help="also read the muk-as/DOTA2_WEB log through the GitHub API")
+    ap.add_argument("--telegram", type=int, metavar="BEFORE",
+                    help="also read the t.me/DOTA_DM_SPAM posts older than this post id (one-off import of 2021-2023)")
+    ap.add_argument("--max-pages", type=int, help="with --telegram: stop after this many pages (a pilot)")
     ap.add_argument("--state", type=Path, help="a file with the last checks, read before and written after the poll")
     args = ap.parse_args(argv)
     data = validate(load(DATA))           # DATA read at call time: a test points it at a temporary file
@@ -195,6 +259,8 @@ def main(argv=None):
     if args.offline:
         data["builds"] = _sorted(data["builds"])
     else:
+        if args.telegram:
+            data = merge_history(data, fetch_telegram(args.telegram, max_pages=args.max_pages))
         if args.history:
             data = merge_history(data, parse_history(fetch_history()))
         data = merge(data, {app: poll_app(app) for app in APPS}, utc_now())
