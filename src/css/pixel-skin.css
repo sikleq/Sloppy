@@ -291,6 +291,11 @@
   background-color: #2e2619;
 }
 .hd-dd-menu[data-dd="diffstat"][hidden] { display: none; }
+/* a phone: two columns, as wide as the screen at most (audit 2026-11-08: 567px wide on a 390px screen) */
+@media (max-width: 760px) {
+  .hd-dd-menu[data-dd="diffstat"] { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: calc(100vw - 16px);
+    max-height: 70vh; overflow: auto; }
+}
 .hd-dd-menu[data-dd="diffstat"] > .hd-dd-all { grid-column: 1 / -1; }
 .hd-dd-menu[data-dd="diffstat"] > .hd-dd-sep { display: none; }
 .hd-dd-menu[data-dd="diffstat"] > .hd-dd-opt { background: var(--px-menu); padding: 5px 10px; }
@@ -416,8 +421,11 @@
    open or not; square cells, no round rings (owner 2026-11-07, mock "Вариант A": "панель этих кнопок всегда справа
    внизу, даже если открыты фильтры-теги", "круглую рамку может можно и убрать"). Left to right: top, filters,
    search, weights; "top" always has its place. */
+/* four a row at most, a fifth starts a second row under the last column (owner 2026-11-08: "панель в 4 иконки и тогда
+   надо 2 ряд делать") */
 .corner-dock {
-  position: fixed; right: 10px; bottom: 14px; z-index: 100; display: flex; gap: 4px; padding: 6px;
+  position: fixed; right: 10px; bottom: 14px; z-index: 100; display: grid; grid-template-columns: repeat(4, 34px);
+  gap: 4px; padding: 6px;
   background: var(--px-panel); border: 2px solid #6d5c3a;
   box-shadow: 0 0 0 2px var(--px-press), inset 0 0 0 1px var(--bg-warm-darker), 0 6px 16px var(--shadow-55);
 }
@@ -429,12 +437,19 @@
 .corner-dock > .filter-fab[aria-expanded="true"],
 .corner-dock > .search-fab[aria-expanded="true"] { box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.6); }
 .corner-dock > .filter-fab.has-active { box-shadow: inset 0 0 0 2px #ff9a2a, 0 0 8px rgba(255, 150, 40, 0.6); }
-.corner-dock > .dyn-w-fab.active { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+/* weights ON: the dark cell and gold scales of OFF, a gold frame — as the filters' and search's open state, not the
+   whole cell lit gold (owner 2026-11-08: "она загорается полностью, а не рамку") */
+.corner-dock > .dyn-w-fab.active {
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="9" y="0" width="2" height="14"/><rect x="2" y="3" width="16" height="2"/><rect x="2" y="5" width="2" height="4"/><rect x="16" y="5" width="2" height="4"/><rect x="0" y="9" width="6" height="2"/><rect x="14" y="9" width="6" height="2"/><rect x="6" y="14" width="8" height="2"/><rect x="4" y="16" width="12" height="2"/></g></svg>'),
+    linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.6);
+}
 /* at the page's top "top" has nothing to do: grey and dim ("тусклой/серой, если я наверху страницы уже") */
 .corner-dock > .back-to-top.at-top { filter: grayscale(1); opacity: 0.4; cursor: default; }
 /* until the script knows where the page is (a reload puts it back only after load), no colour at all */
 .corner-dock > .back-to-top.btt-wait { visibility: hidden; }
-.corner-dock ~ .search-pop { right: 10px; bottom: 74px; }
+.corner-dock ~ .search-pop { right: 10px; bottom: 112px; }   /* over the panel's two rows */
 /* Patch pages: the filters as a framed card at the page's right edge, out from the start, the header's sliders put it
    away (owner 2026-11-07: "включены по умолчанию … по правому краю", look 6 of the mock "галочки в рамке"; patch/page.py
    filter_pop_html, src/js/filter-fab.js). A box to tick before each word: a tag's box in its colour, a section's in

@@ -5,6 +5,6 @@ pytest>=9.1.0
 pytest-xdist>=3.8
 # tests/test_pyflakes_clean.py: неиспользуемые переменные/импорты, неопределённые имена
 pyflakes>=3.2
-# build_site.py минифицирует dist/styles.css и dist/src/scripts.js; без них сборка идёт, но без сжатия
+# build_site.py минифицирует dist/styles.css и dist/src/scripts-<вид страницы>.js; без них сборка идёт, но без сжатия
 rcssmin>=1.2
 rjsmin>=1.2

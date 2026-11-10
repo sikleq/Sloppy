@@ -230,7 +230,8 @@ def _load_ability_names() -> dict[str, str]:
     """engine ability slug → display name from abilities_slim.json."""
     try:
         data = _json.loads((_HERE / "data" / "abilities_slim.json").read_text(encoding="utf-8"))
-    except Exception:
+    except (OSError, ValueError) as e:
+        print(f"  [WARN] aoe: ability names not read from data/abilities_slim.json ({e})")
         return {}
     return {slug: (info.get("dname") or "") for slug, info in data.items()}
 
@@ -414,17 +415,15 @@ def _heroes_root(version: str) -> dict:
     if not path.exists():
         return {}
     text = _strip_backslash_lines(path.read_text(encoding="utf-8", errors="replace"))
-    try:
-        root = dict(parse_kv(text).get("DOTAHeroes", {}))
-    except Exception:
-        return {}
+    root = dict(parse_kv(text).get("DOTAHeroes", {}))      # a file that does not parse fails the build, not the page
     for rel in _re.findall(r'^\s*#base\s+"([^"]+)"', text, flags=_re.M):
         inc = path.parent / rel
         if not inc.exists():
             continue                      # npc_dota_hero_base.txt is not kept in the snapshot
         try:
             sub = parse_kv(_strip_backslash_lines(inc.read_text(encoding="utf-8", errors="replace")))
-        except Exception:
+        except Exception as e:
+            print(f"  [WARN] aoe: {version}/{rel} not parsed, its hero has no radii ({e})")
             continue
         for block in sub.values():
             if isinstance(block, dict):

@@ -708,9 +708,8 @@ def build():
 
     # Faceless Void
     W(hero_header("Faceless Void"))
-    W(facet_header("faceless_void_chronosphere"))
+    W(facet_header("faceless_void_chronosphere", old_title="Temporal Impunity"))
     W(ul_open())
-    W(li("Renamed from Temporal Impunity to Chronosphere", t("MISC")))
     W(li("Time Walk: No longer prevents damage for a short duration after Time Walking", t("DEL")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -846,9 +845,8 @@ def build():
 
     # Lifestealer
     W(hero_header("Lifestealer"))
-    W(facet_header("life_stealer_rage"))
+    W(facet_header("life_stealer_rage", old_title="Corpse Eater"))
     W(ul_open())
-    W(li("Renamed from Corpse Eater to Rage", t("MISC")))
     W(li("No longer gains permanent HP when killing a creep or hero (moved to Feast innate ability)", t("MISC")))
     W(ul_close())
     W(ability("Feast", slug="life_stealer_feast", innate=True))
@@ -907,9 +905,8 @@ def build():
 
     # Luna
     W(hero_header("Luna"))
-    W(facet_header("luna_moonshield"))
+    W(facet_header("luna_moonshield", old_title="Lunar Orbit"))
     W(ul_open())
-    W(li("Renamed from Lunar Orbit to Moonshield", t("MISC")))
     W(ul_close())
     W(ability("Selemene's Favor", slug="luna_selemenes_favor", innate=True))
     W(ul_open())
@@ -951,9 +948,8 @@ def build():
 
     # Magnus
     W(hero_header("Magnus"))
-    W(facet_header("magnataur_reverse_polarity"))
+    W(facet_header("magnataur_reverse_polarity", old_title="Run Through"))
     W(ul_open())
-    W(li("Renamed from Run Through to Reverse Polarity", t("MISC")))
     W(li("Skewer: No longer deals additional damage when skewering enemies into trees or cliffs (moved to base ability)", t("DEL")))
     W(ul_close())
     W(ability("Skewer", slug="magnataur_skewer"))
@@ -1881,9 +1877,8 @@ def build():
 
     # Windranger
     W(hero_header("Windranger"))
-    W(facet_header("windrunner_focusfire"))
+    W(facet_header("windrunner_focusfire", old_title="Tailwind"))
     W(ul_open())
-    W(li("Renamed from Tailwind to Focus Fire Facet", t("MISC")))
     W(li("Windrun: No longer grants additional bonus movement speed to Windranger and nearby allies", t("DEL")))
     W(ul_close())
     W(facet_header("windrunner_whirlwind"))

@@ -18,6 +18,7 @@ _sys.path.insert(0, str(_ROOT))
 _sys.path.insert(0, str(_ROOT / "builders"))
 
 import patch.site_common as _site
+from patch.html_util import strip_tags      # noqa: E402
 from builders import innate_rules as _innate_rules
 from mana_items import parse_kv
 from heroes_stats import (
@@ -182,8 +183,8 @@ def _load_item_names() -> dict[str, str]:
             label = it.get("name_english_loc") or it.get("name_loc") or ""
             if name and label:
                 out[name] = label.replace("\n", " ")
-    except Exception:
-        pass
+    except (OSError, ValueError, KeyError) as e:
+        print(f"  [WARN] hero lab: item names not read from data/itemlist.json ({e})")
     return out
 
 
@@ -194,7 +195,8 @@ def _slug_from_item(item: str) -> str:
 def _load_item_meta() -> dict[str, dict]:
     try:
         dyn = _json.loads((_HERE / ".cache" / "_dynamics.json").read_text(encoding="utf-8"))
-    except Exception:
+    except (OSError, ValueError) as e:
+        print(f"  [WARN] hero lab: no item classes, .cache/_dynamics.json not read ({e}) - run the patch step first")
         return {}
     out: dict[str, dict] = {}
     for rec in dyn.get("items", []):
@@ -755,7 +757,7 @@ def _resolve_attribute_entry(entry, fields: dict) -> str:
         text = _re.sub(r"\$[a-zA-Z_][a-zA-Z0-9_]*", lambda _m: shown, raw, count=1)
     else:
         text = _resolve_attr_label(raw, fields)
-    text_plain = _re.sub(r"<[^>]+>", "", text)
+    text_plain = strip_tags(text)
     if "$" not in raw and field and not _re.search(r"\d", text_plain):
         val = _field_value(fields, field)
         if val is not None:
@@ -774,7 +776,7 @@ def _resolve_attribute_entry(entry, fields: dict) -> str:
     # Valve writes percentage placement as `%+$value` / `%-$value`.
     text = _re.sub(r"^%\+([\d.]+)", r"+\1%", text)
     text = _re.sub(r"^%-([\d.]+)", r"-\1%", text)
-    if placeholders and not _re.search(r"[A-Za-z]", _re.sub(r"<[^>]+>", "", text)):
+    if placeholders and not _re.search(r"[A-Za-z]", strip_tags(text)):
         label = _ITEM_ATTR_LABELS.get(placeholders[0].lower())
         if label:
             text = f"{text} {label}"
@@ -784,7 +786,7 @@ def _resolve_attribute_entry(entry, fields: dict) -> str:
 
 def _is_zero_attribute(text: str) -> bool:
     """Return true for localized stat rows such as `+0 Health Regeneration`."""
-    plain = _re.sub(r"<[^>]+>", "", text).strip()
+    plain = strip_tags(text).strip()
     match = _re.match(r"^[+\-]?\s*([\d.]+)%?(?:\s|$)", plain)
     if not match:
         return False
@@ -795,7 +797,7 @@ def _is_zero_attribute(text: str) -> bool:
 
 
 def _is_noise_attribute(text: str) -> bool:
-    plain = _re.sub(r"<[^>]+>", "", text).strip()
+    plain = strip_tags(text).strip()
     if not plain:
         return True
     if plain.startswith("Rune:"):

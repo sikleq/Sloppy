@@ -428,8 +428,11 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
         return trigger, badge, table
 
     pct_data = [_compute_pct(old_fn(L), new_fn(L), l) for L in levels]
+    # the "%" a span of its own: a narrow table drops it, the row is called "Δ%" (audit 2026-11-08, 7.41 Break of Dawn:
+    # 18 levels in the left half of the line ran "-20%-16%" together; patch-formula-tables.css @container)
+    pct_sign = lambda d: f'{d[:-1]}<span class="fx-pc">%</span>' if d.endswith("%") else d
     pct_cells = [
-        f'<td{cls_for(L)}><span class="badge {cls}">{disp}</span></td>'
+        f'<td{cls_for(L)}><span class="badge {cls}">{pct_sign(disp)}</span></td>'
         for L, (cls, disp, _, _) in zip(levels, pct_data)
     ]
     uniform_delta = len({(cls, disp) for cls, disp, _, _ in pct_data}) == 1

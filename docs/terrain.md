@@ -291,7 +291,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
 - Edge strip (2026-10-02, the owner: "a white strip at the left edge when zoomed in"): where the outer frames stop
   5-6 px short of the picture's edge, SFM's flat grey (55) stayed — too thin for `_void_mask`'s opening and its
   flatness test. Neutral grey within `BORDER_PX` (16) of the edge is now always void; every picture, its webp,
-  zoom tiles and release asset were redone (`sfm/reblack_edges.py`).
+  zoom tiles and release asset were redone (script not kept in the repository).
 - Pink objects = a material the build we render on lacks. 7.39's release map file holds two "templar gates"
   (`npc_dota_unit_templar_gate`, the Twin Gate model `team_portal.vmdl` with skin 2, at (1875, -5075) and
   (-1527, 4000)) that no patch note mentions and 7.39b removed; the 7.40c build has no material for that skin. The
@@ -299,7 +299,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   `scripts/gen/mend_map.py BAD_full.png DONOR_full.png OUT NAME --at=x,y …` takes the pink object (+ its rim and
   shadow, ≤6 px) from a donor render with the same ground there (7.39b: nothing moved within 900 units), not the
   ground around it — 7.39b painted grass where the portal stood, 7.39 keeps its sand. The unmended render is kept
-  as `map_<sha8>_sfm_full_pink.png`; the work script `stitch_final.py` (`MEND`) re-applies it. Tests:
+  as `map_<sha8>_sfm_full_pink.png`; the one-off work script that re-applied it (`stitch_final.py`) is not kept; `scripts/gen/stitch_sfm.py` is the live stitcher. Tests:
   tests/test_mend_map.py.
 - Map history: `scripts/gen/map_history.py` — which dota.vpk each patch shipped (SHA-1 from depot 373301's
   manifests, one Steam login per manifest, with pauses: Steam rate-limits logins) and one download per distinct
@@ -367,7 +367,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
 - **Power-rune cycling** — a power-rune spot can roll any of the 7 runes, so the
   Power layer is special: its 7 icons (`tc_rune_0..6.png`, downloaded from
   liquipedia into `icons/ref/runes/`, kept in their NATURAL colours + soft
-  outline) cycle on the MAP every 3 s while the layer is ON (scripts.js
+  outline) cycle on the MAP every 3 s while the layer is ON (terrain.js
   `togglePowerCycle` / `setRune`, sets `<image>` `href`/`xlink:href`). The toolbar
   button (and the "power runes" chips) show `tc_power.png` = our own power-rune
   icon, a bunch of three runes (`scripts/gen/gen_power_rune_icon.py`, owner
@@ -404,7 +404,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   They live in Oldgrowth `tiles/<ver>/<row>_<col>.webp`, served by its GitHub Pages
   (`https://sikleq.github.io/Oldgrowth/`, `.nojekyll`) — the owner chose that over growing Sloppy by ~190 MB.
   `data/map/renders.json` "tiles" lists the pictures that have them → `_compare_html` writes
-  `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
+  `data-tiles-old/-new`; terrain.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
 - **Where a boss spawns first (2026-10-16)** — a spot's `"first": {"kind": "tormentors" | "roshan", "old": [x, y],
@@ -422,7 +422,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   maybe micro-screenshots, tree positions, now that we know which tree went where". `data/terrain_spots.json` places
   each note that can be seen on the map: `{"match": <the row's text start>, "spots": [[x, y], …], "r": half size}`
   (a moved object → the midpoint of its old and new spot; a mirrored change → one spot per side). Coordinates come
-  from the diff (scratchpad `changes_xy.py`-style listing: tree clusters, moved objects, changed boxes, each by its
+  from the diff (a one-off scratchpad listing (script not kept): tree clusters, moved objects, changed boxes, each by its
   nearest landmark — `terrain_audit.landmarks`). `scripts/gen/terrain_shots.py` crops the same square from the old
   and the new full SFM render (2 units/px → 240 px a side), outlines what changed inside (removed red / added green
   / moved yellow — the chips' `_changed_points`; squares round trees and camps, circles round entities; changed spawn
@@ -438,7 +438,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   objective's name opens the pictures" below); the pictures open below in their own rounded box, centred, framed like the
   item ability cards (`hidden`, so the lazy pictures load only when opened), and a click on a picture opens its
   large copy (`data-large`) in a lightbox, not the Terrain page ("View on map" in the section header is for that).
-  scripts.js "Terrain note pictures".
+  terrain.js "Terrain note pictures".
   More on the pictures (the owner 2026-10-03, "show these on the map too, check the other patches"): a spot's
   `"mark": [[x, y], …]` outlines, white, the camp nearest each point on EACH map picture (`mapdata_<code>.json`
   spawners — a camp may stand elsewhere on the old map) for notes about an unchanged camp (7.39 pull timers, 7.41
@@ -465,7 +465,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   Both lists keep Valve's order; terrain rows carry `class="terrain-row"` and `_sort_changes_li` leaves them in
   order. The tag canon still decides each row's `data-tag` (filters, weights).
 - **The list's patch label opens that patch (2026-10-03)** — the owner: "make the patch switcher clickable, it
-  jumps to that patch (the back arrow appears there)". scripts.js `initSubpatchPicker` makes `.tsp-label` an `<a>`
+  jumps to that patch (the back arrow appears there)". terrain.js `initSubpatchPicker` makes `.tsp-label` an `<a>`
   to `patches/<ver>.html?from=terrain_<code>#terrain` (re-pointed when the arrows step); `plain_header` puts
   `id="terrain"` on the page's FIRST terrain block's View on map button (`_State.terrain_anchor`, reset by
   `write_head`); `?from=terrain_<code>` shows the patch page's bottom-left back arrow, pointed at that map. Dotted
@@ -480,7 +480,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   point's version and tree count on hover ("7.38 · 2496", CSS `.ts-pt:hover .ts-tip`), no labels on the chart (the
   owner: "remove 7.20, 7.23…"), a version without a letter drawn as a bolder point (`.ts-dot-major`), a faint red
   least-squares trend line through all the files (`.ts-trend`); and the table, newest first, full width (a clicked
-  row framed in gold like the other table pages, `.ts-row-selected`, scripts.js "TERRAIN STATS") — map files
+  row framed in gold like the other table pages, `.ts-row-selected`, terrain.js "TERRAIN STATS") — map files
   with nothing different from the one before glued into its row (`group`: 65 files → 33 rows), the "Map version" a
   range ("7.35 – 7.37e", the owner: "easier than listing them"), the date as dd-mm-yy, no icon on Map version / Date,
   17 kinds of object (trees, camps and each tier, towers, outposts, watchers, lotus pools,
@@ -563,7 +563,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   "maybe a separate panel, left or right, that opens and closes … everything neat". The fullscreen bar under the map
   became `.tc-fs-bar` = a 236 px panel LEFT of the map (`order: -1` in a row flex): Exit + a fold toggle
   (`.tc-fsp-toggle`), "Layers" as a 5-wide grid of the layer buttons, "Changed in the map file" with the moved /
-  removed / added switches and the chips (the very markup `_change_controls` writes under the list — scripts.js
+  removed / added switches and the chips (the very markup `_change_controls` writes under the list — terrain.js
   `initChangeHighlights` presses every copy of a key / kind together), the mouse hints at the foot. Folded
   (`.tc-fsp-closed` on `.terrain-compare`) it's a 48 px strip with the two buttons; the map keeps its place against
   the canvas centre (`stage.left += Δwidth / 2`). Under 720 px wide it sits under the map instead.
@@ -590,7 +590,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   `FRAMES_DIR`) + `scripts/gen/sfm_session.py FRAMES OUT.dmx` (fills it in, converts with dmxconvert); the
   render scripts use it. Tests: tests/test_sfm_session.py.
 - **"All layers" toggle (2026-10-02)** — the owner: "add an 'all' filter that turns every object filter on". First
-  of the layer buttons (`layer_btn("all", …)`, both bars); scripts.js turns every layer on, or all off when all are
+  of the layer buttons (`layer_btn("all", …)`, both bars); terrain.js turns every layer on, or all off when all are
   on already, and keeps it pressed exactly while every layer is on. Icon `tc_all.png` — a 16-px pixel glyph of three
   stacked map layers in the site's gold ramp (the owner: "simpler, like our other icons"; four coloured discs were
   rejected), from `scripts/gen/gen_terrain_layer_icons.py tc_all` (the generator now takes icon names; its root
@@ -627,7 +627,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   under the change list and in the fullscreen panel (`_heights_buttons`, numbers only — "0", "128" … "768+", the owner:
   "instead of River 0, Base 512 keep only the values"; 2026-10-05: the key moved off the map, "then 0, 128 … can be
   clicked to turn those layers on and off"). Each height is its own picture (`icons/maps/heights_<ver>_<band>.png`,
-  heightmap.band_overlays); a switch toggles `.hband-off-<band>` on the map (scripts.js initHeightBands; with the
+  heightmap.band_overlays); a switch toggles `.hband-off-<band>` on the map (terrain.js initHeightBands; with the
   layer off, a click turns it on showing just that height). In fullscreen the change chips shrink to icon + "7/28"
   (`.tf-chip-word` hidden, the word kept in the chip's tooltip). The control
   bar's gap went 6px → 2px so the 16 toggles + Zoom + Full stay one row (from a 1280-px window up). Samples with no
@@ -702,7 +702,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   the stroke through an SVG mask of every shape narrowed by half the stroke, inside `g.tm-hl-g-<kind>`. Ward cells
   are filled, not outlined (the owner: "filled, more transparent, like the original purple"): `_cells_fill`, red
   on the old map = turned wardable (`wards.toWardable`), green on the new map = turned no-ward
-  (`wards.toNoWard`), both from `gridnav.changed_cells`. `initChangeHighlights` (src/scripts.js): a pressed chip
+  (`wards.toNoWard`), both from `gridnav.changed_cells`. `initChangeHighlights` (src/js/terrain.js): a pressed chip
   clicks its layer's bar button on when it's off, and its SVGs get `.tm-hl-on` only while that layer is shown
   (re-checked on every bar click); a layer a chip switched on (`autoLayers`) goes off again with the last pressed
   chip of that layer, unless the viewer clicked that layer (or "All") meanwhile — then it's theirs and stays (the
@@ -735,9 +735,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   patch's name, refresh `data/map/patch_maps.json` + `renders.json`, run `build_terrain_diff.py`; the page appears.
   **Oldgrowth for a new map file (owner's tools read it, 2026-10-07):** the folder `versions/<first patch>/` with
   `info.json`, then `python scripts/gen/oldgrowth_mapdata.py <patch>` — mapdata.json (every layer), entities.json.gz
-  AND the three grids (gridnav / elev / fow + info.json "grid", `map_grids.py`) in one go — then `build_index.py`
+  AND the three grids (gridnav / elev / fow + info.json "grid", `map_grids.py`) in one go — then `build_index.py` (a script of the Oldgrowth repository, not of this one)
   there, commit, push. Never skip the grids: another tool waits for them in Oldgrowth and extracts nothing itself.
-- **scripts.js inits ALL sliders** — `initTerrainCompare` does
+- **terrain.js inits ALL sliders** — `initTerrainCompare` does
   `querySelectorAll('.terrain-compare').forEach(initOneTerrainCompare)`; the
   default-hidden second pane (7.40) still gets a working handle/lens/toggles so the
   picker can reveal it. (Was a single `querySelector` → only the first pane worked.)
@@ -789,7 +789,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   centres (7136, 2272) and (7136, 2336), went from blocked and no-ward (16) to free (1); the only changed cells in that quarter of the
   map (the first check, 2026-10-27, missed them). Its picture draws them through the `nowards` layer.
 - 7.39b "Fixed some locations that were incorrectly blocked for warding": the gridnav, the map's physics and visibility files and the
-  no-ward zones of 7.39 and 7.39b are the same byte for byte, so the map files show nothing and the row has no picture. Test: `tests/test_terrain_notes_1027.py`.
+  no-ward zones of 7.39 and 7.39b are the same byte for byte, so the map files show nothing and the row has no picture. Test: `tests/test_mech_blocks.py`.
 
 ## Two colours, one meaning (owner 2026-10-28)
 

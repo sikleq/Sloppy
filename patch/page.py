@@ -2,6 +2,7 @@
 
 import os
 import re
+from .html_util import strip_tags
 
 import patch.site_common as _site
 
@@ -111,6 +112,8 @@ def write_footer():
       '<button class="search-fab" id="search-fab" type="button" aria-label="Search heroes, items, abilities" '
       'aria-expanded="false" aria-controls="search-pop" title="Search (\\ or /)" aria-keyshortcuts="Backslash Slash">'
       '</button><button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>'
+      # (no button dimming the old cards: removed 2026-11-09, "фильтр блюра … удалить, как и функцию" — the old
+      # ability card lies under the new one instead, patch/card_deck.py)
       '</div>')
     # the search field opens above the panel ("/" opens it, Esc closes)
     W('<div class="search-pop" id="search-pop" hidden><div class="search-box">'
@@ -425,8 +428,13 @@ def _sort_changes_li(html):
         if any('class="ability-row"' in li or 'class="ability-row ' in li
                or ' ability-row"' in li or ' ability-row ' in li for li in lis):
             return m.group(0)
+        # a list with facets' talents: those go first, a talent of no facet after them (owner 2026-11-08, 7.38 Wraith
+        # King "+40% Cleave replaced with +60 Attack Speed … выбивается, т.к он не относится к аспектам")
+        facets = ['class="facet-chip"' in li for li in lis]
+        mixed = any(facets) and not all(facets)
         # Stable sort: Python's sorted is stable, so equal ranks keep order.
-        ranked = sorted(enumerate(lis), key=lambda iv: (_story_rank(iv[1]) or _li_rank(iv[1]), iv[0]))
+        ranked = sorted(enumerate(lis), key=lambda iv: (mixed and not facets[iv[0]],
+                                                        _story_rank(iv[1]) or _li_rank(iv[1]), iv[0]))
         ordered = [li for _, li in ranked]
         return open_tag + prefix + ''.join(ordered) + suffix + close_tag
     return _CHANGES_UL_RE.sub(repl, html)
@@ -463,7 +471,6 @@ def _thumb_srcs(html):
 _NEWMECH_UL_RE = re.compile(r'<ul class="changes"><!--NEWMECH(?::(\w+))?(:all)?-->(.*?)</ul>', re.S)
 # any row's chip, for a block drawn as one box (the row's data-tag stays)
 _ANY_CHIP_RE = re.compile(r'(<li\b[^>]*>)<span class="badge [\w-]+"[^>]*>[^<]*</span>')
-_NEW_CHIP_RE = re.compile(r'(<li\b[^>]*data-tag="[^"]*\bnew\b[^"]*"[^>]*>)<span class="badge new"[^>]*>NEW</span>')
 
 
 def _mech_chip_re(tag):
@@ -552,7 +559,7 @@ def _one_paragraph(lis):
 
 
 def _plain_end(html_text):
-    return re.sub(r"<[^>]+>", "", re.sub(r"<!--TIP-->.*?<!--/TIP-->", "", html_text, flags=re.S)).rstrip()
+    return strip_tags(re.sub(r"<!--TIP-->.*?<!--/TIP-->", "", html_text, flags=re.S)).rstrip()
 
 
 def save_html(filename):
@@ -587,9 +594,11 @@ def save_html(filename):
     out = re.sub(r'<!--IABCARD:(.*?)-->', lambda m: render_iab_card(m.group(1)), out)
     out = raise_abilities_beside_gone_stats(out)
     from .value_tables import value_tables
-    out = value_tables(out)                # a card's values as a table (owner 2026-11-05)
-    from .card_pairs import pair_new_cards, single_cards_right
+    from .card_deck import DECK_PAGES
     _stem = os.path.splitext(os.path.basename(filename))[0]
+    # a card's values as a table (owner 2026-11-05); a deck's card, even one value (2026-11-09)
+    out = value_tables(out, decks=DECK_PAGES is None or _stem in DECK_PAGES)
+    from .card_pairs import pair_new_cards
     from .card_sections import card_sections, drop_upgrade_rows_said_below, hide_rows_the_aghs_card_says
     out = hide_rows_the_aghs_card_says(out)   # an Aghanim's row its old -> new card shows already (2026-11-06)
     out = drop_upgrade_rows_said_below(out)   # a card's upgrade row the Aghanim's card below shows (2026-11-06)
@@ -597,7 +606,8 @@ def save_html(filename):
     out = pair_new_cards(out, _stem)       # two new cards side by side (2026-11-06)
     from .card_pairs import pair_replaced_facets
     out = pair_replaced_facets(out, _stem)  # a lost facet left, the new one with its card right (2026-11-06)
-    out = single_cards_right(out, _stem)   # a lone one to the right of its block, a line to it (2026-11-06)
+    from .card_deck import deck_cards
+    out = deck_cards(out, _stem)           # old -> new as a deck: the old card under the new one (2026-11-09)
     if TAG_MARK_PAGES is None or _stem in TAG_MARK_PAGES:
         from .tag_marks import terrain_rows_tagged
         out = terrain_rows_tagged(out)     # a terrain row: its tag as a tile, no number

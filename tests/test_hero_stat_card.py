@@ -41,7 +41,7 @@ def test_card_hides_its_rows_and_carries_their_tags():
         # no table by level (owner 2026-09-28: the two numbers already say it)
         assert "formula-table" not in html and "formula-trigger" not in html
         # the (?): level 30 = Valve's figure, all 7 Attribute Bonus levels counted; the multiplier
-        assert "Damage at level 30: 173–183 → 148–158 (-14%)" in gain and "0.7 → 0.45 damage per attribute" in gain
+        assert 'Damage at level 30: 173–183 → 148–158 (<span class="pop-pct pop-pct-nerf">-14%</span>)' in gain and "0.7 → 0.45 damage per attribute" in gain
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved
 

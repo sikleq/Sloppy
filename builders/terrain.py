@@ -37,6 +37,7 @@ _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 _sys.path.insert(0, _HERE)
 
 import patch.site_common as _site
+from patch.html_util import strip_tags      # noqa: E402
 import patch.map_versions as _map_versions
 # which patches get a page and what moved on the map: data, in patch/terrain_index.py (the header needs it too)
 from patch.terrain_index import (_MOVED_NAMES, _SAME_CAMP, _box_key, _box_key_xy, _current_shapes,
@@ -75,7 +76,9 @@ def _load_map_meta():
     try:
         with open(path, encoding="utf-8") as f:
             return _json.load(f)
-    except Exception:
+    except (OSError, ValueError) as e:
+        print(f"  [WARN] terrain: no map markers, data/terrain_map_meta.json not read ({e}) - "
+              "scripts/gen/build_terrain_maps.py writes it")
         return None
 
 
@@ -312,9 +315,7 @@ def _markers_svg(diff, pair_id="default"):
 # (scripts/gen/extract_map_entities._layers → build_terrain_diff: "lanes", "currents", "zones", entities).
 # Vision entities are not drawn on this site.
 _LANE_COLOUR = {"good": "#7ed060", "bad": "#ff6a54"}
-_CURRENT_COLOUR = "#54aaec"
 _SHOP_COLOUR = "#e3c46a"
-_SHOP_NAME = {"0": "Home shop", "1": "Side shop", "2": "Secret shop"}
 
 
 _CURRENT_ARROW_EVERY = 1100     # world units between the flow arrows along a current
@@ -1207,8 +1208,7 @@ _CHANGED_WORD = {"camp tiers": "re-tiered", "camp spawn boxes": "resized"}
 def _strip_tags(html):
     """Plain text of a chip's value (its tooltip)."""
     import html as _html
-    import re as _re
-    return _html.unescape(_re.sub(r"<[^>]+>", "", html)).strip()
+    return _html.unescape(strip_tags(html)).strip()
 
 
 def _chip(name, kind, n, removed, total):

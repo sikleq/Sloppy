@@ -142,6 +142,28 @@ ul.changes li.aghanim-shard.li-formula {
   text-transform: none;
   letter-spacing: 0;
 }
+/* NEW LEVELS OF MANY VALUES (owner 2026-11-08, 7.38 Invoker "Added values for levels 9 and 10", variant B): ability
+   (icon, once per group) | value | the orb it grows with | every level, the new levels gold */
+.formula-table.lv-values { table-layout: auto; }
+.formula-table.lv-values th:first-child, .formula-table.lv-values td:first-child { width: auto; }
+/* the name may wrap: a phone squeezes this column and a nowrap name ran into Value (Sonnet review 2026-11-08) */
+.formula-table.lv-values tbody th.lv-ab { width: auto; min-width: 96px; overflow-wrap: normal; font-size: 12px; color: var(--text-bright); }
+.formula-table.lv-values .lv-ab-in { display: flex; align-items: center; gap: 6px; }   /* a wrapped name stays by the icon */
+.formula-table.lv-values .lv-ab img { width: 24px; height: 24px; flex: none; border-radius: 3px; }
+.formula-table.lv-values td.lv-label { text-align: left; padding: 4px 8px; }
+.formula-table.lv-values td.lv-scale { width: 22px; min-width: 22px; padding: 2px; }
+.formula-table.lv-values .lv-scale img { width: 16px; min-width: 16px; height: 16px; vertical-align: middle; border-radius: 50%; }
+.formula-table.lv-values td { color: var(--text-dim); }
+.formula-table.lv-values td.lv-label { color: var(--text-main); }
+.formula-table.lv-values .lv-new { color: var(--gold); font-weight: 700; background: rgba(255, 212, 107, 0.08); }
+.formula-table.lv-values tr.lv-first > * { border-top: 1px solid rgba(254, 247, 232, 0.14); }
+/* a narrow row (a lone card beside it takes half the line) has no room for "-56%" in 18 level columns: the "%" goes, the
+   row is called "Δ%" (audit 2026-11-08, 7.41 Break of Dawn; patch/badges.py pct_sign) */
+ul.changes li.li-formula { container-type: inline-size; }
+@container (max-width: 700px) {
+  .formula-table.lvl-default .fx-pc { display: none; }
+  .formula-table.lvl-default .lvl-jump { border-left-width: 0; }   /* the gap before L20 took 6 of its 23px */
+}
 .formula-table .row-label-old { color: #ff9a8c; }
 .formula-table .row-label-new { color: #92c89e; }
 /* Visual gap before L20 (after L1-15 sequential block) */

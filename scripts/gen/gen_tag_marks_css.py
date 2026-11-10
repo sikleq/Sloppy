@@ -70,7 +70,8 @@ def block():
             for tag, path, w in ICONS]
     # the gear bigger than the 12px of the line icons (owner 2026-11-07: "какая-то маленькая и толстая была")
     n = GEAR_BOX
-    rows.append(f'.tag-marks ul.changes > li > .badge[data-tag~="rework"]::before, .tag-marks .properties-change '
+    rows.append(f'.tag-marks ul.changes > li > .badge[data-tag~="rework"]::before, .tag-marks .formula-change-title > '
+                f'.badge[data-tag~="rework"]::before, .tag-marks .properties-change '
                 f'.property-tag .badge[data-tag~="rework"]::before {{ width: {n}px; height: {n}px; }}')
     return "\n".join([BEGIN] + rows + [END])
 

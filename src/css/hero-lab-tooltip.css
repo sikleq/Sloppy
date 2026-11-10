@@ -289,6 +289,10 @@
   height: 32px; box-sizing: border-box; padding: 0 10px;
   background: var(--bg-panel-3); border: 1px solid var(--line); border-radius: 5px;
 }
+/* a phone: the eight tags wrap onto two lines, the row was cut at the panel's edge ("REWORK S…", audit 2026-11-08) */
+@media (max-width: 760px) {
+  .hd-remove-group { flex-wrap: wrap; height: auto; row-gap: 6px; padding-top: 4px; padding-bottom: 4px; }
+}
 .hd-search { flex: 0 1 240px; min-width: 150px; }
 .hd-search input { height: 32px; box-sizing: border-box; }
 /* "Remove" tag chips: the patch-page badges, clickable. A removed tag sinks in
@@ -429,4 +433,11 @@
 .heroes-dyn-table td.ha::after {
   content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
   background: rgba(138, 134, 126, 0.16);
+}
+/* three panels side by side but each under ~500px (1280-1500px screens): the 6 slots and the two circles don't fit
+   beside the portrait and ran under the middle column (audit 2026-11-08: slots to x=549, the bauble to 1324) — they go
+   under it */
+@media (min-width: 821px) and (max-width: 1500px) {
+  .hl-hud { grid-template-columns: 1fr; }
+  .hl-inventory { justify-self: start; margin-left: 0; }
 }

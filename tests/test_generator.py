@@ -62,7 +62,7 @@ import tools.generate_patch_code_v2 as g
     ("Now can be toggled while silenced", "MISC"),
     ("Raptor Dance: Can no longer be interrupted by casting Grappling Claw", "BUFF"),
     ("Activation no longer interrupts movement", "BUFF"),
-    ("Land sub-ability no longer cancels channeling or interrupts movement", "BUFF"),
+    ("Land sub-ability no longer cancels channeling or interrupts movement", "QoL"),   # owner 2026-11-08
     ("Now can be cast without cancelling Charge of Darkness", "BUFF"),
     ("No longer has reduced movement slow against creeps", "BUFF"),
     ("No longer has illusion vision penalty", "BUFF"),

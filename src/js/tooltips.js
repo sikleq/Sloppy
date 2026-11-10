@@ -119,6 +119,9 @@ function ecPinnableTip(tip, show, hide, sel) {
     left = Math.max(8, Math.min(left, window.innerWidth - tipRect.width - 8));
     let top = r.top - tipRect.height - 8;
     if (top < 8) top = r.bottom + 8;
+    // fits neither above nor below (7.38c Flaming Lasso's long list ran 33px off the screen's foot, audit 2026-11-08):
+    // as low as it goes and still whole
+    if (top + tipRect.height > window.innerHeight - 8) top = Math.max(8, window.innerHeight - tipRect.height - 8);
     tip.style.left = left + 'px';
     tip.style.top = top + 'px';
   }

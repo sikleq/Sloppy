@@ -4,6 +4,7 @@ replacements and REWORK rows (signal R), an item's components panel. Cut out of 
 
 import html as _html
 import re
+from .html_util import strip_tags
 
 from .state import _State
 from .weights import row_scores as _row_scores
@@ -56,7 +57,7 @@ _TALENT_LEVEL_RE = re.compile(r'^\s*Level (\d+)(?: Talent)?\s*:', re.I)
 def _row_ctx(text):
     """Where the row lives — drives the weights context multiplier (patch/weights.py)."""
     ek = _State.current_entity_key or ""
-    m = _TALENT_LEVEL_RE.match(re.sub(r'<[^>]+>', '', text))
+    m = _TALENT_LEVEL_RE.match(strip_tags(text))
     return {
         "kind": ek.split("|", 1)[0] if ek else "",
         "item": (_State.dynamics.get(ek) or {}).get("icon") if ek.startswith("item|") else None,

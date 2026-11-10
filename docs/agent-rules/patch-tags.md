@@ -236,7 +236,7 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
 - **Новая способность юнита/босса** («Alleviation: New ability. …») — карточка `ability_change(None, {...}, summary="New ability", tag="new")`, а не строка NEW. *Почему:* так же выглядят новые способности героев.
 - **Переделанный объект** (все общие строки — REWORK, кроме NEW): `unit_header(..., new_mech="Reworked objective")`. Строки REWORK становятся блоком-описанием «как это работает теперь», строки NEW остаются изменениями ниже. *Почему:* это описание нового устройства, а не пять отдельных изменений — как у Shrines of Wisdom.
 - **Где и когда появляется объект** (spawns repositioned, first spawn at 15:00, single active, day/night) — REWORK, не MISC. «Roshan no longer drops …» — DEL.
-- **Карточка под способностью — от левой кромки значка** (владелец 2026-11-04, глобально): `.ability-block > .ability-change` и `.properties-change` занимают и колонку значка, на одной вертикали с боксами блока; название и строки с тегами остаются правее значка. Над карточкой отступ 14 px, значок её не касается. Связь — тонкая сплошная линия из низа значка прямо в карточку, а если между ними строки, по пустому месту под значком (`connectorPath` в `src/scripts.js`, вид в `.ability-change-connector path`; вариант 1 из макета, вместо пунктира вокруг значка). Дерево способностей (Primal Split → Brewling) остаётся пунктирным слева от значка. Карточки «New ability» и новой грани без старой стороны тоже с линией. Способность нового крипа, описанная одними боксами (7.38 Boglet, Riverborn Aura), — не карточка под значком: бокс стоит справа от значка под названием, как Water Bubble (Large) (владелец 2026-11-07). Карточки предмета стоят под кромкой значка предмета, без линии: они идут прямо под ним. Тест `tests/test_cards_at_icon_edge.py`.
+- **Карточка под способностью — от левой кромки значка** (владелец 2026-11-04, глобально): `.ability-block > .ability-change` и `.properties-change` занимают и колонку значка, на одной вертикали с боксами блока; название и строки с тегами остаются правее значка. Над карточкой отступ 14 px, значок её не касается. Связь — тонкая сплошная линия из низа значка прямо в карточку, а если между ними строки, по пустому месту под значком (`connectorPath` в `src/js/patch-page.js`, вид в `.ability-change-connector path`; вариант 1 из макета, вместо пунктира вокруг значка). Дерево способностей (Primal Split → Brewling) остаётся пунктирным слева от значка. Карточки «New ability» и новой грани без старой стороны тоже с линией. Способность нового крипа, описанная одними боксами (7.38 Boglet, Riverborn Aura), — не карточка под значком: бокс стоит справа от значка под названием, как Water Bubble (Large) (владелец 2026-11-07). Карточки предмета стоят под кромкой значка предмета, без линии: они идут прямо под ним. Тест `tests/test_cards_at_icon_edge.py`.
 - **Courier и Flying Courier — один юнит, своя категория** (владелец 2026-11-04, 7.40): `unit_header("Courier", "../icons/units/npc_dota_courier.png", general=False, track=True)`, как Roshan и Tormentor. Генератор переносит туда строки General Updates сам (`_postprocess_courier_rows`), строки предметов остаются. Значок — собственная иконка игры `items/courier_radiant`.
 - **Руна — как способность** (владелец 2026-11-04, 7.38, 7.40): `ability("Haste Rune", icon_url="../icons/runes/haste.png", innate=False)` и её строки без «Haste Rune:», все руны патча вместе под одним `subgroup("Runes")` (7.38: перед Lotus Pools). Генератор делает это сам в General Updates (`_postprocess_rune_rows`). Строка не про одну руну остаётся в списке.
 - **Блок механики абзацем** (владелец 2026-11-04, вариант 4 макета; сделано для 7.38, 7.39, 7.41; 7.37 и 7.40 уже предложение + таблица значков, это тоже принятый вид): `mech_story("абзац", tags=…, table=…, maps=[…], buttons=[…])` первым в списке блока, строки Valve под ним — те же, с `covered=True`. Абзац — слова Valve, пояснения из «?» вписаны в текст, ключевые значения `<b>`. Перечисление с числами из «?» (7.38 Lotus Pools, течения, Madstone Limits) — `mech_table`, не «?»; в таблице значения, а описание остаётся текстом (владелец 2026-11-04: Lotus Pools — строка из пяти чисел, `labels=False`). Текст можно дать списком абзацев: отдельная мысль — отдельный абзац (7.38 «Going downstream…»). Карта заполняет блок: одна — рядом с текстом, ширина сама подбирается под длину текста (`story_side_width`), таблица тогда на всю ширину под ними; две — на всю ширину под текстом, не у левого края. `buttons` — фраза текста, открывающая картинки по клику. *Почему:* строки одного веса с цифрами в середине плохо читаются; скрытые строки держат теги, веса и список страницы Terrain. Теги скрытых строк, кроме NEW и REWORK, передавать в `tags=("rework", "misc", "qol")`, иначе блок пропадёт при таком фильтре. Список способностей из «?» под абзацем: `table=mech_list(info_tip(...))`. Блок, где под каждым предложением своя таблица (7.41 Health Restoration), остаётся коробками: таблицу надо к чему-то привязать. Формулы в плоский абзац не писать (владелец 2026-11-04, 7.39 Health Restoration: «слишком плоско»): отдельные блоки «что это», «как складывается» с `mech_formula(...)` в таблице, «пример» таблицей; несколько `mech_story` подряд дают отдельные коробки. Предмет или способность, названные примером, — со значком: `mech_example("Sange")` прямо в тексте; значок увеличивается при наведении, как все значки в текстах (владелец 2026-11-04). В обычной строке — `li("… Batrider during Firefly", t("MISC"), examples={"Firefly": "Batrider's Firefly"})`: текст остаётся простой строкой, его читают страница Terrain и `kv_review`. Генератор ставит `examples` сам (`_postprocess_example_icons`, понимает и «like those granted by X»), кроме имени способности без героя: его добавляет тот, кто вычитывает черновик. Пояснение в скобках с примером («(like those granted by Gleipnir)», «(e.g. Shiva's Guard …)») уходит из строки под [?] со значком (владелец 2026-11-07, 7.38 Ice Wall: «эту часть в скобках можно под [?] сделать»; `row_examples` возвращает текст и пояснение).
@@ -435,7 +435,7 @@ Aghanim's Scepter», владелец 2026-10-26, Kinetic Fence 7.41); стро�
   ушла во врождённую Momentum) — **MISC**, не DEL (владелец 2026-10-24); линтер предлагает DEL — оставить MISC.
 - Смена способа применения, после которой способность действует иначе («Now a no target ability that affects only
   Bloodseeker», Omniknight 7.41) — **REWORK**, не NERF.
-Тест — `tests/test_fixes_1022.py`.
+Тесты — `tests/test_hero_abilities.py`, `tests/test_code_health.py`, `tests/test_aghs_cards.py`.
 
 
 ## Переключаемые способности (2026-09-27, решение владельца)
@@ -468,7 +468,7 @@ Aghanim's Scepter», владелец 2026-10-26, Kinetic Fence 7.41); стро�
 | «Blink no longer has an overshoot range» | **BUFF** | клик дальше макс. дальности переносил героя на 75% от неё — штраф убран |
 
 Генератор: `_heal_stats_renamed`, `TAG_OVERRIDES` (`tools/generate_patch_code_v2.py`); карточка — `_AGHS_REWORK_RE`
-(`patch/cards_aghs.py`). Тесты: `tests/test_review_739.py`. Оставлены как есть (линтер не прав): Roshan's message
+(`patch/cards_aghs.py`). Тесты: `tests/test_tag_rules.py`, `tests/test_aghs_cards.py`. Оставлены как есть (линтер не прав): Roshan's message
 QoL, Invoker Scepter REWORK, Naga «no longer reduces enemy status
 resistance» DEL (вражеский дебафф), Sprout REWORK, Take Aim NEW; `l=True` у Grow / Focus Fire / Plague Ward bounty /
 Desolate / Infest / Riptide — штраф самого героя или выгода врагу.
@@ -532,7 +532,7 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 Страница 7.38 старше правил генератора: заметка героя с именем способности («Accumulation: …», «Ruin and Restoration: …»,
 «Tar Bomb: …») перенесена в блок способности, Succubus получил карточку «is now an innate ability», строки «Damage at level
 30» — проценты `br()`, как у остальных героев. На телефоне длинная шапка карточки переносится (`.iab-title`): Demonic
-Cleanse раздвигал страницу до 471 px. Тест `tests/test_review_738.py`.
+Cleanse раздвигал страницу до 471 px. Тесты `tests/test_tag_rules.py`, `tests/test_hero_abilities.py`, `tests/test_css_rules.py`.
 
 ## Вычитка 7.37e (2026-10-28)
 
@@ -549,7 +549,7 @@ Cleanse раздвигал страницу до 471 px. Тест `tests/test_re
 | «Improved behavior when casting at maximum cast range» | **QoL** | удобство управления, не сила (владелец 2026-10-28, Stroke of Fate) |
 | «from 18-24 on all levels to 16/24/32/40», «from 14-20 to 17-20» | **`b(21, [...])`** / **`br(14, 20, 17, 20)`** | старый разброс сравнивается по середине, % на каждый уровень (владелец 2026-10-28, Treant); генератор `_emit_range_badge` |
 
-Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
+Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_tag_rules.py`.
 
 ## Вычитка 7.37 (2026-10-30) — патч реворка врождённых
 
@@ -570,7 +570,7 @@ Cleanse раздвигал страницу до 471 px. Тест `tests/test_re
 | Остальные словесные строки | по правилу «новое свойство — NEW»: ~40 правил | `TAG_OVERRIDES` |
 
 Ложные «from» сверки: Unstable Wand (скорость стала ключом файла только в 7.37), Beastmaster блок урона (в коде) —
-`UNCHECKABLE`. Тест `tests/test_review_737.py`.
+`UNCHECKABLE`. Тесты `tests/test_tag_rules.py`, `tests/test_mech_blocks.py`, `tests/test_hero_abilities.py`.
 
 Владелец 2026-10-30, после вычитки:
 - Строки общего раздела про самого Рошана («… Roshan now always drops Roshan's Banner», «… drops Refresher Shard and
@@ -624,7 +624,7 @@ Cleanse раздвигал страницу до 471 px. Тест `tests/test_re
   from»); «Now scales with Pierce the Veil» — BUFF (все в `TAG_OVERRIDES`).
 - Строки «Earth / Storm / Fire / Void Brawler …» способности Drunken Brawler — блоки стоек со своими значками сразу
   после неё, как в 7.40; в строке имя стойки снято («Bonus armor rescaled …»), пунктир к родителю рисует
-  `ABILITY_TREES` в `src/scripts.js` (`STANCE_ABILITIES`, `_postprocess_stance_blocks`). Применено к 7.37, 7.37e, 7.38,
+  `ABILITY_TREES` в `src/js/patch-page.js` (`STANCE_ABILITIES`, `_postprocess_stance_blocks`). Применено к 7.37, 7.37e, 7.38,
   7.40c.
 - Описание из файлов игры с частями «Имя - …» на своих строках (стойки Drunken Brawler) — абзац на часть, имя жирным
   (`_named_parts` в `patch/cards_ability_change.py`).
@@ -667,7 +667,7 @@ Cleanse раздвигал страницу до 471 px. Тест `tests/test_re
   плавный … чтобы не нагружало страницу»; шеврон и пыльцу пробовали — отвергнуты). Без анимации, размытие только в
   свёрнутом виде (тест `test_the_fold_glass_is_light_on_the_page`). Нажатие разворачивает, у раскрытого — тонкая
   полоса сворачивает; нажатие на затухший текст тоже разворачивает (`_fold_named_parts`, `.acr-fold`,
-  `setFold` в `src/scripts.js`); пунктир стоек перерисовывается при каждом переключении.
+  `setFold` в `src/js/patch-page.js`); пунктир стоек перерисовывается при каждом переключении.
 - На телефоне в таблице «Hero | Ability | Details» пояснение — отдельной строкой под героем и способностью, во всю
   ширину: три столбца на 375 px налезали друг на друга.
 - Строки под карточкой новой врождённой скрыты все (кроме строк про Аганим); заметка строки («Illusions cause full
@@ -711,7 +711,7 @@ Hunter, Quas/Wex/Exort/Invoke во время ченнелинга, талант
 | Блок способности, врождённой в своём патче (Predator, Maul) | **`innate=True`** | флаг `Innate` KV того патча, не только `_innate_` в слаге; заодно 7.37c/d/e: 19 блоков (Feast, Mana Shield, Necromastery…) |
 
 Ошибка Valve: Shadow Word «Cast Range rescaled from 600/700/800/**950**» — в 7.37 было 900 → `wrong-word` + note_box.
-Карта 7.37b — файл 7.36, своего шага Terrain нет. Тест `tests/test_review_737b.py`.
+Карта 7.37b — файл 7.36, своего шага Terrain нет. Тест `tests/test_tag_rules.py`.
 
 ## Вычитка 7.37c (2026-10-29)
 
@@ -730,7 +730,7 @@ Hunter, Quas/Wex/Exort/Invoke во время ченнелинга, талант
 «Yellow0» (в игре Yellow1), Slugger «Slugger Facet». Проверка «from» (`scripts/audit/audit_from_values.py`): значение,
 которого у героя нет, берётся из `npc_dota_hero_base` того патча (7.37b Dawnbreaker regen 0.25), герой без записи
 в патче — не проверяется (Ringmaster в 7.37b). Карта: 7.37 и 7.37b шли с файлом 7.36 → картинка 7.36 из Oldgrowth,
-7.36 → 7.37c ничего не сдвинулось. Тест `tests/test_review_737c.py`.
+7.36 → 7.37c ничего не сдвинулось. Тест `tests/test_tag_rules.py`.
 
 ## Вычитка 7.37d (2026-10-29)
 
@@ -755,7 +755,7 @@ Hunter, Quas/Wex/Exort/Invoke во время ченнелинга, талант
 
 Shadow Poison «Vision radius decreased from 400 to 300»: ключ `vision_radius` появился только в 7.37d, в 7.37c его
 нет — строка в `UNCHECKABLE` (`scripts/audit/audit_from_values.py`). Карта 7.37c → 7.37d: ничего не сдвинулось, своей
-страницы Terrain нет (как 7.37e). Тест `tests/test_review_737d.py`.
+страницы Terrain нет (как 7.37e). Тест `tests/test_tag_rules.py`.
 
 **Владелец 2026-10-29:** «Removed X (and Y) Facet(s)» — не строка GENERAL, а **блок каждого снятого фасета** с его
 картинкой и именем и строкой «Removed» (DEL), перед остальными фасетами героя — как 7.39 (Mephitic Shroud). Имя, цвет,

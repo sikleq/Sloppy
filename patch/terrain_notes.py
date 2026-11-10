@@ -13,6 +13,7 @@ the picture maker (scripts/gen/terrain_shots.py).
 import json as _json
 import os as _os
 import re
+from .html_util import strip_tags
 
 from .state import page_cache
 
@@ -157,7 +158,7 @@ def terrain_note(patch, text, prefix="../"):
     moved"). ('', '') for any other row."""
     if not patch or not isinstance(text, str):
         return "", ""
-    plain = re.sub(r"<[^>]+>", "", text).strip()
+    plain = strip_tags(text).strip()
 
     def imgs(names):
         return "".join(

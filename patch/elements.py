@@ -785,8 +785,9 @@ def _facet_any(slug):
     return name, _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"]), icon_name
 
 
-def _open_facet_block(name, icon_html, block_class="ability-block facet-block"):
-    """A facet's block with `icon_html` as its picture, after the hero's "Facets" title if this is his first."""
+def _open_facet_block(name, icon_html, block_class="ability-block facet-block", old_title=None):
+    """A facet's block with `icon_html` as its picture, after the hero's "Facets" title if this is his first;
+    `old_title`: a renamed facet's old name, "Old → New" as a renamed ability's."""
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
     if _State.current_hero and not _State.seen_facets_subgroup:
@@ -795,10 +796,13 @@ def _open_facet_block(name, icon_html, block_class="ability-block facet-block"):
     _State.ability_block_open = True
     _State.current_block_is_facet = True
     _State.current_facet_name = name
-    return out + f'<div class="{block_class}">{icon_html}<h4 class="ability-title">{name}</h4>'
+    title = _renamed_title(old_title, name) if old_title else name
+    return out + f'<div class="{block_class}">{icon_html}<h4 class="ability-title">{title}</h4>'
 
 
-def facet_header(slug):
+def facet_header(slug, old_title=None):
+    """old_title: a renamed facet, "Old → New" in its header, no "Renamed from" row (owner 2026-11-10, 7.37 Corpse Eater
+    -> Rage: "мы обычно убираем такие строки и делаем стрелочку от названия")."""
     found = _facet_any(slug)
     if not found:
         return f'<!-- facet_header: unknown slug {slug} -->'
@@ -808,7 +812,7 @@ def facet_header(slug):
                     f'data-slug="{slug}">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
-    return _open_facet_block(name, icon_html)
+    return _open_facet_block(name, icon_html, old_title=old_title)
 
 
 def _facet_parts(slug):
@@ -973,6 +977,8 @@ def _li_covered(text, _plain_text, dyn_tags, covered):
         covered = True                          # "Now granted by Aghanim's X": the upgrade's card under it says so
     elif isinstance(text, str) and _aghs_rework_card(_plain_text, covered):
         covered = True                          # the old -> new upgrade card under the rows shows it
+    elif isinstance(text, str) and not covered and _aghs_detail_covered(_plain_text):
+        covered = True                          # ... and its "Aghanim's Scepter now …" rows after it
     elif isinstance(text, str) and not covered and "rework" in dyn_tags and _upgrade_wording_covered(_plain_text):
         covered = True                          # "Aghanim's Scepter's X changed from … to …": the card's two texts say it
     elif isinstance(text, str) and not covered and _scale_card(_plain_text):
@@ -1456,6 +1462,7 @@ from .cards_item_abilities import (  # noqa: E402
 )
 from .cards_item_stats import _cost_covered, components_change  # noqa: E402
 from .cards_aghs import (  # noqa: E402
+    _aghs_detail_covered,
     _aghs_parts_cards,
     _aghs_removed_row,
     _aghs_rework_card,

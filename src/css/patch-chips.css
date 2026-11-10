@@ -217,6 +217,12 @@
 .pop-li::before { content: "•"; position: absolute; left: 1px; color: var(--gold); }
 .pop-li.pop-sub { padding-left: 26px; margin-top: 1px; }
 .pop-li.pop-sub::before { content: "–"; left: 14px; color: var(--text-dim, #969289); }
+/* a % inside a popup's text, in the colour of its direction (owner 2026-11-08, 7.38 Lycan "-20% не окрашено") */
+.pop-pct { font-weight: 700; }
+.pop-pct-buff { color: #55cd73; }
+.pop-pct-nerf { color: #e0727a; }
+html.cb-mode .pop-pct-buff { color: #52b2e8; }
+html.cb-mode .pop-pct-nerf { color: #eb7115; }
 /* a talent swap's "?" as a small table (patch/talent_marks.py moves_table; owner 2026-11-07: "слишком подряд цифры
    идут без каких-то разделений"): talent | level | value, a quiet head, lines between the rows, the cells apart */
 .tal-moves { display: grid; grid-template-columns: auto auto auto; column-gap: 14px; }

@@ -1,6 +1,8 @@
 # Weights — how a patch row becomes a number
 
-Living doc. Review with findings: [weights-review.md](weights-review.md). Decisions by Денис (2026-09-16):
+> Research notes. The scripts named here (`scrape_static.py`, `t_events.py`, `weights_from_ladder.py`, `consensus.py`, …) were one-off and are not kept in the repository.
+
+Living doc. Review with findings: [weights-review.md](weights-review.md). Decisions by the owner (2026-09-16):
 **two scales** (net balance `w` + volume `v`), **hybrid magnitude** (Valve's typical step for base
 stats, typical % per type otherwise).
 
@@ -395,7 +397,7 @@ the number is dominated by how many rows Valve wrote; volume `v` is the honest p
 ## Agreement test (review E.8.2) — 2026-09-17
 
 120 buff/nerf rows, stratified by |score| quintile, graded BLIND (no scores shown) on a 1–5 impact scale by
-an independent judge (LLM analyst persona; Денис can re-grade the same file `outputs/agreement_blind.json`).
+an independent judge (LLM analyst persona; the owner can re-grade the same file `outputs/agreement_blind.json`).
 Grades: 1 ×23, 2 ×64, 3 ×29, 4 ×3, 5 ×1. **Spearman ρ(|score|, grade) = 0.21** — weak. Median |score| by
 grade: 0.45 / 0.90 / 0.82 / 0.44 / 1.33 — no monotone rise above grade 2.
 
@@ -410,18 +412,18 @@ Conclusion: the score measures *how large the edit is relative to the parameter*
 changes*. The revert backtest says that is still predictive of Valve's own follow-ups (Q1→Q5 4.6 → 11.2 %),
 but it is not "impact". Candidate fixes (need a decision): an absolute floor per unit (durations < 0.5 s,
 talent deltas below one typical step → ×0.5); a per-ability importance prior (ultimates already ×1.3; core
-passives/innates could get a manual list); re-grade by Денис to confirm the judge.
+passives/innates could get a manual list); re-grade by the owner to confirm the judge.
 
 ### Follow-up applied 2026-09-17 — absolute floor (decision delegated to Claude)
 
 A big % of a tiny number is still tiny: rows whose max-rank change is **< 0.25 s → ×0.35**, **< 0.5 s → ×0.5**,
 or **< 2 percentage points → ×0.5** (`_small_change_damp`). With the floor and the correct base-stat context
 the same 120 rows give **ρ = 0.34** (was 0.21). A manual "core mechanics" list was rejected as subjective;
-Денис re-grading the blind file remains the way to check the judge.
+the owner re-grading the blind file remains the way to check the judge.
 
 ### Skill priority — objective "how central is the ability" (2026-09-17)
 
-The fill-in table idea was dropped (Денис: inconvenient, should be math). Instead: how pros actually skill
+The fill-in table idea was dropped (the owner: inconvenient, should be math). Instead: how pros actually skill
 the hero. `tools/fetch_skill_priority.py` asks the OpenDota explorer for the skill points put into each
 ability within the first 10 upgrades (pro matches, last 120 days; 387 abilities, 127 heroes), and turns the
 share among basic abilities into a multiplier `clamp(1 + 1.5·(share − 1/n), 0.7, 1.3)` →

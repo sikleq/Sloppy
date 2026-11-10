@@ -3,20 +3,12 @@ what the page needs written into it when it is saved."""
 import re
 
 # a row's data-tag words, the kind first: NEW carries "buff new", DEL "del nerf" (the filters' aliases)
-_KINDS = ("new", "rework", "swap", "del", "qol", "misc")
 _TERRAIN_ROW_RE = re.compile(r'<li\b([^>]*)><span class="badge tnum(?: tnum-(buff|nerf))?">(\d+)</span>'
                              r'<span class="row-text">(?=(.*?)</li>)', re.S)
 # what is the map's ground, not an object on it: removing it is no "removed object"
 # (not "water": 7.40 "The watchers … near the small water camps … have been removed" are objects)
 _GROUND_RE = re.compile(r'\b(?:trees?|cliffs?|ramps?|walls?|paths?|terrain|ground|bushes|grass)\b', re.I)
 _REMOVED_RE = re.compile(r'\b(?:removed|deleted)\b', re.I)
-
-
-def row_kinds(data_tag):
-    """The tags a row shows from its data-tag: its kinds (NEW, DEL, ...), else BUFF / NERF."""
-    words = (data_tag or "").split()
-    kinds = [w for w in words if w in _KINDS]
-    return kinds or [w for w in words if w in ("buff", "nerf")][:1]
 
 
 def terrain_tone(attrs, pct_tone, text):

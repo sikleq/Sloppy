@@ -1,15 +1,11 @@
-"""The canonical-phrase tag linter (.claude/skills/sloppy-patch/lint_tags.py) reads EVERY li() row (2026-10-16: its
+"""The canonical-phrase tag linter (tools/lint_tags.py) reads EVERY li() row (2026-10-16: its
 regex skipped 448 of 1100 rows of 7.41 — a row without t() swallowed the next one, so Pipe of Insight's
 "no longer affects" NERF went unseen)."""
 import os
 import sys
 
-import pytest
-
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LINTER = os.path.join(ROOT, ".claude", "skills", "sloppy-patch")
-if not os.path.exists(os.path.join(LINTER, "lint_tags.py")):          # .claude is not in git: CI has no linter
-    pytest.skip("the sloppy-patch skill is local only", allow_module_level=True)
+LINTER = os.path.join(ROOT, "tools")      # in the repository since 2026-11-10: the guard runs on GitHub too
 sys.path.insert(0, LINTER)
 import lint_tags  # noqa: E402
 

@@ -267,7 +267,7 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-hstats { margin-top: auto; padding-top: 14px; }               /* pinned to the bottom → all four line up */
 /* Group summary: plain rows; small icons and colour make the numbers readable (2026-09-26) */
 .ec-hs-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; line-height: 1.35; }
-.ec-hs-table col.ec-hs-lab { width: 22.5%; }
+.ec-hs-table col.ec-hs-lab { width: 26%; }
 .ec-hs-table th, .ec-hs-table td { border: 1px solid rgba(255, 255, 255, 0.07); padding: 4px 5px; height: 26px;
   box-sizing: border-box; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ec-hs-table tbody th { text-align: left; font-weight: 400; color: var(--text-dim); }
@@ -286,7 +286,16 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-hs-table a.ec-hstat-who { display: flex; align-items: center; justify-content: flex-start; gap: 4px; min-width: 0;
   color: var(--text-dim); }
 .ec-hs-table a.ec-hstat-who b { color: var(--text-bright); }
-.ec-hs-table a.ec-hstat-who span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+/* names and labels wrap instead of "Attack ty…", "Drago…", "INTELLIG…" (audit 2026-11-08; a group is ~310px wide on a
+   1280px screen) */
+.ec-hs-table a.ec-hstat-who span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-align: left; white-space: normal;
+  line-height: 1.15; }
+.ec-hs-table tbody th, .ec-hs-table td.ec-hs-hero { white-space: normal; overflow-wrap: normal; text-overflow: clip; }
+/* under ~1500px a group is too narrow for the face and a long name ("Lifestealer"): the name stays, the face goes */
+@media (max-width: 1500px) { .ec-hs-table .ec-hs-face { display: none; } }
+/* ... and the narrowest group (Universal, 1280px: "Pangolier" 50px in a 46px cell) a hair tighter */
+@media (max-width: 1360px) { .ec-hs-table td.ec-hs-hero { padding-left: 3px; padding-right: 2px; font-size: 11px; } }
+.ec-hs-table tr.ec-hs-cap th:first-child { letter-spacing: 0.3px; }
 .ec-hs-table td.ec-hs-hero { text-align: left; }                     /* hero cell | value cell */
 .ec-hs-table td.ec-hs-val { text-align: center; }
 a.ec-hstat-who { text-decoration: none; }

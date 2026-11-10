@@ -74,7 +74,7 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
    cooldown sit in the pane's top-right corner, the text flowing round them (owner 2026-09-30, 7.38 Alleviation) */
 /* ...so the pane gets the item card's own header strip: "Passive" / "Active" left (game files), values right; edge
    to edge whatever the pane's padding (--pt / --px, set with each padding rule) */
-.ability-change-pane > .pane-head { margin: calc(-1 * var(--pt, 0px)) calc(-1 * var(--px, 0px)) 0;
+.ability-change-pane > .pane-head, .ability-change-pane > .deck-card > .pane-head { margin: calc(-1 * var(--pt, 0px)) calc(-1 * var(--px, 0px)) 0;
   padding: 2px var(--px, 12px); border-radius: 5px 5px 0 0; }
 .ability-change-head + .pane-head { margin-top: 0; border-radius: 0; }   /* under a pane's own icon + name head */
 /* a card row's own % badges (a facet's "Path Duration increased from 3/3.5/4/4.5s to 6s") sit at the row's right edge,
@@ -88,6 +88,19 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
   left: 0;
   right: 0;
   top: calc(4px + 1.45em);     /* row padding-top + line-height of its first line */
+  border-bottom: 1px dashed rgba(150, 146, 137, 0.32);
+  pointer-events: none;
+}
+/* ... and a stats card's row with a % (owner 2026-11-08, 7.40 Spirit Bear "в правой карточке не хватает пунктирной
+   линейки при наведении на строки"): the text cell runs to the % column, the line under its first line (pt-bg: a text
+   cell with a % beside it, patch/cards_item_stats.py) */
+.properties-change .property-text.pt-bg { position: relative; }
+.properties-change .property-text.pt-bg:hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: -8px;                 /* to the % column, over the grid gap */
+  top: 1.45em;
   border-bottom: 1px dashed rgba(150, 146, 137, 0.32);
   pointer-events: none;
 }

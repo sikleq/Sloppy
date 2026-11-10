@@ -9,7 +9,7 @@ the patch pages' attribute cards and the Hero Changes summaries all read these n
 
 A history is ((patch, release date, old, new), ...), oldest first; the LAST row is the value in the game
 today, so a Valve change is one new row. Sources: data/patchnotes_english.txt, Liquipedia changelogs."""
-import re
+from .versions import version_key
 
 # ---- Strength / Agility / Intelligence: today's values are the LAST row of each history below ----
 AS_PER_AGI = 1.0           # +1 attack speed per Agility (every patch; the 7.13–7.20 primary bonus is below)
@@ -113,8 +113,7 @@ UNIVERSAL_DMG_PER_ATTR = float(UNIVERSAL_DMG_HIST[-1][3])
 
 def _vkey(v: str) -> tuple:
     """'7.36' < '7.36a' < '7.37' — numeric major/minor, then the letter."""
-    m = re.match(r"(\d+)\.(\d+)([a-z]?)", v or "")
-    return (int(m.group(1)), int(m.group(2)), m.group(3)) if m else (0, 0, "")
+    return version_key(v) if v and version_key(v)[:2] != (0, 0) else (0, 0, "")
 
 
 def at(hist, patch: str | None = None) -> float:

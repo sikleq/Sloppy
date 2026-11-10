@@ -353,7 +353,7 @@ def test_an_example_name_stays_on_the_line_of_the_words_around_it():
 
 def test_738_examples_have_icons():
     src = _content("p738.py")
-    # Lifesteal Amp's three abilities are a table now (owner 2026-11-06), tests/test_review_1106_markers.py
+    # Lifesteal Amp's three abilities are a table now (owner 2026-11-06), tests/test_mech_blocks.py
     for name in ("Linken's Sphere",):
         assert f'mech_example("{name}")' in src, name
 

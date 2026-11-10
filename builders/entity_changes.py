@@ -25,6 +25,7 @@ _sys.path.insert(0, str(_HERE))
 _sys.path.insert(0, str(_HERE / "builders"))
 
 import patch.site_common as _site          # noqa: E402
+from patch.html_util import strip_tags      # noqa: E402
 from patch.js_bundle import read_js
 from patch.meta import PATCHES, RELEASE_HISTORY        # noqa: E402
 
@@ -45,18 +46,10 @@ def _file_slug(e: dict) -> str:
     return ("enchantment-" if e["kind"] == "enchant" else "") + e["slug"]
 _BLOCK_OPEN_RE = _re.compile(r'<div class="entity-block[^"]*"[^>]*>')
 _HEADER_RE = _re.compile(r'<div class="entity (?:hero|item|unit)-entity"[^>]*\bid="dyn-(creep-hero|hero|item|enchant|unit)-([a-z0-9-]+)"[^>]*>')
-_DIV_RE = _re.compile(r"<(/?)div\b[^>]*>")
 _esc = lambda s: _html.escape(str(s), quote=True)
 
 
-def _balanced_div(html: str, start: int) -> int:
-    """Index just past the </div> matching the <div ...> that starts at `start`."""
-    depth = 0
-    for m in _DIV_RE.finditer(html, start):
-        depth += -1 if m.group(1) else 1
-        if depth == 0:
-            return m.end()
-    return len(html)
+from patch.html_util import div_end as _balanced_div      # noqa: E402  (the </div> closing the <div at `start`)
 
 
 def _blocks(page: str):
@@ -80,7 +73,7 @@ def _blocks(page: str):
         # the icon's alt text is the clean display name
         alt = _re.search(r'<img[^>]*\balt="([^"]+)"', header)
         clean_name = _html.unescape(alt.group(1)) if alt else (
-            _re.sub(r"<[^>]+>", "", name.group(1)).strip() if name else h.group(2))
+            strip_tags(name.group(1)).strip() if name else h.group(2))
         yield h.group(1), h.group(2), clean_name, (icon.group(1) if icon else ""), body
 
 
@@ -140,7 +133,7 @@ def _also_rows(page: str):
                 end = t.end()
                 break
         heads = _SECTION_RE.findall(page, 0, m.start())
-        section = _re.sub(r"<[^>]+>", "", heads[-1]).strip() if heads else ""
+        section = strip_tags(heads[-1]).strip() if heads else ""
         yield m.group(1).split(), section, page[m.start():end]
 
 
@@ -262,7 +255,7 @@ def _titles(html: str) -> list[str]:
     out = []
     for m in _AB_BLOCK_RE.finditer(html):
         cls, t = m.group(1), m.group(2)
-        t = _re.sub(r"<[^>]+>", "", t).strip().split("→")[-1].strip()
+        t = strip_tags(t).strip().split("→")[-1].strip()
         if "is-innate" in cls and t not in _active_innates():
             continue
         slug = _re.search(r'data-slug="([a-z_0-9]+)"', m.group(0))
@@ -454,7 +447,7 @@ def _load_talent_aliases() -> dict:
         with open(p, encoding="utf-8") as f:
             d = _json.load(f)
         return {k: v for k, v in d.items() if not k.startswith("_")}
-    except Exception:
+    except FileNotFoundError:
         return {}
 
 
@@ -999,6 +992,8 @@ _CAMP_TITLE_ICON = {"Small": "small", "Medium": "mid", "Large": "big", "Ancient"
 # type, as (icon basename in icons/structures/, display name).
 _STRUCTURE_DEF = [
     ("Towers", [("tower_radiant", "Tower (Radiant)"), ("tower_dire", "Tower (Dire)")]),
+    # the game has no barracks portrait: its tutorial picture materials/vgui/hud/tutorial/barracks (pak01), cropped
+    # to the towers' 128x72 (2026-11-08; a gold square stood there before)
     ("Barracks", [("barracks", "Barracks")]),
     # one Tormentor: the Radiant / Dire models only differ in colour
     ("Tormentors", [("tormentor_radiant", "Tormentor")]),

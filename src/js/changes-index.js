@@ -32,4 +32,6 @@
     b.setAttribute('aria-pressed', classes.has(k) ? 'true' : 'false');
     apply();
   }));
+  // once at load too: "Removed neutrals" showed its heading over cards hidden from the start (audit 2026-11-08)
+  apply();
 })();

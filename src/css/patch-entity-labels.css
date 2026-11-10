@@ -229,6 +229,11 @@ h4.subgroup .subgroup-new-type {
 .acr-fold.is-open .acr-fold-toggle { height: 12px; margin-top: 2px; -webkit-backdrop-filter: none; backdrop-filter: none;
   -webkit-mask-image: none; mask-image: none;
   background: linear-gradient(to bottom, rgba(227, 196, 106, 0), rgba(227, 196, 106, 0.09)); }
+/* open, the strip shows no box under the pointer, only its line brightens (owner 2026-11-08: "видно выделение от
+   мышки") */
+.acr-fold.is-open .acr-fold-toggle:hover { background-color: transparent; }
+/* a fold that hides under two lines stays open, no strip (src/js/fold-small.js) */
+.acr-fold.fold-off > .acr-fold-toggle { display: none; }
 .acr-fold-toggle:focus-visible { outline: 1px solid var(--gold-line); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .acr-fold-toggle { transition: none; } }
 /* Dense stat-list mode — used by per-unit comparison cards (e.g. Brewmaster

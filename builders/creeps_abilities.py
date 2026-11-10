@@ -12,6 +12,7 @@ import os as _os
 import re
 
 import patch.site_common as _site
+from patch.html_util import strip_tags      # noqa: E402
 from builders.creeps_common import (
     ABILITY_COLS, DASH, abil_icon_html, attr_esc, esc, has_abil_icon,
     page_shell, write_dist,
@@ -75,8 +76,6 @@ THROUGH_BKB_TIPS = {
         "but the effect on an enemy under BKB doesn't work"),
 }
 
-DMG_TYPE = {'DAMAGE_TYPE_MAGICAL': 'Magical', 'DAMAGE_TYPE_PHYSICAL': 'Physical',
-            'DAMAGE_TYPE_PURE': 'Pure', 'DAMAGE_TYPE_HP_REMOVAL': 'HP Removal'}
 DISPEL = {'SPELL_DISPELLABLE_YES': 'Yes', 'SPELL_DISPELLABLE_YES_STRONG': 'Strong only',
           'SPELL_DISPELLABLE_NO': 'No'}
 # Aura Stack column: which auras stack with another copy of the same aura.
@@ -624,7 +623,7 @@ def _leveled_cells(props):
         if k.startswith('_'):
             continue
         if isinstance(v, str) and v.startswith('\x01'):
-            text = re.sub(r'<[^>]+>', '', v[1:])
+            text = strip_tags(v[1:])
         else:
             text = str(v or '')
         if _LVL_RE.search(text):

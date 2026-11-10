@@ -62,13 +62,14 @@ jobs:
           src_css = sum(p.stat().st_size for p in pathlib.Path('src/css').glob('*.css'))
           dist_css = pathlib.Path('dist/styles.css').stat().st_size
           src_js = sum(p.stat().st_size for p in pathlib.Path('src/js').glob('*.js'))
-          dist_js = pathlib.Path('dist/src/scripts.js').stat().st_size
+          # the largest of the page bundles (each holds a part of src/js)
+          dist_js = max(p.stat().st_size for p in pathlib.Path('dist/src').glob('scripts-*.js'))
           ok = True
           if dist_css >= src_css:
               print(f'FAIL: dist/styles.css ({dist_css}) not smaller than source ({src_css})')
               ok = False
           if dist_js >= src_js:
-              print(f'FAIL: dist/src/scripts.js ({dist_js}) not smaller than source ({src_js})')
+              print(f'FAIL: dist/src/scripts-*.js ({dist_js}) not smaller than source ({src_js})')
               ok = False
           if ok:
               print(f'OK — CSS {src_css}→{dist_css}, JS {src_js}→{dist_js}')

@@ -152,7 +152,7 @@ def _kv_item_cost(name, version):
     """ItemCost of a (new) item in this patch's KV snapshot, or None."""
     try:
         from patch.stats import _STATS_I
-    except Exception:
+    except ImportError:
         return None
     slug = _KNOWN_ITEM_SLUGS.get(name, name.lower().replace(' ', '_').replace("'", ''))
     cost = (_STATS_I.get(version, {}).get(f'item_{slug}') or {}).get('ItemCost')
@@ -170,7 +170,7 @@ _COST_ROW_RE = re.compile(r'W\(li\("[^"]*\bcost\b[^"]*\d', re.I)
 def _prev_version(version):
     try:
         from patch.meta import RELEASE_HISTORY
-    except Exception:
+    except ImportError:
         return None
     order = [r["version"] for r in RELEASE_HISTORY]          # newest first
     return order[order.index(version) + 1] if version in order and order.index(version) + 1 < len(order) else None

@@ -270,6 +270,8 @@ def ability_text(slug, version, kind="base"):
             continue
         pct = "%" if _is_pct(label, v) else ""
         label = re.sub(r"^[%$+\s]+|[:\s]+$", "", label).strip().capitalize()
+        if len(label) > 40 or "." in label:
+            continue                # a tooltip written as a sentence is no name (Sonnet 2026-11-09, 7.41 Venomancer)
         base, inc, every = grow.get(k.lower(), (None, None, None))
         val = _per_level(n, inc, pct, every) if inc else f"{n}{pct}"
         if inc or _nonzero(n):
@@ -327,6 +329,29 @@ def _with_kin_values(desc, vals, slug, kind, version):
     return {**vals, **{k: next(iter(v)) for k, v in found.items() if len(v) == 1}}
 
 
+_TO_HOLDER_RE = re.compile(r"\bto (%([A-Za-z_]\w*)%)")
+
+
+def _totals_after_to(desc, block, kind):
+    """"to %X%" with the upgrade's bonus said its total: the game writes "Decreases cooldown to %AbilityCooldown%s" and
+    keeps -3 there, the cooldown becomes 13 - 3 = 10 (Sonnet 2026-11-09: 7.40 Earth Spirit's Shard read "to 3s", its
+    table 10s; 7.39 Chen's Scepter "to 40s" for 110/90/70)."""
+    av = {k.lower(): v for k, v in (block.get("AbilityValues") or {}).items()} if isinstance(
+        block.get("AbilityValues"), dict) else {}
+
+    def one(m):
+        v = av.get(m.group(2).lower())
+        if not isinstance(v, dict) or "value" not in v:
+            return m.group(0)
+        bonus = next((v[b] for b in (f"special_bonus_{kind}", "special_bonus_aghanim" if kind == "scepter" else "")
+                      if b and b in v), None)
+        if bonus is None or not str(bonus).strip()[:1] in "+-":
+            return m.group(0)                   # "=6" sets it: the placeholder already reads the value with it
+        total = _total(v["value"], bonus)
+        return f"to {total}" if total is not None else m.group(0)
+    return _TO_HOLDER_RE.sub(one, desc)
+
+
 def aghs_text(slug, kind, version, totals=True):
     """The upgrade text of `slug` ("scepter" / "shard") in `version`: the description, then (after a line break) its
     numbers "Radius: =700. Barrier duration: 6." ("=": the value with the upgrade, _value_lines) — or None. An ability
@@ -341,6 +366,7 @@ def aghs_text(slug, kind, version, totals=True):
         return _granted_text(slug, kind, version, block)
     if not isinstance(block, dict) or not desc:
         return None
+    desc = _totals_after_to(desc, block, kind)
     filled = _fill(desc, _with_kin_values(desc, _values(block, kind), slug, kind, version))
     if filled is None:
         return None
@@ -350,4 +376,40 @@ def aghs_text(slug, kind, version, totals=True):
         return None
     text += "" if text.endswith((".", "!")) else "."
     values = _value_lines(block, kind, slug, version, tooltip, totals)
+    values += _placeholder_lines(desc, block, values)
     return text + ("\n" + " ".join(values) if values else "")      # the numbers: a line of their own
+
+
+_CHANGE_BY_RE = re.compile(r"([A-Z][^.%]*?)\s+(?:is|are)\s+(increased|decreased|reduced)\s+by\s+$")
+
+
+def _placeholder_lines(desc, block, have):
+    """The upgrade's text's own numbers that the game keeps as a bare value with no label of its own (7.39e Spirit
+    Link: "for %duration%s", "increased by %active_bonus%%%"): in the table too, named by the key ("Duration") or by the
+    sentence ("Armor sharing and attack speed increase") — owner 2026-11-08: "из всего многообразия в таблице только
+    манакост и перезарядка, когда можно добавить длительность, и на сколько % увеличивается броня и атакспид"."""
+    av = block.get("AbilityValues")
+    if not isinstance(av, dict):
+        return []
+    named = {line.split(":", 1)[0].lower() for line in have}
+    out = []
+    for m in re.finditer(r"%([A-Za-z_]\w*)%(%%|s\b)?", desc or ""):
+        key, unit = m.group(1), m.group(2) or ""
+        v = next((av[k] for k in av if k.lower() == key.lower()), None)
+        n = _num(v) if isinstance(v, str) else None
+        if n is None or not _nonzero(n) or " " in str(v).strip():
+            continue
+        before = re.sub(r"<[^>]+>", " ", desc[:m.start()]).split(".")[-1]
+        said = _CHANGE_BY_RE.search(before)
+        noun = {"increased": "increase", "decreased": "decrease", "reduced": "reduction"}
+        # a key the game names for its tooltip ("scepter_puddle_radius_tooltip"): the word is the game's, not the value's
+        # (Sonnet 2026-11-09, 7.38 Slithereen Crush: "Scepter puddle radius tooltip")
+        name = re.sub(r"(?i)_?tooltip$", "", key) or key
+        label = (f"{said.group(1).strip()} {noun[said.group(2)]}" if said else name.replace("_", " ").capitalize())
+        label = label[0].upper() + label[1:]
+        if label.lower() in named:
+            continue
+        named.add(label.lower())
+        # "@": listed even though the text says it (patch/cards_aghs._aghs_inline)
+        out.append(f"{label}: @{n}{'%' if unit == '%%' else 's' if unit == 's' else ''}.")
+    return out

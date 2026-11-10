@@ -12,6 +12,7 @@ import html as _html
 import json
 import os
 import re
+from .html_util import strip_tags
 
 from patch import game_files
 from patch.kv import parse_kv
@@ -87,7 +88,7 @@ def _clean(s):
     """Tooltip html -> one line; the tooltip's line breaks become sentence ends ("Duration: 9s. Dispel Type: ...")."""
     s = s.replace("\\n", "\n")                                   # the file's escaped line breaks
     s = re.sub(r"<br\s*/?>", "\n", s)
-    s = re.sub(r"<[^>]+>", "", s)
+    s = strip_tags(s)
     lines = [re.sub(r"\s+", " ", _html.unescape(x)).strip() for x in s.split("\n")]
     out = ""
     for x in (x for x in lines if x):

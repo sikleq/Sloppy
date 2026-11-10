@@ -249,7 +249,7 @@ def remaining(version, source, map_state):
     out = []
     if not os.path.exists(content_path(version)):
         out.append(f"proofread _generated_p_{version}_v2.py, save it as content/p{code(version)}.py (the skill's "
-                   f"annotate.md gates; python .claude/skills/sloppy-patch/lint_tags.py content/p{code(version)}.py), "
+                   f"annotate.md gates; python tools/lint_tags.py content/p{code(version)}.py), "
                    f"then: python tools/new_patch.py {version} --from enchant_values")
     state, why = map_state
     if state != "same":

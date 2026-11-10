@@ -183,7 +183,9 @@
 /* whose ability it is, quietly under its name (owner 2026-11-07: four Riverborn Auras of 7.38 "непонятно, какая к чему") */
 /* whose it is, beside the name in brackets (owner 2026-11-07: "не снизу пиши а рядом в скобках тем же цветом и
    шрифтом") */
-.search-results .result-item .result-owner { font-size: 11.5px; line-height: 1.2; color: var(--text-dim); white-space: nowrap; }
+/* its gap from the name is a margin: the space written before it in the script is lost when the script is minified
+   (owner 2026-11-10: "Side Gunner(Gyrocopter)", "пропущен пробел перед (") */
+.search-results .result-item .result-owner { font-size: 11.5px; line-height: 1.2; color: var(--text-dim); white-space: nowrap; margin-left: 4px; }
 .search-results .result-item .kind {
   margin-left: auto;
   font-size: 10.5px;

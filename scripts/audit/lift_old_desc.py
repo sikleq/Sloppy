@@ -39,10 +39,6 @@ def _patch_chronology():
                                        for x in re.split(r'(\d+)', v) if x))
 
 
-_PATCH_LINE_RE = re.compile(
-    r'"DOTA_Patch_(?P<patch>[0-9_a-z]+?)_'
-    r'(?P<sub>[a-z_]*?)(?P<slug>[a-z_]+?)(?:_\d+)?"\s+"(?P<note>[^"]+)"'
-)
 
 
 def _normalize_patch(s):

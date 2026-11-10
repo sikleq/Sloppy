@@ -5,6 +5,7 @@ active/passive") gives each such row a head of its own: the icon, Active / Passi
 (patch/page.py), after the value tables."""
 import html as _html
 import re
+from .html_util import strip_tags
 
 from .value_tables import _div_end
 
@@ -34,7 +35,7 @@ _BOLD_ROW_RE = re.compile(r'<div class="ability-change-row"><b>([A-Z][\w\' -]{1,
 def _sub_ability_rows(pane):
     out, pos = [], 0
     for m in _BOLD_ROW_RE.finditer(pane):
-        if re.search(rf"\b{re.escape(m.group(1))} ability\b", re.sub(r"<[^>]+>", "", pane[:m.start()])):
+        if re.search(rf"\b{re.escape(m.group(1))} ability\b", strip_tags(pane[:m.start()])):
             out.append(pane[pos:m.start()] + '<div class="ability-change-row acr-sec">')
             pos = m.start() + len(_ROW)
     out.append(pane[pos:])
@@ -113,7 +114,7 @@ _AGHS_ROW_RE = re.compile(r'<div class="ability-change-row( aghanim-(?:scepter|s
 # Scepter Cooldown decreased from 100/95/90s to 90/85/80s — дублирует то, что в карточке уже есть")
 _AGHS_LI_RE = re.compile(r'<li data-tag="[^"]*" class="(aghanim-(?:scepter|shard)[^"]*)">(.*?)</li>', re.S)
 _FROM_TO_RE = re.compile(r"\bfrom ([^ ]*\d[^ ]*) to ([^ ]*\d[^ ]*?)\.?$")
-_PLAIN = lambda h: re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", re.sub(r'<span class="badge-group.*', "", h, flags=re.S))).strip()
+_PLAIN = lambda h: re.sub(r"\s+", " ", strip_tags(re.sub(r'<span class="badge-group.*', "", h, flags=re.S))).strip()
 
 
 def hide_rows_the_aghs_card_says(html):

@@ -176,7 +176,7 @@ Field map: Base Armor → `ArmorPhysical`; Base Damage → `AttackDamageMin`; Mi
 «10% + 1% per level»), различия по словам; нет описания — сборка останавливается (7.41: 23 врождённых).
 **Без подписи** (владелец 2026-10-25): «No longer levels with X.» над такой карточкой — повтор шапок, строки-подписи
 нет (`_under_rows_card(None, …)`), исходная строка скрыта ради весов.
-**Уроки вычитки 7.41 (владелец 2026-10-25), всё в генераторе, тест `tests/test_card_fixes_1025.py`:**
+**Уроки вычитки 7.41 (владелец 2026-10-25), всё в генераторе, тесты `tests/test_value_cards.py`, `tests/test_card_layout.py`:**
 - «A + B per level» в тексте карточки (любой: из файлов игры или руками, и «<b>10% + 2%</b> per hero level») —
   кнопка формулы с таблицей уровней (`_pill_formulas` в `_pane_parts`), как в строках; «per level up» (старая формула
   строки) и готовая кнопка не трогаются. 7.38–7.41: 33 карточки.
@@ -216,7 +216,7 @@ Field map: Base Armor → `ArmorPhysical`; Base Damage → `AttackDamageMin`; Mi
   способность, не под `ability_change`. 7.41 Warp Flare. Когда изменений много (7.38 Demonic Cleanse) — в content
   `ability_change` из `game_ability_pair(slug, version)` перед строками, строки, которые карточка показывает, скрыты.
 
-**Уроки вычитки 7.41 / 7.38 (владелец 2026-10-26), тест `tests/test_card_fixes_1026.py`:**
+**Уроки вычитки 7.41 / 7.38 (владелец 2026-10-26), тесты `tests/test_aghs_cards.py`, `tests/test_item_cards.py`:**
 - «Shares level with X.» уходит в шапку, как «scales with»: «Active – shares level with Kinetic Field»
   (`_PANE_SCALE_RE`); из файлов игры — `DependentOnAbility` у способности с несколькими уровнями (`_shares_level`,
   7.37e Demonic Cleanse → Demonic Purge).
@@ -284,7 +284,7 @@ slug, note=)` берёт текст и числа из файлов игры (`g
 уже говорит, второй раз не пишется (проверка по 60 текстам 7.38–7.41: у 47 из 103 чисел слово есть в описании). Над
 карточкой — подпись: «Aghanim's Shard reworked.» (REWORK) или «Added Aghanim's Shard.» (NEW) для переехавшего — откуда,
 показывает сама карточка; **без синей подложки Aghanim** у подписи — она уже в строках карточки. От значка
-способности — пунктирная связка к старой стороне, как у карточек ability_change (`_under_rows_card`, scripts.js
+способности — пунктирная связка к старой стороне, как у карточек ability_change (`_under_rows_card`, `src/js/patch-page.js`
 `drawAbilityChangeConnectors`).
 **«Было» и «стало» известны всегда** (владелец: «такого не позволяю»): нет старой или новой подсказки или текст тот же —
 сборка останавливается с сообщением, что учить в `patch/aghs_text.py`; строку без карточки не оставлять. Новый
@@ -613,7 +613,7 @@ damage» — не про характеристику урона). «+N All Attr
 - (?) — на последней строке: множитель универсалов, базовый урон «было → стало», неизменное число, 30-й уровень.
 - Скрыты строки урона: Base Damage, Damage at level 1 / 30, Damage gain per level. Их теги на новые строки НЕ
   переносятся (иначе NERF-строка Batrider всплывала под BUFF из-за «Base Damage increased»): скрытая строка
-  блок на экране не держит (scripts.js `rowOnScreen`). Веса — как раньше (`_flush_damage_rows`). Строки
+  блок на экране не держит (`src/js/patch-page.js` `rowOnScreen`). Веса — как раньше (`_flush_damage_rows`). Строки
   характеристик и смена основной характеристики — обычные строки.
 - Отвергнуты владельцем: две коробки «было | стало», рамка с таблицей характеристик, «Attack damage by level» со
   столбцом «30 + AB», вторая таблица прироста за уровень, одна строка «rescaled … and …» с одним тегом, таблица

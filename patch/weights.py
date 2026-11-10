@@ -41,7 +41,7 @@
   volume     — buff/nerf/new/del rows: weight × magnitude; rework rows: weight × 1.0
                (a rework is a big, sign-less decision); misc/qol: 0.
 
-Decisions 2026-09-16 (Денис): two scales (net + volume), hybrid magnitude.
+Decisions 2026-09-16 (the owner): two scales (net + volume), hybrid magnitude.
 """
 import json as _json
 import math as _math

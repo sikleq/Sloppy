@@ -305,7 +305,10 @@
   font-variant-numeric: tabular-nums;
   border-top: 1px solid var(--bg-panel-4);
   margin-bottom: 8px;
+  flex-wrap: wrap;             /* a phone puts the two sides on two lines, not run together (audit 2026-11-08) */
+  gap: 4px 16px;
 }
+.cal-year-summary-right { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .cal-year-summary-key { color: var(--text-dimmer); text-transform: uppercase; letter-spacing: 0.4px; font-size: 10.5px; }
 .cal-year-summary-val { color: var(--text-main); font-weight: 600; }
 .cal-year-summary-meta { color: var(--text-dimmer); font-size: 11px; }

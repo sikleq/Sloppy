@@ -121,7 +121,11 @@ def render_hs_card(key):
     if g1 == g2:
         notes.append(f"Damage gain per level unchanged at {g1}")
     pct30 = round((avg(n30) - avg(o30)) / avg(o30) * 100)
-    notes.append(f"Damage at level 30: {o30[0]}–{o30[1]} → {n30[0]}–{n30[1]} ({pct30:+d}%), with all 7 Attribute "
+    # the % in the colour of its direction (owner 2026-11-08, 7.38 Lycan: "-20% не окрашено"); not a .badge, so the
+    # weights and the tag filters never read it as the row's own
+    tone = "buff" if pct30 > 0 else "nerf" if pct30 < 0 else "flat"
+    notes.append(f'Damage at level 30: {o30[0]}–{o30[1]} → {n30[0]}–{n30[1]} '
+                 f'(<span class="pop-pct pop-pct-{tone}">{pct30:+d}%</span>), with all 7 Attribute '
                  f"Bonus levels, as Valve counts it")
     tip = f'<span class="li-tail">{info_tip(*notes)}</span>'
     start = (("Starting damage", s1, s2, b(avg(o1), avg(n1))),) if o1 != n1 else ()

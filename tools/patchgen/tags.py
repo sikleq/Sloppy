@@ -508,6 +508,9 @@ TAG_OVERRIDES = {
     "toggling items no longer breaks invis":  "QoL",    # Riki: as 7.41 Burn toggling — handling, not power
     "can no longer shoot arrows while":       "DEL",    # Whirlwind Focus Fire: no own attacks while channeling
     "invisibility buff is now dispelled if":  "NERF",   # Windrun Scepter: a new way to lose the invisibility
+    # owner 2026-11-08 (7.38 "Now applies to Shrines of Wisdom instead of removed Wisdom Runes"): the same effect from
+    # what replaced the removed thing — nothing changed for the player; before "instead of" (first match wins)
+    "instead of removed":           "MISC",
     "instead of":                   "REWORK",  # component/requirement swap
     "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
     "respawn time decreased":       "BUFF",
@@ -526,6 +529,9 @@ TAG_OVERRIDES = {
     "preference has switched":                 "REWORK",   # Tormentor's spawn / Roshan's pit preference
     "no longer prevents camp-clearing madstone": "MISC",   # Hand of Midas Transmute on a camp's last creep
     "toggling no longer breaks invisibility":  "QoL",      # Radiance Burn: toggling no longer reveals / interrupts
+    # owner 2026-11-08 (7.40 Telekinesis "Land sub-ability no longer cancels channeling or interrupts movement"): a
+    # sub-ability that stops cutting what the hero does is handling, not power
+    "no longer cancels channeling":            "QoL",
     # owner 2026-10-24 (7.41): what a projectile stops on changes play — REWORK, not MISC
     "treats creep heroes as creeps":           "REWORK",   # Sharpshooter: the arrow now flies through them
 }
@@ -598,5 +604,3 @@ _FROM_TO_RE = re.compile(
     r'to\s+'                                    # 'to '
     r'([-+]?\d+(?:\.\d+)?(?:[/–][-+]?\d+(?:\.\d+)?)*[%sxg]?)',    # NEW value(s)
 )
-# For "from X–Y to A–B" style (en-dash range): take first number of range as the value
-_RANGE_FIRST_RE = re.compile(r'^([-+]?\d+(?:\.\d+)?)–')

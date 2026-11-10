@@ -10,7 +10,6 @@ scripts/fetch/fetch_ability_history.py) for their value changelog.
 """
 import json as _json
 import os as _os
-import re
 from dataclasses import dataclass
 
 from builders.creeps_common import (
@@ -46,8 +45,8 @@ class StatHistory:
 # ---- Loading ----
 
 def _ver_key(v):
-    return tuple(int(p) if p.isdigit() else p
-                 for p in re.split(r'(\d+)', v))
+    from patch.versions import version_key
+    return version_key(v)
 
 
 def _num(x):
@@ -63,7 +62,8 @@ def _load_patch_dates():
     try:
         meta = _json.loads(open(META_PATH, encoding="utf-8").read())
         return meta.get("patch_dates", {})
-    except Exception:
+    except (OSError, ValueError) as e:
+        print(f"  [WARN] creeps: patch dates not read from {META_PATH} ({e})")
         return {}
 
 
@@ -86,7 +86,8 @@ def _load_raw_by_patch(patches):
             continue
         try:
             npc = _json.loads(open(np_path, encoding="utf-8").read())
-        except Exception:
+        except (OSError, ValueError) as e:
+            print(f"  [WARN] creeps: {v}/npc_units.json not read, the patch is left out of the history ({e})")
             continue
         for f in RAW_HIST_FIELDS:
             raw_by_patch[f][v] = {k: _num(entry[f]) for k, entry in npc.items()

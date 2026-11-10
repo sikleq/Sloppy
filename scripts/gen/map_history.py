@@ -35,7 +35,7 @@ WINDOW_DAYS = 3                      # manifests within this many days after a r
 
 def _ver_key(v):
     m = re.match(r"(\d+)\.(\d+)([a-z]?)", v)
-    return int(m.group(1)), int(m.group(2)), m.group(3)
+    return (int(m.group(1)), int(m.group(2)), m.group(3)) if m else (0, 0, str(v))    # a name that is no version: first
 
 
 def patches(start):

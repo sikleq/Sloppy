@@ -43,7 +43,8 @@ def test_a_change_in_any_part_changes_the_pages_asset_version():
 
 def test_the_build_writes_the_glue_and_does_not_copy_the_parts():
     source = (ROOT / "build_site.py").read_text(encoding="utf-8")
-    assert '"src": ("js", "css")' in source and 'write_text(read_js()' in source
+    # each kind of page gets its own bundle; the whole one nothing loads is no longer written (audit 2026-11-10)
+    assert '"src": ("js", "css")' in source and 'write_text(read_js(kind)' in source
 
 
 def test_the_reopened_item_picker_moves_its_highlight():

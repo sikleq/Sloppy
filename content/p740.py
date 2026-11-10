@@ -1623,7 +1623,10 @@ def build():
             slug="lone_druid_entangle",
             desc=[
                 "New Point Targeted basic ability. Pierces Debuff Immunity.",
-                "Allows Lone Druid to Entangle enemies once they gain 5 stacks of this ability. Entangled enemies are unable to move for <b>1.2/1.6/2/2.4s</b> and take <b>60/70/80/90</b> damage per second. On cast, applies 2 stacks to each enemy hero and 5 stacks to enemy creeps in the area, and empowers Lone Druid for 10s (1 stack per attack on enemy heroes). Enemies are protected from gaining new stacks while already Entangled. Radius: 350. Stack Duration: 10s. Cast Range: 700. Mana Cost: 60. Cooldown: 24/22/20/18s.",
+                # the numbers as a list: the card's table beside it (owner 2026-11-08: "Да, карточку справа";
+                # value_tables.tables_beside_single_cards)
+                "Allows Lone Druid to Entangle enemies once they gain enough stacks of this ability. Entangled enemies are unable to move and take damage per second. On cast, applies stacks to each enemy hero and enemy creep in the area, and empowers Lone Druid (1 stack per attack on enemy heroes). Enemies are protected from gaining new stacks while already Entangled. "
+                "Stacks to Entangle: 5. Root Duration: 1.2/1.6/2/2.4s. Damage per Second: 60/70/80/90. Stacks on Cast (Heroes): 2. Stacks on Cast (Creeps): 5. Empower Duration: 10s. Stack Duration: 10s. Radius: 350. Cast Range: 700. Mana Cost: 60. Cooldown: 24/22/20/18s.",
                 "Spirit Bear's Entangling Claws now levels up with this ability and is permanently empowered."
                 + inline_note("The Empowered Buff and the enemy stack-counter debuff are undispellable; the Entangled debuff is dispellable. Creeps gain stacks only on cast (not from attacks); Roshan is affected as a hero."),
                 aghs_line("Increases radius to 450 and hero stacks on cast to 5, instantly Entangling them. Also removes stack protection from Entangled enemies."),
@@ -2278,7 +2281,7 @@ def build():
     W(ul_close())
     W(ability("Telekinesis", slug="rubick_telekinesis"))
     W(ul_open())
-    W(li("Land sub-ability no longer cancels channeling or interrupts movement", t("BUFF")))
+    W(li("Land sub-ability no longer cancels channeling or interrupts movement", t("QoL")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

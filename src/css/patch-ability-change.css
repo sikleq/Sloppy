@@ -44,16 +44,8 @@
 /* ... three in a row in one line, a third each (owner 2026-11-06, 7.38 Invoker's facets); each folds on its own, all
    three folded alike (patch/card_pairs.py), no heights evened ("не обязательно одинаковой высоты карточки делать") */
 .card-pair.card-trio { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 18px; }
-/* A lone one-sided card stands to the right of its block, at its top, a line from its caption to it (owner 2026-11-06,
-   patch/card_pairs.single_cards_right; the line: drawSingleRightLines) */
-.single-right { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; align-items: start;
-  position: relative; }
-.single-right > .ability-block > .ability-change-connector { display: none; }
-.single-right > .ability-change { margin-top: 12px; }
-/* ... the block's own rows under it, where an ability's rows stand (patch/card_pairs._rows_under) */
+/* the block's own rows under a card, where an ability's rows stand (patch/card_pairs._rows_under) */
 .ability-block.sr-under { margin-top: 6px; }
-.single-right > .ability-change.unified-panes.is-single-new { grid-template-columns: minmax(0, 1fr); }
-.sr-line { position: absolute; height: 1px; background: rgba(150, 146, 137, 0.6); pointer-events: none; }
 .ability-change.unified-panes.is-single-new > .ability-change-pane {
   grid-column: 1;
   align-self: start;
@@ -271,6 +263,81 @@
   .ability-change { grid-template-columns: 1fr; row-gap: 6px; }
   .ability-change-arrow { transform: rotate(90deg); }
 }
+/* An old -> new card as a deck (owner 2026-11-09, variant 4 "пиксельные ступени", patch/card_deck.py): the card on top
+   across the block ("на всю ширину контейнера"), the other under it, seen as two square steps at the bottom right;
+   bronze under the pointer and while the old card is on top. A click swaps them in place (card-deck.js). Room over it
+   for its patch tab. */
+.ability-change.unified-panes.is-deck { grid-template-columns: minmax(0, 1fr) 23px minmax(0, 1fr); column-gap: 12px;
+  align-items: start; margin-top: 18px;
+  /* the one card under it — there is one other version, not two (owner 2026-11-09: "кажется будто сзади 2 карточки,
+     а не 1"): a dark card with a thin edge, smaller than the one on top, seen only at its bottom right and starting
+     well under the top ("улучши золотую подсветку … обрамление", the solid bronze slab ran up beside the patch tab, "в
+     углу ещё вот это"); the edge gold under the pointer and while the old card is up */
+  --deck-e1: rgba(150, 146, 137, 0.34);
+  --deck-under: 7px 7px 0 -4px #141312, 7px 7px 0 -3px var(--deck-e1);
+  /* the new ability's card glows a little yellow; the old one, when up, does not (owner 2026-11-09: "небольшое
+     полупрозрачное жёлтое свечение у карточки с новой способностью") */
+  --deck-glow: 0 0 14px 1px rgba(227, 196, 106, 0.16); }
+.ability-change.unified-panes.is-deck:hover,
+.ability-change.unified-panes.is-deck.deck-old { --deck-e1: rgba(227, 196, 106, 0.8); }
+.ability-change.unified-panes.is-deck.deck-old { --deck-glow: 0 0 0 0 transparent; }
+.ability-change.unified-panes.is-deck > .ability-change-arrow,
+.ability-change.unified-panes.is-deck > .deck-hid { display: none; }
+.ability-change.unified-panes.is-deck > .ability-change-pane { grid-column: 1; grid-row: 1; align-self: start;
+  justify-self: stretch; width: auto; max-width: none; border-radius: 0; position: relative;
+  /* room inside the frame: at 4px "Passive" and the text touched it (owner 2026-11-09: "надпись слишком близко к
+     рамке"); an Aghanim's or facet card keeps its own wider padding */
+  padding: 0 10px; --pt: 0px; --px: 10px;
+  /* solid: the cards pass over each other when they swap (a see-through pane showed both texts at once) — the same
+     4% tint over the page's own dark */
+  background-color: #121110; background-image: linear-gradient(rgba(150, 146, 137, 0.04), rgba(150, 146, 137, 0.04));
+  box-shadow: var(--deck-glow), var(--deck-under); transition: box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1); }
+/* a card with a value table: two cards side by side, as the old -> new pair stood, the text on the left half and the
+   values a card of their own on the right, both a card of the deck (owner 2026-11-09: "как раньше мы делали в 2
+   карточки рядом, только вторая карточка это блок ха-к"; patch/card_deck.py) */
+/* (not the hidden side: as a grid it stood on the page over the one on top, the card never changed — Sonnet 2026-11-09,
+   7.38 Unyielding Shield "невозможно стало обратно поменять") */
+.ability-change.unified-panes.is-deck > .ability-change-pane.has-vals:not(.deck-hid) { grid-column: 1 / -1; display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 47px; align-items: start; padding: 0; border: 0;
+  background: none; box-shadow: none; }
+.has-vals > .deck-card, .has-vals > .deck-vals { min-width: 0; border: 1px solid var(--line-soft); border-radius: 0;
+  background-color: #121110; background-image: linear-gradient(rgba(150, 146, 137, 0.04), rgba(150, 146, 137, 0.04));
+  box-shadow: var(--deck-glow), var(--deck-under); transition: box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1); }
+.has-vals > .deck-card { display: flex; flex-direction: column; row-gap: 8px; padding: var(--pt, 0px) var(--px, 0px);
+  position: relative; }
+@media (max-width: 720px) {
+  .ability-change.unified-panes.is-deck { grid-template-columns: minmax(0, 1fr); }
+  .ability-change.unified-panes.is-deck > .ability-change-pane.has-vals:not(.deck-hid) { grid-template-columns: minmax(0, 1fr);
+    row-gap: 10px; } }
+/* ... a card of several abilities' values: each table under its ability's name, as in the text (7.40 Clinkz) */
+.deck-vals-head { padding: 4px 10px; border-bottom: 1px solid var(--line-soft); background: rgba(150, 146, 137, 0.06);
+  font-size: 13px; }
+.deck-vals > .value-table + .deck-vals-head { border-top: 1px solid var(--line-soft); }
+/* a header value's icon before its name in the values card, a space between (owner 2026-11-09: "иконка слишком близко
+   к надписи mana cost / cooldown"; patch/deck_extra.py) */
+.value-table > .vt-l > .iab-ico:first-child { margin-right: 6px; top: 0; }
+/* the old card's values plain: it is there to compare, the new one shows what changed (owner 2026-11-09 "да, так";
+   the generator lit some old values with the opposite colour — Sonnet, 7.38 Demonic Cleanse, 7.41 Overclocking) */
+.ability-change.is-deck > .ability-change-old .value-table .iab-hl { color: inherit; background: none;
+  border-bottom-color: transparent; }
+/* a lit value with no % on hover (new to the ability): no dotted line, the line says "hover me" (owner 2026-11-10,
+   7.40 Shadow Step's gold values; patch/deck_values._lit) */
+.value-table .iab-hl.iab-hl-num.iab-hl-flat { border-bottom-color: transparent; }
+/* while the cards move (card-deck.js): both stand in one place, the deck's height animated */
+.ability-change.unified-panes.is-deck.deck-moving > .ability-change-pane { pointer-events: none; will-change: transform; }
+/* ... their edges and glow change at once, not fading along: a shadow fading on a moving card is painted anew every
+   frame (owner 2026-11-09: "очень лагает") */
+.ability-change.unified-panes.is-deck.deck-moving > .ability-change-pane,
+.ability-change.unified-panes.is-deck.deck-moving > .has-vals > .deck-card,
+.ability-change.unified-panes.is-deck.deck-moving > .has-vals > .deck-vals { transition: none; }
+/* which card is on top: its patch on a tab over its top right corner, joined to the card (owner 2026-11-09: "непонятно,
+   где новая, а где старая"); gold for this patch, grey for the one before */
+.deck-tab { position: absolute; right: -1px; bottom: 100%; margin: 0; padding: 1px 7px 0; border: 1px solid var(--line-soft);
+  border-bottom: 0; border-radius: 0; background: #151413; font: inherit; font-size: 11px; line-height: 15px;
+  font-weight: 700; letter-spacing: 0.4px; font-variant-numeric: tabular-nums; cursor: pointer; }
+.deck-tab:focus-visible { outline: 1px solid #e3c46a; outline-offset: 1px; }   /* a button: reached by the keyboard */
+.deck-tab-new { color: #e3c46a; }
+.deck-tab-old { color: #a59f93; }
 /* When discrete change rows follow an ability_change card (numerical
    tweaks that complement the prose swap), give the ul.changes the same
    left indent the ability-block's content column would have — otherwise
@@ -376,13 +443,11 @@ body.patch-page .entity-block.item-block:not(.is-new) ul.changes li.ability-box-
 .vt-side { align-self: start; min-width: 0; background: var(--muted-04); border: 1px solid var(--line-soft);
   border-radius: 6px; overflow: hidden; }
 .vt-side > .value-table { margin: 0; border-top: 0; --px: 10px; }
+/* a value for creeps under the same value for heroes, one row for the two (owner 2026-11-10, 7.36c Astral Spirit:
+   "можно как-то лучше creeps/heroes значения записать"; patch/deck_text.merge_unit_pairs) */
+.value-table .vt-sub { display: block; font-size: 11.5px; font-weight: 400; color: var(--text-dim); }
 .ability-change.unified-panes.is-single-new > .vt-side { grid-column: 3; grid-row: 1; }
 .card-pair .ability-change.unified-panes.is-single-new > .vt-side { grid-column: 1; grid-row: auto; margin-top: 8px; }
-/* ... a lone card that stood right of its block's name goes under it, its text left and its values right, as in the
-   mock (7.38 Throw) */
-.single-right > .ability-change.unified-panes.is-single-new.has-vt-side { grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; }
-.single-right > .ability-change.unified-panes.is-single-new.has-vt-side > .vt-side { grid-column: 2; }
 /* Rows each led by an ability's icon stand like a table's rows: a line over each, edge to edge of the card (owner
    2026-11-06, patch/card_sections.py); a facet changing two abilities gives each its head: icon, Active / Passive, name */
 .ability-change-row.acr-sec { border-top: 1px solid var(--line-soft); margin: 0 calc(-1 * var(--px, 0px));

@@ -31,6 +31,9 @@
    Mana Items has no .creeps-scroll → it page-scrolls normally. */
 body:has(.creeps-scroll) { overflow: hidden; }
 body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
+/* a short Changes index (Structures): the box as tall as the screen, so the sub-menus inside it aren't cut at its foot
+   (audit 2026-11-08: Heroes ▸ Hero Dynamics below the 210px box could not be clicked) */
+.creeps-page.ec-index .creeps-scroll { min-height: calc(100vh - var(--site-nav-h, 96px) - 24px); }
 .creeps-scroll {
   overflow: auto;
   width: 100%;

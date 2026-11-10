@@ -2,6 +2,7 @@
 Aghanim's row's stripe, the closing "?" glued to its word, and a long side folded (owner 2026-10-30)."""
 import html as _html
 import re
+from .html_util import strip_tags
 
 from .state import _State
 
@@ -46,7 +47,7 @@ _ROW_AGHS_RE = re.compile(r"^(?:[A-Z][\w'.\- ]{2,40}?:\s+)?(?:Can be upgraded wi
 
 
 def _card_row(chips, text):
-    m = _ROW_AGHS_RE.match(re.sub(r"<[^>]+>", "", text).lstrip())
+    m = _ROW_AGHS_RE.match(strip_tags(text).lstrip())
     return _CardRow((tuple(chips), text, m.group(1).lower() if m else ""))
 
 
@@ -69,7 +70,7 @@ def _badges_into_number(text):
     from .number_tips import _number_tip
     m, kind = pairs[0], badges.group(1)
     new = m.group(2)
-    tipped = _number_tip(re.sub(r"<[^>]+>", "", m.group(1)), new, kind)
+    tipped = _number_tip(strip_tags(m.group(1)), new, kind)
     if not tipped:
         return text
     return (body[:m.start(2)] + f'<span class="iab-hl iab-hl-{kind} iab-hl-num">{tipped}</span>' + body[m.end(2):])

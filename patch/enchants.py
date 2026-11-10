@@ -215,7 +215,10 @@ def _ench_covered(text):
     if not re.search(r"\d", low):
         return False
     words = _iab_stems(low)
-    return any(_iab_stems(lab.lower()) & words for lab in card["labels"])
+    # a short label ("GPM") has no stem: the whole label as a word (owner 2026-11-08, 7.41e Greedy "GPM Bonus
+    # decreased from +75/100 to +65/90" stood as a row under the card that shows it)
+    return any(_iab_stems(lab.lower()) & words or re.search(rf"\b{re.escape(lab.lower())}\b", low)
+               for lab in card["labels"])
 
 
 _ENCHANT_VALUES = None

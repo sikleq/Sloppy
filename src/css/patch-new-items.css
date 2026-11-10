@@ -204,11 +204,27 @@ body.patch-page .enchant-list-head .ench-tiers {
   align-self: stretch;
   align-content: center;
   margin: -6px 0;
-  padding: 6px 0;
-  background: repeating-linear-gradient(to left, transparent 0 55px, rgba(254, 247, 232, 0.08) 55px 56px)
+  padding: 6px 0 6px 10px;
+  background: repeating-linear-gradient(to left, transparent 0 55px, rgba(254, 247, 232, 0.10) 55px 56px)
               right top / 280px 100% no-repeat;
+  /* and the lines at both ends: name | bonus, Tier 5 | patches (owner 2026-11-08: "не хватает разделителей") */
+  border-left: 1px solid rgba(254, 247, 232, 0.10);
+  border-right: 1px solid rgba(254, 247, 232, 0.10);
+  row-gap: 0;
 }
-body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0; }
+body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0 5px 10px; }
+/* a horizontal line between the bonuses of one enchantment, as in the 7.41 tier tables; the cells stretch to
+   their line's height so a two-line bonus keeps the line straight */
+.enchant-list-row .ench-tiers > .ench-stat, .enchant-list-row .ench-tiers > .ench-v {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 3px 0;
+}
+.enchant-list-row .ench-tiers > .ench-stat { padding-right: 8px; }
+.enchant-list-row .ench-tiers > .ench-v { justify-content: center; }
+.enchant-list-row .ench-tiers > .ench-v + .ench-stat,
+.enchant-list-row .ench-tiers > .ench-v + .ench-stat ~ .ench-v { border-top: 1px solid rgba(254, 247, 232, 0.06); }
 .ench-tiers-h { grid-column: 3; }
 .ench-tier-h, .ench-v { text-align: center; }
 .ench-stat { color: var(--text-main); overflow-wrap: anywhere; }

@@ -36,7 +36,7 @@ The matrix is overwhelmingly placeholder cells:
 
 ## What is already optimized
 
-Reading `src/scripts.js` 700–1400:
+Reading the dynamics code (`src/js/patch-dynamics.js`; lines 700–1400 of the former single script):
 
 1. **Event delegation is already in place.** There is *no* per-cell
    `addEventListener`. A single `document.addEventListener('mouseover', …)`
@@ -149,7 +149,7 @@ Regression checks required after any change (per task brief):
 Change: emit `<td class="he">` / `<td class="ha">` (with optional
 `hd-gsep` still appended) instead of `<td class="hd-cell hd-empty">` /
 `<td class="hd-cell hd-absent">`. `he` and `ha` are aliased in `styles.css`
-so the visual output is identical. `scripts.js`'s "Hide old" style rule
+so the visual output is identical. `src/js/patch-dynamics.js`'s "Hide old" style rule
 was widened to match `td.he` / `td.ha` alongside `td.hd-cell`.
 
 The same builder change (`builders/dyn_matrix_common.py`) also applies

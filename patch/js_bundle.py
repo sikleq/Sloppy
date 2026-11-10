@@ -14,7 +14,7 @@ JS_DIR = Path(__file__).resolve().parent.parent / "src" / "js"
 # The order is the order of execution. It matters: abilities trees (patch-page) before changes-filters, the mana heatmap's
 # listener (mana-items) before its toggle (mana-items-heatmap).
 JS_PARTS = (
-    "nav-subnav", "back-arrow", "patch-reanchor", "back-to-top", "version-dropdown", "patch-page", "patch-dynamics", "talent-tree", "dyn-lens", "creeps-table", "unit-abilities-upgrades",
+    "nav-subnav", "back-arrow", "patch-reanchor", "back-to-top", "version-dropdown", "patch-page", "fold-small", "card-deck", "patch-dynamics", "talent-tree", "dyn-lens", "creeps-table", "unit-abilities-upgrades",
     "creeps-changelog", "creeps-scroll-size", "creeps-pinned", "tooltips", "nav-height", "mana-items",
     "terrain-stats-rows", "mana-items-filters", "hero-stats", "changes-filters", "changes-item-slots", "changes-index",
     "hero-lab", "hero-stats-divider", "mana-items-heatmap", "index-wall", "index-tiles", "formula-calculator", "terrain",

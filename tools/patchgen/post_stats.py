@@ -137,9 +137,6 @@ _NEW_ABILITY_TRIGGERS = (
 #   kind="remove"  → ("DEL", "+stat") in old column only
 #   kind="change"  → ("BUFF"/"NERF", "+old stat") in old + ("", "+new stat", b(a,b)) in new
 
-# Match "+stat" tokens. Tolerate slash-lists like "+7/9/11/13/15" and
-# percent signs. Stat names are 1-4 words, may include "All Attributes".
-_STAT_TOKEN = r'\+([0-9./]+%?\s+[A-Z][a-zA-Z\' ]+?)(?=[.,]|\s+(?:increased|decreased|rescaled|changed|to|from|by)\b|$)'
 
 _PROP_ADD_PREFIX_RE = re.compile(
     r'^Now also (?:provides?|grants?|gives?|deals?|fires?)\s+'

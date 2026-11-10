@@ -60,7 +60,7 @@ Pass `vary=(var, label, [values])` + `fixed={input_var: default}` + `unit="…"`
   patch rows (`gradient_class` colours). The number input has **no spinner arrows**.
 - Input label: "Set " (normal text) + variable name (`.fx-vname`, var colour) + ":".
 - A **number input** (`formula-input`) lets the reader type their own value for the
-  `fixed` variable; `scripts.js` (`.formula-change[data-fx-old]`) re-evaluates every
+  `fixed` variable; `src/js/formula-calculator.js` (`.formula-change[data-fx-old]`) re-evaluates every
   row live via `new Function(invar, varyvar, …)`. Empty input → the default. The
   default is shown only as the placeholder **"By default: <value>"** (no caption).
 - Server-side render uses the default so it works without JS; `_eval_formula`
@@ -77,7 +77,7 @@ Pass `vary=(var, label, [values])` + `fixed={input_var: default}` + `unit="…"`
 
 Helpers (`_fmt_formula`, `_eval_formula`, `_formula_pct_badge`) live in
 `patch/elements.py`; styles in `styles.css` under "Game-formula change"; the live
-recompute is in `src/scripts.js` ("Formula calculator").
+recompute is in `src/js/formula-calculator.js` ("Formula calculator").
 
 First used in **7.40** General Changes (Assist Gold, higher gold = buff) — at
 VictimNetworth 10,000: Old `430→134`, New `435→99` gold for 1→5 heroes

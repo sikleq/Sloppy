@@ -327,7 +327,7 @@ Under each attribute column a summary block (`_hero_group_stats`) pins to the bo
 
 Ability chips on a hero page also pull in **talents**: at build time `_tag_talent_rows` marks every row of a
 Talents block that names one of the hero's abilities (`data-ec-ab="Nether Ward|Life Drain"`, longest name
-wins on overlaps), and the filter in `src/scripts.js` keeps only those rows while a chip is active. A current
+wins on overlaps), and the filter in `src/js/changes-filters.js` keeps only those rows while a chip is active. A current
 ability changed only through talents (Pugna's Nether Blast) gets a chip of its own. Facets are not matched.
 
 ## CI gates
@@ -397,7 +397,7 @@ tracked as follow-up work, not yet done.
 
 `patch/loc_history.py` reads the game's localization of any patch (abilities, items, talents, facets, hero texts) from
 the store — `resource/localization/{abilities,dota}_english.txt` of the patch's own build, before 7.20 the single
-`resource/dota_english.txt` (until 2026-10-24: `tools/fetch_loc_history.py` and a git-ignored `outputs/loc_history/`
+`resource/dota_english.txt` (until 2026-10-24: a fetch script (removed) and a git-ignored `outputs/loc_history/`
 from d2vpkr — both gone, nothing to run after a new patch: the `store` step of `tools/new_patch.py` covers it). Read a
 tooltip as it was: `patch.loc_history.tooltip(key, "7.37e")` — numbers stay as %placeholders%, fill them from that
 patch's KV. Old descriptions on the site (ability_change / item_abilities_change) come from here — never invented.

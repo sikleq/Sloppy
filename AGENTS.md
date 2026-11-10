@@ -14,10 +14,10 @@
 ## ВАЖНО: source of truth
 
 `build_site.py` — **единственный entrypoint сборки**. Он запускает все builders (patches, creeps, mana items, hero lab, terrain, silent, …). `builders/build_patches.py` сам авто-обнаруживает `content/p*.py` — ручной регистрации нового патча в builders/ не требуется (только `patch/meta.py`).
-- `src/js/*.js` (39 частей, порядок склейки и файлы `dist/src/scripts-<вид страницы>.js` — `patch/js_bundle.py`: каждому виду страниц только его части, новую часть для немногих страниц вносить в `PART_MARKERS` и `JS_PAGES`, проверяет `tests/test_js_pages.py`) и `src/css/*.css` (склеиваются в `dist/styles.css`, `patch/css_bundle.py`) — единственный источник правды для стилей и поведения всех страниц (включая `index.html` и `calendar.html`). Редактируй напрямую — IDE/linter работают нормально. `build_site.py` минифицирует их в `dist/` при сборке.
+- `src/js/*.js` (41 часть, порядок склейки и файлы `dist/src/scripts-<вид страницы>.js` — `patch/js_bundle.py`: каждому виду страниц только его части, новую часть для немногих страниц вносить в `PART_MARKERS` и `JS_PAGES`, проверяет `tests/test_js_pages.py`) и `src/css/*.css` (склеиваются в `dist/styles.css`, `patch/css_bundle.py`) — единственный источник правды для стилей и поведения всех страниц (включая `index.html` и `calendar.html`). Редактируй напрямую — IDE/linter работают нормально. `build_site.py` минифицирует их в `dist/` при сборке.
 - **Порядок частей `src/css` — это каскад, его не менять.** Правило добавлять в часть своего раздела. Чтобы изменить вид, править существующее объявление, а не дописывать новое ниже: `python tools/css_dead_rules.py` показывает объявления, которые уже ни на что не влияют. `colorblind.generated.css` пишет `scripts/gen/gen_colorblind_css.py`, руками не править.
 - Сгенерированные HTML (`dist/patches/7.41d.html` и т.д.) — результат запуска `python build_site.py`, не редактируй вручную.
-- Все патч-файлы лежат в `dist/patches/` (не в корне), поэтому их CSS/JS подключаются через `../styles.css`, `../src/scripts.js`.
+- Все патч-файлы лежат в `dist/patches/` (не в корне), поэтому их CSS/JS подключаются через `../styles.css`, `../src/scripts-<kind>.js` (kind: base, home, changes, entity, lab, table; `patch/js_bundle.py`).
 
 ## Карта правил агента (`docs/agent-rules/`)
 
@@ -39,7 +39,7 @@
 - **`sloppy-patch`** — данные и содержание: новый патч целиком (файлы игры → тихие изменения → разметка
   `content/p<version>.py` → карта/Terrain/Oldgrowth → выпуск: доки, тесты, CI). Разметка — workflow с
   воротами (`references/annotate.md`), ядро — линтер канонических фраз:
-  `python .claude/skills/sloppy-patch/lint_tags.py content/p<version>.py`.
+  `python tools/lint_tags.py content/p<version>.py`.
 - **`sloppy-visual`** — внешний вид: стиль сайта, иконки, визуальная проверка лёгким агентом.
 
 Скиллы не дублируют правила, а ссылаются на `docs/agent-rules/*` и `docs/*.md`.

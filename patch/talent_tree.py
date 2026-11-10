@@ -33,7 +33,7 @@ _STOP = {"talent", "level", "bonus", "the", "and", "with", "per", "for", "from",
          "when", "that", "this", "into", "longer", "instead", "seconds", "second"}
 _WORD_RE = re.compile(r"[a-z][a-z']{2,}")
 _LEVEL_RE = re.compile(r"\bLevel\s+(10|15|20|25)(?:\s+Talent)?\s*:?", re.I)
-_TAG_RE = re.compile(r"<[^>]+>")
+from .html_util import TAG_RE as _TAG_RE      # noqa: E402
 
 _slots_doc = None
 _tooltips = None

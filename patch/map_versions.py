@@ -10,7 +10,7 @@ versions"). A patch that shipped the same file as the one before (7.40b, 7.41b) 
 """
 import json
 import os
-import re
+from .versions import version_key
 from typing import NamedTuple
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,8 +19,7 @@ _MAP = os.path.join(_ROOT, "data", "map")
 
 def ver_key(v):
     """'7.40' < '7.40b' < '7.41'."""
-    m = re.match(r"^(\d+)\.(\d+)([a-z]*)$", v)
-    return (int(m.group(1)), int(m.group(2)), m.group(3)) if m else (0, 0, v)
+    return version_key(v)
 
 
 def code(v):

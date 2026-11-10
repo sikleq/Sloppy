@@ -100,17 +100,8 @@ def stat_i(item_display: str, field: str, version: str):
 
 def _patch_sort_key(v: str):
     """Sort key for patch versions like '7.41', '7.41b'. Returns (major, minor, suffix)."""
-    parts = v.split(".")
-    major = int(parts[0]) if parts[0].isdigit() else 0
-    rest = parts[1] if len(parts) > 1 else "0"
-    num = ""
-    suf = ""
-    for c in rest:
-        if c.isdigit():
-            num += c
-        else:
-            suf += c
-    return (major, int(num) if num else 0, suf)
+    from .versions import version_key
+    return version_key(v)
 
 
 def _prev_change_patch(db: dict, key_with_prefix: str, field: str, before_patch: str):

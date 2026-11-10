@@ -51,7 +51,7 @@ renderer is **entity-agnostic**. `builders/heroes_dyn.py` passes the hero config
 (`kind="hero"`, `roster_key="heroes"`, `icon_dir="icons/heroes"`, …),
 `builders/items_dyn.py` the item config (`kind="item"`, `roster_key="items"`,
 `icon_dir="icons/items"`, `from_token="items_dyn"`, …). Both emit the SAME
-`class="creeps-table heroes-dyn-table"` so the shared CSS + `scripts.js`
+`class="creeps-table heroes-dyn-table"` so the shared CSS + `src/js/patch-dynamics.js`
 (`dynBuildMatrix`/`dynLayoutMatrix`/`dynSetupMatrix`) apply unchanged.
 - `patch/rosters.py` writes BOTH rosters into `.cache/_dynamics.json` (`heroes` = full
   HERO_SLUG roster; `items` = every `item|<slug>` entity touched in any tracked
@@ -149,12 +149,12 @@ Toy = `pogo_stick`. **Phantom neutrals** flagged BOTH neutral AND `SpeciallyBann
 Each row's identity `<td>` carries a `data-alias` of extra search keywords so the placeholder's
 promise ("aghs") works: a manual abbreviation map (`_ITEM_SEARCH_ALIASES`: aghs→Aghanim's Scepter,
 bkb, mkb, deso, euls, pms, sny, hotd, midas …) plus an auto **acronym** of the words (Black King
-Bar→bkb; on heroes_dyn this also gives cm→Crystal Maiden, pa→Phantom Assassin). `scripts.js`
+Bar→bkb; on heroes_dyn this also gives cm→Crystal Maiden, pa→Phantom Assassin). `src/js/patch-dynamics.js`
 `applyRowFilters` matches each search term against `data-sort` (name) OR `data-alias`.
 
 The items_dyn controls (`current_toggle` / `class_filter` / `price_filter` /
 `category_filter` params of `save_dyn_matrix`) put `data-class` + `data-current` +
-`data-price` + `data-category` on each `<tr>`; `scripts.js dynSetupMatrix` combines
+`data-price` + `data-category` on each `<tr>`; `src/js/patch-dynamics.js dynSetupMatrix` combines
 name-search + the dropdowns + "Show deleted" toggle + price min/max into ONE
 visibility pass (no-ops on heroes_dyn, whose roster lacks those fields). **Price** =
 latest items.json `ItemCost`; items with no cost (neutrals/enchants = 0 → roster
@@ -237,15 +237,15 @@ matrix only draws the item's slots WITHIN its life:
   it just consumes the JSON.
 - Table = `creeps-table heroes-dyn-table`, ONE sticky-col (hero icon+name), single `col-row`
   header (no cat-row), 115 patch columns oldest→newest. `<body data-dyn-path="_dynamics.json">`
-  tells `scripts.js` where to fetch the manifest (patch pages use the default `../_dynamics.json`).
-- **Cells:** the builder marks only *touched* cells with `data-ver/data-hkey/data-eid`; `scripts.js`
+  tells `src/js/patch-dynamics.js` where to fetch the manifest (patch pages use the default `../_dynamics.json`).
+- **Cells:** the builder marks only *touched* cells with `data-ver/data-hkey/data-eid`; `src/js/patch-dynamics.js`
   `dynBuildMatrix()` fills those with a coloured pill (reusing `dynBuildPill`, so colour logic stays
   single-sourced). Untouched cells are `td.hd-cell.hd-empty` → a static empty diamond via CSS
   `::after` (keeps the ~14k-cell grid's HTML light; runtime work scales with real data only).
 - Clicking a pill → `patches/<ver>.html#dyn-hero-<slug>` (filePrefix `'patches/'` passed to
   `dynBuildPill`). The `.dyn-cell`/`.dyn-cell-wrap` CSS was de-scoped from `.patch-dynamics` so the
   pill renders anywhere.
-- **Layout (`scripts.js` `dynLayoutMatrix`, runs on load + resize):** `table-layout: fixed; width:
+- **Layout (`src/js/patch-dynamics.js` `dynLayoutMatrix`, runs on load + resize):** `table-layout: fixed; width:
   max-content` (override `.creeps-table`'s `min-width:100%`). Column widths are CSS vars set live:
   `--hd-hero-w` = longest hero name measured at runtime + icon + gap + zoom clearance (so names
   never wrap and icons/names line up); `--hd-col-w` = patch-column width (28px pill, `box-sizing:
@@ -316,7 +316,7 @@ matrix only draws the item's slots WITHIN its life:
 
 `site_common.py` reads `data/site_meta.json`, so `builders/build_patches.py` must run first.
 Generated HTML is **gitignored** and rebuilt by CI; only the `.py` / `src/css` /
-`scripts.js` sources are committed.
+`src/js/*.js` sources are committed.
 
 `src/css/*.css` and `src/js/*.js` are **source files, hand-edited directly** — shared by
 every page including the patch notes.
@@ -342,7 +342,7 @@ Note: KV engine slug ≠ in-game display name (e.g. `frostmourne` → "Curse of 
 Neutral Stats self-auras (`AURA_SELF` names ability + key, value from `npc_abilities.json`), the AoE
 Increase item filter (every current item with an `aoe_bonus` / `bonus_aoe` / `aoe_pct` key), hero innates
 (`builders/innate_rules.py`, `kv` maps), attribute constants (one copy, `patch/game_constants.py`, embedded
-for `scripts.js`). What the files cannot give (camps, enchantment tiers, phantom items, summon rosters,
+for the page scripts in `src/js/`). What the files cannot give (camps, enchantment tiers, phantom items, summon rosters,
 neutral tier times, hand-written ability cells) is guarded by `tests/test_roster_guards.py`: a new creep,
 enchantment, ability or unit portrait the lists do not know fails CI and names the list to extend — see
 `docs/agent-rules/stats-db.md`.
@@ -392,7 +392,7 @@ page → leave the default `stable`.
 ### Two-row sticky header (Neutral Creeps)
 - `<tr class="cat-row">` (BASIC / VITALITY / …) sticks at `top: 0` (of the box).
 - `<tr class="col-row">` (Lvl / Unit / HP …) sticks at `top: calc(var(--cat-row-h) - 2px)`.
-- `--cat-row-h` is set by `scripts.js` from the category row's measured height.
+- `--cat-row-h` is set by the page script (`src/js/`) from the category row's measured height.
   Unit Abilities has no `.cat-row` → its single header row pins at `top: 0`.
 - The col-row carries an upward `box-shadow: 0 -14px 0 0 #161b22` that fills any
   rounding gap between the two pinned rows; the cat-row (higher z-index) paints over
@@ -409,7 +409,7 @@ page → leave the default `stable`.
   `styles.css` ~3395 (`z-index:40`), so the header MUST stay above 40, else a hovered
   row near the top paints over the pinned header.
 
-## Highlight / interaction (`scripts.js`)
+## Highlight / interaction (`src/js/creeps-changelog.js`)
 - **Click a row** → `.row-marked` (gold frame), single-select.
 - **Anchor jump** (`#unit-ability` from a link) → `centerHash()` scrolls + applies the
   same `.row-marked` (replaced the old yellow `:target` flash).
@@ -419,7 +419,7 @@ page → leave the default `stable`.
   frog unit** (see `builders/creeps.py` `_row_abilities`, the `abilities.sort(...)` on the riverborn slug).
 
 ## Cell change-history tooltips (`data-hist`)
-Payload: `patch|date|KIND|…` segments joined by `;`. Decoded in `scripts.js` `entryParts()`.
+Payload: `patch|date|KIND|…` segments joined by `;`. Decoded in `src/js/creeps-changelog.js` `entryParts()`.
 
 | KIND | Meaning |
 |---|---|
@@ -437,7 +437,7 @@ starts at 7.33 and runs forward; a missing tail just means a stale rebuild.
 ### Overall net-change summary (tooltip top line)
 Cells flagged `data-net=""` (a value cell that changed **>1 time**) get an extra line at the
 **TOP** of the hover tooltip, above the newest patch, with a divider:
-`overall <first observed> → <today> <pct>%`. Built by `netSummary()` in `scripts.js`:
+`overall <first observed> → <today> <pct>%`. Built by `netSummary()` in `src/js/creeps-changelog.js`:
 - scans past `A`/`R`/`P` markers to the **first and last real value entries** (`valEntry()`
   handles `V`/`F`/`C`/`N`; `C` uses the raw numerics for the %, the pretty values for display);
 - needs ≥2 value entries; net **0%** (drifted then returned to start) is still shown (`flat`);

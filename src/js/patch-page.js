@@ -396,7 +396,7 @@
           ? `<img src="${m.icon}" alt="" onerror="this.onerror=null;this.src='../icons/misc/missing.svg';">`
           : '<span style="width:32px;display:inline-block"></span>'
       }<span class="result-name">${highlight(m.name, query)}${
-        m.owner ? ` <span class="result-owner">(${escapeHtml(m.owner)})</span>` : ''
+        m.owner ? `<span class="result-owner">(${escapeHtml(m.owner)})</span>` : ''
       }</span><span class="kind">${m.kind}</span></div>`
     ).join('');
     resultsBox.classList.add('show');
@@ -486,19 +486,21 @@
     return 'M ' + x + ' ' + (iconRect.bottom - blockRect.top) + ' L ' + x + ' ' + (paneRect.top - blockRect.top);
   }
   function drawAbilityChangeConnectors() {
-    const blocks = document.querySelectorAll('.ability-change-block');
-    blocks.forEach((block) => {
+    // every block measured first, then every line written: measuring after a write made the browser lay the page out
+    // again for each of the ~70 blocks (2026-11-09, a deck's swap ended on a long frame)
+    const jobs = [];
+    document.querySelectorAll('.ability-change-block').forEach((block) => {
       const svg = block.querySelector(':scope > .ability-change-connector:not(.under-rows-connector)');
       const path = svg && svg.querySelector('path');
       const icon = block.querySelector(':scope > .ability-icon-wrap');
       // a card of a new ability has only its new pane
       const oldPane = block.querySelector(
-        ':scope > .ability-change > .ability-change-old, :scope > .ability-change > .ability-change-new'
+        ':scope > .ability-change > .ability-change-old:not(.deck-hid), :scope > .ability-change > .ability-change-new:not(.deck-hid)'
       );
       if (!svg || !path || !icon || !oldPane) return;
-      const blockRect = block.getBoundingClientRect();
-      const iconRect = icon.getBoundingClientRect();
-      const paneRect = oldPane.getBoundingClientRect();
+      jobs.push([svg, path, block.getBoundingClientRect(), icon.getBoundingClientRect(), oldPane.getBoundingClientRect()]);
+    });
+    jobs.forEach(([svg, path, blockRect, iconRect, paneRect]) => {
       if (!blockRect.width || !paneRect.width) return;
       // Cover the whole block so we have a global coordinate system for
       // the path; absolute positioning relative to block (which is
@@ -523,7 +525,8 @@
         card = card.nextElementSibling;
       }
       // a one-sided card (an upgrade added / removed) has only its new or old pane; a new creep's ability, its box
-      const oldPane = card && card.querySelector(':scope > .ability-change-old, :scope > .ability-change-new, :scope > li');
+      // a deck's hidden side has no place (card-deck.js): the one on top
+      const oldPane = card && card.querySelector(':scope > .ability-change-old:not(.deck-hid), :scope > .ability-change-new:not(.deck-hid), :scope > li');
       if (!path || !icon || !oldPane) return;
       const blockRect = block.getBoundingClientRect();
       const iconRect = icon.getBoundingClientRect();
@@ -536,7 +539,10 @@
       // that card, it does not run through it (owner 2026-11-05)
       let before = svg.previousElementSibling;
       while (before && !before.classList.contains('ability-change')) before = before.previousElementSibling;
-      const start = before ? { left: iconRect.left, width: iconRect.width, bottom: before.getBoundingClientRect().bottom } : iconRect;
+      // ... from the foot of that card's pane the line runs under, not of its taller other side (audit 2026-11-08, 7.38
+      // Sanguivore: it hung 22px under the left pane)
+      const above = before && (before.querySelector(':scope > .ability-change-old:not(.deck-hid), :scope > .ability-change-new:not(.deck-hid)') || before);
+      const start = above ? { left: iconRect.left, width: iconRect.width, bottom: above.getBoundingClientRect().bottom } : iconRect;
       path.setAttribute('d', connectorPath(blockRect, start, paneRect));
     });
     // Two sides standing from one top edge (Aghanim's cards, cards under an ability's rows): the arrow stands at the
@@ -548,7 +554,8 @@
       const arrow = card.querySelector(':scope > .ability-change-arrow');
       const oldPane = card.querySelector(':scope > .ability-change-old');
       const newPane = card.querySelector(':scope > .ability-change-new');
-      if (!arrow || !oldPane || !newPane) return;
+      // a deck has no arrow to place (card-deck.js); measuring it laid the page out again for each one
+      if (!arrow || !oldPane || !newPane || card.classList.contains('is-deck')) return;
       arrow.style.marginTop = '';
       arrow.style.alignSelf = '';
       const o = oldPane.getBoundingClientRect();
@@ -560,33 +567,12 @@
       arrow.style.marginTop = Math.max(0, p.top - a.top + (p.height - a.height) / 2) + 'px';
     });
   }
-  // A lone one-sided card to the right of its block (owner 2026-11-06, patch/card_pairs.py): a line from the end of its
-  // caption's words ("Added Aghanim's Scepter.", "New facet") straight to the card's left edge. None when they stack.
-  function drawSingleRightLines() {
-    document.querySelectorAll('.single-right').forEach((box) => {
-      const line = box.querySelector(':scope > .sr-line');
-      const card = box.querySelector(':scope > .ability-change');
-      const caps = box.querySelectorAll(':scope > .ability-block > ul.ability-change-summary-ul li .row-text');
-      const cap = caps[caps.length - 1];
-      if (!line || !card || !cap) return;
-      const range = document.createRange();
-      range.selectNodeContents(cap);
-      const t = range.getBoundingClientRect();
-      const c = card.getBoundingClientRect();
-      const b = box.getBoundingClientRect();
-      if (!c.width || !t.width || c.left <= t.right || card.offsetParent === null) { line.style.display = 'none'; return; }
-      line.style.display = '';
-      line.style.left = (t.right - b.left + 8) + 'px';
-      line.style.top = Math.round(t.top - b.top + t.height / 2) + 'px';
-      line.style.width = Math.max(0, c.left - t.right - 8) + 'px';
-    });
-  }
   drawAbilityChangeConnectors();
-  drawSingleRightLines();
-  window.addEventListener('resize', drawSingleRightLines);
-  window.addEventListener('load', drawSingleRightLines);
 
   window.addEventListener('resize', drawAbilityChangeConnectors);
+  // a deck swapped its card (card-deck.js): only the lines, every kind whose place a height change moves (code review
+  // 2026-11-09: Brewmaster's lines stayed where they were)
+  window.sloppyDrawConnectors = () => { drawAbilityChangeConnectors(); drawBrewlingConnectors(); };
   // Also re-run after fonts/images settle so the layout has its final
   // dimensions (icon images may load late and shift the icon position).
   window.addEventListener('load', drawAbilityChangeConnectors);
@@ -691,6 +677,10 @@
 
   function drawAbilityTreeIn(scope, parentImg, childSlugs) {
     if (parentImg.closest('.f-hide, .cat-hide, .ec-scope-hide')) return;
+    // a facet's rows are about the facet, not its orb's spells: no line from it (owner 2026-11-08, 7.40 Mind of
+    // Tornarus "E.M.P.: Aghanim's Shard drag speed …" joined to Alacrity: "почему тут стрелочкой соединен"). The tree
+    // stays for the Changes-page filters.
+    if (parentImg.closest('.facet-icon-wrap')) return;
     const childImgs = childSlugs
       .map((s) => scope.querySelector('img[data-slug="' + s + '"]'))
       .filter(Boolean)

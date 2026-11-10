@@ -32,11 +32,8 @@ def _box_key(box):
 
 def _ver_key(v):
     """Sort key for version strings: '7.40' < '7.40b' < '7.41'."""
-    import re
-    def _part(s):
-        m = re.match(r'^(\d+)([a-z]*)$', s)
-        return (int(m.group(1)), m.group(2)) if m else (0, s)
-    return tuple(_part(x) for x in v.split("."))
+    from .versions import version_key
+    return version_key(v)
 
 
 def _call_name(node):

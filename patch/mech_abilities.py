@@ -13,6 +13,7 @@ import html as _html
 import math
 import os as _os
 import re
+from .html_util import strip_tags
 
 from .images import ABIL_CDN, HERO_SLUG, ITEM_CDN, ITEM_SLUG, _LOCAL_ABIL_ICONS
 from .state import _State, page_cache
@@ -494,7 +495,7 @@ _FOLLOWING_RE = re.compile(r"\bthe following ([a-z][a-z ]*?)(?= (?:do|does|have|
 
 def _list_title(row_text):
     """What a row's list is ("The following sources and targets do not …" -> "Sources and targets"), else "Case"."""
-    m = _FOLLOWING_RE.search(re.sub(r"<[^>]+>", "", row_text or ""))
+    m = _FOLLOWING_RE.search(strip_tags(row_text or ""))
     return _sentence(m.group(1)) if m else "Case"
 
 
@@ -573,7 +574,7 @@ def story_side_width(paragraphs):
     """The widest picture no taller than the text beside it: the two fill the block together, with no empty corner
     under one of them (owner 2026-11-04: "скриншот… чтобы занимал всё пространство пустое внутри блока"). Short text:
     the smallest picture still readable; the text is centred against it then."""
-    plain = [re.sub(r"<[^>]+>", "", p) for p in paragraphs]
+    plain = [strip_tags(p) for p in paragraphs]
     best = _STORY_SIDE_MIN
     for width in range(_STORY_SIDE_MIN, _STORY_SIDE_MAX + 1, 10):
         per_line = (_STORY_INNER - _STORY_GAP - width) / _STORY_CHAR

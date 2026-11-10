@@ -3,6 +3,7 @@
 import difflib
 import html as _html
 import re
+from .html_util import strip_tags
 
 from .state import _State, page_cache
 from .elements import hl
@@ -153,7 +154,7 @@ def _iab_meta_chips(values, props=None, marks=None):
             mark, card, old = (tuple(marks[key]) + (None,))[:3]
             # the new side's value carries the old one: the % on hover, as the cards' numbers (owner 2026-10-25,
             # 7.41 Noxious Plague mana 200/300/400 -> 200/250/300 was dotted with no %)
-            old = re.sub(r"[^\d./%+\-]", "", re.sub(r"<[^>]+>", "", str(old))) if old else ""
+            old = re.sub(r"[^\d./%+\-]", "", strip_tags(str(old))) if old else ""
             val = f"<!--CHIPMARK:{card}:{key}:{mark}:{old}-->{val}<!--/CHIPMARK-->"
         if val:
             out.append(f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>')
@@ -319,7 +320,7 @@ def _pane_scale(items, plain, props=None, kind=""):
             return f"scales with {m.group(1).strip()}"
     if not kind:
         return ""
-    said = " ".join(re.sub(r"<[^>]+>", "", items[i]) for i in plain)
+    said = " ".join(strip_tags(items[i]) for i in plain)
     if _PANE_TIME_RE.search(said):
         return "scales with game time"
     if "level_scaled" not in (props or {}) and _PANE_LEVEL_RE.search(said):
@@ -376,7 +377,7 @@ def _head_said_twice(key, val, text, props) -> bool:
         return False
     if key == "castrange" and str(val) == str((props or {}).get("aoe") or ""):
         return True
-    plain = re.sub(r"<[^>]+>", "", text)
+    plain = strip_tags(text)
     return bool(re.search(rf"\b{_HEAD_SAID_LABEL[key]}\s*:\s*{re.escape(str(val))}(?![\d/]|\.\d)", plain, re.I))
 
 
@@ -479,7 +480,7 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
              else f'<span class="iab-name">{name}</span>' if name else "")
     if kind and not scale and (props or {}).get("level_scaled"):
         scale = "scales with level"             # the game files: a value grows with hero level (7.41 innates)
-    scale = re.sub(r"<[^>]+>", "", scale)      # never coloured in the header (owner 2026-10-25: "не крась scales with")
+    scale = strip_tags(scale)      # never coloured in the header (owner 2026-10-25: "не крась scales with")
     # "Aghanim's" as the upgrade's own icon: the header stays on one line (owner 2026-10-27, Planar Pocket 7.41)
     grant = (f'granted by <span class="aghanim-marker {granted}" role="img" aria-label="Aghanim\'s"></span>'
              f'{granted.title()}') if granted else ""

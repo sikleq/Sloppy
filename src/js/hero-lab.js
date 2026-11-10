@@ -1337,7 +1337,12 @@
     const boxes = [...menu.querySelectorAll('input[data-diffstat]')];
     document.body.appendChild(menu);
     menu.style.position = 'fixed';
-    const place = () => { const r = btn.getBoundingClientRect(); menu.style.top = (r.bottom + 6) + 'px'; menu.style.left = r.left + 'px'; };
+    // kept on the screen: on a phone the 4-column stat menu ran 220px past the right edge (audit 2026-11-08)
+    const place = () => {
+      const r = btn.getBoundingClientRect();
+      menu.style.top = (r.bottom + 6) + 'px';
+      menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - menu.offsetWidth - 8)) + 'px';
+    };
     const sync = () => {
       const n = boxes.filter(b => b.checked).length;
       if (badge) badge.textContent = n === boxes.length ? 'all' : String(n);

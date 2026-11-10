@@ -174,14 +174,17 @@ def save_calendar_html():
                 f'<span class="cal-year-summary-key">Total count:</span> '
                 f'<span class="cal-year-summary-val">{ys["total"]}</span>'
                 '</div>'
+                # two items apart by a gap, no "·" between them (owner's rule 2026-10-29; audit 2026-11-08: a phone ran
+                # "TOTAL COUNT: 8LONGEST: …" together)
                 '<div class="cal-year-summary-right">'
+                '<span class="cal-ys-item">'
                 f'<span class="cal-year-summary-key">Longest:</span> '
                 f'<span class="cal-year-summary-val">{" &amp; ".join(ys["longest"][0])}</span>'
-                f' <span class="cal-year-summary-meta">({ys["longest"][1]} days)</span>'
-                f' &middot; '
+                f' <span class="cal-year-summary-meta">({ys["longest"][1]} days)</span></span>'
+                '<span class="cal-ys-item">'
                 f'<span class="cal-year-summary-key">Shortest:</span> '
                 f'<span class="cal-year-summary-val">{" &amp; ".join(ys["shortest"][0])}</span>'
-                f' <span class="cal-year-summary-meta">({ys["shortest"][1]} days)</span>'
+                f' <span class="cal-year-summary-meta">({ys["shortest"][1]} days)</span></span>'
                 '</div>'
                 '</div>'
             )

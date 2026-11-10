@@ -9,20 +9,13 @@ import re
 MIN_VALUES = 2
 
 _ROW_OPEN_RE = re.compile(r'<div class="ability-change-row(?: [^"]*)?">')
-_TAG_RE = re.compile(r"<[^>]+>")
+from .html_util import TAG_RE as _TAG_RE      # noqa: E402
 # a value's name starts a sentence: the text's start or after ". "; the value runs to the next ". " or the end
 _PAIR_RE = re.compile(r"(?:(?<=^)|(?<=\. )|(?<=\.\x00))([A-Z][A-Za-z0-9 %'()/\-]{1,48}):\s*(.+?)(?:\.(?=\s|\x00|$)|$)")
 _FORMULA_ID_RE = re.compile(r'class="formula-trigger" data-formula="([^"]+)"')
 
 
-def _div_end(html, start):
-    """Index just past the </div> that closes the <div at `start`."""
-    depth = 0
-    for m in re.finditer(r"<div\b|</div>", html[start:]):
-        depth += 1 if m.group(0) == "<div" else -1
-        if depth == 0:
-            return start + m.end()
-    return len(html)
+from .html_util import div_end as _div_end      # noqa: E402  (the name the module and its tests use)
 
 
 # a word value the game lists among the numbers: "DISPEL TYPE: Basic Dispel" (owner 2026-11-06, 7.38 Demonic Cleanse:
@@ -30,8 +23,16 @@ def _div_end(html, start):
 _WORD_VALUE_RE = re.compile(r"(?:Basic|Strong|Weak) Dispel$")
 
 
+# a value says a number and its unit, a short tail at most ("12% + 0.5% per level"); more words make a sentence whose
+# start only looks like a name (Sonnet 2026-11-09, 7.41 Venomancer "Imbues Venomancer's attacks with poison: 9 + 1 per
+# level damage per second and a flat 10% movement slow")
+MAX_VALUE_WORDS = 8
+
+
 def _is_value(html):
     text = _TAG_RE.sub("", html).strip()
+    if len(re.sub(r"\([^)]*\)", "", text).split()) > MAX_VALUE_WORDS:
+        return False
     return ('class="formula-trigger"' in html or bool(re.match(r"[+\-−]?x?\d", text))
             or bool(_WORD_VALUE_RE.fullmatch(text)))
 
@@ -76,7 +77,9 @@ def _restore(flat, tags, a, b):
 
 
 _ABILITY_ICON_RE = re.compile(r'abilities/([a-z0-9_]+)\.(?:png|webp)')
-_TRAILING_NOTE_RE = re.compile(r"\s*\(((?:[^()]|<[^>]*>)*)\)\s*$")
+# the two alternatives share no character: "[^()]" taking "<" too read every tag two ways, and a bracket of a dozen
+# tags before more text took seconds to fail (audit 2026-11-10: 12 tags 4 s, x16 for each two more)
+_TRAILING_NOTE_RE = re.compile(r"\s*\(((?:[^()<]|<[^>]*>)*)\)\s*$")
 NOTE_FROM_WORDS = 4                  # a longer bracket after a value goes under [?]
 
 
@@ -128,10 +131,18 @@ def _table(pairs, formulas, slug=None):
 _CARD_OPEN_RE = re.compile(r'<div class="ability-change[ "]')
 
 
-def _rows_to_table(html):
+def _two_sided(card_html):
+    """An ability's old -> new card (both sides), the one patch/card_deck.py lays as a deck."""
+    return (card_html.startswith('<div class="ability-change unified-panes') and "is-single-new" not in card_html[:120]
+            and 'ability-change-pane ability-change-old' in card_html and 'ability-change-pane ability-change-new' in card_html)
+
+
+def _rows_to_table(html, decks=False):
     """{row start: split} of the rows that become tables. A card decides for both its sides: once one side has MIN_VALUES
     values, the other side's values are a table too, even two of them (owner 2026-11-05, 7.41 Sadist: a table on the left,
-    a sentence on the right)."""
+    a sentence on the right). With `decks` (a page of card_deck.DECK_PAGES) an old -> new ability card makes a table of one
+    value too: it goes to the values card beside the text (owner 2026-11-09, 7.38 Reflect "Damage percentage: 50% + 2% per
+    minute": "тут тоже можно вторую карточку справа характеристиками, т.к это займёт пустое пространство")."""
     cards = [(c.start(), _div_end(html, c.start())) for c in _CARD_OPEN_RE.finditer(html)]
     rows, by_card = {}, {}
     for m in _ROW_OPEN_RE.finditer(html):
@@ -146,8 +157,9 @@ def _rows_to_table(html):
         rows[m.start()] = split
         by_card.setdefault(card or m.start(), []).append(m.start())
     keep = {}
-    for starts in by_card.values():
-        if max(len(rows[s][1]) for s in starts) >= MIN_VALUES:
+    for card, starts in by_card.items():
+        deck = decks and isinstance(card, tuple) and _two_sided(html[card[0]:card[1]])
+        if deck or max(len(rows[s][1]) for s in starts) >= MIN_VALUES:
             keep.update({s: rows[s] for s in starts})
     return keep
 
@@ -155,7 +167,6 @@ def _rows_to_table(html):
 _BLOCK_OPEN_RE = re.compile(r'<div class="ability-block[ "]')
 _TRIGGER_RE = re.compile(r'<span class="formula-trigger" data-formula="([^"]+)">(.*?)</span>', re.S)
 _LI_RE = re.compile(r"<li\b.*?</li>", re.S)
-_CARD_OPEN_RE = re.compile(r'<div class="ability-change[ "]')
 
 
 def _formula_key(inner):
@@ -245,10 +256,11 @@ def plain_phrases_in_cards(html):
     return "".join(out)
 
 
-def value_tables(html):
-    """Every card with MIN_VALUES values or more on a side, as tables; the level tables of its formulas move under their rows."""
+def value_tables(html, decks=False):
+    """Every card with MIN_VALUES values or more on a side, as tables; the level tables of its formulas move under their rows.
+    `decks`: the page lays its old -> new cards as decks (_rows_to_table)."""
     html = plain_phrases_in_cards(drop_formulas_said_above(html))
-    chosen = _rows_to_table(html)
+    chosen = _rows_to_table(html, decks)
     out, pos = [], 0
     for m in _ROW_OPEN_RE.finditer(html):
         if m.start() < pos or m.start() not in chosen:

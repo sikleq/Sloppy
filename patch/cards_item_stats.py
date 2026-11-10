@@ -263,7 +263,7 @@ def properties_change(old, new, old_extras=None, new_extras=None):
                     cells.append(
                         f'<span class="property-tag" style="grid-row:{cur_row};grid-column:1">'
                         f'{_prop_tag(tag)}</span>'
-                        f'<span class="property-text" style="grid-row:{cur_row};grid-column:2">'
+                        f'<span class="property-text pt-bg" style="grid-row:{cur_row};grid-column:2">'
                         f'{text}</span>'
                         f'<span class="property-badge" style="grid-row:{cur_row};grid-column:3">'
                         f'{badge}</span>'

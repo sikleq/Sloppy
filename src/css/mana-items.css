@@ -273,3 +273,10 @@
 }
 .mr-table tbody tr.mr-row-selected .mr-name-text { color: #fff8e0; }
 
+/* A phone: the table scrolls sideways in its own box, its heads on one line; squeezed to 390px they read letter by
+   letter ("P r i c e") and the numbers ran together "680025" (audit 2026-11-08) */
+@media (max-width: 760px) {
+  .mr-table { display: block; overflow-x: auto; }
+  .mr-table thead th:not(.mr-col-name) { white-space: nowrap; overflow-wrap: normal; }
+  .mr-table .mr-col-name, .mr-table .mr-name { width: 190px; min-width: 190px; }
+}

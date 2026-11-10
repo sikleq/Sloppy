@@ -31,7 +31,9 @@ PAGES = ROOT / "dist" / "patches"
 _NUM = r"-?\d+(?:\.\d+)?"
 _VAL = rf"{_NUM}(?:\s*/\s*{_NUM})*"
 _FROM_TO = re.compile(rf"\bfrom\s+\+?({_VAL})\s*(?:s|%|°)?\s+to\s+\+?({_VAL})\s*(?:s|%|°)?(?![\w/])", re.I)
-_KV_VAL = re.compile(r'"\s*((?:[+=]?-?(?:\d+\.?\d*|\.\d+)\s*)+)"')      # "=40 =60" facet values, ".5"
+_NUM1 = r"[+=]?-?(?:\d+\.?\d*|\.\d+)"
+# numbers parted by spaces: "(?:number\s*)+" let one run of digits split many ways (audit 2026-11-10)
+_KV_VAL = re.compile(rf'"\s*({_NUM1}(?:\s+{_NUM1})*)\s*"')      # "=40 =60" facet values, ".5"
 # rows a reader checked: the KV has no key for the old value (it was a tooltip number or derived)
 UNCHECKABLE = {("7.39c", "kunkka_tidal_wave"), ("7.40", "clinkz_wind_walk"), ("7.38", "ethereal_blade"),
                ("7.39c", "crystal_maiden_freezing_field"), ("7.40", "antimage_counterspell"),

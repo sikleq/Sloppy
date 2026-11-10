@@ -201,7 +201,9 @@ def main() -> int:
             shutil.copytree(src, dst, ignore=shutil.ignore_patterns(*ignore))
     from patch.css_bundle import read_css
     from patch.js_bundle import JS_PAGES, read_js
-    (_dist / "src" / "scripts.js").write_text(read_js(), encoding="utf-8")
+    # no whole bundle: every kind of page loads its own parts, a 250 KB file nothing asked for was deployed with them
+    # (code audit 2026-11-10); a copy left by an earlier build goes
+    (_dist / "src" / "scripts.js").unlink(missing_ok=True)
     for kind in JS_PAGES:
         (_dist / "src" / f"scripts-{kind}.js").write_text(read_js(kind), encoding="utf-8")
     (_dist / "styles.css").write_text(read_css(), encoding="utf-8")

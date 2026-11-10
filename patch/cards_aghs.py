@@ -2,6 +2,7 @@
 
 import html as _html
 import re
+from .html_util import strip_tags
 
 from .state import _State, page_cache
 from .elements import hl, sub_ability
@@ -16,7 +17,8 @@ from .cards_item_abilities import (_CARD_CONFIRMED, _CARD_SEQ, _bold_numbers_htm
 # weights and filters. No old or new tooltip (or the same text) -> no card, the row shows as before.
 # 7.39 Batrider: "upgrade"; 7.37 Anti-Mage "Aghanim's Scepter upgrade reworked. Reduces cooldown …" (a full stop,
 # owner 2026-10-30: "не опознал, что надо сделать old > new карточками аганим")
-_AGHS_REWORK_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard)(?: upgrade)? reworked\s*[:.]", re.I)
+# 7.40 Riki: "Aghanim's Scepter slightly reworked: …" (owner 2026-11-08: "разве old > new карточкой не надо сделать")
+_AGHS_REWORK_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard)(?: upgrade)?(?: slightly)? reworked\s*[:.]", re.I)
 
 
 _AGHS_WORD_RE = re.compile(r"\S+")
@@ -58,7 +60,10 @@ def _aghs_inline(text, loose=True):
     shown = lambda value: value[1:] if value.startswith("=") else value        # "=16%": the value with the upgrade
     said_already = lambda value: re.search(rf"(?<![\d.]){re.escape(shown(value).lstrip('+-'))}(?!\d|\.\d)", said)
     # "-10s" and "Lowers cooldown by 10s" say the same (7.41 Arena of Blood); "grants 6 armor" (7.40 Warcry)
-    pairs = [(label, value) for label, value in pairs if not said_already(value)]
+    # "@": a bare number of the text the table lists anyway (aghs_text._placeholder_lines, owner 2026-11-08: Spirit Link's
+    # duration and +35% in the table); it is never put into the sentence either
+    kept = [(label, value[1:]) for label, value in pairs if value.startswith("@")]
+    pairs = [(label, value) for label, value in pairs if not value.startswith("@") and not said_already(value)]
     # enough values for a table: all of them go there, none into the sentence (owner 2026-11-06, 7.41 Objurgation's
     # "barrier (120/180/240/300)" stood in the text beside a table of the others)
     inline = len(pairs) < INLINE_UNTIL
@@ -89,6 +94,7 @@ def _aghs_inline(text, loose=True):
                 INLINED[f"{desc[spot.start():spot.end()].lower()} ({shown(value)})"] = label
         else:
             rest.append(f"{label}: {shown(value)}.")
+    rest += [f"{label}: {value}." for label, value in kept]
     return " ".join([_drop_said_percent(desc, put)] + rest)
 
 
@@ -197,7 +203,7 @@ def _aghs_moved_from(slug, kind, version, prev):
 
 def _aghs_rework_card(text, covered=False) -> bool:
     """A reworked-upgrade row under an ability: queue its old -> new card (ul_close draws it). True when queued."""
-    plain = re.sub(r"<[^>]+>", "", text or "")
+    plain = strip_tags(text or "")
     m = _AGHS_REWORK_RE.match(plain)
     defn = None if m or covered else (_AGHS_DEF_RE.match(plain) or _AGHS_MOVED_RE.match(plain))
     gone = None if m or defn or covered else _AGHS_REMOVED_RE.match(plain)
@@ -269,7 +275,20 @@ def _aghs_rework_card(text, covered=False) -> bool:
     tag = "rework" if sources == [slug] or m else "new"
     _State.aghs_cards.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
     _AGHS_SHOWN.add((version, _State.current_hero, kind))     # its old parts are in this card
+    _AGHS_CARD_OF.add((version, slug, kind))
     return True
+
+
+_AGHS_CARD_OF: set = page_cache(set())   # (version, ability slug, kind) with an old -> new upgrade card under its rows
+_AGHS_DETAIL_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard) (?:now|no longer)\b", re.I)
+
+
+def _aghs_detail_covered(plain) -> bool:
+    """"Aghanim's Scepter now also allows to hide within allied creeps" under an ability whose old -> new upgrade card
+    is queued: the card's two texts say it (owner 2026-11-08, 7.40 Tricks of the Trade: "old > new карточкой …,
+    оставив только строки, которые показывают изменения")."""
+    m = _AGHS_DETAIL_RE.match(plain or "")
+    return bool(m) and (_State.current_patch_version, _State.current_ability_slug, m.group(1).lower()) in _AGHS_CARD_OF
 
 
 # an upgrade that trades the cooldown for charges: "Cooldown: -100%. Charge restore time: 38/32/26/20s." (7.37e Escape
@@ -508,7 +527,7 @@ _NO_LONGER_SCALES_RE = re.compile(r"^\s*No longer (?:levels(?: up)?|scales|impro
 
 
 def _scale_card(text) -> bool:
-    m = _NO_LONGER_SCALES_RE.match(re.sub(r"<[^>]+>", "", text or ""))
+    m = _NO_LONGER_SCALES_RE.match(strip_tags(text or ""))
     slug, version = _State.current_ability_slug, _State.current_patch_version
     if not m or not slug or not version:
         return False
@@ -549,7 +568,7 @@ _CARD_META_KEY = {"cooldown": "cooldown", "mana cost": "manacost", "health cost"
 def _card_meta_covered(text) -> bool:
     """A "Cooldown increased from 20s to 25s" row whose both values the card's headers show: the row is hidden and the
     headers' values get their colour (_CARD_CONFIRMED)."""
-    m = _CARD_META_ROW_RE.match(re.sub(r"<[^>]+>", "", text or ""))
+    m = _CARD_META_ROW_RE.match(strip_tags(text or ""))
     key = _CARD_META_KEY[m.group(1).lower()] if m else None
     pair = _State.card_meta.get(key) if key else None
     hit = bool(pair) and (_iab_meta_numbers(m.group(2)), _iab_meta_numbers(m.group(3))) == \

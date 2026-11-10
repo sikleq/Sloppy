@@ -5,8 +5,9 @@ from .general import _render_general_note
 from .lines import _drop_empty_ul
 from .normalize import fetch_datafeed
 from .notes import _postprocess_group_rows_home, _postprocess_same_change_abilities
-from .post_facets import _postprocess_removed_facet_groups, _postprocess_removed_facets
+from .post_facets import _postprocess_removed_facet_groups, _postprocess_removed_facets, _postprocess_renamed_facets
 from .post_shared import _postprocess_shared_row_group
+from .post_level_values import _postprocess_level_values
 from .post_hero import _postprocess_attr_change_first, _postprocess_facets_summary_covered
 from .post_cards import (
     _postprocess_card_stat_notes,
@@ -86,7 +87,8 @@ def _build_prev_hero_abils(version):
         return {}
     try:
         prev_d = fetch_datafeed(prev_ver)
-    except Exception:
+    except Exception as e:
+        print(f"  [WARN] previous patch {prev_ver} not read ({e}): renamed and removed abilities are not detected")
         return {}
     result = {}
     for hero in prev_d.get('heroes', []):
@@ -200,6 +202,7 @@ def generate(version):
     out = _postprocess_neutral_cast_notes(out)        # "Neutrals will cast …" -> [?] of the ability (owner 11-07)
     out = _postprocess_umbrella_stat_rows(out)        # "+25% … Amplifications replaced with +20% HR" -> NERF (11-07)
     out = _postprocess_lost_heal_cut_rows(out)        # a healing cut turned into a 7.39 HR cut -> NERF (11-07)
+    out = _postprocess_level_values(out, version)     # a [?] list of new level values -> one table (owner 11-08)
     out = _postprocess_rune_rows(out)                 # a rune reads as an ability: icon, name, rows (owner 2026-11-04)
     out = _postprocess_example_icons(out)             # an example named in a row carries its icon (owner 2026-11-04)
     out = _postprocess_courier_rows(out)              # Courier rows -> the unit's own category (owner 2026-11-04)
@@ -247,6 +250,7 @@ def generate(version):
     out = _postprocess_facet_improves_row(out)        # "Now is a facet that improves X" + "X: …" -> one row (owner)
     out = _postprocess_facets_first(out)              # a hero's facets, then his abilities (owner 2026-11-02)
     out = _postprocess_removed_facet_groups(out)      # lost facets side by side (owner 2026-11-05)
+    out = _postprocess_renamed_facets(out)            # "Old → New" in a renamed facet's header (owner 2026-11-10)
     out = _postprocess_two_selves_cards(out, version)  # Arc Warden's two selves -> old / new cards (owner 2026-11-05)
     out = _postprocess_rows_first(out)                # a card's plain rows above its caption (owner 2026-11-05)
     out = _postprocess_attr_change_first(out)         # a new main attribute first in General (owner 2026-11-06)

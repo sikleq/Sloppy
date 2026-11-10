@@ -51,6 +51,8 @@ Helpers are imported in every `content/p*.py` via `from patch.api import *`.
 | `patch/meta.py` | `PATCHES`, `RELEASE_HISTORY`, `latest_stats_version()` |
 | `patch/known_exceptions.py` | shared ability/icon allowlists (imported by audits AND builders so they cannot drift) |
 | `patch/rosters.py` | hero/item rosters, writes `.cache/_dynamics.json` (copied into `dist/`) |
+| `patch/html_util.py` | shared HTML helpers: `div_end`, `strip_tags`, `plain` |
+| `patch/versions.py` | `version_key`, the one order of patch versions |
 | `patch/index_page.py` / `patch/calendar.py` | landing "inventory book" + calendar/cadence infographic |
 | `content/p<version>.py` | per-patch `def build()` — auto-discovered, never imported manually |
 | `builders/build_patches.py` | orchestrator — walks `content/p*.py` in chronological order from `RELEASE_HISTORY` |
@@ -70,7 +72,7 @@ in the repo are **source files, not outputs**.
 
 Each entity header (`hero_header`/`item_header`/`unit_header`/`plain_header`) calls
 `_register_entity()`, which emits an `id="dyn-<kind>-<slug>"` and feeds the per-patch
-tag tally (`_dynamics.json`); `scripts.js` then renders a diamond row on every
+tag tally (`_dynamics.json`); `src/js/patch-dynamics.js` then renders a diamond row on every
 `.entity[id^="dyn-"]`. **Exception:** everything under the big **"General Updates"**
 section (slug `general` — General Changes, Map Objectives, Terrain Changes, Captains
 Mode, …) gets **no dyn-cells**. `_register_entity()` short-circuits when
@@ -112,7 +114,7 @@ The autodetector is right ~80% of the time. Tag classification, `l=True` placeme
 
 ## How CSS / JS reach the HTML
 
-`src/css/*.css` (glued into `dist/styles.css` in the order of `patch/css_bundle.py` CSS_PARTS: that order is the cascade) and `src/js/*.js` (glued in the order of `patch/js_bundle.py` JS_PARTS into `dist/src/scripts-<kind>.js`, one file per kind of page: JS_PAGES says which parts beyond the common ones it gets, PART_MARKERS what in a page's HTML asks for a part, `tests/test_js_pages.py` checks every built page; `dist/src/scripts.js` stays whole for pages cached from before) are **hand-edited source files**. They are **linked, not embedded**: patch pages reference
+`src/css/*.css` (glued into `dist/styles.css` in the order of `patch/css_bundle.py` CSS_PARTS: that order is the cascade) and `src/js/*.js` (glued in the order of `patch/js_bundle.py` JS_PARTS into `dist/src/scripts-<kind>.js`, one file per kind of page: JS_PAGES says which parts beyond the common ones it gets, PART_MARKERS what in a page's HTML asks for a part, `tests/test_js_pages.py` checks every built page) are **hand-edited source files**. They are **linked, not embedded**: patch pages reference
 `../styles.css?v=…` / `../src/scripts-base.js?v=…`, and root pages (`index.html`,
 `calendar.html`, `neutral_stats.html`, …) reference them relative to root.
 `patch/page.py` reads them from disk and stamps a cache-busting `?v=` asset

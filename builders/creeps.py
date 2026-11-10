@@ -758,18 +758,6 @@ COL_MODE = {k: m for _cat, cols in CATEGORIES for (k, _l, m) in cols}
 _CAT_SLUG = {'Basic': 'basic', 'Vitality': 'vitality', 'Attack': 'attack',
              'Bounty': 'bounty', 'Other': 'other', 'Abilities': 'abilities'}
 COL_CAT = {k: _CAT_SLUG[cat] for cat, cols in CATEGORIES for (k, _l, _m) in cols}
-COL_WIDTHS = {
-    'lvl': 30, 'icon': 56, 'name': 170, 'createhero': 130,
-    'hp': 50, 'hp_regen': 52, 'mp': 50, 'mp_regen': 52,
-    'armor': 52, 'armor_pct': 64, 'ehp_phys': 64, 'magres': 56,
-    'ehp_mag': 64, 'dmg_avg': 60,
-    'as': 38, 't_per_attack': 58, 'bat': 38, 'ms': 38,
-    'gold': 56, 'xp': 42, 'attack_range': 110,
-    'attack_type': 100, 'vision': 70, 'aggro': 70,
-    'ap': 48, 'turn_rate': 64, 'collision_size': 96,
-    'bound_radius': 88, 'projectile': 100,
-    'ability1': 150, 'ability2': 150, 'ability3': 150,
-}
 # No colgroup: table-layout: auto lets the browser size each column
 # to fit content (and each header) on one line. Headers and cells
 # are explicitly centred via CSS so the auto-width math doesn't have
@@ -881,7 +869,7 @@ def _load_unit_page_slugs():
     try:
         import builders.entity_changes as _echg
         return _echg.unit_page_slugs()
-    except Exception:
+    except ImportError:               # a bug inside it must show, not unlink every creep
         return {}
 
 

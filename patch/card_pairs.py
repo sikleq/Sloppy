@@ -28,39 +28,6 @@ def _pairable(block):
     return True
 
 
-def _single_card(block):
-    """(start, end) of the block's only card when it is one-sided, else None. Rows of its own may stand on the left."""
-    cards = list(_CARD_OPEN_RE.finditer(block))
-    if len(cards) != 1 or "is-single-new" not in block[cards[0].start():block.index(">", cards[0].start())]:
-        return None
-    return cards[0].start(), _div_end(block, cards[0].start())
-
-
-def single_cards_right(html, page=None):
-    """A lone one-sided card stands to the right of its block, at the block's top, with a line from its caption ("Added
-    Aghanim's Scepter.", "New facet") to it (owner 2026-11-06, 7.38 Bloodrage / Marshmage Convert). The block keeps the
-    left half: <div class="single-right"><div class="ability-block …">…</div><span class="sr-line"></span><card></div>;
-    the line is drawn by drawSingleRightLines (src/js/patch-page.js). Blocks already in a pair are left alone."""
-    if PAGES is not None and page not in PAGES:
-        return html
-    out, pos = [], 0
-    for b in _BLOCK_OPEN_RE.finditer(html):
-        if b.start() < pos:
-            continue
-        end = _div_end(html, b.start())
-        block = html[b.start():end]
-        card = _single_card(block)
-        if not card or _in_pair(html, b.start()):
-            continue
-        left = block[:card[0]] + block[card[1]:]
-        left, under = _rows_under(left)
-        out.append(html[pos:b.start()] + '<div class="single-right">' + left
-                   + '<span class="sr-line" aria-hidden="true"></span>' + block[card[0]:card[1]] + "</div>" + under)
-        pos = end
-    out.append(html[pos:])
-    return "".join(out)
-
-
 _SUMMARY_UL_RE = re.compile(r'(<ul class="changes ability-change-summary-ul">)(.*?)(</ul>)', re.S)
 
 
@@ -73,7 +40,9 @@ def _rows_under(block):
         return block, ""
     from .page import _split_top_li
     _prefix, items, _suffix = _split_top_li(m.group(2))
-    moving = [li for li in items[1:] if "iab-covered" not in li.split(">", 1)[0]]   # hidden ones stay
+    # hidden ones stay; the caption is the first SHOWN row: a covered row may stand before it (rows_first, owner
+    # 2026-11-08, 7.40 Searing Arrows "Returning as a base ability." went under the card)
+    moving = [li for li in items if "iab-covered" not in li.split(">", 1)[0]][1:]
     if not moving:
         return block, ""
     rest = "".join(moving)
@@ -87,7 +56,12 @@ def _rows_under(block):
 _ENTITY_RE = re.compile(r'<div class="entity-block[ "]')
 _FACET_BLOCK_RE = re.compile(r'<div class="ability-block facet-block[ "]')
 _REMOVED_ROWS_RE = re.compile(r'<ul class="changes">\s*<li data-tag="del[^"]*"><span class="badge del"[^>]*>DEL</span>'
-                              r'<span class="row-text">(?:<span class="li-tail">)?Removed(?:</span>)?</span></li>\s*</ul>')
+                              # a [?] after "Removed" too (owner 2026-11-08, 7.38 Spirit Breaker Imbalanced: "That's also
+                              # the facet's name") — the pair keeps it
+                              r'<span class="row-text">(?:<span class="li-tail">)?Removed\s*'
+                              r'(?:(?:<!--TIP-->)?<span class="info-tip"[^>]*>\?<span class="info-pop">(?:(?!</li>).)*?'
+                              r'</span></span>(?:<!--/TIP-->)?)?'
+                              r'(?:</span>)?</span></li>\s*</ul>')
 
 
 def pair_replaced_facets(html, page=None):
@@ -109,12 +83,24 @@ def pair_replaced_facets(html, page=None):
             continue
         (gs, gt), (ns, nt) = gone[0], new[0]
         # the new one first: its card says what the hero has now (owner 2026-11-06: "меняй местами новый и удалённый")
-        pair = '<div class="card-pair facet-swap">' + ent[ns:nt] + ent[gs:gt] + "</div>"
+        pair = '<div class="card-pair facet-swap">' + _rows_after_card(ent[ns:nt]) + ent[gs:gt] + "</div>"
         ent = ent[:gs] + pair + ent[gt:ns] + ent[nt:]
         out.append(html[pos:e.start()] + ent)
         pos = end
     out.append(html[pos:])
     return "".join(out)
+
+
+def _rows_after_card(block):
+    """A paired block's rows other than its caption go under its card, inside the block (owner 2026-11-08, 7.38 Magnus
+    Diminishing Return: "Number of times +2 All Attributes … decreased from 7 to 6" stood between "New facet" and the
+    card with its -14% in the middle of the line: "эту строку изменений надо под карточкой, а не до")."""
+    left, under = _rows_under(block)
+    if not under:
+        return block
+    rows = under[len('<div class="ability-block sr-under">'):-len("</div>")]
+    rows = rows.replace('<ul class="changes">', '<ul class="changes pair-under">', 1)
+    return left[:-len("</div>")] + rows + "</div>"
 
 
 def _in_pair(html, at):
@@ -155,7 +141,7 @@ def pair_new_cards(html, page=None):
         groups = [run] if len(run) == 3 else [run[i:i + 2] for i in range(0, len(run) - 1, 2)]
         for g in groups:
             cls = "card-pair card-trio" if len(g) == 3 else "card-pair"
-            blocks = [html[s:e] for s, e in g]
+            blocks = [_rows_after_card(html[s:e]) for s, e in g]
             if len(g) == 3 and any(_FOLD in b for b in blocks):
                 blocks = [b if _FOLD in b else _fold_after_first(b) for b in blocks]
             gap = [html[g[k][1]:g[k + 1][0]] for k in range(len(g) - 1)] + [""]

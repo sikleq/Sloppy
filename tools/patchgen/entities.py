@@ -474,13 +474,14 @@ def _render_neutral_creep(creep):
     # Match each note to an ability by display-name substring (case-insensitive).
     buckets = {a_slug: [] for a_slug, _ in abil_pairs}
     general = []
-    for n in notes:
-        txt = _strip_html(n.get('note') or '').lower()
-        matched = None
-        for a_slug, dname in abil_pairs:
-            if dname.lower() in txt:
-                matched = a_slug
-                break
+    matched = None
+    for i, n in enumerate(notes):
+        # a nested note goes where its parent went, whatever it names itself ("Mana Burn reworked" > "Now burns 100
+        # mana" stood as the unit's own row, its children under other rows — pilot 2026-11-10 on indent levels 3-4);
+        # the first note is a parent whatever its level says
+        if i == 0 or (n.get('indent_level') or 1) <= 1:
+            txt = _strip_html(n.get('note') or '').lower()
+            matched = next((a_slug for a_slug, dname in abil_pairs if dname.lower() in txt), None)
         if matched:
             buckets[matched].append(n)
         else:

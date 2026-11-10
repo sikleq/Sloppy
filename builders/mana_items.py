@@ -275,7 +275,10 @@ def load_metric_history(kind: str) -> dict[str, list[tuple[str, str, float, floa
     for patch, date in _patches_with_items():
         try:
             data = _json.loads((STATS_ROOT / patch / "items.json").read_text(encoding="utf-8"))
-        except Exception:
+        except FileNotFoundError:
+            continue
+        except (OSError, ValueError) as e:
+            print(f"  [WARN] mana items: {patch}/items.json not read, the patch is left out of the history ({e})")
             continue
         # Only patches whose items.json actually carries the deep mana fields
         # count toward history. Older slim JSON (pre-backfill / pre-7.33) hold
@@ -317,7 +320,10 @@ def load_cost_history() -> dict[str, list]:
     for patch, date in patches:
         try:
             data = _json.loads((STATS_ROOT / patch / "items.json").read_text(encoding="utf-8"))
-        except Exception:
+        except FileNotFoundError:
+            continue
+        except (OSError, ValueError) as e:
+            print(f"  [WARN] mana items: {patch}/items.json not read, the patch is left out of the cost history ({e})")
             continue
         for slug, fields in data.items():
             if not isinstance(fields, dict):

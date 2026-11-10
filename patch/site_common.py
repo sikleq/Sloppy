@@ -36,7 +36,6 @@ def head_common(prefix=""):
 # The site's name (owner 2026-11-05): "s/kle", the slash marked like the cut in the avatar
 BRAND_HTML = ('<span class="nav-brand-sikle">s</span><span class="nav-brand-slash">/</span>'
               '<span class="nav-brand-sikle">kle</span>')
-SITE_NAME = "s/kle"
 
 
 def favicon_links(prefix=""):

@@ -197,3 +197,25 @@ def _postprocess_removed_facets(lines, version=None):
         out.extend(_after_innates(rest, version))
         i = end
     return out
+
+
+_RENAMED_RE = re.compile(r'^(\s*)W\(li\("Renamed from (.+?) to (.+?)"(?:, t\("[A-Z]+"\))?\)\)\s*$')
+_FACET_HEAD_RE = re.compile(r'^(\s*)W\(facet_header\("([^"]+)"\)\)\s*$')
+
+
+def _postprocess_renamed_facets(lines):
+    """A facet whose first row is "Renamed from Old to New": the old name goes into its header, "Old → New", and
+    the row goes, as for a renamed ability (owner 2026-11-10, 7.37 Corpse Eater -> Rage)."""
+    out = list(lines)
+    for i, line in enumerate(out):
+        head = _FACET_HEAD_RE.match(line) if line is not None else None
+        if not head:
+            continue
+        j = i + 1
+        while j < len(out) and out[j].strip() in ("", "W(ul_open())"):
+            j += 1
+        row = _RENAMED_RE.match(out[j]) if j < len(out) else None
+        if row:
+            out[i] = f'{head.group(1)}W(facet_header("{head.group(2)}", old_title="{row.group(2)}"))'
+            out[j] = None
+    return [x for x in out if x is not None]

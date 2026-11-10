@@ -177,12 +177,7 @@
   .ability-change.is-in-place,
   .ability-change.unified-panes.is-single-new { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
   .card-pair, .card-pair.card-trio { grid-template-columns: minmax(0, 1fr); }      /* a phone: one under the other */
-  .single-right { grid-template-columns: minmax(0, 1fr); }   /* the card under its block, no line */
-  .single-right > .ability-change { margin-top: 0; }
-  .ability-change.unified-panes.is-single-new > .vt-side,
-  .single-right > .ability-change.unified-panes.is-single-new.has-vt-side > .vt-side { grid-column: 1; grid-row: auto; }
-  .single-right > .ability-change.unified-panes.is-single-new.has-vt-side { grid-template-columns: minmax(0, 1fr); }
-  .sr-line { display: none; }
+  .ability-change.unified-panes.is-single-new > .vt-side { grid-column: 1; grid-row: auto; }
   .ability-change-arrow { transform: rotate(90deg); }
   /* item / ability card header: the cast range / mana / cooldown values wrap instead of widening the card */
   .properties-change .properties-pane { min-width: 0; }
@@ -217,9 +212,12 @@
   .ench-change .ench-arrow { display: none; }
   body.patch-page .enchant-list-row .ench-tiers,
   body.patch-page .enchant-list-head .ench-tiers {
-    background: repeating-linear-gradient(to left, transparent 0 43px, rgba(254, 247, 232, 0.08) 43px 44px)
+    background: repeating-linear-gradient(to left, transparent 0 43px, rgba(254, 247, 232, 0.10) 43px 44px)
                 right top / 220px 100% no-repeat;
+    border-left: none;            /* the values span the row here: its frame is the end line */
+    padding-left: 0;
   }
+  .enchant-list-head .ench-tier-h { letter-spacing: 0; }   /* "TIER 1" kept off the lines of a 44px column */
 
   /* ---- Silent Changes pages: narrower gutters, the raw-field tables scroll inside themselves ---- */
   .sc-page { padding: 16px 10px 80px; }

@@ -46,6 +46,7 @@ _HERE = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_HERE))
 
 import patch.site_common as _site
+from patch.html_util import strip_tags      # noqa: E402
 
 STATS_DIR = _HERE / "data" / "stats"
 ASSET_VERSION = _site.compute_asset_version()
@@ -70,23 +71,16 @@ from patch.game_constants import (
 # ---------- patch ordering / dates ----------
 
 def _patch_sort_key(v: str):
-    parts = v.split(".")
-    major = int(parts[0]) if parts[0].isdigit() else 0
-    rest = parts[1] if len(parts) > 1 else "0"
-    num, suf = "", ""
-    for c in rest:
-        if c.isdigit():
-            num += c
-        else:
-            suf += c
-    return (major, int(num or 0), suf)
+    from patch.versions import version_key
+    return version_key(v)
 
 
 def _load_patch_dates() -> dict[str, str]:
     meta = _HERE / "data" / "site_meta.json"
     try:
         return _json.loads(meta.read_text(encoding="utf-8")).get("patch_dates", {})
-    except Exception:
+    except (OSError, ValueError) as e:
+        print(f"  [WARN] hero stats: patch dates not read from {meta} ({e})")
         return {}
 
 
@@ -1341,8 +1335,8 @@ def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
             shifted = shifted_patch(ver, previous_ver)
             shifted_date = dates.get(shifted, "")
             if display_fn:
-                po = _re.sub(r"<[^>]+>", "", prev_disp)
-                dn = _re.sub(r"<[^>]+>", "", d)
+                po = strip_tags(prev_disp)
+                dn = strip_tags(d)
                 parts.append((shifted,
                               f"|{shifted_date}|C|{po}|{dn}|{prev_val:g}|{v:g}|{pol}"))
             else:

@@ -47,7 +47,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) 
 
 # The code lives in tools/patchgen (split 2026-11-04). Every name stays reachable here: tests, the skill's linter and the
 # scripts import from this file.
-_PARTS = ('common', 'data', 'tags', 'rows', 'notes', 'lines', 'general', 'entities', 'post_stats', 'post_cards', 'post_general', 'post_items', 'normalize', 'post_late', 'post_hero', 'post_shared', 'post_facets', 'pipeline', 'facets_auto')
+_PARTS = ('common', 'data', 'tags', 'rows', 'notes', 'lines', 'general', 'entities', 'post_stats', 'post_cards', 'post_general', 'post_items', 'normalize', 'post_late', 'post_hero', 'post_shared', 'post_level_values', 'post_facets', 'pipeline', 'facets_auto')
 for _part in _PARTS:
     _module = importlib.import_module(f"tools.patchgen.{_part}")
     globals().update({k: v for k, v in vars(_module).items() if not k.startswith("__")})

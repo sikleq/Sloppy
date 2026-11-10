@@ -101,9 +101,8 @@ CSS (`src/css/tables-shared.css`, секция «UNIFIED TOOLBAR PANEL») дел
 (`.result-owner`; семь Riverborn Aura в 7.38). Приставка «Dragon Knight's» у имени, если это тот же владелец, снимается.
 
 Карточка с одной стороной и 5+ значениями в таблице: таблица уходит отдельным блоком в её пустую правую половину
-(`tables_beside_single_cards`, `SIDE_TABLE_ROWS`, `.vt-side`); если карточка стояла справа от названия
-(`.single-right`), она встаёт под название на всю ширину. Сейчас так: 7.38 Throw, 7.38 Nothl Projection, 7.37
-Gorgon's Grasp. На телефоне таблица под текстом.
+(`tables_beside_single_cards`, `SIDE_TABLE_ROWS`, `.vt-side`). Сейчас так: 7.38 Throw, 7.38 Nothl Projection, 7.37
+Gorgon's Grasp. На телефоне таблица под текстом. Что в ней пишется — `docs/agent-rules/ability-change.md`.
 
 Подсказка [?] у таланта, сменившего уровень, — маленькая таблица Talent / Level / Value (`moves_table`): уровень и
 число «было → стало», лучше — зелёным, хуже — красным, процент изменения серым.
@@ -151,7 +150,7 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
 
 Все **навигационные / направленные стрелки** на сайте должны использовать единый дизайн: сплошной **пиксельный SVG-треугольник** (`shape-rendering=crispEdges`, золото `#e3c46a`) на золото-кожаном кружке (`linear-gradient(180deg,#3b2e1d,#2a2014)`, рамка `2px solid #e3c46a`). Эталон — `.back-to-top` / `.nav-back-arrow` / `.version-nav-arrow` (`is-prev`/`is-next`). Это касается и стрелок слайдера terrain (`.tc-chev-l/.tc-chev-r` переиспользуют те же data-URI пиксель-треугольники). НЕ использовать CSS-border-треугольники, юникод-стрелки (▲◄►) или эмодзи для навигации.
 
-## Глобальные UI-элементы (во всех страницах через `site_common.py` / `scripts.js`)
+## Глобальные UI-элементы (во всех страницах через `site_common.py` / `src/js/`)
 - **Лого и название** (владелец 2026-11-05) — знак «s/» из аватара (буква в золоте сайта, голубой и розовый край, белый разрез, прозрачный фон) `icons/logo_sikle.png` во всю высоту шапки у левого края, название «s/kle» (`site_common.BRAND_HTML`, косая черта белая с голубым и розовым краем, как разрез на аватаре); значки вкладки из того же аватара. Прежний пиксельный шлем `logo_knight.png` удалён 2026-11-05 (прозрачный фон). Раньше был шлем `header-helmet.png` с canvas-эффектом EyeFire — удалён целиком (файлы + код).
 - **Режим для дальтоников** (2026-10-09): значок-глаз `button.cb-toggle` в правом конце шапки (`.nav-end`, в рамке
   как `.version`, той же высоты 38px; иконки `icon_cb_off/on.png` из `scripts/gen/gen_cb_icon.py`). Выключен —
@@ -164,7 +163,7 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
   зрение дейтеранопа/протанопа: любая пара тегов ≥ `MIN_DE` (14; на обычном сайте SWAP/MISC = 6). Текст тега
   сохраняет яркость (читается), фон и рамка — цвет тега, плотнее обычного. CSS — генерируемый блок перед блоком
   телефонов (`scripts/gen/gen_colorblind_css.py`, `TAG_SELECTORS`; `--check` и `tests/test_colorblind.py` ловят
-  забытую перегенерацию), ячейки динамики — `DYN_TAG_RGB_CB` в scripts.js (тест держит равным `CB_TAGS`). Новое
+  забытую перегенерацию), ячейки динамики — `DYN_TAG_RGB_CB` в `src/js/patch-dynamics.js` (тест держит равным `CB_TAGS`). Новое
   правило с цветом тега → перезапустить генератор. Карта, таблицы, атрибуты — не трогаем (владелец: «только для
   тегов/cells»).
 - **Плавающие кнопки** `.nav-back-arrow` (назад в календарь/патч, низ-слева) и `.back-to-top` (низ-справа) — золото/кожа кружок (стиль index) + сплошной пиксельный SVG-треугольник (как `.version-nav-arrow`). Обе во НИЖНИХ углах (back-стрелка раньше была top-left и налезала на теги; JS больше НЕ выставляет ей inline `top`).
@@ -174,7 +173,7 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
 
 Лупа в правом нижнем стеке. Горячие клавиши — `\` и `/` (с 2026-10-24), по физической клавише (`e.code ===
 "Backslash"` / `"Slash"`), поэтому работают в любой раскладке; повторное нажатие (в том числе из поля поиска)
-закрывает поиск, сам символ в поле не попадает. Код — `src/scripts.js`, блок «Patch pages: the search sits behind
+закрывает поиск, сам символ в поле не попадает. Код — `src/js/search-layout.js`, блок «Patch pages: the search sits behind
 the round loupe button».
 
 **Все поля ввода сайта — только английский** (поиск 2026-09-26, весь сайт 2026-10-24: кириллица ломала
@@ -185,7 +184,7 @@ the round loupe button».
 
 ## Полоса истории (квадратики патчей) открывается на своём патче (2026-10-06)
 
-`scripts.js dynDefaultOffset`: на странице патча текущий патч стоит посередине полосы (слева старее, справа новее) и
+`src/js/patch-dynamics.js dynDefaultOffset`: на странице патча текущий патч стоит посередине полосы (слева старее, справа новее) и
 подсвечен (`.dyn-cell-wrap.current`); у краёв списка — первым или последним. Раньше полоса всегда показывала
 последние 12 патчей: на 7.38 самого 7.38 в ней не было, на 7.08 полоса Blink Dagger была пустой. Страницы героев,
 предметов и юнитов (без версии в выборе патча) — как раньше, последние патчи. Стрелки листают от этого места.
@@ -204,12 +203,12 @@ the round loupe button».
   their chips; a twig whose rows have different tags stays gold). The outline is one `<path id="ttree-shape">`
   per page (sprite after `<body>`), each twig a `<use data-b data-tag>` filled from CSS (`--tt`, colour-blind
   mode has its own). SWAP is cyan, not the chip's teal: at twig size teal read as BUFF green.
-  Each placed row gets `data-tt="20r 25r"`, each twig its own gold `<image data-b>`; scripts.js "TALENT TREE"
+  Each placed row gets `data-tt="20r 25r"`, each twig its own gold `<image data-b>`; `src/js/talent-tree.js` "TALENT TREE"
   lights only the twigs of rows a filter leaves visible (a hidden NERF row's twig must not glow). Unlit twigs dim to 42%.
   Any changed talent lights its twig, not only a SWAP. If a hero's twig stays dark, check talent_slots.json first:
   from 7.39 some KV hero heads sit at column 0 (Earth Spirit, Slark) and the builder used to merge them into the
   hero above (fixed 2026-10-09, `test_a_single_changed_talent_lights_its_twig_for_unindented_heroes`).
-- **Dynamics matrices**: cells never pop; one `.dyn-lens` (scripts.js) with a copy of the hovered pill grows
+- **Dynamics matrices**: cells never pop; one `.dyn-lens` (`src/js/dyn-lens.js`) with a copy of the hovered pill grows
   over it and glides between cells (transform/opacity only). A per-cell transition repaints every passing cell.
 
 ## Телефоны (2026-10-05)
@@ -222,7 +221,7 @@ the round loupe button».
 - **Страница не шире экрана** (`scrollWidth <= innerWidth`): широкое (вкладки, фильтры, таблицы уровней, календарь,
   таблица лагерей, таблицы Silent Changes) прокручивается внутри своего контейнера (`overflow-x: auto`), а не всей
   страницей. Невидимые копии подсказок (`.info-pop` в строке, `::after` у чипов) раньше растягивали страницу до 1069 px:
-  на телефоне они скрыты. «?» показывает общий `.info-pop-body` из scripts.js, `::after`-подсказки по нажатию
+  на телефоне они скрыты. «?» показывает общий `.info-pop-body` из `src/js/tooltips.js`, `::after`-подсказки по нажатию
   открываются полосой над угловыми кнопками.
 - Текст строк не меньше 14 px (сейчас 15). Кнопки фильтров и вкладок не ниже 32 px.
 - Угловые круглые кнопки — 38 px, одним рядом внизу справа.
