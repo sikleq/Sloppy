@@ -434,7 +434,7 @@ def save_calendar_html():
         + '\n<div class="container calendar-page">\n'
         + view_tabs_html() + '\n'
         + '\n'.join(body) + '\n'
-        + _builds.render_panel(_builds.load_builds(), RELEASE_HISTORY, patch_pages=has_html)
+        + _builds.render_panel(_builds.load_builds(), RELEASE_HISTORY, patch_pages=has_html, from_staging=True)
         + '\n</div>\n\n'
         + f'<script defer src="src/scripts-calendar.js?v={_ASSET_VERSION}"></script>\n'
         + toggle_script + '\n'

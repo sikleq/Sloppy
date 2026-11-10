@@ -140,10 +140,11 @@ b + .tb-tip-table, .tb-tip-sub + .tb-tip-table { margin-top: 4px; }
 .tb-plist[hidden], .tb-pr[hidden] { display: none; }
 .tb-pr {
   display: grid;
-  grid-template-columns: 170px 1fr 1fr 1fr 1fr 130px;
+  grid-template-columns: 170px repeat(5, 1fr) 130px;
   align-items: stretch;
   border-top: 1px solid rgba(213, 207, 195, 0.14);
 }
+.tb-pr[hidden] { display: none; }
 .tb-pr > * { padding: 7px 12px; }
 .tb-pr > * + * { border-left: 1px solid rgba(213, 207, 195, 0.14); }
 .tb-pr[data-patch]:hover, .tb-pr.is-on { background: rgba(255, 138, 26, 0.07); }
@@ -205,12 +206,13 @@ b + .tb-tip-table, .tb-tip-sub + .tb-tip-table { margin-top: 4px; }
   .tb-cal-right .tb-cal-key { display: none; }
   .tb-weekly { width: 1300px; max-width: none; }
   .tb-card { padding: 10px; }
-  /* A phone: the name across, the four durations 2 by 2 each with its own label (the header row is hidden), the
-     builds across */
+  /* A phone: the name across, the five durations 2 by 2 (the fifth across) each with its own label (the header
+     row is hidden), the builds across */
   .tb-pr { grid-template-columns: 1fr 1fr; }
   .tb-pr-name { grid-column: 1 / -1; border-bottom: 1px solid rgba(213, 207, 195, 0.14); }
-  .tb-pr > .tb-pr-cell:nth-child(2), .tb-pr > .tb-pr-cell:nth-child(4) { border-left: 0; }
-  .tb-pr > .tb-pr-cell:nth-child(4), .tb-pr > .tb-pr-cell:nth-child(5) { border-top: 1px solid rgba(213, 207, 195, 0.14); }
+  .tb-pr > .tb-pr-cell:nth-child(2n) { border-left: 0; }
+  .tb-pr > .tb-pr-cell:nth-child(n+4) { border-top: 1px solid rgba(213, 207, 195, 0.14); }
+  .tb-pr > .tb-pr-cell:nth-child(6) { grid-column: 1 / -1; }
   .tb-pr-cell[data-label]::before { content: attr(data-label); font-size: 10.5px; color: var(--text-dimmer); }
   .tb-pr-counts { grid-column: 1 / -1; border-left: 0; border-top: 1px solid rgba(213, 207, 195, 0.14); flex-wrap: wrap; justify-content: center; }
   .tb-pr-counts::before { flex-basis: 100%; text-align: center; }

@@ -43,7 +43,7 @@
   // The same little table as patch/branch_builds.py _count_table: a row per server in its colour
   const countTable = (counts, shown) => '<table class="tb-tip-table">' + shown.map(br =>
     `<tr class="tb-tip-${br}"><td>${LBL[br]}</td><td>${counts[br] || 0}</td></tr>`).join('') + '</table>';
-  const NICE = [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100, 200];
+  const NICE = [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100, 200, 250, 500, 1000, 2500];
   const nice = m => { const st = NICE.find(s => s * 4 >= m) || Math.ceil(m / 4); return [st, st * 4]; };
   const sumIn = (attr, y0, y1) => (attr || '').split(',').filter(Boolean)
     .reduce((a, p) => { const [y, c] = p.split(':').map(Number); return a + (y >= y0 && y <= y1 ? c : 0); }, 0);
@@ -53,9 +53,8 @@
 
   function weekly(svg, y0, y1) {
     const hits = [...svg.querySelectorAll('.tb-hit:not(.tb-patch-hit)')];
-    if (!hits.length) return;
-    const weeks = hits.map(h => +h.dataset.t);
-    const r0 = Math.max(monday(jan1(y0)), Math.min(...weeks)), r1 = Math.min(monday(jan1(y1 + 1)), Math.max(...weeks) + WEEK);
+    if (!svg.dataset.t0) return;
+    const r0 = Math.max(monday(jan1(y0)), +svg.dataset.t0), r1 = Math.min(monday(jan1(y1 + 1)), +svg.dataset.t1);
     const pl = +svg.dataset.pl, pw = +svg.dataset.pw, mid = +svg.dataset.mid, half = +svg.dataset.half;
     const single = svg.dataset.series !== 'both';
     const x = t => pl + (t - r0) / (r1 - r0) * pw;
@@ -73,15 +72,23 @@
       b.setAttribute('y', single || b.classList.contains('tb-experimental') ? mid - h : mid);
     });
     hits.forEach(r => { const t = +r.dataset.t, on = t >= r0 && t < r1; r.style.display = on ? '' : 'none'; if (on) { r.setAttribute('x', x(t)); r.setAttribute('width', colw); } });
-    // The bars' numbers once a week's column is BAR_VALUE_MIN_COL px or wider (patch/branch_builds.py)
-    svg.querySelectorAll('text.tb-bar-val').forEach(v => {
-      const t = +v.dataset.t, on = t >= r0 && t < r1 && colw >= 14;
-      v.style.display = on ? '' : 'none';
-      if (!on) return;
-      const h = v.dataset.v / top * half, below = !single && v.classList.contains('tb-staging');
-      v.setAttribute('x', x(t) + colw / 2);
-      v.setAttribute('y', below ? mid + h + 11 : mid - h - 3);
-    });
+    // The bars' numbers once a week's column is BAR_VALUE_MIN_COL px or wider (patch/branch_builds.py): written here,
+    // not in the page, so 13 years of weeks stay light
+    svg.querySelectorAll('text.tb-bar-val').forEach(v => v.remove());
+    if (colw >= 14) {
+      const NS = 'http://www.w3.org/2000/svg';
+      bars.forEach(b => {
+        if (b.style.display) return;
+        const t = +b.dataset.t, h = b.dataset.v / top * half, below = !single && b.classList.contains('tb-staging');
+        const v = document.createElementNS(NS, 'text');
+        v.setAttribute('class', 'tb-bar-val ' + (b.classList.contains('tb-staging') ? 'tb-staging' : 'tb-experimental'));
+        v.setAttribute('x', x(t) + colw / 2);
+        v.setAttribute('y', below ? mid + h + 11 : mid - h - 3);
+        v.setAttribute('text-anchor', 'middle');
+        v.textContent = b.dataset.v;
+        svg.appendChild(v);
+      });
+    }
     svg.querySelectorAll('.tb-ytick[data-k]').forEach(tk => { tk.textContent = step * tk.dataset.k; });
     // Points in time: month marks, patch lines and labels, their hover strips, "now"
     svg.querySelectorAll('line[data-t], text[data-t]:not(.is-start), .tb-patch-hit').forEach(el => {
@@ -130,7 +137,34 @@
   }
 
   // ---- one Test servers view: its switches, its patch lighting, its charts' years ----
+  // The medians of the whole patches shown, as medians() and fmt_short in branch_builds.py: the time after the last
+  // Staging builds over every patch, the run-ups only over patches whose whole run-up is in the log (no data-partial)
+  const WHOLE_ONLY = { lag2: false, lag: false, stg1: true, stg: true, lead: true };
+  function median(xs) {
+    const s = xs.slice().sort((a, b) => a - b), m = s.length >> 1;
+    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  }
+  function fmtShort(sec) {
+    const h = Math.max(Math.floor(sec / 3600), 0);
+    return h >= 48 ? `${Math.floor(h / 24)} d` : `${h} h`;
+  }
+  function medianStripOf(view) {
+    return (y0, y1, toNow) => {
+      const rows = [...view.querySelectorAll('.tb-plist[data-lag="major"] .tb-pr[data-year]')]
+        .filter(r => +r.dataset.year >= y0 && +r.dataset.year <= y1);
+      view.querySelectorAll('.tb-answer [data-median]').forEach(panel => {
+        const key = panel.dataset.median;
+        const xs = rows.filter(r => r.dataset[key] !== undefined && !(WHOLE_ONLY[key] && r.dataset.partial))
+          .map(r => +r.dataset[key]);
+        panel.querySelector('b').textContent = xs.length ? fmtShort(median(xs)) : '–';
+      });
+      const since = view.querySelector('.tb-ig-since');
+      if (since) since.textContent = toNow ? `${y0} to now` : (y0 === y1 ? `${y0}` : `${y0} to ${y1}`);
+    };
+  }
+
   function initView(view) {
+    const medianStrip = medianStripOf(view);
     // Both / Experimental / Staging: each card shows its chart of that name (weekly, hours, weekdays)
     view.querySelectorAll('.tb-card').forEach(card => {
       const btns = [...card.querySelectorAll('.tb-series-btn')];
@@ -163,24 +197,41 @@
       view.querySelectorAll('.tb-pr[data-patch]').forEach(r => r.classList.toggle('is-on', !!patch && r.dataset.patch === patch));
     }
     view.addEventListener('mouseover', e => {
+      // A day or week keeps only its counts (data-c "experimental,staging"); its tooltip table is written on the first
+      // hover, before tooltips.js (listening on the document) reads it
+      const lazy = e.target.closest('[data-c]');
+      if (lazy && !lazy.dataset.tooltip) {
+        const [ce, cs] = lazy.dataset.c.split(',').map(Number);
+        const shown = lazy.dataset.show ? [lazy.dataset.show] : ['experimental', 'staging'];
+        lazy.dataset.tooltip = (lazy.dataset.title ? `<b>${lazy.dataset.title}</b>` : '')
+          + countTable({ experimental: ce, staging: cs }, shown);
+      }
       const t = e.target.closest('.tb-patch-hit, .tb-pr[data-patch]');
       const major = t && t.closest('.tb-plist[data-lag="major"]');
       light(t ? t.dataset.patch : null, major ? 'major' : 'patch');
     });
     view.addEventListener('mouseleave', () => light(null));
 
-    // The years are the charts' own (owner 2026-11-10): the calendar has its year picker, the answer and the table of
-    // patches cover the whole log
+    // From / To cover everything under the calendar, which has its own year (owner 2026-11-10): the medians strip,
+    // the Each patch rows and the charts
     const yFrom = view.querySelector('.tb-year-from'), yTo = view.querySelector('.tb-year-to');
     if (!yFrom || !yTo) return;
     function applyYears() {
       let y0 = +yFrom.value, y1 = +yTo.value;
       if (y0 > y1) { [y0, y1] = [y1, y0]; yFrom.value = y0; yTo.value = y1; }
+      view.querySelectorAll('.tb-plist').forEach(list => {
+        const rows = [...list.querySelectorAll('.tb-pr[data-year]')];
+        rows.forEach(r => { r.hidden = +r.dataset.year < y0 || +r.dataset.year > y1; });
+        const none = list.querySelector('.tb-plist-none');
+        if (none) none.hidden = rows.some(r => !r.hidden);
+      });
+      medianStrip(y0, y1, y1 === +yTo.options[yTo.options.length - 1].value);
       view.querySelectorAll('svg.tb-weekly').forEach(svg => weekly(svg, y0, y1));
       view.querySelectorAll('svg.tb-bars').forEach(svg => whenChart(svg, y0, y1));
     }
     yFrom.addEventListener('change', applyYears);
     yTo.addEventListener('change', applyYears);
+    view.querySelectorAll('svg.tb-weekly').forEach(svg => weekly(svg, +yFrom.value, +yTo.value));   // the bars' numbers
   }
   const views = [...panel.querySelectorAll('.tb-view')];
   views.forEach(initView);
