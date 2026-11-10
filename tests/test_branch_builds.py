@@ -174,6 +174,18 @@ def test_the_job_polls_often_and_reads_the_log_daily():
     assert "--state .cache/branch_builds_state.json" in wf and "actions/cache/save" in wf
 
 
+def test_a_new_build_deploys_the_site():
+    # Owner 2026-11-10: new builds must reach the site on their own. A push with GITHUB_TOKEN starts no workflow, so the
+    # job dispatches build.yml itself, only after it committed new builds
+    wf = (ROOT / ".github" / "workflows" / "branch-builds.yml").read_text(encoding="utf-8")
+    assert "actions: write" in wf and "gh workflow run build.yml --ref main" in wf
+    assert "id: commit" in wf and 'echo "new=true" >> "$GITHUB_OUTPUT"' in wf
+    assert "if: steps.commit.outputs.new == 'true'" in wf
+    assert wf.index('echo "new=true"') > wf.index("git push origin HEAD:main")     # only once the data is pushed
+    build = (ROOT / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
+    assert "workflow_dispatch" in build
+
+
 # ---------------------------------------------------------------- the page
 
 def test_a_patch_came_out_at_the_first_live_build_of_its_day(tmp_path):

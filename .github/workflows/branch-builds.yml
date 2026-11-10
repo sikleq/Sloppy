@@ -3,8 +3,9 @@ name: branch-builds
 # Dota 2's test servers (Experimental 247040, Staging 2305270) and the live game (570): Valve's keyless Web API
 # IGCVersion_<app>/GetClientVersion every 15 minutes, once a day also the muk-as/DOTA2_WEB log (fills any hours this job
 # missed). scripts/fetch/fetch_branch_builds.py; the last checks live in the Actions cache between runs, and main gets a
-# commit only per new build. A commit made with GITHUB_TOKEN starts no other workflow: the site shows the new builds at
-# its next deploy.
+# commit only per new build. A push made with GITHUB_TOKEN starts no other workflow, so after a new build the job starts
+# the site's build (and deploy) itself with workflow_dispatch, which GITHUB_TOKEN may do (owner 2026-11-10: new builds
+# appear on the site on their own).
 on:
   schedule:
     - cron: "*/15 * * * *"
@@ -13,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  actions: write          # gh workflow run build.yml after a new build
 
 concurrency:
   group: branch-builds
@@ -53,6 +55,7 @@ jobs:
           key: branch-builds-state-${{ github.run_id }}
 
       - name: Commit new builds
+        id: commit
         run: |
           before=$(git show HEAD:data/branch_builds.json | python -c "import json,sys; print(len(json.load(sys.stdin)['builds']))")
           after=$(python -c "import json; print(len(json.load(open('data/branch_builds.json'))['builds']))")
@@ -63,3 +66,10 @@ jobs:
           git commit -m "data: test-server builds ($after version changes)"
           git pull --rebase origin main
           git push origin HEAD:main
+          echo "new=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy the site with the new builds
+        if: steps.commit.outputs.new == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run build.yml --ref main
