@@ -272,7 +272,7 @@ def test_every_week_and_patch_line_has_a_tooltip_and_its_patch(tmp_path):
     assert weeks and ("1", "0", "Week of 25 May 2026") in weeks and "data-tooltip" not in svg.split("tb-patch-hit")[0]
     patch = re.search(r'class="tb-hit tb-patch-hit tb-tip-target" data-patch="7.41"[^>]*? data-tooltip="([^"]+)"', svg)
     text = html.unescape(patch[1])
-    assert text == '<b>7.41</b><span class="tb-tip-sub">1 Jun 2026 21:30 UTC</span><table class="tb-tip-table"><tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>–</td></tr><tr class="tb-tip-key"><td>After the last Staging build</td><td>13 h</td></tr><tr class="tb-tip-staging"><td>First Staging build after the previous patch, before</td><td>13 h</td></tr><tr class="tb-tip-staging"><td>Staging builds</td><td>1</td></tr><tr class="tb-tip-experimental"><td>Experimental builds</td><td>1</td></tr></table>'
+    assert text == '<b>7.41</b><span class="tb-tip-sub">1 Jun 2026 21:30 UTC</span><table class="tb-tip-table"><tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>–</td></tr><tr class="tb-tip-key"><td>After the last Staging build</td><td>13 h</td></tr><tr class="tb-tip-staging"><td>First Staging build after the previous patch, before</td><td>13 h</td></tr><tr class="tb-tip-staging"><td>Staging versions</td><td>1</td></tr><tr class="tb-tip-experimental"><td>Experimental versions</td><td>1</td></tr></table>'
 
 
 
@@ -484,7 +484,7 @@ def test_the_patch_tooltip_is_a_table(tmp_path):
     _, _, every, whole = _groups(tmp_path)
     g = whole[-1]
     text = html.unescape(bb._row_tip(g, bb.group_stats(g, NOW)))
-    assert text == '<b>7.41</b><span class="tb-tip-sub">1 Jun 2026 20:00 UTC</span><table class="tb-tip-table"><tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>2 d</td></tr><tr class="tb-tip-key"><td>After the last Staging build</td><td>2 h</td></tr><tr class="tb-tip-staging"><td>First Staging build after the previous patch, before</td><td>2 d</td></tr><tr class="tb-tip-staging"><td>Staging builds</td><td>2</td></tr><tr class="tb-tip-experimental"><td>Experimental builds</td><td>1</td></tr></table>'
+    assert text == '<b>7.41</b><span class="tb-tip-sub">1 Jun 2026 20:00 UTC</span><table class="tb-tip-table"><tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>2 d</td></tr><tr class="tb-tip-key"><td>After the last Staging build</td><td>2 h</td></tr><tr class="tb-tip-staging"><td>First Staging build after the previous patch, before</td><td>2 d</td></tr><tr class="tb-tip-staging"><td>Staging versions</td><td>2</td></tr><tr class="tb-tip-experimental"><td>Experimental versions</td><td>1</td></tr></table>'
 
 
 def test_the_answer_tiles_are_medians_over_whole_patches(tmp_path):
@@ -598,8 +598,8 @@ def test_the_switch_shows_the_tab_without_the_staging_fixes_first(tmp_path):
     assert re.findall(r'<div class="tb-view" data-fix="(\w+)"( hidden)?>', page) == [("hide", ""), ("all", " hidden")]
     assert re.findall(r'class="ua-switch-input tb-fix-input"( checked)?>', page) == [" checked", ""]
     hide, every = page.split('<div class="tb-view" data-fix="all"')
-    assert "Staging builds:</span> <span class=\"cal-year-summary-val tb-sum-staging\">1<" in hide
-    assert "Staging builds:</span> <span class=\"cal-year-summary-val tb-sum-staging\">2<" in every
+    assert "Staging versions:</span> <span class=\"cal-year-summary-val tb-sum-staging\">1<" in hide
+    assert "Staging versions:</span> <span class=\"cal-year-summary-val tb-sum-staging\">2<" in every
     js = (ROOT / "src" / "js" / "calendar-builds.js").read_text(encoding="utf-8")
     assert "panel.querySelectorAll('.tb-view')" in js and ".tb-fix-input" in js
 
@@ -625,3 +625,20 @@ def test_the_tab_starts_with_the_first_staging_build(tmp_path):
     assert "from_staging=True" in (ROOT / "patch" / "calendar.py").read_text(encoding="utf-8")   # the site's tab
     assert bb.since_staging(builds[:2], history) == (builds[:2], history)                # no Staging yet: everything
 
+
+
+def test_builds_are_counted_by_their_version_numbers(tmp_path):
+    # Owner 2026-11-10: "считай номера версий": Staging 3332 => 3338 in one update is 6 versions; a rollback is 1
+    raw = {"builds": [
+        {"branch": "staging", "from": 3332, "version": 3338, "time": "2026-06-01T01:55:00Z", "timed": True},
+        {"branch": "staging", "from": 3338, "version": 3341, "time": "2026-06-01T19:23:00Z", "timed": True},
+        {"branch": "experimental", "from": 7505, "version": 7504, "time": "2026-06-01T10:00:00Z", "timed": True}]}
+    builds = _load(tmp_path, raw)
+    assert [b["n"] for b in builds] == [6, 1, 3]
+    assert bb._day_counts(builds)[builds[0]["time"].date()] == {"experimental": 1, "staging": 9}
+    assert bb.hour_counts(builds, "staging")[1] == 6 and bb.hour_counts(builds, "staging")[19] == 3
+    assert bb.weekday_counts(builds, "staging")[0] == 9
+    assert bb.counts_by_year(builds, "staging", lambda t: t.hour, 24)[2026][1] == 6
+    week = [w for w in bb.weekly_counts(builds, NOW) if w[1] or w[2]]
+    assert [(w[1], w[2]) for w in week] == [(1, 9)]
+    assert bb.nv(builds) == 10 and bb.versions(None, 5) == 1

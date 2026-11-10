@@ -32,6 +32,17 @@ def _midnight(d):
     return datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
 
 
+def versions(old, new):
+    """How many versions one update stands for (owner 2026-11-10: count the version numbers, 3332 => 3338 is 6): the
+    step of the number; a rollback to a lower number or an unknown one is 1."""
+    return new - old if isinstance(old, int) and isinstance(new, int) and new > old else 1
+
+
+def nv(lst):
+    """The versions of a list of updates."""
+    return sum(b.get("n", 1) for b in lst)
+
+
 def load_builds(path=DATA):
     """Every version change, oldest first: dicts with branch, from, version, time (datetime), timed (bool)."""
     if not path.exists():
@@ -45,7 +56,7 @@ def load_builds(path=DATA):
             timed = bool(b.get("after")) and t - _t(b["after"]) <= timedelta(hours=TIMED_WINDOW_H)
         # A SteamDB event (before Oct 2021) has a changenumber, no version
         out.append({"branch": b["branch"], "from": b.get("from"), "version": b.get("version"), "time": t, "timed": timed,
-                    "source": b.get("source")})
+                    "source": b.get("source"), "n": versions(b.get("from"), b.get("version"))})
     return sorted(out, key=lambda b: b["time"])
 
 
@@ -158,7 +169,7 @@ def hour_counts(builds, branch):
     c = [0] * 24
     for b in builds:
         if b["branch"] == branch and b["timed"]:
-            c[b["time"].hour] += 1
+            c[b["time"].hour] += b.get("n", 1)
     return c
 
 
@@ -166,7 +177,7 @@ def weekday_counts(builds, branch):
     c = [0] * 7
     for b in builds:
         if b["branch"] == branch and b["timed"]:
-            c[b["time"].weekday()] += 1
+            c[b["time"].weekday()] += b.get("n", 1)
     return c
 
 
@@ -272,7 +283,7 @@ def weekly_counts(builds, now, groups=None):
     weeks = {}
     for b in tests:
         w = weeks.setdefault(_monday(b["time"].date()), {"experimental": 0, "staging": 0, "patch": None})
-        w[b["branch"]] += 1
+        w[b["branch"]] += b.get("n", 1)
         w["patch"] = of.get(id(b))
     out, d = [], first
     while d <= last:
@@ -422,7 +433,7 @@ def weekly_svg(builds, rels, now, moments=None, groups=None, series="both", majo
 def weekly_card(builds, rels, now, moments, groups, major_groups=None):
     """The wide chart with its Both / Experimental / Staging switch (calendar-builds.js shows one of the three)."""
     charts = "".join(weekly_svg(builds, rels, now, moments, groups, k, major_groups) for k in SERIES)
-    return (f'<div class="tb-card"><div class="tb-card-head"><div class="cal-ig-h">Builds per week</div>'
+    return (f'<div class="tb-card"><div class="tb-card-head"><div class="cal-ig-h">Versions per week</div>'
             f'{series_buttons()}</div><div class="tb-weekly-scroll">{charts}</div></div>')
 
 
@@ -446,7 +457,7 @@ def _chip(version, cls=""):
 # The table's columns: a phone hides the header row and writes each cell's own label above it (data-label)
 PR_COLUMNS = ("After the second-to-last Staging build", "After the last Staging build",
               "First Staging build after the previous patch", "Staging run-up began before", "Experimental began before",
-              "Builds")
+              "Versions")
 
 
 def _bar_cell(span, full, br, key=False, label=""):
@@ -470,8 +481,8 @@ def _row_tip(g, s):
             f'<tr class="tb-tip-key"><td>After the last Staging build</td><td>{lag}</td></tr>'
             f'<tr class="tb-tip-staging"><td>First Staging build after the previous patch, before</td>'
             f'<td>{fmt_short(s["stg_first"]) if s["stg_first"] is not None else "–"}</td></tr>'
-            f'<tr class="tb-tip-staging"><td>Staging builds</td><td>{len(s["stg_run"])}</td></tr>'
-            f'<tr class="tb-tip-experimental"><td>Experimental builds</td><td>{len(s["exp_run"])}</td></tr>')
+            f'<tr class="tb-tip-staging"><td>Staging versions</td><td>{nv(s["stg_run"])}</td></tr>'
+            f'<tr class="tb-tip-experimental"><td>Experimental versions</td><td>{nv(s["exp_run"])}</td></tr>')
     return _html.escape(f'<b>{_html.escape(g["version"])}</b><span class="tb-tip-sub">{when}</span>'
                         f'<table class="tb-tip-table">{rows}</table>', quote=True)
 
@@ -489,7 +500,7 @@ def _patch_rows(groups, now):
                         ("stg", s["stg_start"]),
                         ("lead", s["exp_lead"])) if v is not None)
         data += ' data-partial="1"' if s["exp_cut"] else ""
-        n_stg, n_exp = len(s["stg_run"]), len(s["exp_run"])
+        n_stg, n_exp = nv(s["stg_run"]), nv(s["exp_run"])
         counts = (f'<span class="tb-pr-cell tb-pr-counts" data-label="{PR_COLUMNS[5]}"><span class="tb-count tb-staging" data-n="{n_stg}">{n_stg}</span>'
                   f'<span class="tb-count tb-experimental" data-n="{n_exp}">{n_exp}</span></span>')
         lead = _bar_cell(s["exp_lead"], full_exp, "experimental", label=PR_COLUMNS[4])
@@ -517,7 +528,7 @@ def patch_card(groups, now, major_groups):
             '<span class="tb-pr-cell">First Staging build after the previous patch</span>'
             '<span class="tb-pr-cell">Staging run-up began before</span>'
             '<span class="tb-pr-cell">Experimental began before</span>'
-            '<span class="tb-pr-cell tb-pr-counts">Builds</span></div>')
+            '<span class="tb-pr-cell tb-pr-counts">Versions</span></div>')
     modes = '<div class="tb-series">' + "".join(
         f'<button type="button" class="cat-filter-btn tb-lag-btn{" active" if k == "major" else ""}" data-lag="{k}" '
         f'aria-pressed="{"true" if k == "major" else "false"}">{label}</button>'
@@ -546,7 +557,7 @@ def _day_counts(builds):
     out = {}
     for b in builds:
         if b["branch"] in BRANCHES:
-            out.setdefault(b["time"].date(), {"experimental": 0, "staging": 0})[b["branch"]] += 1
+            out.setdefault(b["time"].date(), {"experimental": 0, "staging": 0})[b["branch"]] += b.get("n", 1)
     return out
 
 
@@ -607,9 +618,9 @@ def builds_calendar(builds, rels, years, patch_pages=(), today=None, fix_switch=
         out.append(f'<div class="cal-year-pane" data-year="{year}"{"" if year == newest[0] else " hidden"}>'
                    f'<div class="cal-mode-full"><div class="cal-full-grid">{"".join(cells)}</div></div>'
                    '<div class="cal-year-summary"><div class="cal-year-summary-left">'
-                   f'<span class="cal-year-summary-key">Experimental builds:</span> '
+                   f'<span class="cal-year-summary-key">Experimental versions:</span> '
                    f'<span class="cal-year-summary-val tb-sum-experimental">{n["experimental"]}</span>'
-                   f'<span class="tb-sum-gap"></span><span class="cal-year-summary-key">Staging builds:</span> '
+                   f'<span class="tb-sum-gap"></span><span class="cal-year-summary-key">Staging versions:</span> '
                    f'<span class="cal-year-summary-val tb-sum-staging">{n["staging"]}</span></div>'
                    # each "key: value" pair in its own item, as the Patches footer (its right side is a flex row)
                    f'<div class="cal-year-summary-right"><span class="cal-ys-item"><span class="cal-year-summary-key">'
@@ -652,7 +663,7 @@ def counts_by_year(builds, branch, key, size):
     out = {}
     for b in builds:
         if b["branch"] == branch and b["timed"]:
-            out.setdefault(b["time"].year, [0] * size)[key(b["time"])] += 1
+            out.setdefault(b["time"].year, [0] * size)[key(b["time"])] += b.get("n", 1)
     return out
 
 
