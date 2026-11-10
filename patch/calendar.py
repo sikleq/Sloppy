@@ -355,8 +355,9 @@ def save_calendar_html():
       cal.classList.add(compact.checked ? 'mode-compact' : 'mode-full');
     });
   }
-  const picker = document.querySelector('.cal-year-picker');
-  if (picker) {
+  // Every year picker drives the panes of its own block (Patches, and the Test servers calendar since 2026-11-10)
+  document.querySelectorAll('.cal-year-picker').forEach(picker => {
+    const block = picker.closest('.cal-year-block');
     const btn  = picker.querySelector('.cal-year-current');
     const menu = picker.querySelector('.cal-year-menu');
     const valEl = picker.querySelector('.cal-year-current-val');
@@ -370,7 +371,7 @@ def save_calendar_html():
         o.classList.toggle('is-selected', on);
         o.setAttribute('aria-selected', on ? 'true' : 'false');
       });
-      document.querySelectorAll('.cal-year-pane').forEach(p => {
+      block.querySelectorAll('.cal-year-pane').forEach(p => {
         p.hidden = (p.dataset.year !== year);
       });
     };
@@ -378,7 +379,7 @@ def save_calendar_html():
     opts.forEach(o => o.addEventListener('click', () => { selectYear(o.dataset.year); close(); }));
     document.addEventListener('click', e => { if (!picker.contains(e.target)) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-  }
+  });
   // Row + column cross-highlight on the Full grid. Event-delegated so it
   // works across all year panes (only one is visible at a time).
   document.querySelectorAll('.cal-full-grid').forEach(grid => {
@@ -406,10 +407,13 @@ def save_calendar_html():
   // Today's cell: a light frame (owner 2026-09-30). The page is built ahead of time, so the visitor's own clock
   // decides which day that is.
   const now = new Date();
-  const todayPane = document.querySelector(`.cal-year-pane[data-year="${now.getFullYear()}"]`);
-  const todayCell = todayPane && todayPane.querySelector(
-    `.cal-full-day[data-month="${now.getMonth() + 1}"][data-day="${now.getDate()}"]`);
-  if (todayCell) { todayCell.classList.add('is-today'); todayCell.title = 'Today'; }
+  document.querySelectorAll(`.cal-year-pane[data-year="${now.getFullYear()}"]`).forEach(todayPane => {
+    const todayCell = todayPane.querySelector(
+      `.cal-full-day[data-month="${now.getMonth() + 1}"][data-day="${now.getDate()}"]`);
+    if (!todayCell) return;
+    todayCell.classList.add('is-today');
+    if (!todayCell.dataset.tooltip) todayCell.title = 'Today';      // a builds day keeps its own tooltip
+  });
 })();
 </script>'''
 
@@ -427,7 +431,7 @@ def save_calendar_html():
         + '\n<div class="container calendar-page">\n'
         + view_tabs_html() + '\n'
         + '\n'.join(body) + '\n'
-        + _builds.render_panel(_builds.load_builds(), RELEASE_HISTORY)
+        + _builds.render_panel(_builds.load_builds(), RELEASE_HISTORY, patch_pages=has_html)
         + '\n</div>\n\n'
         + f'<script defer src="src/scripts-calendar.js?v={_ASSET_VERSION}"></script>\n'
         + toggle_script + '\n'

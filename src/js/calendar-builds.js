@@ -1,7 +1,8 @@
 
-// ---- CALENDAR: Patches / Test servers views + the test servers' tables (patch/branch_builds.py, 2026-11-10) ----
-// The two tabs swap the calendar and the .tb-panel; #test-servers in the address opens the second. Table headers sort in
-// three steps: the column's own first direction (data-first), the other way, back to the built order.
+// ---- CALENDAR: Patches / Test servers views + the test servers' charts (patch/branch_builds.py, 2026-11-10) ----
+// The two tabs swap the calendar and the .tb-panel; #test-servers in the address opens the second. The panel holds the
+// Test servers view twice (.tb-view): without the Staging builds that went to the live game as fixes, and with them;
+// the "Hide Staging fixes" switch in the calendar's header swaps them. Each view's controls work on that view only.
 (function() {
   const panel = document.querySelector('.tb-panel');
   const tabs = [...document.querySelectorAll('.cal-view-tab')];
@@ -23,6 +24,8 @@
     history.replaceState(null, '', t.dataset.view === 'test-servers' ? '#test-servers' : location.pathname + location.search);
   }));
   if (location.hash === '#test-servers') show('test-servers');
+  // A link to #test-servers on this same page (no reload) opens it too
+  window.addEventListener('hashchange', () => show(location.hash === '#test-servers' ? 'test-servers' : 'patches'));
 
   // A card's own switch buttons: one pressed at a time
   function press(btns, btn) {
@@ -32,90 +35,21 @@
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
-  // Both / Experimental / Staging: each card shows its chart of that name (weekly, hours, weekdays)
-  panel.querySelectorAll('.tb-card').forEach(card => {
-    const btns = [...card.querySelectorAll('.tb-series-btn')];
-    btns.forEach(btn => btn.addEventListener('click', () => {
-      press(btns, btn);
-      // An <svg> has no .hidden property: the attribute itself must change
-      card.querySelectorAll('svg[data-series]').forEach(svg => svg.toggleAttribute('hidden', svg.dataset.series !== btn.dataset.series));
-    }));
-  });
-  // Before each patch: the list of every patch, or of whole patches only
-  const lagBtns = [...panel.querySelectorAll('.tb-lag-btn')];
-  lagBtns.forEach(btn => btn.addEventListener('click', () => {
-    press(lagBtns, btn);
-    panel.querySelectorAll('.tb-lag[data-lag]').forEach(l => l.toggleAttribute('hidden', l.dataset.lag !== btn.dataset.lag));
-  }));
 
-  // Pointing at a patch (its line, or its row in "Before each patch") lights the weeks that led to it. A row of the
-  // whole-patches list lights by data-major: there a whole patch's run-up includes the letter patches before it.
-  const charts = [...panel.querySelectorAll('.tb-weekly')];
-  let lit = null;
-  function light(patch, key) {
-    const id = patch ? key + ':' + patch : null;
-    if (id === lit) return;
-    lit = id;
-    charts.forEach(svg => {
-      svg.classList.toggle('is-focus', !!patch);
-      svg.querySelectorAll('.tb-bar').forEach(r => r.classList.toggle('is-on', !!patch && r.dataset[key] === patch));
-      svg.querySelectorAll('.tb-patch-hit').forEach(r => r.classList.toggle('is-on', !!patch && r.dataset.patch === patch));
-    });
-    panel.querySelectorAll('.tb-lag-row[data-patch]').forEach(r => r.classList.toggle('is-on', !!patch && r.dataset.patch === patch));
-  }
-  panel.addEventListener('mouseover', e => {
-    const t = e.target.closest('.tb-patch-hit, .tb-lag-row[data-patch]');
-    const major = t && t.closest('.tb-lag[data-lag="major"]');
-    light(t ? t.dataset.patch : null, major ? 'major' : 'patch');
-  });
-  panel.addEventListener('mouseleave', () => light(null));
-
-  panel.querySelectorAll('.tb-table').forEach(table => {
-    const body = table.tBodies[0];
-    const rows = [...body.rows];
-    rows.forEach((r, i) => { r.dataset.order = i; });
-    const heads = [...table.querySelectorAll('th[data-sort]')];
-    heads.forEach(th => th.addEventListener('click', () => {
-      const first = th.dataset.first || 'desc';
-      const now = th.classList.contains('sort-desc') ? 'desc' : th.classList.contains('sort-asc') ? 'asc' : '';
-      const next = !now ? first : now === first ? (first === 'desc' ? 'asc' : 'desc') : '';
-      heads.forEach(h => h.classList.remove('sort-desc', 'sort-asc'));
-      const col = +th.dataset.sort;
-      let sorted = rows.slice();
-      if (next) {
-        th.classList.add('sort-' + next);
-        const val = r => {
-          const v = r.cells[col].dataset.v;
-          return v === '' ? null : (isNaN(+v) ? v : +v);
-        };
-        sorted.sort((a, b) => {
-          const x = val(a), y = val(b);
-          if (x === null || y === null) return (x === null) - (y === null);   // empty cells last both ways
-          const c = x < y ? -1 : x > y ? 1 : 0;
-          return next === 'asc' ? c : -c;
-        });
-      } else {
-        sorted.sort((a, b) => a.dataset.order - b.dataset.order);
-      }
-      sorted.forEach(r => body.appendChild(r));
-    }));
-  });
-
-  // ---- From / To years: every chart, tile, bar and row of the tab shows only those years ----
+  // ---- the charts' From / To years: helpers ----
   // The page is built with the whole log; each element carries its time (data-t), value (data-v) or counts by year
   // ("2024:3,2025:5"), and this redoes the layout and the scales (the same nice steps as patch/branch_builds.py).
-  const yFrom = panel.querySelector('.tb-year-from'), yTo = panel.querySelector('.tb-year-to');
-  if (!yFrom || !yTo) return;
   const LBL = { experimental: 'Experimental', staging: 'Staging' };
+  // The same little table as patch/branch_builds.py _count_table: a row per server in its colour
+  const countTable = (counts, shown) => '<table class="tb-tip-table">' + shown.map(br =>
+    `<tr class="tb-tip-${br}"><td>${LBL[br]}</td><td>${counts[br] || 0}</td></tr>`).join('') + '</table>';
   const NICE = [1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100, 200];
   const nice = m => { const st = NICE.find(s => s * 4 >= m) || Math.ceil(m / 4); return [st, st * 4]; };
-  const span = s => { const h = Math.floor(s / 3600), d = Math.floor(h / 24); return d ? `${d} d ${h % 24} h` : `${h} h`; };
   const sumIn = (attr, y0, y1) => (attr || '').split(',').filter(Boolean)
     .reduce((a, p) => { const [y, c] = p.split(':').map(Number); return a + (y >= y0 && y <= y1 ? c : 0); }, 0);
   const DAY = 86400, WEEK = 7 * DAY;
   const jan1 = y => Date.UTC(y, 0, 1) / 1000;
   const monday = t => t - ((Math.floor(t / DAY) + 3) % 7) * DAY;      // 1 Jan 1970 was a Thursday
-  const median = a => { if (!a.length) return null; a.sort((x, y) => x - y); const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
 
   function weekly(svg, y0, y1) {
     const hits = [...svg.querySelectorAll('.tb-hit:not(.tb-patch-hit)')];
@@ -139,6 +73,15 @@
       b.setAttribute('y', single || b.classList.contains('tb-experimental') ? mid - h : mid);
     });
     hits.forEach(r => { const t = +r.dataset.t, on = t >= r0 && t < r1; r.style.display = on ? '' : 'none'; if (on) { r.setAttribute('x', x(t)); r.setAttribute('width', colw); } });
+    // The bars' numbers once a week's column is BAR_VALUE_MIN_COL px or wider (patch/branch_builds.py)
+    svg.querySelectorAll('text.tb-bar-val').forEach(v => {
+      const t = +v.dataset.t, on = t >= r0 && t < r1 && colw >= 14;
+      v.style.display = on ? '' : 'none';
+      if (!on) return;
+      const h = v.dataset.v / top * half, below = !single && v.classList.contains('tb-staging');
+      v.setAttribute('x', x(t) + colw / 2);
+      v.setAttribute('y', below ? mid + h + 11 : mid - h - 3);
+    });
     svg.querySelectorAll('.tb-ytick[data-k]').forEach(tk => { tk.textContent = step * tk.dataset.k; });
     // Points in time: month marks, patch lines and labels, their hover strips, "now"
     svg.querySelectorAll('line[data-t], text[data-t]:not(.is-start), .tb-patch-hit').forEach(el => {
@@ -181,44 +124,79 @@
         y -= hh;
         if (r) { r.setAttribute('y', y); r.setAttribute('height', hh); }
       });
-      h.setAttribute('data-tooltip', `<b>${h.dataset.name}</b>` + shown.map(br => `<br>${LBL[br]}: ${vals[i][br]}`).join(''));
+      h.setAttribute('data-tooltip', `<b>${h.dataset.name}</b>` + countTable(vals[i], shown));
     });
     svg.querySelectorAll('.cal-ig-ytick[data-k]').forEach(tk => { tk.textContent = step * tk.dataset.k; });
   }
 
-  const tiles = [...panel.querySelectorAll('.tb-tile')];
-  tiles.forEach(t => { t.dataset.caption = t.querySelector('span').textContent; });
-  function applyYears() {
-    let y0 = +yFrom.value, y1 = +yTo.value;
-    if (y0 > y1) { [y0, y1] = [y1, y0]; yFrom.value = y0; yTo.value = y1; }
-    const all = y0 === +yFrom.options[0].value && y1 === +yTo.options[yTo.options.length - 1].value;
-    const inYears = y => +y >= y0 && +y <= y1;
-    panel.querySelectorAll('svg.tb-weekly').forEach(svg => weekly(svg, y0, y1));
-    panel.querySelectorAll('svg.tb-bars').forEach(svg => whenChart(svg, y0, y1));
-    panel.querySelectorAll('tr[data-year], .tb-lag-row[data-year]').forEach(r => { r.hidden = !inYears(r.dataset.year); });
-    panel.querySelectorAll('.tb-lag[data-lag]').forEach(list => {
-      const rows = [...list.querySelectorAll('.tb-lag-row[data-year]')].filter(r => !r.hidden);
-      const maxLead = Math.max(1, ...rows.map(r => +(r.dataset.lead || 0)));
-      rows.forEach(r => {
-        const b = r.querySelector('.tb-lag-bar.tb-experimental');
-        if (b && r.dataset.lead) b.style.setProperty('--p', Math.min(r.dataset.lead / maxLead, 1).toFixed(3));
+  // ---- one Test servers view: its switches, its patch lighting, its charts' years ----
+  function initView(view) {
+    // Both / Experimental / Staging: each card shows its chart of that name (weekly, hours, weekdays)
+    view.querySelectorAll('.tb-card').forEach(card => {
+      const btns = [...card.querySelectorAll('.tb-series-btn')];
+      btns.forEach(btn => btn.addEventListener('click', () => {
+        press(btns, btn);
+        // An <svg> has no .hidden property: the attribute itself must change
+        card.querySelectorAll('svg[data-series]').forEach(svg => svg.toggleAttribute('hidden', svg.dataset.series !== btn.dataset.series));
+      }));
+    });
+    // Each patch: whole patches (the default) or every patch
+    const lagBtns = [...view.querySelectorAll('.tb-lag-btn')];
+    lagBtns.forEach(btn => btn.addEventListener('click', () => {
+      press(lagBtns, btn);
+      view.querySelectorAll('.tb-plist[data-lag]').forEach(l => l.toggleAttribute('hidden', l.dataset.lag !== btn.dataset.lag));
+    }));
+
+    // Pointing at a patch (its line, or its row in "Each patch") lights the weeks that led to it. A row of the
+    // whole-patches list lights by data-major: there a whole patch's run-up includes the letter patches before it.
+    const charts = [...view.querySelectorAll('.tb-weekly')];
+    let lit = null;
+    function light(patch, key) {
+      const id = patch ? key + ':' + patch : null;
+      if (id === lit) return;
+      lit = id;
+      charts.forEach(svg => {
+        svg.classList.toggle('is-focus', !!patch);
+        svg.querySelectorAll('.tb-bar').forEach(r => r.classList.toggle('is-on', !!patch && r.dataset[key] === patch));
+        svg.querySelectorAll('.tb-patch-hit').forEach(r => r.classList.toggle('is-on', !!patch && r.dataset.patch === patch));
       });
+      view.querySelectorAll('.tb-pr[data-patch]').forEach(r => r.classList.toggle('is-on', !!patch && r.dataset.patch === patch));
+    }
+    view.addEventListener('mouseover', e => {
+      const t = e.target.closest('.tb-patch-hit, .tb-pr[data-patch]');
+      const major = t && t.closest('.tb-plist[data-lag="major"]');
+      light(t ? t.dataset.patch : null, major ? 'major' : 'patch');
     });
-    const rows = [...panel.querySelectorAll('.tb-lag[data-lag="all"] .tb-lag-row[data-year]')].filter(r => !r.hidden);
-    const years = y0 === y1 ? `in ${y0}` : `in ${y0} to ${y1}`;
-    tiles.forEach(t => {
-      const b = t.querySelector('b'), cap = t.querySelector('span');
-      if (t.dataset.count !== undefined) {
-        b.textContent = sumIn(t.dataset.count, y0, y1);
-        cap.textContent = all ? t.dataset.caption : `${t.dataset.what} ${years}`;
-      } else if (t.dataset.median) {
-        const m = t.dataset.median === 'lead'
-          ? median(rows.filter(r => r.dataset.lead && !r.dataset.partial).map(r => +r.dataset.lead))
-          : median(rows.filter(r => r.dataset.lag).map(r => +r.dataset.lag));
-        b.textContent = m === null ? '–' : span(m);
-      }
-    });
+    view.addEventListener('mouseleave', () => light(null));
+
+    // The years are the charts' own (owner 2026-11-10): the calendar has its year picker, the answer and the table of
+    // patches cover the whole log
+    const yFrom = view.querySelector('.tb-year-from'), yTo = view.querySelector('.tb-year-to');
+    if (!yFrom || !yTo) return;
+    function applyYears() {
+      let y0 = +yFrom.value, y1 = +yTo.value;
+      if (y0 > y1) { [y0, y1] = [y1, y0]; yFrom.value = y0; yTo.value = y1; }
+      view.querySelectorAll('svg.tb-weekly').forEach(svg => weekly(svg, y0, y1));
+      view.querySelectorAll('svg.tb-bars').forEach(svg => whenChart(svg, y0, y1));
+    }
+    yFrom.addEventListener('change', applyYears);
+    yTo.addEventListener('change', applyYears);
   }
-  yFrom.addEventListener('change', applyYears);
-  yTo.addEventListener('change', applyYears);
+  const views = [...panel.querySelectorAll('.tb-view')];
+  views.forEach(initView);
+
+  // ---- Hide Staging fixes: swap the two views, keeping the calendar's year and the charts' years ----
+  panel.querySelectorAll('.tb-fix-input').forEach(input => input.addEventListener('change', () => {
+    const from = views.find(v => !v.hidden), to = views.find(v => v.dataset.fix === (input.checked ? 'hide' : 'all'));
+    if (!from || !to || from === to) return;
+    views.forEach(v => { v.hidden = v !== to; });
+    panel.querySelectorAll('.tb-fix-input').forEach(i => { i.checked = input.checked; });
+    const year = from.querySelector('.cal-year-current-val');
+    const opt = year && to.querySelector(`.cal-year-opt[data-year="${year.textContent}"]`);
+    if (opt) opt.click();
+    ['.tb-year-from', '.tb-year-to'].forEach(sel => {
+      const a = from.querySelector(sel), b = to.querySelector(sel);
+      if (a && b && a.value !== b.value) { b.value = a.value; b.dispatchEvent(new Event('change')); }
+    });
+  }));
 })();

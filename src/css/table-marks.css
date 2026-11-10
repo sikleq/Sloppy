@@ -124,13 +124,11 @@
    otherwise the uppercase label aligns to its baseline while the arrow
    centres on x-height, dropping it below the letters. */
 .creeps-table th.sortable .th-label,
-.mr-table thead th.sortable .th-label,
-.tb-table th.sortable .th-label {
+.mr-table thead th.sortable .th-label {
   vertical-align: middle;
 }
 .creeps-table th.sortable .sort-ind,
-.mr-table thead th.sortable .sort-ind,
-.tb-table th.sortable .sort-ind {
+.mr-table thead th.sortable .sort-ind {
   margin-left: 4px;
   display: inline-block;
   vertical-align: middle;
@@ -147,33 +145,26 @@
   mask: url('icons/sort/sort.png') center / contain no-repeat;
 }
 .creeps-table th.sortable .sort-ind::after,
-.mr-table thead th.sortable .sort-ind::after,
-.tb-table th.sortable .sort-ind::after { content: none; }
+.mr-table thead th.sortable .sort-ind::after { content: none; }
 .creeps-table th.sort-desc .sort-ind,
 .creeps-table th.sort-asc .sort-ind,
 .mr-table thead th.sort-desc .sort-ind,
-.mr-table thead th.sort-asc .sort-ind,
-.tb-table th.sort-desc .sort-ind,
-.tb-table th.sort-asc .sort-ind {
+.mr-table thead th.sort-asc .sort-ind {
   background-color: var(--gold);
 }
 .creeps-table th.sort-desc .th-label,
 .creeps-table th.sort-asc .th-label,
 .mr-table thead th.sort-desc .th-label,
-.mr-table thead th.sort-asc .th-label,
-.tb-table th.sort-desc .th-label,
-.tb-table th.sort-asc .th-label {
+.mr-table thead th.sort-asc .th-label {
   color: var(--gold);
 }
 .creeps-table th.sort-desc .sort-ind,
-.mr-table thead th.sort-desc .sort-ind,
-.tb-table th.sort-desc .sort-ind {
+.mr-table thead th.sort-desc .sort-ind {
   -webkit-mask-image: url('icons/sort/sort-down.png');
   mask-image: url('icons/sort/sort-down.png');
 }
 .creeps-table th.sort-asc .sort-ind,
-.mr-table thead th.sort-asc .sort-ind,
-.tb-table th.sort-asc .sort-ind {
+.mr-table thead th.sort-asc .sort-ind {
   -webkit-mask-image: url('icons/sort/sort-up.png');
   mask-image: url('icons/sort/sort-up.png');
 }
