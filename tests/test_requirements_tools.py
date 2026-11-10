@@ -30,7 +30,8 @@ def _third_party_imports():
     if r.returncode:
         pytest.skip("not a git checkout")
     files = r.stdout.split()
-    own = {os.path.splitext(os.path.basename(f))[0] for f in files} | {f.split("/")[0] for f in files}
+    # our own modules and packages, at any depth: tools/patchgen is imported as "patchgen" from tools/ on sys.path
+    own = {os.path.splitext(os.path.basename(f))[0] for f in files} | {d for f in files for d in f.split("/")[:-1]}
     found = {}
     for f in files:
         with open(os.path.join(ROOT, f), encoding="utf-8") as fh:
