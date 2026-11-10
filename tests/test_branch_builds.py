@@ -391,6 +391,13 @@ def test_the_tab_is_laid_out_as_the_patches_view(tmp_path):
     assert re.search(r"\.tb-pr > \* \+ \* \{ border-left: 1px solid", css)           # Each patch: lines between cells
 
 
+def test_patch_chips_stand_on_one_line_whatever_the_date():
+    # 2026-11-10, the owner: chips moved with the length of the date beside them
+    css = (ROOT / "src" / "css" / "calendar-builds.css").read_text(encoding="utf-8")
+    rule = re.search(r"\.tb-pr-name \{(.*?)\}", css)[1]
+    assert re.search(r"grid-template-columns: \d+px \d+px", rule)                  # two fixed columns, not content-sized
+
+
 def test_the_two_view_tabs_are_one_width():
     # 2026-11-10: "Patches" and "Test servers" were each as wide as its word; the owner: no symmetry
     css = (ROOT / "src" / "css" / "calendar-builds.css").read_text(encoding="utf-8")

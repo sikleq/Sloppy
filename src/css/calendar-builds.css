@@ -75,7 +75,7 @@
 /* A patch as a chip, coloured as on Patches: whole patches orange, letter patches grey */
 .tb-chip {
   display: inline-block;
-  min-width: 44px;
+  min-width: 52px;
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 12px;
@@ -150,7 +150,10 @@ b + .tb-tip-table, .tb-tip-sub + .tb-tip-table { margin-top: 4px; }
 .tb-pr-head { border-top: 0; border-bottom: 1px solid rgba(213, 207, 195, 0.22); font-size: 12px; font-weight: 600; color: var(--text-dim); }
 .tb-pr-head > * { padding-bottom: 8px; }
 .tb-pr-head .is-key { color: #f0d58c; }
-.tb-pr-name { display: flex; align-items: center; justify-content: center; gap: 10px; }
+/* Chip and date in two fixed columns, so every row's chip stands on one line whatever its date's length (owner
+   2026-11-10: "не ровно стоят") */
+.tb-pr-name { display: grid; grid-template-columns: 56px 80px; justify-content: center; align-items: center; gap: 10px; }
+.tb-pr-head .tb-pr-name { display: flex; }
 .tb-pr-name .tb-sub { font-size: 11px; color: var(--text-dimmer); white-space: nowrap; }
 .tb-pr-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0; text-align: center; }
 .tb-pr-cell b { font-size: 16px; font-weight: 700; color: var(--text-main); font-variant-numeric: tabular-nums; }
