@@ -267,11 +267,12 @@ def test_the_card_has_three_charts_and_a_switch(tmp_path):
 def test_every_week_and_patch_line_has_a_tooltip_and_its_patch(tmp_path):
     _, svg = _weekly(tmp_path, ("public", 11, "2026-06-01T21:30:00Z"), ("experimental", 1, "2026-05-25T10:00:00Z"),
                      ("staging", 2, "2026-06-01T08:00:00Z"))
-    weeks = re.findall(r'class="tb-hit tb-tip-target"([^>]*?) data-tooltip="([^"]+)"', svg)
-    assert weeks and all("Week of" in t for _, t in weeks)
+    # A week keeps its counts and title; the script writes the table on hover (13 years of weeks stay light)
+    weeks = re.findall(r'class="tb-hit tb-tip-target"[^>]*? data-c="(\d+),(\d+)" data-title="(Week of [^"]+)"', svg)
+    assert weeks and ("1", "0", "Week of 25 May 2026") in weeks and "data-tooltip" not in svg.split("tb-patch-hit")[0]
     patch = re.search(r'class="tb-hit tb-patch-hit tb-tip-target" data-patch="7.41"[^>]*? data-tooltip="([^"]+)"', svg)
     text = html.unescape(patch[1])
-    assert text == '<b>7.41</b><span class="tb-tip-sub">1 Jun 2026 21:30 UTC</span><table class="tb-tip-table"><tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>–</td></tr><tr class="tb-tip-key"><td>After the last Staging build</td><td>13 h</td></tr><tr class="tb-tip-staging"><td>Staging builds</td><td>1</td></tr><tr class="tb-tip-experimental"><td>Experimental builds</td><td>1</td></tr></table>'
+    assert text == '<b>7.41</b><span class="tb-tip-sub">1 Jun 2026 21:30 UTC</span><table class="tb-tip-table"><tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>–</td></tr><tr class="tb-tip-key"><td>After the last Staging build</td><td>13 h</td></tr><tr class="tb-tip-staging"><td>First Staging build after the previous patch, before</td><td>13 h</td></tr><tr class="tb-tip-staging"><td>Staging builds</td><td>1</td></tr><tr class="tb-tip-experimental"><td>Experimental builds</td><td>1</td></tr></table>'
 
 
 
@@ -311,8 +312,8 @@ def test_hours_and_weekdays_have_the_switch_and_a_tooltip_per_column():
 def test_a_one_server_weekly_chart_tells_only_that_server_on_hover(tmp_path):
     _, svg = _weekly(tmp_path, ("experimental", 1, "2026-06-01T10:00:00Z"), ("staging", 2, "2026-06-01T12:00:00Z"),
                      series="staging")
-    tips = [html.unescape(t) for t in re.findall(r'class="tb-hit tb-tip-target"[^>]*data-tooltip="([^"]+)"', svg)]
-    assert tips and all("tb-tip-staging" in t and "tb-tip-experimental" not in t for t in tips)
+    hits = re.findall(r'<rect class="tb-hit tb-tip-target"[^>]*>', svg)
+    assert hits and all('data-show="staging"' in h for h in hits)                   # the script shows that row only
 
 
 
@@ -326,8 +327,8 @@ def test_counts_by_year_split_the_hour_chart():
 def test_the_year_filter_script_redraws_with_the_same_steps_as_the_generator():
     js = (ROOT / "src" / "js" / "calendar-builds.js").read_text(encoding="utf-8")
     steps = re.search(r"const NICE = \[([\d, ]+)\]", js)[1]
-    py = __import__("inspect").getsource(bb._nice_top)
-    assert f"({steps})" in py.replace(" ", "").replace(",", ", ") or steps.replace(" ", "") in py.replace(" ", "")
+    assert tuple(int(x) for x in steps.split(",")) == bb.NICE_STEPS
+    assert bb._nice_top(900) == (250, 1000) and bb._nice_top(20000) == (5000, 20000)    # no list end to fall off
     for hook in ("tb-year-from", "tb-year-to", "text.tb-bar-val", "countTable", "svg.tb-weekly", "svg.tb-bars"):
         assert hook in js, hook
 
@@ -367,9 +368,9 @@ def test_staging_began_and_experimental_began_share_one_scale(tmp_path):
     _, _, every, whole = _groups(tmp_path)
     row = re.search(r'data-patch="7.41".*?</div>', bb.patch_card(every, NOW, whole))[0]
     shares = [float(x) for x in re.findall(r"--p:([\d.]+)", row)]
-    assert shares[3] == 1.0 and abs(shares[2] - 2 / 31) < 0.01                         # 2 d against 31 d, one scale
+    assert shares[4] == 1.0 and abs(shares[3] - 2 / 31) < 0.01 and abs(shares[2] - 2 / 31) < 0.01   # one scale
     js = (ROOT / "src" / "js" / "calendar-builds.js").read_text(encoding="utf-8")
-    assert ".tb-pr[data-year]" not in js                                               # the years are the charts' only
+    assert ".tb-pr[data-year]" in js                                                   # Each patch follows From / To
 
 
 def test_a_day_shows_a_dot_per_server_sized_by_its_builds():
@@ -383,8 +384,10 @@ def test_the_tab_is_laid_out_as_the_patches_view(tmp_path):
     # go under the calendar as on Patches, a day splits between the two servers
     builds, history, _, _ = _groups(tmp_path)
     page = bb.render_panel(builds, history, NOW)
-    order = [page.index(k) for k in ('class="cal-year-block is-current tb-calblock"', 'class="cal-infographic tb-answer"',
-                                     'class="tb-plist" data-lag="major"', 'class="tb-years"', 'class="tb-weekly"')]
+    # The From / To years stand right under the calendar and cover the medians and Each patch too (owner 2026-11-10)
+    order = [page.index(k) for k in ('class="cal-year-block is-current tb-calblock"', 'class="tb-years"',
+                                     'class="cal-infographic tb-answer"', 'class="tb-plist" data-lag="major"',
+                                     'class="tb-weekly"')]
     assert order == sorted(order)
     css = (ROOT / "src" / "css" / "calendar-builds.css").read_text(encoding="utf-8")
     assert ".tb-dot-e { background: #d0603a; }" in css and ".tb-d3 { width: 8px; height: 8px; }" in css
@@ -471,25 +474,61 @@ def test_each_patch_leads_with_the_time_after_the_last_staging_build(tmp_path):
     row = re.search(r'<div class="tb-pr tb-tip-target" data-patch="7.41".*?</div>', major)[0]
     cells = re.findall(r'<span class="tb-pr-cell( is-key)?" data-label="[^"]+"><b>([^<]+)</b>', row)   # labelled for phones
     assert cells[0] == (" is-key", "2 d") and cells[1] == (" is-key", "2 h")           # second-to-last, last Staging
-    assert cells[2][1] == "2 d" and cells[3][1] == "31 d"                              # Staging run, Experimental run
+    assert [c[1] for c in cells[2:5]] == ["2 d", "2 d", "31 d"]                        # first Staging, its run, Experimental
     assert re.findall(r'class="tb-count tb-(\w+)" data-n="(\d+)"', row) == [("staging", "2"), ("experimental", "1")]
     assert '<span class="tb-chip is-major">7.41</span>' in row
-    assert re.search(r'data-lag2="172800" data-lag="7200" data-stg="\d+" data-lead="\d+"', row)
+    assert re.search(r'data-lag2="172800" data-lag="7200" data-stg1="\d+" data-stg="\d+" data-lead="\d+"', row)
 
 
 def test_the_patch_tooltip_is_a_table(tmp_path):
     _, _, every, whole = _groups(tmp_path)
     g = whole[-1]
     text = html.unescape(bb._row_tip(g, bb.group_stats(g, NOW)))
-    assert text == '<b>7.41</b><span class="tb-tip-sub">1 Jun 2026 20:00 UTC</span><table class="tb-tip-table"><tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>2 d</td></tr><tr class="tb-tip-key"><td>After the last Staging build</td><td>2 h</td></tr><tr class="tb-tip-staging"><td>Staging builds</td><td>2</td></tr><tr class="tb-tip-experimental"><td>Experimental builds</td><td>1</td></tr></table>'
+    assert text == '<b>7.41</b><span class="tb-tip-sub">1 Jun 2026 20:00 UTC</span><table class="tb-tip-table"><tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>2 d</td></tr><tr class="tb-tip-key"><td>After the last Staging build</td><td>2 h</td></tr><tr class="tb-tip-staging"><td>First Staging build after the previous patch, before</td><td>2 d</td></tr><tr class="tb-tip-staging"><td>Staging builds</td><td>2</td></tr><tr class="tb-tip-experimental"><td>Experimental builds</td><td>1</td></tr></table>'
 
 
 def test_the_answer_tiles_are_medians_over_whole_patches(tmp_path):
     builds, history, _, _ = _groups(tmp_path)
     page = _first_view(bb.render_panel(builds, history, NOW))
     tiles = re.findall(r'<div class="cal-ig-panel tb-ig-num([^"]*)" data-median="(\w+)"><b>([^<]+)</b>', page)
-    assert [(k, v) for _, k, v in tiles] == [("lag2", "2 d"), ("lag", "2 h"), ("stg", "2 d"), ("lead", "31 d")]
+    assert [(k, v) for _, k, v in tiles] == [("lag2", "2 d"), ("lag", "2 h"), ("stg1", "2 d"), ("stg", "2 d"),
+                                               ("lead", "31 d")]
     assert "is-key" in tiles[0][0]
+
+
+def test_the_year_filter_recounts_the_medians_as_the_generator(tmp_path):
+    # The script recounts the strip from the whole-patch rows: the same keys, the same "whole run-up only" choice
+    # (medians() skips patches cut by the log's start for stg1, stg, lead), the same rounding as fmt_short
+    builds, history, _, _ = _groups(tmp_path)
+    page = _first_view(bb.render_panel(builds, history, NOW))
+    js = (ROOT / "src" / "js" / "calendar-builds.js").read_text(encoding="utf-8")
+    whole = dict(re.findall(r"(\w+): (true|false)", re.search(r"const WHOLE_ONLY = \{([^}]+)\}", js)[1]))
+    assert whole == {"lag2": "false", "lag": "false", "stg1": "true", "stg": "true", "lead": "true"}
+    assert list(whole) == re.findall(r'data-median="(\w+)"', page)
+    assert "h >= 48 ? `${Math.floor(h / 24)} d` : `${h} h`" in js
+    assert re.search(r'medians, <span class="tb-ig-since">\d{4} to now</span>', page)  # the script rewrites it
+    assert page.count('<div class="tb-empty tb-plist-none" hidden>') == 2
+    css = (ROOT / "src" / "css" / "calendar-builds.css").read_text(encoding="utf-8")
+    assert ".tb-pr[hidden] { display: none; }" in css                                  # the grid would show it
+
+
+def test_the_first_staging_build_counts_from_the_previous_patch_of_any_kind(tmp_path):
+    # Owner 2026-11-10: patch X out, every Staging build after it until patch Y belongs to Y. The first one may sit
+    # weeks before a pause; the run-up is the builds after the last pause over a week, both after X only.
+    history = [{"version": "7.40", "date": "01.03.2026"}, {"version": "7.40b", "date": "01.04.2026"},
+               {"version": "7.41", "date": "01.06.2026"}]
+    builds = _load(tmp_path, _raw(("public", 9, "2026-03-01T20:00:00Z"), ("public", 10, "2026-04-01T20:00:00Z"),
+                                  ("public", 11, "2026-06-01T20:00:00Z"),
+                                  ("staging", 1, "2026-03-20T20:00:00Z"),           # before 7.40b: 7.40b's
+                                  ("staging", 2, "2026-04-11T20:00:00Z"),           # first after 7.40b
+                                  ("staging", 3, "2026-05-30T20:00:00Z"), ("staging", 4, "2026-06-01T18:00:00Z")))
+    rels = bb.releases(history)
+    m = bb.patch_moments(rels, builds)
+    g = bb.group_by_patch(builds, bb.major_releases(rels), m)[-1]
+    s = bb.group_stats(g, NOW)
+    assert g["version"] == "7.41" and g["after_patch"] == m["7.40b"][0]
+    assert bb.fmt_short(s["stg_first"]) == "51 d" and bb.fmt_short(s["stg_start"]) == "2 d"
+    assert [b["version"] for b in s["stg_run"]] == [3, 4]
 
 
 def test_the_builds_calendar_is_the_patches_grid_with_builds_per_day(tmp_path):
@@ -497,8 +536,8 @@ def test_the_builds_calendar_is_the_patches_grid_with_builds_per_day(tmp_path):
     cal = bb.builds_calendar(builds, bb.releases(history), [2025, 2026], patch_pages={"7.41"})
     assert cal.count('class="cal-full-month-name"') == 24 and cal.count('<div class="cal-full-grid">') == 2
     day = re.search(r'<div class="cal-full-day tb-day tb-e1 tb-tip-target" data-month="5" data-day="1" '
-                    r'data-tooltip="([^"]+)">1<span class="tb-dots"><i class="tb-dot-e tb-d1"></i></span></div>', cal)
-    assert day and html.unescape(day[1]) == '<table class="tb-tip-table"><tr class="tb-tip-experimental"><td>Experimental</td><td>1</td></tr><tr class="tb-tip-staging"><td>Staging</td><td>0</td></tr></table>'        # no date, only the builds
+                    r'data-c="(\d+),(\d+)">1<span class="tb-dots"><i class="tb-dot-e tb-d1"></i></span></div>', cal)
+    assert day and (day[1], day[2]) == ("1", "0")                                     # no date, only the builds
     patch = re.search(r'<a class="cal-full-day tb-day tb-s1 has-patch major tb-tip-target" '
                       r'href="patches/7.41.html\?from=calendar" data-month="6" data-day="1"', cal)
     assert patch                                                                       # Staging that day, and 7.41
@@ -530,7 +569,6 @@ def test_every_piece_carries_its_year_for_the_filter(tmp_path):
     assert re.findall(r'<select class="cal-mode-select tb-year-(\w+)">', page) == ["from", "to"]
     assert all(re.search(r'data-year="20\d\d"', r) for r in re.findall(r'<div class="tb-pr tb-tip-target[^>]*>', page))
     assert re.search(r'class="tb-bar tb-experimental"[^>]* data-t="\d+" data-v="1"', page)
-    assert re.search(r'class="tb-bar-val tb-experimental"[^>]* data-v="1"', page)          # its number, shown when wide
     assert re.search(r'class="tb-hit tb-tip-target" data-i="10" data-name="10:00 to 10:59 UTC" '
                      r'data-c-experimental="2026:2"', page)
 
@@ -564,3 +602,26 @@ def test_the_switch_shows_the_tab_without_the_staging_fixes_first(tmp_path):
     assert "Staging builds:</span> <span class=\"cal-year-summary-val tb-sum-staging\">2<" in every
     js = (ROOT / "src" / "js" / "calendar-builds.js").read_text(encoding="utf-8")
     assert "panel.querySelectorAll('.tb-view')" in js and ".tb-fix-input" in js
+
+
+def test_the_script_writes_the_lazy_tooltips_and_bar_numbers():
+    # 2026-11-10: with 13 years of history the page kept tables per day and week; now numbers only, written on hover
+    js = (ROOT / "src" / "js" / "calendar-builds.js").read_text(encoding="utf-8")
+    assert "e.target.closest('[data-c]')" in js and "lazy.dataset.tooltip =" in js
+    assert "createElementNS(NS, 'text')" in js and "svg.dataset.t0" in js
+
+
+def test_the_tab_starts_with_the_first_staging_build(tmp_path):
+    # 2026-11-10, the owner: years of Experimental alone (SteamDB back to 2013) were a mess; the tab covers Staging's time
+    history = [{"version": "7.32", "date": "01.01.2023"}, {"version": "7.33", "date": "20.04.2023"}]
+    builds = _load(tmp_path, _raw(("experimental", 1, "2022-12-01T10:00:00Z"), ("public", 2, "2022-12-30T10:00:00Z"),
+                                  ("staging", 3, "2023-03-01T07:00:00Z"), ("experimental", 4, "2023-03-05T10:00:00Z"),
+                                  ("public", 5, "2023-04-20T23:00:00Z")))
+    kept, rels = bb.since_staging(builds, history)
+    assert [b["version"] for b in kept] == [3, 4, 5] and [r["version"] for r in rels] == ["7.33"]
+    page = bb.render_panel(builds, history, NOW, from_staging=True)
+    panes = re.findall(r'<div class="cal-year-pane" data-year="(\d+)"', page)
+    assert panes and min(panes) == "2023" and 'data-year="2022"' not in page
+    assert "from_staging=True" in (ROOT / "patch" / "calendar.py").read_text(encoding="utf-8")   # the site's tab
+    assert bb.since_staging(builds[:2], history) == (builds[:2], history)                # no Staging yet: everything
+

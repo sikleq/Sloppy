@@ -43,7 +43,9 @@ def load_builds(path=DATA):
         timed = b.get("timed")
         if timed is None:
             timed = bool(b.get("after")) and t - _t(b["after"]) <= timedelta(hours=TIMED_WINDOW_H)
-        out.append({"branch": b["branch"], "from": b.get("from"), "version": b["version"], "time": t, "timed": timed})
+        # A SteamDB event (before Oct 2021) has a changenumber, no version
+        out.append({"branch": b["branch"], "from": b.get("from"), "version": b.get("version"), "time": t, "timed": timed,
+                    "source": b.get("source")})
     return sorted(out, key=lambda b: b["time"])
 
 
@@ -85,6 +87,12 @@ def group_by_patch(builds, rels, moments=None):
     ordered = [groups[v] for v, _ in order if v in groups]
     if None in groups:
         ordered.append(groups[None])
+    # The patch just before each one, whole or letter, from every patch in `moments` (even when `rels` holds only the
+    # whole ones): its first Staging build is counted from there
+    every = sorted(t for t, _ in moments.values())
+    for g in ordered:
+        before = [t for t in every if g["moment"] is None or t < g["moment"]]
+        g["after_patch"] = before[-1] if before else None
     return ordered
 
 
@@ -108,7 +116,13 @@ def group_stats(g, now):
     s["staging_lag_text"] = None if last_st is None else fmt_span(s["staging_lag"])
     # The second-to-last Staging build too (owner 2026-11-10): the last one often lands with the patch itself
     s["staging_lag2"] = end - g["staging"][-2]["time"] if len(g["staging"]) >= 2 else None
-    s["exp_run"], s["stg_run"] = run_up(g["experimental"]), run_up(g["staging"])
+    # The first Staging build after the previous patch came out (owner 2026-11-10: every Staging build after patch X
+    # until patch Y belongs to Y): the group's first, whatever pauses follow it
+    after = g.get("after_patch")                          # the moment of the patch just before, whole or letter
+    since = [b for b in g["staging"] if after is None or b["time"] > after]
+    s["stg_first"] = end - since[0]["time"] if since else None
+    # The Staging run-up stays after that patch too, so it is never longer than the first build after it
+    s["exp_run"], s["stg_run"] = run_up(g["experimental"]), run_up(since)
     s["exp_lead"] = end - s["exp_run"][0]["time"] if s["exp_run"] else None
     s["stg_start"] = end - s["stg_run"][0]["time"] if s["stg_run"] else None
     # The run-up reaching back to the first build of a group older than the log: it may have begun earlier
@@ -166,8 +180,13 @@ def fmt_day(d):
 
 # ---------------------------------------------------------------- charts
 
+NICE_STEPS = (1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100, 200, 250, 500, 1000, 2500)
+
+
 def _nice_top(maxv):
-    step = next(st for st in (1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100, 200) if st * 4 >= maxv)
+    """A scale of 4 round steps over maxv. Past the list (13 years of builds by weekday run over 800) the step is
+    maxv / 4 rounded up, so a chart never fails on a big count (2026-11-10)."""
+    step = next((st for st in NICE_STEPS if st * 4 >= maxv), -(-int(maxv) // 4))
     return step, step * 4
 
 
@@ -315,6 +334,7 @@ def weekly_svg(builds, rels, now, moments=None, groups=None, series="both", majo
     half = plot_h / 2 if series == "both" else plot_h
     t0 = _midnight(weeks[0][0])
     t1 = _midnight(weeks[-1][0] + timedelta(days=7))
+    s[0] = s[0].replace(' data-pl=', f' data-t0="{_ts(t0)}" data-t1="{_ts(t1)}" data-pl=', 1)   # the whole range, for the script
     plot_w = view_w - pad_l - pad_r
 
     def x_of(t):
@@ -366,14 +386,13 @@ def weekly_svg(builds, rels, now, moments=None, groups=None, series="both", majo
             bh = v / scale * half
             y = mid - bh if (series != "both" or br == "experimental") else mid
             s.append(f'<rect class="tb-bar tb-{br}"{dp} data-v="{v}" x="{x:.1f}" y="{y:.1f}" width="{bar:.1f}" height="{bh:.1f}"/>')
-            below = series == "both" and br == "staging"
-            ty = mid + bh + 11 if below else y - 3
-            s.append(f'<text class="tb-bar-val tb-{br}"{dp} data-v="{v}" x="{x + bar / 2:.1f}" y="{ty:.1f}" '
-                     f'text-anchor="middle"{"" if col >= BAR_VALUE_MIN_COL else " style=" + chr(34) + "display:none" + chr(34)}>{v}</text>')
-        counts = {"experimental": e, "staging": st}
-        tip = _counts_tip(f"Week of {fmt_day(monday)}", counts, shown)
-        s.append(f'<rect class="tb-hit tb-tip-target"{dp} data-tooltip="{tip}" x="{pad_l + col * i:.1f}" y="{top}" '
-                 f'width="{col:.2f}" height="{plot_h}"/>')
+        # A week with builds is a hover target; its tooltip is written on hover from data-c (calendar-builds.js), and
+        # the bars' numbers too, once a week is wide enough: 13 years of weeks would weigh megabytes otherwise
+        if not any({"experimental": e, "staging": st}[br] for br in shown):
+            continue
+        one = "" if series == "both" else f' data-show="{series}"'
+        s.append(f'<rect class="tb-hit tb-tip-target"{dp} data-c="{e},{st}"{one} data-title="Week of {fmt_day(monday)}" '
+                 f'x="{pad_l + col * i:.1f}" y="{top}" width="{col:.2f}" height="{plot_h}"/>')
     s.append(f'<line class="cal-ig-axis is-base" x1="{pad_l}" y1="{mid}" x2="{view_w - pad_r}" y2="{mid}"/>')
     stats = {g["version"]: group_stats(g, now) for g in groups if g["version"]}
     for v, _ in rels:
@@ -425,8 +444,9 @@ def _chip(version, cls=""):
 
 
 # The table's columns: a phone hides the header row and writes each cell's own label above it (data-label)
-PR_COLUMNS = ("After the second-to-last Staging build", "After the last Staging build", "Staging began before",
-              "Experimental began before", "Builds")
+PR_COLUMNS = ("After the second-to-last Staging build", "After the last Staging build",
+              "First Staging build after the previous patch", "Staging run-up began before", "Experimental began before",
+              "Builds")
 
 
 def _bar_cell(span, full, br, key=False, label=""):
@@ -448,6 +468,8 @@ def _row_tip(g, s):
     lag2 = fmt_short(s["staging_lag2"]) if s["staging_lag2"] is not None else "–"
     rows = (f'<tr class="tb-tip-key"><td>After the second-to-last Staging build</td><td>{lag2}</td></tr>'
             f'<tr class="tb-tip-key"><td>After the last Staging build</td><td>{lag}</td></tr>'
+            f'<tr class="tb-tip-staging"><td>First Staging build after the previous patch, before</td>'
+            f'<td>{fmt_short(s["stg_first"]) if s["stg_first"] is not None else "–"}</td></tr>'
             f'<tr class="tb-tip-staging"><td>Staging builds</td><td>{len(s["stg_run"])}</td></tr>'
             f'<tr class="tb-tip-experimental"><td>Experimental builds</td><td>{len(s["exp_run"])}</td></tr>')
     return _html.escape(f'<b>{_html.escape(g["version"])}</b><span class="tb-tip-sub">{when}</span>'
@@ -459,17 +481,18 @@ def _patch_rows(groups, now):
     stats = [group_stats(g, now) for g in released]
     longest = lambda key: max([s[key].total_seconds() for s in stats if s[key]] + [1])  # noqa: E731
     # Staging began and Experimental began share one scale of days, so their bars compare across the row
-    full_stg = full_exp = max(longest("stg_start"), longest("exp_lead"))
+    full_stg = full_exp = max(longest("stg_start"), longest("exp_lead"), longest("stg_first"))
     rows = []
     for g, s in zip(released, stats):
         data = "".join(f' data-{k}="{int(v.total_seconds())}"' for k, v in
-                       (("lag2", s["staging_lag2"]), ("lag", s["staging_lag"]), ("stg", s["stg_start"]),
+                       (("lag2", s["staging_lag2"]), ("lag", s["staging_lag"]), ("stg1", s["stg_first"]),
+                        ("stg", s["stg_start"]),
                         ("lead", s["exp_lead"])) if v is not None)
         data += ' data-partial="1"' if s["exp_cut"] else ""
         n_stg, n_exp = len(s["stg_run"]), len(s["exp_run"])
-        counts = (f'<span class="tb-pr-cell tb-pr-counts" data-label="{PR_COLUMNS[4]}"><span class="tb-count tb-staging" data-n="{n_stg}">{n_stg}</span>'
+        counts = (f'<span class="tb-pr-cell tb-pr-counts" data-label="{PR_COLUMNS[5]}"><span class="tb-count tb-staging" data-n="{n_stg}">{n_stg}</span>'
                   f'<span class="tb-count tb-experimental" data-n="{n_exp}">{n_exp}</span></span>')
-        lead = _bar_cell(s["exp_lead"], full_exp, "experimental", label=PR_COLUMNS[3])
+        lead = _bar_cell(s["exp_lead"], full_exp, "experimental", label=PR_COLUMNS[4])
         if s["exp_cut"]:
             lead = lead.replace("<b>", "<b>≥ ", 1)
         rows.append(f'<div class="tb-pr tb-tip-target" data-patch="{_html.escape(g["version"])}" '
@@ -478,7 +501,8 @@ def _patch_rows(groups, now):
                     f'{fmt_day((g["moment"] if g["exact"] else _midnight(g["date"])).date())}</span></span>'
                     + _bar_cell(s["staging_lag2"], LAG2_STAGING_CAP_H * 3600, "staging", True, PR_COLUMNS[0])
                     + _bar_cell(s["staging_lag"], LAG_STAGING_CAP_H * 3600, "staging", True, PR_COLUMNS[1])
-                    + _bar_cell(s["stg_start"], full_stg, "staging", label=PR_COLUMNS[2]) + lead + counts + '</div>')
+                    + _bar_cell(s["stg_first"], full_stg, "staging", label=PR_COLUMNS[2])
+                    + _bar_cell(s["stg_start"], full_stg, "staging", label=PR_COLUMNS[3]) + lead + counts + '</div>')
     return "".join(rows) or _empty_row_div()
 
 
@@ -490,15 +514,17 @@ def patch_card(groups, now, major_groups):
     head = ('<div class="tb-pr tb-pr-head"><span class="tb-pr-name">Patch</span>'
             '<span class="tb-pr-cell is-key">After the second-to-last Staging build</span>'
             '<span class="tb-pr-cell is-key">After the last Staging build</span>'
-            '<span class="tb-pr-cell">Staging began before</span>'
+            '<span class="tb-pr-cell">First Staging build after the previous patch</span>'
+            '<span class="tb-pr-cell">Staging run-up began before</span>'
             '<span class="tb-pr-cell">Experimental began before</span>'
             '<span class="tb-pr-cell tb-pr-counts">Builds</span></div>')
     modes = '<div class="tb-series">' + "".join(
         f'<button type="button" class="cat-filter-btn tb-lag-btn{" active" if k == "major" else ""}" data-lag="{k}" '
         f'aria-pressed="{"true" if k == "major" else "false"}">{label}</button>'
         for k, label in (("major", "Whole patches"), ("all", "All patches"))) + '</div>'
-    lists = (f'<div class="tb-plist" data-lag="major">{head}{_patch_rows(major_groups, now)}</div>'
-             f'<div class="tb-plist" data-lag="all" hidden>{head}{_patch_rows(groups, now)}</div>')
+    none = '<div class="tb-empty tb-plist-none" hidden>No patches in these years</div>'   # the year filter shows it
+    lists = (f'<div class="tb-plist" data-lag="major">{head}{_patch_rows(major_groups, now)}{none}</div>'
+             f'<div class="tb-plist" data-lag="all" hidden>{head}{_patch_rows(groups, now)}{none}</div>')
     return (f'<div class="tb-card"><div class="tb-card-head"><div class="cal-ig-h">Each patch</div>{modes}</div>'
             f'{lists}</div>')
 
@@ -572,7 +598,7 @@ def builds_calendar(builds, rels, years, patch_pages=(), today=None, fix_switch=
                 if c["experimental"] or c["staging"]:
                     # The day itself is the cell: the tooltip is only its builds, a row per server
                     cls.append("tb-tip-target")
-                    attrs += f' data-tooltip="{_counts_tip("", c)}"'
+                    attrs += f' data-c="{c["experimental"]},{c["staging"]}"'     # the tooltip is written on hover
                 text = (_html.escape(v) if v else str(day)) + _dots(c)
                 tag, href = ("a", f' href="patches/{v}.html?from=calendar"') if v and v in patch_pages else ("div", "")
                 cells.append(f'<{tag} class="{" ".join(cls)}"{href}{attrs}>{text}</{tag}>')
@@ -585,8 +611,9 @@ def builds_calendar(builds, rels, years, patch_pages=(), today=None, fix_switch=
                    f'<span class="cal-year-summary-val tb-sum-experimental">{n["experimental"]}</span>'
                    f'<span class="tb-sum-gap"></span><span class="cal-year-summary-key">Staging builds:</span> '
                    f'<span class="cal-year-summary-val tb-sum-staging">{n["staging"]}</span></div>'
-                   f'<div class="cal-year-summary-right"><span class="cal-year-summary-key">Patches:</span> '
-                   f'<span class="cal-year-summary-val">{n_patches}</span></div></div></div>')
+                   # each "key: value" pair in its own item, as the Patches footer (its right side is a flex row)
+                   f'<div class="cal-year-summary-right"><span class="cal-ys-item"><span class="cal-year-summary-key">'
+                   f'Patches:</span> <span class="cal-year-summary-val">{n_patches}</span></span></div></div></div>')
     out.append('</div>')
     return "".join(out)
 
@@ -602,15 +629,17 @@ def medians(groups, now):
     stats = [group_stats(g, now) for g in released]
     pick = lambda key, whole: [s[key] for g, s in zip(released, stats) if s[key] and (not whole or not s["exp_cut"])]  # noqa: E731
     return {k: (median(v) if v else None) for k, v in
-            (("lag2", pick("staging_lag2", False)), ("lag", pick("staging_lag", False)), ("stg", pick("stg_start", True)),
+            (("lag2", pick("staging_lag2", False)), ("lag", pick("staging_lag", False)), ("stg1", pick("stg_first", True)),
+             ("stg", pick("stg_start", True)),
              ("lead", pick("exp_lead", True)))}
 
 
 # ---------------------------------------------------------------- the tab
 
 def year_filter(years):
-    """From / To over the charts only (owner 2026-11-10: the calendar has its own year above). calendar-builds.js
-    redraws the weekly, hour and weekday charts for those years. Both default to the whole log."""
+    """From / To over everything under the calendar, which has its own year (owner 2026-11-10). calendar-builds.js
+    recounts the medians strip from the rows of whole patches, hides the Each patch rows of other years and redraws the
+    weekly, hour and weekday charts. Both default to the whole log."""
     def sel(cls, label, chosen):
         opts = "".join(f'<option value="{y}"{" selected" if y == chosen else ""}>{y}</option>' for y in years)
         return f'<label class="tb-year"><span>{label}</span><select class="cal-mode-select {cls}">{opts}</select></label>'
@@ -638,9 +667,10 @@ def answer_strip(m, since):
                 f'<span>{caption}</span></div>')
     return ('<div class="cal-infographic tb-answer">'
             '<div class="cal-ig-panel cal-ig-lead"><div class="cal-ig-title">Before a whole patch</div>'
-            f'<div class="cal-ig-sub">medians, {since}</div></div>'
+            f'<div class="cal-ig-sub">medians, <span class="tb-ig-since">{since}</span></div></div>'
             + num("lag2", "the patch comes out after the second-to-last Staging build", " is-key")
             + num("lag", "and after the last Staging build", " is-key")
+            + num("stg1", "the first Staging build after the previous patch comes before it", " tb-staging-t")
             + num("stg", "the Staging run-up begins before it", " tb-staging-t")
             + num("lead", "Experimental begins before it", " tb-experimental-t")
             + '</div>')
@@ -679,9 +709,10 @@ def _view(builds, rels, moments, years, now, patch_pages, hidden):
     since = f"{years[0]} to now" if years else "no builds yet"
     p = [f'<div class="tb-view" data-fix="{"hide" if hidden else "all"}"{"" if hidden else " hidden"}>']
     p.append(builds_calendar(builds, rels, years, patch_pages, fix_switch=fix_toggle(hidden)))
+    # From / To over everything under the calendar (owner 2026-11-10: the answer and Each patch follow the years too)
+    p.append(year_filter(years))
     p.append(answer_strip(medians(major_groups, now), since))
     p.append(patch_card(groups, now, major_groups))
-    p.append(year_filter(years))
     p.append(weekly_card(builds, rels, now, moments, groups, major_groups))
     p.append('<div class="tb-charts">')
     p.append(when_card("Hour of day, UTC", {br: hour_counts(builds, br) for br in BRANCHES},
@@ -694,11 +725,24 @@ def _view(builds, rels, moments, years, now, patch_pages, hidden):
     return "\n".join(p)
 
 
-def render_panel(builds, history, now=None, patch_pages=()):
+def since_staging(builds, history):
+    """The tab covers the time Staging exists (owner 2026-11-10: the years before it, Experimental alone, were a mess):
+    the builds from the first Staging build on, the patches released after it. No Staging build yet: everything."""
+    staging = [b["time"] for b in builds if b["branch"] == "staging"]
+    if not staging:
+        return builds, history
+    start = min(staging)
+    kept = [r for r in history if datetime.strptime(r["date"], "%d.%m.%Y").date() >= start.date()]
+    return [b for b in builds if b["time"] >= start], kept
+
+
+def render_panel(builds, history, now=None, patch_pages=(), from_staging=False):
     """The whole tab's HTML, built as the Patches view: the calendar of builds on top, the answer in a strip under it
     (medians over whole patches), each patch's answer as a table; then the charts with their From / To years. Twice:
     without the Staging fixes (shown first, the switch on) and with every build; calendar-builds.js swaps them."""
     now = now or datetime.now(timezone.utc)
+    if from_staging:                                      # the site's tab: Staging's time only (since_staging)
+        builds, history = since_staging(builds, history)
     rels = releases(history)
     moments = patch_moments(rels, builds)                 # the live game's builds date the patches in both views
     fixes = staging_fixes(builds, moments)
