@@ -193,3 +193,66 @@ def test_a_row_without_numbers_is_not_half_a_numbered_one():
     plain = W.row_scores("Toggling is no longer disabled by silence", {"buff"}, t("BUFF"))[0]
     assert plain == pytest.approx(W.weight_of(W.classify("Toggling is no longer disabled by silence"))
                                   * W.NUMBERLESS_W * W._DIR["buff"], abs=0.01)
+
+
+# ---- audit 2026-11-10 (docs/weights.md "Audit 2026-11-10") -------------------------------------
+
+def test_hero_mana_cost_is_half_of_signal_j():
+    """Blind judges rated mana-cost rows at half of what J gave them ("Mana Cost 25 -> 0" was +2.96)."""
+    net = W.row_scores("Mana Cost decreased from 100 to 80", {"buff"}, b(100, 80, l=True))[0]
+    assert net == pytest.approx(W._compress(W._J["mana_cost"] * W.MANA_COST_F * 20 / W.J_PCT_UNIT), abs=0.01)
+    zero = W.row_scores("Mana Cost decreased from 25 to 0", {"buff"}, b(25, 0, l=True))[0]
+    assert W.MANA_COST_F == 0.5 and zero == pytest.approx(2.22, abs=0.01)     # was the row ceiling, 2.79
+
+
+def test_mixed_rescale_is_sized_by_its_net_change():
+    """Tiny 7.38c "Movement Speed Bonus 10/20/30 -> 15" (+50/-25/-50) was sized by the max rank alone (-50%)."""
+    badge = b([10, 20, 30], 15)
+    assert W._row_pcts("Movement Speed Bonus rescaled from 10/20/30 to 15", badge) == [pytest.approx(25.0)]
+    # the net change wins when it is more than half the max-rank step
+    badge = b([20, 30, 40, 50], [60, 70, 80, 45])
+    signed = [200, 133, 100, -10]
+    assert W._row_pcts("Damage rescaled from 20/30/40/50 to 60/70/80/45", badge) == [
+        pytest.approx(sum(signed) / 4, abs=1)]
+    # one direction only: unchanged rule (max rank)
+    assert W._row_pcts("Damage increased from 10/20/30 to 20/30/40", b([10, 20, 30], [20, 30, 40])) == [33.0]
+
+
+def test_own_illusions_are_not_niche_but_damage_to_illusions_is():
+    badge = b(30, 20)
+    core = W.row_scores("Illusion Damage decreased from 30% to 20%", {"nerf"}, badge)[0]
+    plain = W.row_scores("Damage decreased from 30% to 20%", {"nerf"}, badge)[0]
+    target = W.row_scores("Damage to illusions decreased from 30% to 20%", {"nerf"}, badge)[0]
+    assert core == pytest.approx(plain, abs=0.01)
+    assert target == pytest.approx(plain * W.NICHE_W, abs=0.01)
+    creeps = W.row_scores("Creep damage decreased from 30% to 20%", {"nerf"}, badge)[0]
+    assert creeps == pytest.approx(plain * W.NICHE_W, abs=0.01)
+
+
+@pytest.mark.parametrize("text,kind", [
+    ("Trap vision radius decreased from 400 to 250", "vision"),
+    ("Vision and True Sight radius increased from 500 to 600", "vision"),
+    ("Daytime Vision Range increased from 1600 to 1800", "vision"),
+    ("Radius increased from 300 to 400", "range"),
+])
+def test_vision_radius_is_vision(text, kind):
+    assert W.classify(text) == kind
+
+
+def test_adoption_window_runs_past_a_sub_patch_days_later():
+    """7.41a came 4 days after 7.41: 7.41 had no window, so its reworks had no signal R."""
+    import sys
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import fetch_item_adoption as F
+    day = 86400
+    rel = [(0, "A"), (30 * day, "B"), (34 * day, "Bb"), (60 * day, "C")]
+    got = {v: (lo, t, hi) for v, lo, t, hi in F.windows(rel)}
+    assert got["B"] == (9 * day, 30 * day, 51 * day)      # after-window runs on past Bb, 21 days
+    assert "Bb" not in got                                # its before-window is the short one
+
+
+def test_741_has_signal_r_data():
+    import json
+    for name in ("hero_adoption.json", "item_adoption.json"):
+        doc = json.load(open(os.path.join(ROOT, "data", "rules", name), encoding="utf-8"))
+        assert "7.41" in doc["versions"]

@@ -38,12 +38,20 @@ def _ts(d):
     return int(dt.datetime.strptime(d, "%d.%m.%Y").replace(tzinfo=dt.timezone.utc).timestamp())
 
 
-def windows():
-    rel = sorted(((_ts(r["date"]), r["version"]) for r in RELEASE_HISTORY if r.get("date")))
+def windows(rel=None):
+    """(version, lo, t, hi) per patch. A sub-patch that came out less than MIN_DAYS after a patch is joined to it:
+    the after-window runs on past the sub-patch (7.41 -> 7.41a 4 days later, audit 2026-11-10: without it the 67
+    reworked heroes of 7.41, the biggest patch, had no signal R while every other patch's reworks did). The sub-patch
+    itself has no window then (its before-window is the short one)."""
+    if rel is None:
+        rel = sorted(((_ts(r["date"]), r["version"]) for r in RELEASE_HISTORY if r.get("date")))
     day = 86400
     for i, (t, v) in enumerate(rel):
         lo = max(t - WINDOW_DAYS * day, rel[i - 1][0] if i else 0)
-        hi = min(t + WINDOW_DAYS * day, rel[i + 1][0] if i + 1 < len(rel) else t + WINDOW_DAYS * day)
+        j = i + 1
+        while j < len(rel) and rel[j][0] - t < MIN_DAYS * day:
+            j += 1                                   # a sub-patch days later: the window runs on past it
+        hi = min(t + WINDOW_DAYS * day, rel[j][0] if j < len(rel) else t + WINDOW_DAYS * day)
         if t - lo >= MIN_DAYS * day and hi - t >= MIN_DAYS * day:
             yield v, lo, t, hi
 

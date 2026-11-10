@@ -308,8 +308,8 @@ REWORK rows get (dlog − 0.41 × net − 0.13), minus the 0.21 meta noise, / 0.
 ±3. Changed cells: Orb of Corrosion 7.38 −3.84 → −0.84 (bought ×2.85 despite ~1000 g of stats lost: the new
 Corrosion), Drum of Endurance 7.38 −2.76 → −0.90, Mask of Madness 7.41e −0.80 → −0.33, Shiva's Guard 7.39
 0 → −0.29, Consecrated Wraps 7.41b −1.08 → −1.10; the other 8 reworks with data are within the noise.
-Against OpenDota (independent): ρ 0.202 → 0.207. Patches without a match database window (7.41: 7.41a came 4 days
-later; the newest patch until ~5 days of games) keep REWORK = 0 until `tools/refresh_weights_data.py` runs.
+Against OpenDota (independent): ρ 0.202 → 0.207. Patches without a match database window (the newest patch until ~5 days of games;
+7.41 has one since 2026-11-10: a sub-patch days later is joined to it, see "Audit 2026-11-10") keep REWORK = 0 until `tools/refresh_weights_data.py` runs.
 
 ### Signal R for heroes (2026-09-26)
 
@@ -635,3 +635,49 @@ No real gain (the bar was +0.08 over ridge with the interval clear of 0). More f
 in-sample and 0.08 on new patches. In 4 of 16 windows even the formula goes the other way (7.39c −0.37). The site needs a
 weight per row, which an additive (linear) score gives and trees do not. Not adopted; Fable 5.1's independent read agreed.
 Scripts and per-window numbers were kept outside the repository (session scratchpad).
+
+## Audit 2026-11-10 — mana costs, mixed rescales, own illusions, 7.41 signal R
+
+Every scored row of the 24 annotated patches (7.08, 7.37 → 7.41f; 7001 rows) was dumped with its type, context
+and score. New blind sample: 200 hero buff/nerf rows, stratified by the classes under suspicion (60 anchors,
+40 mixed rescales, 35 mana costs, 25 talents, 25 illusion / creep / building rows, 15 "per X" coefficients),
+graded 1–5 by two independent judges (Sonnet, pro analyst and Immortal coach personas; judge vs judge ρ 0.68).
+"Over-rated" = (class mean |score| / anchor mean) ÷ (class mean grade / anchor mean); 1.00 = fair.
+
+| class | over-rated before | after | ρ inside the class before → after |
+|---|---|---|---|
+| mana cost | 1.98× | 1.18× | 0.65 → 0.64 |
+| mixed rescale (some levels up, some down) | 1.27× | 1.03× | −0.14 → +0.15 |
+| illusion / creep / building rows | 0.60× | 0.88× | −0.01 → +0.24 |
+| talents | 1.16× | unchanged | 0.19 |
+| "per X" coefficients | 1.19× | unchanged | 0.52 |
+
+Agreement (Spearman ρ of |score| vs grade): new sample **0.245 → 0.418**; the 2026-09-17 sample (another judge,
+97 hero rows matched) **0.446 → 0.486** — the fixes were chosen on the new sample and checked on the old one.
+
+1. **Hero mana costs ×0.5** (`MANA_COST_F`): signal J values +1 % of a mana cost at 1.35, more than cooldown
+   (1.17); the judges put mana-cost rows well below cooldown and damage rows. "Mana Cost decreased from 25 to 0"
+   +2.96 → +2.35; Timbersaw 7.41a (two Chakram mana rows) +5.75 → +4.12. Items already price mana in gold.
+2. **Mixed rescales** (`_row_pcts`, `MIXED_MIN_SHARE`): when some levels gained and others lost, the size is the
+   net change over the levels (mean of the signed %), never less than half the max-rank step. Before it was the
+   max rank alone: Tiny 7.38c "Movement Speed Bonus 10/20/30 → 15" (+50 / −25 / −50) −2.64 → −1.74.
+3. **Own illusions are not niche** (`_NICHE_RE`): ×0.5 stays for buildings, towers, Roshan, creeps, neutrals, a
+   sub-ability, and for illusions only as the target ("damage to illusions", "illusion vision"). Terrorblade
+   7.40 "Illusion Damage 30/40/50/60 % → 20/25/30/35 %" −1.03 → −2.07; Phantom Lancer 7.37 −4.83 → −7.83.
+4. **Vision radius is vision** (classifier): "Trap vision radius 400 → 250" was a radius (−2.40), now −0.26.
+5. **Signal R for 7.41** (`tools/fetch_item_adoption.py windows()`): 7.41a came 4 days after 7.41, so 7.41 had
+   no after-window (≥ 5 days) and its 67 reworked hero cells and 22 item cells had no direction while every
+   other patch's reworks had one. A sub-patch less than 5 days later is now joined: the window runs on past it
+   (7.41: 21 days before, 14 after, 2589 / 1888 player-games); the sub-patch has no window of its own. The
+   refresh also picked up the 7.39 date fix (22.05.2025) and a few re-counted matches (±10 games).
+
+Effect: 351 cells move by more than 0.1 (344 hero, 7 item), 59 of them in 7.41. Largest: 7.41 Tiny +6.13 →
++1.53 and Warlock +5.58 → +1.20 (signal R: their pick share rose far less than their rows promise), 7.37
+Phantom Lancer −4.83 → −7.83, 7.41 Monkey King +0.13 → +2.60, 7.39c Templar Assassin −2.85 → −0.71.
+`corr(w, buff − nerf)` 0.817 → 0.811.
+
+Checked and fine: identical rows of different heroes weigh the same (the only spread is skill priority); no
+BUFF row with a negative score or the reverse; item gold scale differences between items are by design (the same
++25 Attack Speed is 4.24 on Orb of Corrosion and 0.77 on Gleipnir: a share of the item's cost).
+Not changed: signal R's fit (slope 0.135, drift 0.095) was made with the old nets; re-fitting it on the new ones
+is open.

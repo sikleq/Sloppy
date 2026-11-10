@@ -10,6 +10,8 @@
   J          — signal J (exchange rate from Valve's own buff<->nerf compensations, 3 865 pairs):
                value of +1% of a type. For rows with % badges the value is
                u[type] × mean|%| / 20 — this REPLACES weight × magnitude there (24 types).
+               Hero mana costs at half of J (MANA_COST_F, audit 2026-11-10); a mixed rescale (some
+               levels up, some down) is sized by its net change, at least half the max-rank step.
   weight     — data/rules/valve_weights.json "final" (consensus shrunk towards `other`
                when fewer than 3 signals back the type: w = other + (raw − other) × n/3).
   direction  — +1 buff, −1 nerf, ±0.5 new/del (only when it is the row's sole tag),
@@ -76,7 +78,8 @@ CAT = [
     ("base_damage", r"base damage|attack damage|damage at level"),
     ("charges", r"charge|stack|max attacks|attacks to"),
     ("gold_xp", r"gold|bounty|experience|\bxp\b"), ("respawn", r"respawn|reincarnat"),
-    ("vision", r"vision|sight|reveal"),
+    # "Trap vision radius" / "Vision and True Sight radius" is vision, not the radius of an effect (audit 2026-11-10)
+    ("vision", r"vision(?:[\w ]*?(?:radius|range))?|sight|reveal"),
     ("cost", r"recipe cost|total cost|(?<!health )\bcost\b|price"),   # a spell's health cost = health
     ("damage", r"damage|dmg|dps|burn|cleave"),
     ("duration", r"duration|\btime\b|lasts|linger|channel"),
@@ -107,12 +110,22 @@ def _row_pcts(text, badge_html):
         if _re.search(r"total cost unchanged", _plain(text), _re.I):
             return [found[0][1]]
         return [found[-1][1]]
+    pcts = [v for _, v in found]
     if len(found) >= 2:
         overall = _OVERALL_RE.search(badge_html or "")
         last = next(((c, v) for c, v in reversed(found) if c != "neutral"), None)
         if last and overall and last[0] == overall.group(1):
-            return [last[1]]
-    return [v for _, v in found]
+            pcts = [last[1]]
+    if {c for c, _ in found} >= {"buff", "nerf"}:
+        # Mixed rescale (audit 2026-11-10, Tiny "Movement Speed Bonus 10/20/30 -> 15": +50/-25/-50 scored by the
+        # max rank -50% = -2.64): some levels gained, others lost, so the size is the NET change over the levels,
+        # never less than half the max-rank step (blind judges: 1.27x over-rated -> 1.03x)
+        signed = [v if c == "buff" else (-v if c == "nerf" else 0.0) for c, v in found]
+        return [max(abs(sum(signed) / len(signed)), MIXED_MIN_SHARE * max(pcts))]
+    return pcts
+
+
+MIXED_MIN_SHARE = 0.5
 _DIR = {"buff": 1.0, "nerf": -1.0}
 
 
@@ -603,6 +616,11 @@ def _item_row_scores(text, tags, ctx):
 
 _J = _WJ.get("J", {}).get("u", {})       # signal J: value of +1% of the type (exchange rate)
 J_PCT_UNIT = 20.0                        # a 20% change of a u=1 type = 1.0
+# A spell's mana cost on signal J (1.35 per 1 %) was rated 1.98x of what two blind judges gave it next to the
+# other rows (audit 2026-11-10, 35 rows; "Mana Cost 25 -> 0" +2.96, Timbersaw 7.41a +5.75 for two mana rows);
+# x0.5 brings it to 1.18x and lifts agreement on both samples (0.245 -> 0.359 new, 0.446 -> 0.477 old judge).
+# Items price mana costs in gold already (docs/weights.md "Mana costs — rule").
+MANA_COST_F = 0.5
 
 
 _ABS_FROMTO_RE = _re.compile(r"from\s+([+\-\d./%s x]+?)\s+to\s+([+\-\d./%s x]+?)(?=[\s.,;)]|$)", _re.I)
@@ -650,9 +668,14 @@ def _compress(x):
     return x if x <= 1.0 else 1.0 + math.log(min(x, 6.0))
 
 
-# Numbers that act on buildings, illusions, creeps, a sub-ability — not on the enemy heroes (x0.5;
+# Numbers that act on buildings, creeps, a sub-ability — not on the enemy heroes (x0.5;
 # 2026-09-26: "Skeleton Building Damage penalty 25% -> 75%" scored -3.63; judge rho +0.007).
-_NICHE_RE = _re.compile(r"building|structure|tower|sub-ability|illusion|creep|neutral|roshan", _re.I)
+# Illusions only as the TARGET ("damage to illusions", "illusion vision penalty"): the hero's OWN illusions
+# are the kit of Phantom Lancer, Terrorblade, Naga, Spectre (audit 2026-11-10: the class was rated 0.60x of
+# what blind judges gave it; "Terrorblade Illusion Damage 30/40/50/60% -> 20/25/30/35%" weighed -1.03).
+_NICHE_RE = _re.compile(r"building|structure|tower|sub-ability|creep|neutral|roshan"
+                        r"|\b(?:to|against|vs\.?|on|by|from)\s+(?:enemy\s+|allied\s+|other\s+)?illusions?\b"
+                        r"|illusion vision", _re.I)
 NICHE_W = 0.5
 # A buff/nerf row with no number at all ("can now be cast while channeling") was scored by the bare
 # type weight — half of what a blind judge gives it next to numbered rows (2026-09-26, 115 such hero
@@ -674,7 +697,8 @@ def _row_value_raw(text, badge_html, kind, ctx):
     pcts = _row_pcts(text, badge_html)
     damp = _small_change_damp(text)
     if pcts and kind in _J:
-        return _compress(_J[kind] * (sum(pcts) / len(pcts)) / J_PCT_UNIT) * damp
+        u = _J[kind] * (MANA_COST_F if kind == "mana_cost" else 1.0)
+        return _compress(u * (sum(pcts) / len(pcts)) / J_PCT_UNIT) * damp
     if pcts:
         return weight_of(kind) * _compress((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0)) * damp
     if not _re.search(r"\d", _plain(text)):
