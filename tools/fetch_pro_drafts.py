@@ -31,6 +31,7 @@ BASE = "https://api.steampowered.com/IDOTA2Match_570/"
 UA = "SloppyResearch/1.0 (https://github.com/sikleq/Sloppy)"
 PAUSE = 1.05                  # seconds between calls (Valve: 100 000 calls a day per key)
 RETRIES = 4
+CAPTAINS_MODE = 2
 GIVE_UP = 30                  # a league with no draft in its first 30 matches is not captains-mode play (an open
                               # qualifier of ESL One Katowice 2018: 8 drafts in 500 matches), the rest is skipped
 
@@ -101,9 +102,10 @@ def league_matches(api, league_id):
 
 
 def store_match(con, rec, league_id):
-    """Write one match's record (from GetMatchHistoryBySequenceNum); False when it has no draft."""
+    """Write one match's record (from GetMatchHistoryBySequenceNum); False when it is not a Captains Mode draft
+    (Captains Draft 16 and other modes also list bans, but are not what pros play)."""
     pb = rec.get("picks_bans") or []
-    if not pb or rec.get("radiant_win") is None:
+    if not pb or rec.get("radiant_win") is None or rec.get("game_mode") != CAPTAINS_MODE:
         return False
     con.execute("INSERT OR REPLACE INTO matches VALUES (?, ?, ?, ?, ?, ?)",
                 (rec["match_id"], league_id, rec.get("start_time"), int(bool(rec["radiant_win"])),

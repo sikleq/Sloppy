@@ -84,6 +84,13 @@ def test_retry_missing_recovers_server_errors_but_not_matches_without_a_draft(tm
     assert asked == [102]                                              # "no draft" is never asked again
 
 
+def test_store_match_keeps_only_captains_mode(tmp_path):
+    con = F.connect(str(tmp_path / "d.sqlite"))
+    assert F.store_match(con, dict(_rec(1), game_mode=16), 7) is False     # Captains Draft also has bans
+    assert F.store_match(con, _rec(2), 7) is True
+    assert con.execute("SELECT match_id FROM matches").fetchall() == [(2,)]
+
+
 def test_fetch_league_keeps_only_the_date_range(tmp_path):
     hist = [{"match_id": m, "match_seq_num": 100 + m, "start_time": t} for m, t in ((2, 5000), (1, 50))]
     api = FakeApi(hist, {102: _rec(2), 101: _rec(1)})
