@@ -66,7 +66,7 @@ def test_the_patch_info_is_a_folded_card_above_the_filters():
     assert html.startswith('<div class="pinfo-card" id="pinfo-card"><a class="pi-official" '
                            'href="https://www.dota2.com/patches/7.38"')
     assert '<span>Released</span><span class="pi-val"><b>19.02.2025</b> 00:53 UTC</span>' in html
-    assert '<span>Ran</span><span class="pi-val"><b>14</b> days</span>' in html
+    assert '<span>Ran</span><span class="pi-val"><b>15</b> days</span>' in html     # 7.38b: 06.03.2025 since 11-11
     from patch.elements import section
     from patch.state import _State
     _State.patch_info, _State.section_panel_open = html, False

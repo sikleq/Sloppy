@@ -10,19 +10,21 @@ import patch.site_common as _site
 # Major-patch dates from odota/dotaconstants. Sub-patches sourced from Liquipedia
 # and Fandom. Add new entries anywhere — the list is re-sorted NEWEST-FIRST right
 # below (PATCHES[0], rosters, Mana Items history and the Dynamics columns rely on it).
+# A date is the UTC day the live game got the patch's own build when the builds log has it (owner 2026-11-11: "сделай
+# как лучше"; patch/branch_builds.release_time, tests/test_patch_release_time.py) — 21 dates moved by a day then.
 RELEASE_HISTORY = [
     # 7.41 cycle
     {"version": "7.41f", "date": "15.09.2026", "filename": "patches/7.41f.html"},
-    {"version": "7.41e", "date": "30.07.2026", "filename": "patches/7.41e.html"},
-    {"version": "7.41d", "date": "04.06.2026", "filename": "patches/7.41d.html"},
+    {"version": "7.41e", "date": "31.07.2026", "filename": "patches/7.41e.html"},
+    {"version": "7.41d", "date": "05.06.2026", "filename": "patches/7.41d.html"},
     {"version": "7.41c", "date": "06.05.2026", "filename": "patches/7.41c.html"},
     {"version": "7.41b", "date": "07.04.2026", "filename": "patches/7.41b.html"},
-    {"version": "7.41a", "date": "28.03.2026", "filename": "patches/7.41a.html"},
+    {"version": "7.41a", "date": "27.03.2026", "filename": "patches/7.41a.html"},
     {"version": "7.41",  "date": "24.03.2026", "filename": "patches/7.41.html"},
     # 7.40 cycle
-    {"version": "7.40c", "date": "21.01.2026", "filename": "patches/7.40c.html"},
+    {"version": "7.40c", "date": "22.01.2026", "filename": "patches/7.40c.html"},
     {"version": "7.40b", "date": "23.12.2025", "filename": "patches/7.40b.html"},
-    {"version": "7.40",  "date": "15.12.2025", "filename": "patches/7.40.html"},
+    {"version": "7.40",  "date": "16.12.2025", "filename": "patches/7.40.html"},
     # 7.39 cycle
     {"version": "7.39e", "date": "02.10.2025", "filename": "patches/7.39e.html"},
     {"version": "7.39d", "date": "05.08.2025", "filename": "patches/7.39d.html"},
@@ -31,46 +33,46 @@ RELEASE_HISTORY = [
     {"version": "7.39",  "date": "22.05.2025", "filename": "patches/7.39.html"},
     # 7.38 cycle
     {"version": "7.38c", "date": "27.03.2025", "filename": "patches/7.38c.html"},
-    {"version": "7.38b", "date": "05.03.2025", "filename": "patches/7.38b.html"},
+    {"version": "7.38b", "date": "06.03.2025", "filename": "patches/7.38b.html"},
     {"version": "7.38",  "date": "19.02.2025"},
     # 7.37 cycle
-    {"version": "7.37e", "date": "19.11.2024"},
-    {"version": "7.37d", "date": "01.10.2024"},
+    {"version": "7.37e", "date": "20.11.2024"},
+    {"version": "7.37d", "date": "02.10.2024"},
     {"version": "7.37c", "date": "28.08.2024"},
     {"version": "7.37b", "date": "14.08.2024"},
     {"version": "7.37",  "date": "31.07.2024"},
     # 7.36 cycle
-    {"version": "7.36c", "date": "24.06.2024"},
-    {"version": "7.36b", "date": "05.06.2024"},
-    {"version": "7.36a", "date": "26.05.2024"},
-    {"version": "7.36",  "date": "22.05.2024"},
+    {"version": "7.36c", "date": "25.06.2024"},
+    {"version": "7.36b", "date": "06.06.2024"},
+    {"version": "7.36a", "date": "27.05.2024"},
+    {"version": "7.36",  "date": "23.05.2024"},
     # 7.35 cycle
     {"version": "7.35d", "date": "21.03.2024"},
-    {"version": "7.35c", "date": "21.02.2024"},
+    {"version": "7.35c", "date": "22.02.2024"},
     {"version": "7.35b", "date": "21.12.2023"},
     {"version": "7.35",  "date": "14.12.2023"},
     # 7.34 cycle
-    {"version": "7.34e", "date": "20.11.2023"},
+    {"version": "7.34e", "date": "21.11.2023"},
     {"version": "7.34d", "date": "05.10.2023"},
-    {"version": "7.34c", "date": "08.09.2023"},
-    {"version": "7.34b", "date": "14.08.2023"},
+    {"version": "7.34c", "date": "09.09.2023"},
+    {"version": "7.34b", "date": "15.08.2023"},
     {"version": "7.34",  "date": "08.08.2023"},
     # 7.33 cycle
     {"version": "7.33e", "date": "13.07.2023"},
-    {"version": "7.33d", "date": "15.06.2023"},
+    {"version": "7.33d", "date": "16.06.2023"},
     {"version": "7.33c", "date": "13.05.2023"},
-    {"version": "7.33b", "date": "25.04.2023"},
+    {"version": "7.33b", "date": "26.04.2023"},
     {"version": "7.33",  "date": "20.04.2023"},
     # 7.32 cycle
-    {"version": "7.32e", "date": "07.03.2023"},
+    {"version": "7.32e", "date": "06.03.2023"},
     {"version": "7.32d", "date": "29.11.2022"},
     {"version": "7.32c", "date": "27.09.2022"},
     {"version": "7.32b", "date": "30.08.2022"},
-    {"version": "7.32",  "date": "24.08.2022"},
+    {"version": "7.32",  "date": "23.08.2022"},
     # 7.31 cycle
     {"version": "7.31d", "date": "08.06.2022"},
     {"version": "7.31c", "date": "04.05.2022"},
-    {"version": "7.31b", "date": "28.02.2022"},
+    {"version": "7.31b", "date": "01.03.2022"},
     {"version": "7.31",  "date": "23.02.2022"},
     # 7.30 cycle
     {"version": "7.30e", "date": "28.10.2021"},

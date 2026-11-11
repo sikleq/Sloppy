@@ -1,7 +1,7 @@
 from patch.api import *
 
 def build():
-    write_head("7.41e", "30.07.2026")
+    write_head("7.41e", "31.07.2026")
 
     # 7.41e — auto-generated from data/7.41e_datafeed.json (tools/generate_patch_code_v2.py)
     # then hand-reviewed: recipe-cost rows with unchanged total moved to the

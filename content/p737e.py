@@ -1,7 +1,7 @@
 from patch.api import *
 
 def build():
-    write_head("7.37e", "19.11.2024")
+    write_head("7.37e", "20.11.2024")
 
     # ===== ITEM UPDATES =====
     W(section("Item Updates"))

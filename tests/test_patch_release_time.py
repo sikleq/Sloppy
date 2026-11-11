@@ -58,6 +58,30 @@ def test_the_patch_card_says_the_minute_and_old_patches_their_date():
     assert '<span class="pi-val"><b>01.02.2018</b></span>' in patch_info_html("7.08", "01.02.2018")
 
 
+def test_every_date_is_the_utc_day_of_its_live_build():
+    # owner 2026-11-11 ("сделай как лучше"): one clock for the date and the minute; 21 dates moved then (7.40: 15.12 ->
+    # 16.12.2025, out at 00:10 UTC; 7.36b, 7.38b were a day early)
+    from patch.meta import RELEASE_HISTORY
+    wrong = [(r["version"], r["date"], bb.release_time(r["version"]).strftime("%d.%m.%Y")) for r in RELEASE_HISTORY
+             if bb.release_time(r["version"]) and bb.release_time(r["version"]).strftime("%d.%m.%Y") != r["date"]]
+    assert wrong == []
+
+
+def test_page_heads_and_the_map_history_carry_the_same_dates():
+    import json
+    import re
+    from patch.meta import RELEASE_HISTORY
+    dates = {r["version"]: r["date"] for r in RELEASE_HISTORY}
+    for f in (ROOT / "content").glob("p*.py"):
+        m = re.search(r'write_head\("([^"]+)", "([0-9.]+)"\)', f.read_text(encoding="utf-8"))
+        if m and m.group(1) in dates:
+            assert m.group(2) == dates[m.group(1)], f.name
+    for e in json.loads((ROOT / "data" / "map" / "map_history.json").read_text(encoding="utf-8"))["patches"]:
+        if e.get("patch") in dates and e.get("date"):
+            y, mo, d = e["date"].split("-")
+            assert f"{d}.{mo}.{y}" == dates[e["patch"]], e["patch"]
+
+
 def test_new_patch_records_the_client_version():
     text = (ROOT / "tools" / "new_patch.py").read_text(encoding="utf-8")
     assert 'Step("client_version"' in text and "build_patch_client_versions.py" in text

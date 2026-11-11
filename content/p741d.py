@@ -1,7 +1,7 @@
 from patch.api import *
 
 def build():
-    write_head("7.41d", "04.06.2026")
+    write_head("7.41d", "05.06.2026")
 
     # 7.41d — auto-generated from data/7.41d_datafeed.json (tools/generate_patch_code_v2.py)
     # then hand-reviewed: cooldown/timer rows promoted from MISC to numeric badges

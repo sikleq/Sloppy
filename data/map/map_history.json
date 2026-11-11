@@ -1333,7 +1333,7 @@
 },
 {
 "patch": "7.31b",
-"date": "2022-02-28",
+"date": "2022-03-01",
 "sha8": "2824d065",
 "same_as": "7.31"
 },
@@ -1373,7 +1373,7 @@
 },
 {
 "patch": "7.32",
-"date": "2022-08-24",
+"date": "2022-08-23",
 "sha8": "7aa57609",
 "changes": "trees +57 −44; camps +0 −2; camp spawn boxes +1 −3; bounty runes moved: 1; outposts moved: 1",
 "n": {
@@ -1460,7 +1460,7 @@
 },
 {
 "patch": "7.32e",
-"date": "2023-03-07",
+"date": "2023-03-06",
 "sha8": "ff89b0d9",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -1566,7 +1566,7 @@
 },
 {
 "patch": "7.33b",
-"date": "2023-04-25",
+"date": "2023-04-26",
 "sha8": "04af1613",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -1627,7 +1627,7 @@
 },
 {
 "patch": "7.33d",
-"date": "2023-06-15",
+"date": "2023-06-16",
 "sha8": "ff01e294",
 "same_as": "7.33c"
 },
@@ -1678,13 +1678,13 @@
 },
 {
 "patch": "7.34b",
-"date": "2023-08-14",
+"date": "2023-08-15",
 "sha8": "e4712e67",
 "same_as": "7.34"
 },
 {
 "patch": "7.34c",
-"date": "2023-09-08",
+"date": "2023-09-09",
 "sha8": "825b4fa4",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -1740,7 +1740,7 @@
 },
 {
 "patch": "7.34e",
-"date": "2023-11-20",
+"date": "2023-11-21",
 "sha8": "689ba8d2",
 "same_as": "7.34d"
 },
@@ -1789,7 +1789,7 @@
 },
 {
 "patch": "7.35c",
-"date": "2024-02-21",
+"date": "2024-02-22",
 "sha8": "29af3d9b",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -1823,7 +1823,7 @@
 },
 {
 "patch": "7.36",
-"date": "2024-05-22",
+"date": "2024-05-23",
 "sha8": "35eaa445",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -1851,19 +1851,19 @@
 },
 {
 "patch": "7.36a",
-"date": "2024-05-26",
+"date": "2024-05-27",
 "sha8": "35eaa445",
 "same_as": "7.36"
 },
 {
 "patch": "7.36b",
-"date": "2024-06-05",
+"date": "2024-06-06",
 "sha8": "35eaa445",
 "same_as": "7.36"
 },
 {
 "patch": "7.36c",
-"date": "2024-06-24",
+"date": "2024-06-25",
 "sha8": "35eaa445",
 "same_as": "7.36"
 },
@@ -1909,7 +1909,7 @@
 },
 {
 "patch": "7.37d",
-"date": "2024-10-01",
+"date": "2024-10-02",
 "sha8": "7ae179cb",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -1937,7 +1937,7 @@
 },
 {
 "patch": "7.37e",
-"date": "2024-11-19",
+"date": "2024-11-20",
 "sha8": "7216d111",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -2028,7 +2028,7 @@
 },
 {
 "patch": "7.38b",
-"date": "2025-03-05",
+"date": "2025-03-06",
 "sha8": "d92126db",
 "changes": "trees +2 −11",
 "n": {
@@ -2289,7 +2289,7 @@
 },
 {
 "patch": "7.40",
-"date": "2025-12-15",
+"date": "2025-12-16",
 "sha8": "cb69e349",
 "changes": "trees +239 −293; camps moved: 9; towers moved: 1; watchers +4 −8; wisdom shrines moved: 2",
 "n": {
@@ -2341,7 +2341,7 @@
 },
 {
 "patch": "7.40c",
-"date": "2026-01-21",
+"date": "2026-01-22",
 "sha8": "e84183fb",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -2420,7 +2420,7 @@
 },
 {
 "patch": "7.41a",
-"date": "2026-03-28",
+"date": "2026-03-27",
 "sha8": "dbb3027e",
 "changes": "trees +0 −1",
 "n": {
@@ -2487,7 +2487,7 @@
 },
 {
 "patch": "7.41d",
-"date": "2026-06-04",
+"date": "2026-06-05",
 "sha8": "9b4ca69f",
 "changes": "no object moved (the map file still changed)",
 "n": {
@@ -2515,7 +2515,7 @@
 },
 {
 "patch": "7.41e",
-"date": "2026-07-30",
+"date": "2026-07-31",
 "sha8": "f049eadf",
 "changes": "no object moved (the map file still changed)",
 "n": {

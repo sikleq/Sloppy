@@ -46,10 +46,20 @@ def first_notes_build(clone, version, day, next_version, max_gap_days):
     return None
 
 
+def _store_module(name):
+    """A module of the store's tools/ folder, loaded by path (it imports its neighbours, so the folder joins sys.path)."""
+    import importlib.util
+    folder = STORE / "tools"
+    sys.path.insert(0, str(folder))
+    spec = importlib.util.spec_from_file_location(f"store_{name}", folder / f"{name}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def find_all(versions=None):
     """{version: ClientVersion} for the patches the archives hold (all of RELEASE_HISTORY, or only `versions`)."""
-    sys.path.insert(0, str(STORE / "tools"))
-    import builds as store_builds                       # the store's own module: archives, Clone.has_notes
+    store_builds = _store_module("builds")             # the store's own module: archives, Clone.has_notes
     b = store_builds.Builds()
     names = [p["version"] for p in b.history]           # newest first
     out = {}

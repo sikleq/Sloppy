@@ -1,7 +1,7 @@
 from patch.api import *
 
 def build():
-    write_head("7.38b", "05.03.2025")
+    write_head("7.38b", "06.03.2025")
 
     W(section("General Updates"))
     W(ul_open())

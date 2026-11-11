@@ -4,7 +4,7 @@ from patch.api import *
 _NC_CDN = "../icons/units/npc_dota_neutral_"
 
 def build():
-    write_head("7.40", "15.12.2025")
+    write_head("7.40", "16.12.2025")
 
     # ===== GENERAL UPDATES =====
     W(section("General Updates"))

@@ -46,7 +46,7 @@ def test_cells_show_added_removed_and_moved():
     assert '<span class="ts-moved">7 moved</span>' in row and '<span class="ts-moved">2 moved</span>' in row
     assert "What moved" not in table and "picture" not in table
     assert 'src="icons/maps/thumbs/' in table and 'class="ts-thumb"' in table
-    assert 'icons/ui/gothic/tc_shrines.png' in table and ">28-03-26<" in table
+    assert 'icons/ui/gothic/tc_shrines.png' in table and ">27-03-26<" in table   # 7.41a: 27.03 since 11-11
     for f in files:                                                    # every square and icon is there
         assert os.path.exists(os.path.join(_ROOT, "icons", "maps", "thumbs", f["sha8"] + ".webp")), f["patch"]
     for _k, _label, icon in ts.COLUMNS:
