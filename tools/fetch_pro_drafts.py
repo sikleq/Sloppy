@@ -121,7 +121,13 @@ def fetch_league(api, con, league_id, lo, hi, log=print):
         if i == GIVE_UP and not got:
             log(f"league {league_id}: no drafts in the first {GIVE_UP} matches, skipped")
             break
-        res = api.get("GetMatchHistoryBySequenceNum", start_at_match_seq_num=seq, matches_requested=1).get("result", {})
+        try:
+            res = api.get("GetMatchHistoryBySequenceNum", start_at_match_seq_num=seq, matches_requested=1)
+        except urllib.error.HTTPError as e:   # Valve keeps answering 500 for a few records: skip that match only
+            con.execute("INSERT OR REPLACE INTO missing VALUES (?, ?)", (match_id, f"http {e.code}"))
+            con.commit()
+            continue
+        res = res.get("result", {})
         rec = next((m for m in res.get("matches") or [] if m.get("match_id") == match_id), None)
         if rec and store_match(con, rec, league_id):
             got += 1
@@ -152,7 +158,10 @@ def main(argv=None):
     try:
         for lg in leagues:
             if lg["league_id"] not in done:
-                fetch_league(api, con, lg["league_id"], lo, hi)
+                try:
+                    fetch_league(api, con, lg["league_id"], lo, hi)
+                except (urllib.error.URLError, TimeoutError) as e:   # history pages failed: next run retries it
+                    print(f"league {lg['league_id']}: {getattr(e, 'code', e)}, left for the next run")
     except Stop as e:
         print("stopped:", e)
     n = con.execute("SELECT count(*) FROM matches").fetchone()[0]

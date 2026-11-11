@@ -56,6 +56,21 @@ def test_fetch_league_gives_up_on_a_league_without_drafts(tmp_path, monkeypatch)
     assert sum(1 for m, _ in api.calls if m == "GetMatchHistoryBySequenceNum") == 3
 
 
+def test_fetch_league_skips_a_match_valve_keeps_failing(tmp_path):
+    hist = [{"match_id": m, "match_seq_num": 100 + m, "start_time": 1000 + m} for m in (2, 1)]
+    api = FakeApi(hist, {101: _rec(1)})
+    real = api.get
+
+    def get(method, **p):
+        if p.get("start_at_match_seq_num") == 102:
+            raise urllib.error.HTTPError("u", 500, "err", {}, io.BytesIO(b""))
+        return real(method, **p)
+    api.get = get
+    con = F.connect(str(tmp_path / "d.sqlite"))
+    assert F.fetch_league(api, con, 7, 0, 10 ** 9, log=lambda *a: None) == 1
+    assert con.execute("SELECT match_id, reason FROM missing").fetchall() == [(2, "http 500")]
+
+
 def test_fetch_league_keeps_only_the_date_range(tmp_path):
     hist = [{"match_id": m, "match_seq_num": 100 + m, "start_time": t} for m, t in ((2, 5000), (1, 50))]
     api = FakeApi(hist, {102: _rec(2), 101: _rec(1)})
