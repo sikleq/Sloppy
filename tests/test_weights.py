@@ -197,12 +197,13 @@ def test_a_row_without_numbers_is_not_half_a_numbered_one():
 
 # ---- audit 2026-11-10 (docs/weights.md "Audit 2026-11-10") -------------------------------------
 
-def test_hero_mana_cost_is_half_of_signal_j():
+def test_hero_mana_cost_is_scaled_down_on_signal_j():
     """Blind judges rated mana-cost rows at half of what J gave them ("Mana Cost 25 -> 0" was +2.96)."""
     net = W.row_scores("Mana Cost decreased from 100 to 80", {"buff"}, b(100, 80, l=True))[0]
     assert net == pytest.approx(W._compress(W._J["mana_cost"] * W.MANA_COST_F * 20 / W.J_PCT_UNIT), abs=0.01)
     zero = W.row_scores("Mana Cost decreased from 25 to 0", {"buff"}, b(25, 0, l=True))[0]
-    assert W.MANA_COST_F == 0.5 and zero == pytest.approx(2.22, abs=0.01)     # was the row ceiling, 2.79
+    # was the row ceiling 2.79, then 2.22 at x0.5; x0.35 since 2026-11-11 (pro drafts + both judge samples)
+    assert W.MANA_COST_F == 0.35 and zero == pytest.approx(1.86, abs=0.01)
 
 
 def test_mixed_rescale_is_sized_by_its_net_change():
@@ -284,3 +285,24 @@ def test_741_has_signal_r_data():
     for name in ("hero_adoption.json", "item_adoption.json"):
         doc = json.load(open(os.path.join(ROOT, "data", "rules", name), encoding="utf-8"))
         assert "7.41" in doc["versions"]
+
+
+def test_hero_adoption_counts_picks_and_bans():
+    """Signal R for heroes reads the share of drafts that picked OR banned the hero (2026-11-11)."""
+    import sqlite3
+    import sys
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import fetch_item_adoption as A
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE matches (match_id INT, start_time INT)")
+    con.execute("CREATE TABLE draft_actions (match_id INT, ord INT, team_side INT, is_pick INT, hero_id INT)")
+    con.executemany("INSERT INTO matches VALUES (?, ?)", [(1, 100), (2, 200), (3, 900)])
+    con.executemany("INSERT INTO draft_actions VALUES (?, ?, 0, ?, ?)",
+                    [(1, 0, 0, 7), (1, 1, 1, 8), (2, 0, 1, 7), (3, 0, 1, 7)])
+    games, n = A.hero_counts(con, 0, 500, {7: "pudge", 8: "axe"})
+    assert games == 2                       # drafts in the window, not player-games
+    assert n == {"pudge": 2, "axe": 1}      # banned in match 1, picked in match 2
+    import json
+    doc = json.load(open(os.path.join(ROOT, "data", "rules", "hero_adoption.json"), encoding="utf-8"))
+    v = doc["versions"]["7.41"]
+    assert sum(b for b, _ in v["heroes"].values()) > 15 * v["games"][0]   # ~24 picks+bans per draft

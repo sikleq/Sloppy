@@ -6,8 +6,8 @@ Source: a Tier 1-2 pro match database (2024 onwards), table `purchases`
 at least once (a component bought for a different upgrade still counts: it is what pros spent on).
 Windows: up to 21 days before and after the patch date, cut at the neighbouring patches.
 
-Heroes (same windows, -> data/rules/hero_adoption.json): share of player-games that PLAYED the hero
-(match_players.hero_id; ids -> npc names from data/stats/<latest>/heroes/*.txt "HeroID").
+Heroes (same windows, -> data/rules/hero_adoption.json): share of drafts that PICKED OR BANNED the hero
+(draft_actions.hero_id; ids -> npc names from data/stats/<latest>/heroes/*.txt "HeroID").
 
 Used by patch/weights.py for an item's / a hero's REWORK rows (signal R): the direction of a reworked ability
 cannot be read from the notes, Valve's pricing or Valve's follow-up patches (docs/weights.md
@@ -79,10 +79,14 @@ def hero_names():
 
 
 def hero_counts(con, lo, hi, names):
-    games = con.execute("SELECT count(*) FROM match_players mp JOIN matches m USING(match_id) "
+    """(drafts, {hero: drafts where it was picked OR banned}) for matches started in [lo, hi).
+    Picks + bans, not picks alone (weights research 2026-11-11): a hero pros fear after a buff is banned, not
+    picked, so picks alone miss half the response; on 597 clean hero cells the pick+ban share follows the
+    weights better (rho 0.30 vs 0.27)."""
+    games = con.execute("SELECT count(DISTINCT d.match_id) FROM draft_actions d JOIN matches m USING(match_id) "
                         "WHERE m.start_time >= ? AND m.start_time < ?", (lo, hi)).fetchone()[0]
-    cur = con.execute("SELECT mp.hero_id, count(*) FROM match_players mp JOIN matches m USING(match_id) "
-                      "WHERE m.start_time >= ? AND m.start_time < ? GROUP BY mp.hero_id", (lo, hi))
+    cur = con.execute("SELECT d.hero_id, count(DISTINCT d.match_id) FROM draft_actions d JOIN matches m "
+                      "USING(match_id) WHERE m.start_time >= ? AND m.start_time < ? GROUP BY d.hero_id", (lo, hi))
     return games, {names[h]: n for h, n in cur if h in names}
 
 
@@ -114,8 +118,8 @@ def main():
     doc = __doc__.strip().split("\n\n")[0] + (" items: slug -> [player-games that bought it before, after]; "
                                                 "games: all player-games in the two windows.")
     write(OUT, doc, out)
-    write(OUT_HEROES, "Tier 1-2 pro pick counts per hero, before/after every patch (the match database, tools/fetch_item_adoption.py). "
-          "heroes: npc name -> [player-games on the hero before, after]; games: all player-games.", out_h)
+    write(OUT_HEROES, "Tier 1-2 pro pick+ban counts per hero, before/after every patch (the match database, tools/fetch_item_adoption.py). "
+          "heroes: npc name -> [drafts that picked or banned the hero before, after]; games: all drafts.", out_h)
     print(len(out), "patch windows ->", OUT)
     return 0
 

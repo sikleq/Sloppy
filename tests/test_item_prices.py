@@ -161,7 +161,7 @@ def test_item_mana_cost_is_the_mana_in_gold_not_its_percent():
     # hero spells keep signal J
     hero = W.row_scores("Mana Cost decreased from 75 to 25", {"buff"}, b(75, 25, l=True),
                         {"kind": "hero", "version": "7.38"})[0]
-    assert hero > 1.5
+    assert hero > 1.0 and hero > 3 * net        # x MANA_COST_F 0.35 since 2026-11-11: 1.46
 
 
 def test_mana_cost_reduction_stat_is_not_a_mana_cost_row():

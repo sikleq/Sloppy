@@ -655,7 +655,7 @@ graded 1–5 by two independent judges (Sonnet, pro analyst and Immortal coach p
 Agreement (Spearman ρ of |score| vs grade): new sample **0.245 → 0.418**; the 2026-09-17 sample (another judge,
 97 hero rows matched) **0.446 → 0.486** — the fixes were chosen on the new sample and checked on the old one.
 
-1. **Hero mana costs ×0.5** (`MANA_COST_F`): signal J values +1 % of a mana cost at 1.35, more than cooldown
+1. **Hero mana costs ×0.5** (`MANA_COST_F`, ×0.35 since item 10 below): signal J values +1 % of a mana cost at 1.35, more than cooldown
    (1.17); the judges put mana-cost rows well below cooldown and damage rows. "Mana Cost decreased from 25 to 0"
    +2.96 → +2.35; Timbersaw 7.41a (two Chakram mana rows) +5.75 → +4.12. Items already price mana in gold.
 2. **Mixed rescales** (`_row_pcts`, `MIXED_MIN_SHARE`): when some levels gained and others lost, the size is the
@@ -709,3 +709,52 @@ Effect of 6–8 (on top of 1–5): 480 cells move by more than 0.1 (375 hero, 10
 +0.64 → −1.50 (three aura effects lost), Gleipnir 7.38 −0.25 → −2.18, Gunpowder Gauntlet 7.38b +0.37 → +2.23,
 Khanda 7.38 −1.84 → −3.33, Refresher Orb 7.41 +1.22 → 0.00 ("no longer refreshes items" −1.39), Treant Protector
 7.40 +7.37 → +6.21. `corr(w, buff − nerf)` 0.811 → 0.783.
+
+### 2026-11-11 (later) — outcome research, picks + bans, mana, old notes
+
+Two research rounds checked the weights against what happened after each patch.
+- Round 1: a 3-patch pilot on public ranked win rates.
+- Round 2: the pro match database, 27 before/after windows from 7.35c, 1 012 changed hero cells with ≥ 20 games.
+
+Findings:
+- The direction of a cell is read well, and the size of one row adds almost nothing measurable.
+- On a held-out patch, pick + ban share follows a plain "buff rows − nerf rows" count. Sign accuracy and explained
+  variance for the count, the weights (without R), ridge on types and a pooled model on types:
+  - count: 66.1 %, 5.6 %;
+  - weights: 63.9 %, 4.2 %;
+  - ridge: 61.6 %, 3.1 %;
+  - pooled model: 64.3 %, 4.1 %.
+- Going forward in time over 19 patches, the order is the same.
+- Pro win rate and replay metrics (GPM, damage, lane) are 80–100 % sampling noise per cell, so they cannot fit type
+  weights.
+- So the type weights are not refit on outcomes. That needs the pro drafts of 2018–2023 (about 80 more patches).
+
+What changed:
+
+9. **Signal R for heroes reads picks + bans** (`tools/fetch_item_adoption.py hero_counts`). The count is the share of
+   drafts that picked or banned the hero, where it used to be the player-games on it. A feared hero is banned, not
+   picked. The refit moves heroes from 0.15 × net − 0.019 to **0.19 × net + 0.022, noise 0.41**: n 597 → 730, ρ
+   0.27 → 0.30. Items are unchanged.
+10. **Hero mana costs ×0.5 → ×0.35** (`MANA_COST_F`). In the pro data this is the one type the weights still
+    over-rate. On the blind samples the new sample goes 0.471 → 0.506 and the old one 0.549 → 0.550; the class sits at
+    0.64× of the anchors (judges 0.73×). ×0.25 and ×0.1 rank no better and under-rate it. "Mana Cost 25 → 0" now
+    scores 1.86.
+11. **Old notes without a verb get a direction** (`tools/patchgen/tags.py _guess_tag`). This affects the generator
+    only, for the not-yet-annotated 7.06–7.20 patches. 251 rows read like "Cooldown from 40 to 15" or "Talent from +12
+    Damage to +14", and 172 of them were MISC.
+    - Parseable values now defer to `b()`, as with a verb.
+    - Words or units between the numbers: the first value of each side decides.
+    - Talents compare magnitudes, so "-3s Cooldown to -4s" is a bigger bonus.
+    - "change from A to B" stays a swap.
+    - 4 rows stay MISC.
+
+Not changed: rows "from 0 to N" (6 on the site). They keep the numberless value (0.4–0.6). Counting them as +100 %,
+like "from N to 0", would put "Base health regen 0 → 0.5" at ~2.6.
+
+Effect of 9–10: 208 cells move by more than 0.1 (206 hero). Largest, mostly through R on reworks:
+- Dragon Knight 7.38 −4.78 → −0.93;
+- Doom 7.41 +2.55 → +5.48;
+- Medusa 7.37 −2.47 → +0.06;
+- Alchemist 7.38 −0.77 → −2.94.
+
+Full research report: kept outside the repository.

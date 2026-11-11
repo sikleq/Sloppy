@@ -584,7 +584,25 @@ def _guess_tag(text):
         return None if has_parseable_from_to else ('BUFF' if lower else 'NERF')
     if re.search(r'\bimproved\b', clean, re.I):
         return None if has_parseable_from_to else 'BUFF'
+    # Old notes (7.06-7.20) often have no verb at all (weights research 2026-11-11: 251 rows, 172 of them read as
+    # MISC): "Cooldown from 40/32/24/16 to 15" -> the parseable values decide, as with a verb.
+    if has_parseable_from_to or _FROM_TO_RE.search(clean):
+        return None
+    verbless = None if re.search(r'\bchange[ds]?\b', clean, re.I) else _VERBLESS_FROM_TO_RE.search(clean)
+    if verbless:
+        old, new = (float(x) for x in verbless.groups())
+        if re.search(r'\btalent\b', clean, re.I):
+            old, new, lower = abs(old), abs(new), False
+        if old != new:
+            return 'BUFF' if (new > old) != lower else 'NERF'
     return 'MISC'
+
+
+# "Talent: Level 20 Talent from +12 Spiders Attack Damage to +14", "Scepter damage from 2x to 1.75x": words or units
+# sit between the numbers, so no b(); the first value of each side decides. A talent value is a bonus, its sign only
+# says which way the stat goes: "-3s Lucent Beam Cooldown to -4s" is a bigger bonus. "change from A to B" is a swap.
+_VERBLESS_FROM_TO_RE = re.compile(
+    r'\bfrom\s+([-+]?\d+(?:\.\d+)?)[^.]*?\bto\s+([-+]?\d+(?:\.\d+)?)', re.I)
 
 
 def _is_lower_better(text):

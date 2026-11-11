@@ -544,3 +544,17 @@ def test_a_follow_up_list_stays_in_its_rows_note():
 def test_losing_the_blink_overshoot_penalty_is_a_buff():
     # a click past max range used to blink 75% of it (owner 2026-10-27)
     assert g._guess_tag("Blink no longer has an overshoot range") == "BUFF"
+
+
+@pytest.mark.parametrize("text, tag", [
+    ("Cooldown from 40/32/24/16 to 15", None),                          # parseable: b() decides
+    ("Damage from 35/50/65/80% to 30/45/60/75%", None),                 # "%" after levels is still parseable
+    ("Talent: Level 20 Talent from +12 Spiders Attack Damage to +14", "BUFF"),
+    ("Talent: Level 25 Talent from +40/4% Fiery Soul to +35/3%", "NERF"),
+    ("Talent: Level 15 Talent from -3s Lucent Beam Cooldown to -4s", "BUFF"),   # bigger bonus, sign = stat way
+    ("Level 25 Talent change from +200 Armor Wukong's Command to 0 Cooldown Primal Spring", "MISC"),  # a swap
+])
+def test_verbless_old_rows_get_a_direction(text, tag):
+    """Notes 7.06-7.20 often have no verb (weights research 2026-11-11: 172 of 251 such rows were MISC)."""
+    from tools.patchgen.tags import _guess_tag
+    assert _guess_tag(text) == tag

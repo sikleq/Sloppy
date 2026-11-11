@@ -10,7 +10,7 @@
   J          — signal J (exchange rate from Valve's own buff<->nerf compensations, 3 865 pairs):
                value of +1% of a type. For rows with % badges the value is
                u[type] × mean|%| / 20 — this REPLACES weight × magnitude there (24 types).
-               Hero mana costs at half of J (MANA_COST_F, audit 2026-11-10); a mixed rescale (some
+               Hero mana costs at 0.35 of J (MANA_COST_F, audit 2026-11-10/11); a mixed rescale (some
                levels up, some down) is sized by its net change, at least half the max-rank step.
   weight     — data/rules/valve_weights.json "final" (consensus shrunk towards `other`
                when fewer than 3 signals back the type: w = other + (raw − other) × n/3).
@@ -568,8 +568,10 @@ _ADOPT = {"item": _load_adopt("item_adoption.json", "items"), "hero": _load_adop
 # and 24 patches with 7.37 and 7.41): heroes n 597 rho 0.27, items n 219 rho 0.35. The old drift (0.095 / 0.127)
 # came from the first 20 patches; on today's data the share shift of an unchanged entity is ~0, so the old drift
 # pulled every hero rework ~0.7 toward a nerf. R never enters the cells it is fitted on: one pass is final.
+# Heroes 2026-11-11 (later): share of drafts that PICKED OR BANNED the hero, not picks alone (a feared hero is
+# banned, not picked): n 597 -> 730 cells, rho 0.27 -> 0.30.
 ADOPT_FIT = {"item": {"slope": 0.211, "drift": 0.022, "noise": 0.21, "min_n": 30},
-             "hero": {"slope": 0.15, "drift": -0.019, "noise": 0.37, "min_n": 20}}
+             "hero": {"slope": 0.19, "drift": 0.022, "noise": 0.41, "min_n": 20}}
 ADOPT_SHRINK_N = 50          # n / (n + 50), n = harmonic mean of the before / after counts: the SMALLER
                              # side decides how much of the shift is trusted (7.38 had ~100 matches after)
 ITEM_REWORK_CAP = 3.0        # cap of signal R for one entity per patch (items and heroes)
@@ -623,7 +625,10 @@ J_PCT_UNIT = 20.0                        # a 20% change of a u=1 type = 1.0
 # other rows (audit 2026-11-10, 35 rows; "Mana Cost 25 -> 0" +2.96, Timbersaw 7.41a +5.75 for two mana rows);
 # x0.5 brings it to 1.18x and lifts agreement on both samples (0.245 -> 0.359 new, 0.446 -> 0.477 old judge).
 # Items price mana costs in gold already (docs/weights.md "Mana costs — rule").
-MANA_COST_F = 0.5
+# 2026-11-11, x0.5 -> x0.35: pro drafts (1 012 hero cells, 27 patches, weights research) put mana cost as the one
+# type the weights still over-rate; on the judge samples 0.35 gives 0.471 -> 0.506 new, 0.549 -> 0.550 old, and
+# the class sits at 0.64x of the anchors (judges 0.73x). 0.25 / 0.1 rank no better and under-rate it.
+MANA_COST_F = 0.35
 
 
 _ABS_FROMTO_RE = _re.compile(r"from\s+([+\-\d./%s x]+?)\s+to\s+([+\-\d./%s x]+?)(?=[\s.,;)]|$)", _re.I)
