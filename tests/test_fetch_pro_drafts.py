@@ -71,6 +71,19 @@ def test_fetch_league_skips_a_match_valve_keeps_failing(tmp_path):
     assert con.execute("SELECT match_id, reason FROM missing").fetchall() == [(2, "http 500")]
 
 
+def test_retry_missing_recovers_server_errors_but_not_matches_without_a_draft(tmp_path):
+    hist = [{"match_id": m, "match_seq_num": 100 + m, "start_time": 1000 + m} for m in (4, 3, 2, 1)]
+    api = FakeApi(hist, {101: _rec(1), 102: _rec(2), 104: _rec(4)})
+    con = F.connect(str(tmp_path / "d.sqlite"))
+    F.store_match(con, _rec(1), 7)
+    F.store_match(con, _rec(4), 7)
+    con.executemany("INSERT INTO missing VALUES (?, ?)", [(2, "http 500"), (3, "no draft")])
+    assert F.retry_missing(api, con, log=lambda *a: None) == 1
+    assert con.execute("SELECT match_id FROM missing").fetchall() == [(3,)]
+    asked = [p["start_at_match_seq_num"] for m, p in api.calls if m == "GetMatchHistoryBySequenceNum"]
+    assert asked == [102]                                              # "no draft" is never asked again
+
+
 def test_fetch_league_keeps_only_the_date_range(tmp_path):
     hist = [{"match_id": m, "match_seq_num": 100 + m, "start_time": t} for m, t in ((2, 5000), (1, 50))]
     api = FakeApi(hist, {102: _rec(2), 101: _rec(1)})

@@ -5,6 +5,7 @@ Why: the match database behind signal R starts in 2024 (7.35b), so the weights c
 after a patch on 27 windows only. Picks, bans and the winner of every league match back to 7.08 (2018) give ~80 more.
 
     python tools/fetch_pro_drafts.py LEAGUES.json [--from 2017-12-01] [--to 2024-01-04] [--max-calls 50000]
+    python tools/fetch_pro_drafts.py LEAGUES.json --retry-missing   # matches skipped on a Valve error, once more
 
 LEAGUES.json: [{"league_id": 10749, "tier": "1", ...}, ...] (league ids of Tier 1-2 tournaments, e.g. from Liquipedia
 infoboxes). Key: env STEAM_API_KEY, never printed or stored.
@@ -140,12 +141,49 @@ def fetch_league(api, con, league_id, lo, hi, log=print):
     return got
 
 
+RETRY_REASONS = ("http %", "no record")   # "no draft" is a real record without captains-mode picks: never retried
+
+
+def retry_missing(api, con, league_matches_of=None, log=print):
+    """Ask Valve again for matches skipped on a server error or an empty answer; returns how many were recovered.
+
+    The seq num is not stored, so the history of each league whose stored match ids span a skipped one is re-read
+    (one call per 100 matches)."""
+    where = " OR ".join("reason LIKE ?" for _ in RETRY_REASONS)
+    ids = {r[0] for r in con.execute(f"SELECT match_id FROM missing WHERE {where}", RETRY_REASONS)}
+    if not ids:
+        return 0
+    spans = con.execute("SELECT league_id, min(match_id), max(match_id) FROM matches GROUP BY league_id").fetchall()
+    leagues = [lg for lg, lo, hi in spans if any(lo <= i <= hi for i in ids)]
+    got = 0
+    for lg in leagues:
+        for match_id, seq, _ in (league_matches_of or league_matches)(api, lg):
+            if match_id not in ids:
+                continue
+            ids.discard(match_id)
+            try:
+                res = api.get("GetMatchHistoryBySequenceNum", start_at_match_seq_num=seq, matches_requested=1)
+            except urllib.error.HTTPError:
+                continue
+            rec = next((m for m in res.get("result", {}).get("matches") or [] if m.get("match_id") == match_id), None)
+            if rec and store_match(con, rec, lg):
+                con.execute("DELETE FROM missing WHERE match_id = ?", (match_id,))
+                got += 1
+            con.commit()
+        if not ids:
+            break
+    log(f"retry: {got} recovered, {len(ids)} still missing")
+    return got
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("leagues")
     ap.add_argument("--from", dest="lo", default="2017-12-01")
     ap.add_argument("--to", dest="hi", default="2024-01-04")
     ap.add_argument("--max-calls", type=int, default=50000)
+    ap.add_argument("--retry-missing", action="store_true",
+                    help="only ask again for matches skipped on a server error or an empty answer")
     a = ap.parse_args(argv)
     key = os.environ.get("STEAM_API_KEY")
     if not key:
@@ -156,6 +194,9 @@ def main(argv=None):
     done = {r[0] for r in con.execute("SELECT league_id FROM leagues_done")}
     lo, hi = _ts(a.lo), _ts(a.hi)
     try:
+        if a.retry_missing:
+            retry_missing(api, con)
+            leagues = []
         for lg in leagues:
             if lg["league_id"] not in done:
                 try:
