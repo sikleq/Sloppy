@@ -9,6 +9,7 @@ import patch.site_common as _site
 from .output import H, W
 from .state import _State, reset_page_state
 from .meta import _render_top_nav, _patch_meta_parts
+from . import branch_builds as _builds
 from .elements import _close_block, STAT_ICONS, STAT_DETECT_RULES
 from .static_has import add_static_has_classes
 from .talent_tree import light_talent_trees
@@ -52,9 +53,14 @@ def patch_info_html(version, date):
     только выше панели фильтров тегов и тоже добавить кнопку, только в центр верхней кромки панели тегов-фильтров").
     It stood on a plate in the first section's header before."""
     prev_part, age_part = _patch_meta_parts(version)
+    # the minute the live game got the patch's own build (owner 2026-11-11: "из билдов"), in UTC, with that moment's
+    # own UTC day; a patch older than the builds log keeps its date alone
+    moment = _builds.release_time(version)
+    released = (f'<b>{moment.strftime("%d.%m.%Y")}</b> {moment.strftime("%H:%M")} UTC' if moment
+                else f'<b>{date}</b>')
     rows = [f'<a class="pi-official" href="https://www.dota2.com/patches/{version}" target="_blank" rel="noopener">'
             f'Official notes<i class="pi-out" aria-hidden="true"></i></a>',
-            f'<div class="pi-row"><span>Released</span><span class="pi-val"><b>{date}</b></span></div>']
+            f'<div class="pi-row"><span>Released</span><span class="pi-val">{released}</span></div>']
     if age_part:
         key, value = age_part.split(":", 1)
         rows.append(f'<div class="pi-row"><span>{key}</span><span class="pi-val">{value.strip()}</span></div>')

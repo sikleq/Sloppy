@@ -194,6 +194,9 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
         Step("meta", "data/site_meta.json with the new patch (before the top-ups)", [PY, "build_site.py", "patch"]),
         Step("store", f"the patch's game files -> the store ({'installed game' if source == 'game' else 'archives'})",
              store, skip=None if history else no_hist),
+        # the minute the patch went live: its first build with notes -> its ClientVersion (owner 2026-11-11)
+        Step("client_version", "data/patch_client_versions.json (the patch's live build: its exact release time)",
+             [PY, "tools/build_patch_client_versions.py", version], skip=None if history else no_hist),
         # before Sloppy is pushed: CI lays the raw files out from the store on GitHub (checks + backup inside)
         Step("publish", "the store -> GitHub (tools/publish.py)", [PY, os.path.join(STORE, "tools", "publish.py")],
              skip=None if history else no_hist),

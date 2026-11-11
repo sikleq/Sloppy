@@ -2,8 +2,9 @@
 
 Data: data/branch_builds.json (scripts/fetch/fetch_branch_builds.py): every change of the client version of Experimental
 (247040), Staging (2305270) and the live game (570), with the time it was seen. Rules:
-  * a patch came out at the first live-game build of its day (UTC), up to PATCH_DAY_SLACK_H hours into the next day; a
-    patch day with no live build in the log falls back to noon UTC;
+  * a patch came out when the live game first had its own build (data/patch_client_versions.json: the first build
+    with the patch's notes, tools/build_patch_client_versions.py); a patch missing there takes the first live-game
+    build of its day (UTC), up to PATCH_DAY_SLACK_H hours into the next day; no live build in the log: noon UTC;
   * a test build belongs to the first patch that came out after it; builds after the newest patch wait for the next one;
   * a patch whose previous patch is older than the log only has a lower bound for its Experimental lead ("≥");
   * only timed builds (seen within a few hours of the change) go into the hour and weekday charts.
@@ -11,10 +12,12 @@ Data: data/branch_builds.json (scripts/fetch/fetch_branch_builds.py): every chan
 import html as _html
 import json
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
 from pathlib import Path
 from statistics import median
 
 DATA = Path(__file__).resolve().parent.parent / "data" / "branch_builds.json"
+CLIENT_VERSIONS = DATA.parent / "patch_client_versions.json"
 BRANCHES = ("experimental", "staging")
 LABELS = {"experimental": "Experimental", "staging": "Staging"}
 TIMED_WINDOW_H = 3
@@ -65,15 +68,41 @@ def releases(history):
     return sorted(((r["version"], datetime.strptime(r["date"], "%d.%m.%Y").date()) for r in history), key=lambda r: r[1])
 
 
-def patch_moments(rels, builds):
-    """{version: (datetime, exact)}: the first live-game build of the patch's day (or early next day), else noon."""
-    public = [b["time"] for b in builds if b["branch"] == "public"]
+def load_client_versions(path=CLIENT_VERSIONS):
+    """{version: the live ClientVersion the patch came out with} (tools/build_patch_client_versions.py), or {}."""
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
+def patch_moments(rels, builds, client_versions=None):
+    """{version: (datetime, exact)}: when the live game first had the patch's own build (its ClientVersion from
+    data/patch_client_versions.json, owner 2026-11-11); without one, the first live-game build of the patch's day (or
+    early next day); else noon."""
+    cvs = load_client_versions() if client_versions is None else client_versions
+    public = [b for b in builds if b["branch"] == "public"]
+    first_seen = {}
+    for b in public:
+        first_seen.setdefault(b["version"], b["time"])
     out = {}
     for v, d in rels:
+        if first_seen.get(cvs.get(v)):
+            out[v] = (first_seen[cvs[v]], True)
+            continue
         lo, hi = _midnight(d), _midnight(d) + timedelta(days=1, hours=PATCH_DAY_SLACK_H)
-        hit = next((t for t in public if lo <= t < hi), None)
+        hit = next((b["time"] for b in public if lo <= b["time"] < hi), None)
         out[v] = (hit, True) if hit else (lo + timedelta(hours=12), False)
     return out
+
+
+@lru_cache(maxsize=1)
+def _site_moments():
+    from patch.meta import RELEASE_HISTORY
+    return patch_moments(releases(RELEASE_HISTORY), load_builds())
+
+
+def release_time(version):
+    """The minute (UTC datetime) the live game got the patch, or None when the log has no build for it."""
+    moment, exact = _site_moments().get(version, (None, False))
+    return moment if exact else None
 
 
 def group_by_patch(builds, rels, moments=None):
