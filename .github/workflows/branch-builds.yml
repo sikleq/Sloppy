@@ -2,8 +2,9 @@ name: branch-builds
 
 # Dota 2's test servers (Experimental 247040, Staging 2305270) and the live game (570): Valve's keyless Web API
 # IGCVersion_<app>/GetClientVersion every 15 minutes, once a day also the muk-as/DOTA2_WEB log (fills any hours this job
-# missed). scripts/fetch/fetch_branch_builds.py; the last checks live in the Actions cache between runs, and main gets a
-# commit only per new build. A push made with GITHUB_TOKEN starts no other workflow, so after a new build the job starts
+# missed). scripts/fetch/fetch_branch_builds.py; the last checks live in the Actions cache between runs, and the
+# data-branch-builds branch gets a commit only per new build (protected main refuses this token's pushes; build.yml takes
+# that branch's list in). A push made with GITHUB_TOKEN starts no other workflow, so after a new build the job starts
 # the site's build (and deploy) itself with workflow_dispatch, which GITHUB_TOKEN may do (owner 2026-11-10: new builds
 # appear on the site on their own).
 on:
@@ -40,12 +41,24 @@ jobs:
           key: branch-builds-state-${{ github.run_id }}
           restore-keys: branch-builds-state-
 
+      # The job's own copy lives on the data-branch-builds branch (main is protected: a green "build" check before any
+      # push, which this token cannot pass; owner 2026-11-11 "отдельная ветка данных")
+      - name: Take in the data branch's copy
+        id: data
+        run: |
+          if git fetch origin data-branch-builds; then
+            git show FETCH_HEAD:data/branch_builds.json > "$RUNNER_TEMP/branch_builds.json"
+            echo "copy=$RUNNER_TEMP/branch_builds.json" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Poll Valve's Web API
         env:
           PYTHONIOENCODING: utf-8
           DAILY: ${{ github.event.schedule == '41 3 * * *' || github.event_name == 'workflow_dispatch' }}
+          COPY: ${{ steps.data.outputs.copy }}
         run: |
           if [ "$DAILY" = "true" ]; then extra="--history"; else extra=""; fi
+          if [ -n "$COPY" ]; then extra="$extra --merge-from $COPY"; fi
           python scripts/fetch/fetch_branch_builds.py --state .cache/branch_builds_state.json $extra
 
       - name: Save the last checks
@@ -54,18 +67,24 @@ jobs:
           path: .cache/branch_builds_state.json
           key: branch-builds-state-${{ github.run_id }}
 
-      - name: Commit new builds
+      - name: Commit new builds to the data branch
         id: commit
+        env:
+          COPY: ${{ steps.data.outputs.copy }}
         run: |
-          before=$(git show HEAD:data/branch_builds.json | python -c "import json,sys; print(len(json.load(sys.stdin)['builds']))")
-          after=$(python -c "import json; print(len(json.load(open('data/branch_builds.json'))['builds']))")
+          count() { python -c "import json,sys; print(len(json.load(open(sys.argv[1]))['builds']))" "$1"; }
+          if [ -n "$COPY" ]; then before=$(count "$COPY"); else before=$(git show HEAD:data/branch_builds.json > "$RUNNER_TEMP/main.json" && count "$RUNNER_TEMP/main.json"); fi
+          after=$(count data/branch_builds.json)
           if [ "$before" = "$after" ]; then exit 0; fi
+          cp data/branch_builds.json "$RUNNER_TEMP/new.json"
+          git checkout -- data/branch_builds.json
+          if [ -n "$COPY" ]; then git checkout -B data-branch-builds FETCH_HEAD; else git checkout -B data-branch-builds; fi
+          cp "$RUNNER_TEMP/new.json" data/branch_builds.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/branch_builds.json
           git commit -m "data: test-server builds ($after version changes)"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          git push origin data-branch-builds
           echo "new=true" >> "$GITHUB_OUTPUT"
 
       - name: Deploy the site with the new builds

@@ -16,6 +16,12 @@ Two sources, both written into data/branch_builds.json as one list of version ch
     python scripts/fetch/fetch_branch_builds.py --offline           # no network: check and re-sort the file
 
 Raw answers are cached in .cache/branch_builds/ (gitignored); only data/branch_builds.json is committed.
+
+Where the job keeps it (owner 2026-11-11, "отдельная ветка данных"): main is protected (a green "build" check before any
+push), which the job's token cannot pass, so the job commits the file to its own branch DATA_BRANCH; the site's build
+takes that copy in (--offline --merge-from) before building. main's copy is refreshed by hand when convenient:
+    git fetch origin data-branch-builds && git show origin/data-branch-builds:data/branch_builds.json > x.json
+    python scripts/fetch/fetch_branch_builds.py --offline --merge-from x.json
 """
 import argparse
 import json
@@ -28,6 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data" / "branch_builds.json"
 CACHE = ROOT / ".cache" / "branch_builds"
+DATA_BRANCH = "data-branch-builds"       # the job's own branch (not protected); .github/workflows/branch-builds.yml
 API = "https://api.steampowered.com/IGCVersion_{app}/GetClientVersion/v1/"
 HISTORY_API = "https://api.github.com/repos/muk-as/DOTA2_WEB/contents/steam_api/_HISTORY_by_date.txt"
 HISTORY_SOURCE = "muk-as/DOTA2_WEB"
@@ -236,6 +243,18 @@ def newer_checks(data, state):
     return out
 
 
+def union(data, other):
+    """Both copies of the file in one (owner 2026-11-11: the job keeps its builds on the DATA_BRANCH branch, protected
+    main may hold an older copy): every build of either, a change seen by both once, the later check of each app."""
+    out = newer_checks(data, other["checks"])
+    builds = list(data["builds"])
+    for b in other["builds"]:
+        if not any(_key(x) == _key(b) and x["time"] == b["time"] for x in builds) and not _already_known(builds, b):
+            builds.append(b)
+    out["builds"] = _sorted(builds)
+    return validate(out)
+
+
 def save(data, path=DATA):
     """One build per line, so a new build is a one-line diff."""
     head = {k: v for k, v in data.items() if k != "builds"}
@@ -252,8 +271,12 @@ def main(argv=None):
                     help="also read the t.me/DOTA_DM_SPAM posts older than this post id (one-off import of 2021-2023)")
     ap.add_argument("--max-pages", type=int, help="with --telegram: stop after this many pages (a pilot)")
     ap.add_argument("--state", type=Path, help="a file with the last checks, read before and written after the poll")
+    ap.add_argument("--merge-from", type=Path, metavar="FILE",
+                    help="first take in another copy of branch_builds.json (the data branch's), if it exists")
     args = ap.parse_args(argv)
     data = validate(load(DATA))           # DATA read at call time: a test points it at a temporary file
+    if args.merge_from and args.merge_from.exists() and args.merge_from.stat().st_size:
+        data = union(data, validate(load(args.merge_from)))
     if args.state and args.state.exists():
         data = newer_checks(data, json.loads(args.state.read_text(encoding="utf-8")))
     if args.offline:

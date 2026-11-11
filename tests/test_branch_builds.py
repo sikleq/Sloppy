@@ -181,9 +181,42 @@ def test_a_new_build_deploys_the_site():
     assert "actions: write" in wf and "gh workflow run build.yml --ref main" in wf
     assert "id: commit" in wf and 'echo "new=true" >> "$GITHUB_OUTPUT"' in wf
     assert "if: steps.commit.outputs.new == 'true'" in wf
-    assert wf.index('echo "new=true"') > wf.index("git push origin HEAD:main")     # only once the data is pushed
+    assert wf.index('echo "new=true"') > wf.index("git push origin data-branch-builds")   # only once the data is pushed
     build = (ROOT / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch" in build
+
+
+def test_the_job_keeps_its_builds_on_its_own_branch():
+    # Owner 2026-11-11 ("отдельная ветка данных"): main is protected (a green "build" check before a push), which the
+    # job's token cannot pass, so from 10.11 23:39 no new build reached the site. The job pushes to its own branch, takes
+    # that branch's copy in before polling, and the site's build takes it in before building
+    wf = (ROOT / ".github" / "workflows" / "branch-builds.yml").read_text(encoding="utf-8")
+    assert "HEAD:main" not in wf and "git pull --rebase origin main" not in wf
+    assert "git fetch origin data-branch-builds" in wf and "--merge-from $COPY" in wf
+    assert fetch.DATA_BRANCH == "data-branch-builds"
+    build = (ROOT / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
+    take, make = build.index("git fetch --depth=1 origin data-branch-builds"), build.index("run: python build_site.py")
+    assert take < make and "--offline --merge-from" in build
+
+
+def test_the_two_copies_join_without_losing_or_doubling_a_build(tmp_path, monkeypatch):
+    main = _raw(("staging", 3338, "2026-11-10T01:55:35Z"), ("public", 6973, "2026-11-01T10:00:00Z"))
+    main["apps"], main["checks"] = {"2305270": "staging"}, {"2305270": {"version": 3338, "checked": "2026-11-10T02:00:00Z"}}
+    branch = _raw(("staging", 3338, "2026-11-10T01:55:35Z"), ("staging", 3341, "2026-11-10T19:23:55Z"),
+                  ("staging", 3350, "2026-11-11T17:00:00Z"))
+    branch["apps"], branch["checks"] = main["apps"], {"2305270": {"version": 3350, "checked": "2026-11-11T17:00:00Z"}}
+    out = fetch.union(main, branch)
+    assert [(b["branch"], b["version"]) for b in out["builds"]] == [
+        ("public", 6973), ("staging", 3338), ("staging", 3341), ("staging", 3350)]
+    assert out["checks"]["2305270"]["version"] == 3350
+    # the command line: --offline --merge-from, as build.yml runs it
+    data, copy = tmp_path / "bb.json", tmp_path / "copy.json"
+    fetch.save(main, data)
+    fetch.save(branch, copy)
+    monkeypatch.setattr(fetch, "DATA", data)
+    assert fetch.main(["--offline", "--merge-from", str(copy)]) == 0
+    assert len(fetch.load(data)["builds"]) == 4
+    assert fetch.main(["--offline", "--merge-from", str(tmp_path / "none.json")]) == 0    # no copy: the file stays
 
 
 # ---------------------------------------------------------------- the page

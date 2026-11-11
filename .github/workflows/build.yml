@@ -45,6 +45,19 @@ jobs:
       - name: Install test dependencies
         run: pip install -r requirements-dev.txt
 
+      # The test-server builds job keeps its newest list on the data-branch-builds branch (main is protected; owner
+      # 2026-11-11): take it in, so a new Experimental/Staging build reaches the site without a commit to main
+      - name: Take in the newest test-server builds
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          if git fetch --depth=1 origin data-branch-builds; then
+            git show FETCH_HEAD:data/branch_builds.json > "$RUNNER_TEMP/branch_builds.json"
+            python scripts/fetch/fetch_branch_builds.py --offline --merge-from "$RUNNER_TEMP/branch_builds.json"
+          else
+            echo "no data-branch-builds branch yet: main's copy stays"
+          fi
+
       - name: Build site
         env:
           PYTHONIOENCODING: utf-8
