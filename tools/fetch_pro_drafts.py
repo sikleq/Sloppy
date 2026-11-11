@@ -30,6 +30,8 @@ BASE = "https://api.steampowered.com/IDOTA2Match_570/"
 UA = "SloppyResearch/1.0 (https://github.com/sikleq/Sloppy)"
 PAUSE = 1.05                  # seconds between calls (Valve: 100 000 calls a day per key)
 RETRIES = 4
+GIVE_UP = 30                  # a league with no draft in its first 30 matches is not captains-mode play (an open
+                              # qualifier of ESL One Katowice 2018: 8 drafts in 500 matches), the rest is skipped
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS leagues_done (league_id INTEGER PRIMARY KEY, matches INTEGER, done_at INTEGER);
@@ -115,7 +117,10 @@ def fetch_league(api, con, league_id, lo, hi, log=print):
     known = {r[0] for r in con.execute("SELECT match_id FROM matches UNION SELECT match_id FROM missing")}
     todo = [m for m in league_matches(api, league_id) if lo <= m[2] < hi and m[0] not in known]
     got = 0
-    for match_id, seq, _ in todo:
+    for i, (match_id, seq, _) in enumerate(todo):
+        if i == GIVE_UP and not got:
+            log(f"league {league_id}: no drafts in the first {GIVE_UP} matches, skipped")
+            break
         res = api.get("GetMatchHistoryBySequenceNum", start_at_match_seq_num=seq, matches_requested=1).get("result", {})
         rec = next((m for m in res.get("matches") or [] if m.get("match_id") == match_id), None)
         if rec and store_match(con, rec, league_id):

@@ -47,6 +47,15 @@ def test_fetch_league_pages_history_and_stores_drafts(tmp_path):
     assert all(m == "GetMatchHistory" for m, _ in api.calls)
 
 
+def test_fetch_league_gives_up_on_a_league_without_drafts(tmp_path, monkeypatch):
+    monkeypatch.setattr(F, "GIVE_UP", 3)
+    hist = [{"match_id": m, "match_seq_num": 100 + m, "start_time": 1000 + m} for m in range(10, 0, -1)]
+    api = FakeApi(hist, {100 + m: _rec(m, draft=False) for m in range(1, 11)})
+    con = F.connect(str(tmp_path / "d.sqlite"))
+    assert F.fetch_league(api, con, 7, 0, 10 ** 9, log=lambda *a: None) == 0
+    assert sum(1 for m, _ in api.calls if m == "GetMatchHistoryBySequenceNum") == 3
+
+
 def test_fetch_league_keeps_only_the_date_range(tmp_path):
     hist = [{"match_id": m, "match_seq_num": 100 + m, "start_time": t} for m, t in ((2, 5000), (1, 50))]
     api = FakeApi(hist, {102: _rec(2), 101: _rec(1)})
