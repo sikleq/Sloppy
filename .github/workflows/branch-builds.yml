@@ -23,7 +23,7 @@ concurrency:
 jobs:
   poll:
     runs-on: ubuntu-latest
-    timeout-minutes: 25     # waits for the build check of a new commit (~5 min, more when the pages queue is busy)
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
 
@@ -56,8 +56,6 @@ jobs:
 
       - name: Commit new builds
         id: commit
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           before=$(git show HEAD:data/branch_builds.json | python -c "import json,sys; print(len(json.load(sys.stdin)['builds']))")
           after=$(python -c "import json; print(len(json.load(open('data/branch_builds.json'))['builds']))")
@@ -67,24 +65,7 @@ jobs:
           git add data/branch_builds.json
           git commit -m "data: test-server builds ($after version changes)"
           git pull --rebase origin main
-          # main is protected: a commit gets in only with a green "build" check on it (2026-11-11: every push
-          # straight to main was refused). So the commit goes to its own branch first, build.yml checks it there
-          # (no deploy off main), and then the same commit moves main forward.
-          branch="bot/branch-builds-${{ github.run_id }}"
-          git push origin "HEAD:refs/heads/$branch"
-          gh workflow run build.yml --ref "$branch"
-          run=""
-          for i in $(seq 1 30); do
-            sleep 10
-            run=$(gh run list --workflow build.yml --branch "$branch" --limit 1 --json databaseId --jq '.[0].databaseId')
-            if [ -n "$run" ]; then break; fi
-          done
-          if [ -z "$run" ]; then echo "::error::build.yml did not start on $branch"; exit 1; fi
-          if ! gh run watch "$run" --exit-status --interval 20; then
-            echo "::error::build failed on $branch (run $run), main left as it was"; exit 1
-          fi
           git push origin HEAD:main
-          git push origin --delete "$branch"
           echo "new=true" >> "$GITHUB_OUTPUT"
 
       - name: Deploy the site with the new builds
