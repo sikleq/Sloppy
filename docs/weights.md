@@ -757,4 +757,13 @@ Effect of 9–10: 208 cells move by more than 0.1 (206 hero). Largest, mostly th
 - Medusa 7.37 −2.47 → +0.06;
 - Alchemist 7.38 −0.77 → −2.94.
 
+Tried and not taken: **sentence embeddings** of the rows (BAAI/bge-small-en-v1.5, 19 190 hero rows):
+- On pro drafts, held-out patch, the PCA-24 text directions do worse than the plain count:
+  - with the count: sign 63.4 % against the count's 66.1 %;
+  - with the types: sign 60.8 %.
+- On the blind judges, trained on one sample and tested on the other:
+  - embeddings alone: ρ 0.31, while the weights reach 0.51 / 0.55;
+  - the weights plus embeddings: 0.516 / 0.569, against 0.506 / 0.550 for the weights alone. That is within the noise
+    of 200 rows, so it does not justify a 130 MB model in the build.
+
 Full research report: kept outside the repository.
