@@ -83,7 +83,13 @@ jobs:
           if ! gh run watch "$run" --exit-status --interval 20; then
             echo "::error::build failed on $branch (run $run), main left as it was"; exit 1
           fi
-          git push origin HEAD:main
+          # the green check reaches branch protection with a lag (2026-11-11: a push 10 s after the run was refused)
+          pushed=""
+          for i in $(seq 1 8); do
+            sleep 20
+            if git push origin HEAD:main; then pushed=yes; break; fi
+          done
+          if [ -z "$pushed" ]; then echo "::error::main refused the checked commit from $branch"; exit 1; fi
           git push origin --delete "$branch"
           echo "new=true" >> "$GITHUB_OUTPUT"
 
