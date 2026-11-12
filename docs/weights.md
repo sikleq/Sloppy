@@ -767,3 +767,27 @@ Tried and not taken: **sentence embeddings** of the rows (BAAI/bge-small-en-v1.5
     of 200 rows, so it does not justify a 130 MB model in the build.
 
 Full research report: kept outside the repository.
+
+### 2026-11-12 — the same check on 99 windows (pro drafts 2017–2023 added)
+
+`tools/fetch_pro_drafts.py` reads the old Tier 1–2 leagues from Valve's Web API (260 league ids from Liquipedia
+infoboxes, open qualifiers left out): 30 131 Captains Mode drafts with winners, 12.2017 – 2023, into
+`.cache/pro_drafts.sqlite` (not in git). Other modes with bans (Captains Draft and the like) are not stored. With the
+27 newer windows that is 99 before/after windows, 92 patches with a changed hero cell, 2 657 changed cells with ≥ 20
+games (median 23 before, 24 after).
+
+Result: four times the data, the same answer.
+- Pick + ban share, held-out patch, sign accuracy and explained variance:
+  - count "buff rows − nerf rows": 66.3 %, 7.6 %;
+  - weights (without R): 64.6 %, 6.1 %;
+  - ridge on types: 64.5 %, 5.4 %;
+  - pooled model on types: 64.6 %, 6.0 %;
+  - text directions (LSA): 64.8 %, 8.3 %.
+- Training on earlier patches only (84 patches): count 66.2 %, 7.1 %; weights 64.4 %, 5.8 %; ridge 63.8 %, 4.7 %.
+- Pro win rate is still 95 % sampling noise per cell; nothing predicts it beyond 56 % sign.
+- Type multipliers fitted on the data (pooled, λ 30) agree with earlier cuts: stats ×0.34, mana costs ×0.32, damage
+  ×0.58, cooldown ×0.60; BKB-piercing, projectile speed, lifesteal ×2–3. The model that uses them does not beat the
+  current weights on a held-out patch, so no type weight is changed from them.
+
+So: the direction of a change predicts what pros do next; its size, as any of these models reads it, does not add a
+measurable amount. The weights stay as they are; the ranking of heroes by size within one direction is weak evidence.
