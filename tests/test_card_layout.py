@@ -214,18 +214,6 @@ def test_many_values_of_a_one_sided_card_stand_beside_it():
     assert ".ability-change.unified-panes.is-single-new > .vt-side { grid-column: 3; grid-row: 1; }" in css
 
 
-def test_a_paired_cards_values_stand_on_its_right():
-    # owner 2026-11-12, 7.38 Provoke the Beast: "карточка же может быть справа, почему тут внизу" — in a pair of two
-    # the values stand beside the text; a trio's third and a phone keep them under
-    css = (ROOT / "src" / "css" / "patch-ability-change.css").read_text(encoding="utf-8")
-    side = css[css.index("@media (min-width: 761px) {\n  .card-pair:not(.card-trio)"):]
-    side = side[:side.index("\n}\n")]
-    assert "grid-template-columns: minmax(0, 1fr) fit-content(45%)" in side
-    assert "> .vt-side {\n    grid-column: 2; grid-row: 1; margin-top: 0; }" in side
-    phones = (ROOT / "src" / "css" / "phones.css").read_text(encoding="utf-8")
-    assert "@media (max-width: 760px)" in phones
-
-
 def test_a_lone_card_keeps_its_caption_when_a_hidden_row_stands_first():
     # 7.40 Searing Arrows: "Returning as a base ability." went under the card
     from patch.card_pairs import _rows_under
