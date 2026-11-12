@@ -791,3 +791,18 @@ Result: four times the data, the same answer.
 
 So: the direction of a change predicts what pros do next; its size, as any of these models reads it, does not add a
 measurable amount. The weights stay as they are; the ranking of heroes by size within one direction is weak evidence.
+
+### Accuracy of the row weights, in plain numbers (2026-11-12)
+
+Share of row pairs that the weights order the same way as the blind judges (pairs the judges grade alike are skipped;
+`pairwise.py`, kept outside the repository):
+
+| Sample | Before the audit (11-10) | Now | Two judges with each other |
+|---|---|---|---|
+| New, 200 rows, mean of two judges | 60.9 % | 73.2 % | 82.7 % |
+| Same, judges 1+ grade apart | 64.9 % | 80.5 % | |
+| Same, judges 2+ grades apart | | 94.3 % | |
+| Old, 112 rows, one judge | 73.3 % | 78.1 % | |
+
+The new sample was used to choose the fixes, so its gain is partly fitted. The old sample was not, and it gained
+4.8 points.
