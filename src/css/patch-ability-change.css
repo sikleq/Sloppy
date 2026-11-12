@@ -448,6 +448,14 @@ body.patch-page .entity-block.item-block:not(.is-new) ul.changes li.ability-box-
 .value-table .vt-sub { display: block; font-size: 11.5px; font-weight: 400; color: var(--text-dim); }
 .ability-change.unified-panes.is-single-new > .vt-side { grid-column: 3; grid-row: 1; }
 .card-pair .ability-change.unified-panes.is-single-new > .vt-side { grid-column: 1; grid-row: auto; margin-top: 8px; }
+/* ... but in a pair of two the half has room: the values stand beside the text, on its right (owner 2026-11-12, 7.38
+   Provoke the Beast: "карточка же может быть справа, почему тут внизу"); a trio's third and a phone keep them under */
+@media (min-width: 761px) {
+  .card-pair:not(.card-trio) .ability-change.unified-panes.is-single-new.has-vt-side {
+    grid-template-columns: minmax(0, 1fr) fit-content(45%); column-gap: 10px; }
+  .card-pair:not(.card-trio) .ability-change.unified-panes.is-single-new.has-vt-side > .vt-side {
+    grid-column: 2; grid-row: 1; margin-top: 0; }
+}
 /* Rows each led by an ability's icon stand like a table's rows: a line over each, edge to edge of the card (owner
    2026-11-06, patch/card_sections.py); a facet changing two abilities gives each its head: icon, Active / Passive, name */
 .ability-change-row.acr-sec { border-top: 1px solid var(--line-soft); margin: 0 calc(-1 * var(--px, 0px));
