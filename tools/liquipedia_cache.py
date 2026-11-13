@@ -25,6 +25,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from patch.atomic_write import atomic_write_bytes, atomic_write_text  # noqa: E402
+from patch.checks import PipelineCheckError  # noqa: E402
+
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT = os.path.join(HERE, "outputs", "liquipedia")
 API = "https://liquipedia.net/dota2/api.php"
@@ -92,18 +96,20 @@ def _index_path():
 
 
 def load_index():
-    try:
-        return json.load(open(_index_path(), encoding="utf-8"))
-    except (OSError, ValueError):
+    """No index yet = empty cache. A broken index is an error: read as empty it would silently re-download
+    everything at 31 s a page."""
+    if not os.path.exists(_index_path()):
         return {}
+    try:
+        with open(_index_path(), encoding="utf-8") as f:
+            return json.load(f)
+    except ValueError as e:
+        raise PipelineCheckError(f"{_index_path()} is broken ({e}); delete it to rebuild the cache") from e
 
 
 def save_index(index):
     os.makedirs(ROOT, exist_ok=True)
-    tmp = _index_path() + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(index, f, ensure_ascii=False, indent=0, sort_keys=True)
-    os.replace(tmp, _index_path())
+    atomic_write_text(_index_path(), json.dumps(index, ensure_ascii=False, indent=0, sort_keys=True))
 
 
 def _file(kind, title):
@@ -113,8 +119,7 @@ def _file(kind, title):
 def _write(kind, title, text):
     path = _file(kind, title)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with gzip.open(path, "wt", encoding="utf-8") as f:
-        f.write(text)
+    atomic_write_bytes(path, gzip.compress(text.encode("utf-8"), mtime=0))   # a cut-off .gz would not read back
 
 
 def read(kind, title):

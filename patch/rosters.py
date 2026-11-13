@@ -4,6 +4,7 @@ import os as _os
 import json as _json
 import re
 
+from .atomic_write import atomic_write_text
 from .state import _State
 from .images import HERO_SLUG
 from .meta import RELEASE_HISTORY, PATCHES
@@ -362,8 +363,7 @@ def write_dynamics(path, payload):
     """_dynamics.json with sorted keys: the entity records come in page-build order, which differs run to run —
     sorted, two builds of one commit give the same bytes. The arrays keep their order; scripts.js and the builders
     look the records up by key."""
-    with open(path, 'w', encoding='utf-8') as f:
-        _json.dump(payload, f, separators=(',', ':'), sort_keys=True)
+    atomic_write_text(path, _json.dumps(payload, separators=(',', ':'), sort_keys=True))
 
 
 def build_rosters():

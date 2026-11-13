@@ -32,6 +32,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from patch.atomic_write import atomic_write_bytes, atomic_write_text  # noqa: E402
+from patch.checks import ensure  # noqa: E402
 DATA = ROOT / "data" / "branch_builds.json"
 CACHE = ROOT / ".cache" / "branch_builds"
 DATA_BRANCH = "data-branch-builds"       # the job's own branch (not protected); .github/workflows/branch-builds.yml
@@ -130,14 +133,16 @@ def _already_known(builds, b, within=timedelta(days=2)):
 def parse_history(text):
     """The version changes of the three apps in the muk-as log, times in UTC. The first line of each app ("None => N")
     is where its log starts, not a build."""
-    out = []
+    out, seen = [], 0
     for line in text.splitlines():
         m = _HIST_LINE.match(line.strip())
+        seen += bool(m)
         if not m or m["name"] not in HISTORY_NAMES or m["old"] == "None":
             continue
         t = datetime.strptime(m["t"], "%Y-%m-%d %H:%M:%S") - timedelta(hours=int(m["tz"]))
         out.append({"branch": HISTORY_NAMES[m["name"]], "from": int(m["old"]), "version": int(m["new"]),
                     "time": t.strftime(TIME_FMT), "source": HISTORY_SOURCE, "timed": True})
+    ensure(seen, "muk-as log: no version line at all - not the log (error page? format changed?)")
     return out
 
 
@@ -160,7 +165,7 @@ def _get(url, cache_name, accept=None):
     with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=60) as r:
         raw = r.read()
     CACHE.mkdir(parents=True, exist_ok=True)
-    (CACHE / cache_name).write_bytes(raw)
+    atomic_write_bytes(CACHE / cache_name, raw)
     return raw
 
 
@@ -199,6 +204,7 @@ def parse_telegram_page(text):
             if app in APPS and old != "None":
                 out.append({"branch": APPS[app], "from": int(old), "version": int(new), "time": t[1] + "Z",
                             "source": TG_SOURCE, "timed": True})
+    ensure(ids, "Telegram page: no posts - not the channel's page (blocked? layout changed?)")
     return ids, out
 
 
@@ -216,7 +222,8 @@ def fetch_telegram(before, stop_at=1, max_pages=None):
             req = urllib.request.Request(TG_PAGE.format(before=before), headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=60) as r:
                 text = r.read().decode("utf-8")
-            cached.write_text(text, encoding="utf-8")
+            parse_telegram_page(text)                 # a page that is not the channel's raises here, uncached
+            atomic_write_text(cached, text)
             time.sleep(TG_PAUSE_S)
         ids, rows = parse_telegram_page(text)
         found += rows
@@ -260,7 +267,7 @@ def save(data, path=DATA):
     head = {k: v for k, v in data.items() if k != "builds"}
     lines = ",\n".join("  " + json.dumps(b, ensure_ascii=False) for b in data["builds"])
     text = json.dumps(head, indent=1, ensure_ascii=False)[:-2] + ',\n "builds": [\n' + lines + "\n ]\n}\n"
-    path.write_text(text, encoding="utf-8")
+    atomic_write_text(path, text)              # the site and the auto-deploy read it: never half a file
 
 
 def main(argv=None):
