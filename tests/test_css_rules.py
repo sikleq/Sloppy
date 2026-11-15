@@ -19,6 +19,13 @@ def test_head_icons_line_up_with_the_digits_and_tails_never_break():
     assert out.startswith('upon activating <span class="li-tail">any ' + chip)
 
 
+def test_hero_page_item_slot_cross_stays_inside_the_slot():
+    # the remove x of a hero page item slot hung past the cell edge (owner 2026-11-15)
+    rule = read_css().split(".ec-islot .hl-slot-clear {", 1)[1].split("}", 1)[0]
+    offsets = dict(re.findall(r"(top|right):\s*(-?\d+)px", rule))
+    assert offsets and all(int(v) >= 0 for v in offsets.values()), rule
+
+
 def test_regen_icons_are_heart_and_drop_with_a_plus():
     # the up arrow misled on a decrease; the plus in the corner (owner 2026-11-06, variant 5)
     for name in ("health_regen.svg", "mana_regen.svg"):

@@ -139,7 +139,7 @@ body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { paddi
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 4px;
   box-shadow: 0 1px 2px var(--shadow-55), inset 0 1px 0 var(--white-22);
 }
-.ec-islot .hl-slot-clear { top: -6px; right: -6px; width: 13px; height: 13px; font-size: 9px; line-height: 11px; }
+.ec-islot .hl-slot-clear { top: 1px; right: 1px; width: 13px; height: 13px; font-size: 9px; line-height: 11px; }
 .ec-islot:hover .hl-slot-clear { opacity: 1; }
 /* Picker close = the site's round gold / leather button (back-to-top family) with a pixel X;
    every Hero Lab / Hero Changes picker. The old inline SVG cross is hidden. */
