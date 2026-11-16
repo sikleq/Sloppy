@@ -50,6 +50,12 @@
     ['ehpPhys', 'EHP phys'], ['ehpMag', 'EHP mag'],
     ['itemCdr', 'Item CDR'],
   ];
+  // Percent stats that most heroes have at 0%: a row is hidden when both
+  // compared heroes sit at 0. Armor, both resists and regens always show.
+  const HIDE_WHEN_BOTH_ZERO = new Set(['statusRes', 'slowRes', 'spellAmp', 'evasion', 'lifesteal', 'spellLifesteal', 'healthRestoration', 'cooldownReduction', 'itemCdr']);
+  function heroLabStatIsZero(key, ...sets) {
+    return sets.every(v => !v || Math.abs(Number(v[key]) || 0) < 0.0001);
+  }
   const byHero = new Map(heroes.map(h => [h.id, h]));
   const byItem = new Map(items.map(i => [i.id, i]));
   // Enchanter's Bauble multiplier for tier-5 enchantments. Values come from the
@@ -882,7 +888,7 @@
     });
   }
 
-  function renderTotals(panel, vals, st) {
+  function renderTotals(panel, vals, st, otherVals) {
     const list = panel.querySelector('[data-total-list]');
     if (!list) return;
     const hero = st ? st.hero : null;
@@ -942,7 +948,8 @@
       return mergePositive && beneficial ? fmtBase(finalVal) : fmtBase(baseVal);
     };
 
-    const statRow = (label, baseStr, bonStr) => {
+    const statRow = (label, baseStr, bonStr, key) => {
+      if (key && HIDE_WHEN_BOTH_ZERO.has(key) && heroLabStatIsZero(key, vals, base, otherVals)) return '';
       const bon = bonStr || '';
       return `<div class="hl-ds-row"><span class="hl-ds-name">${label}</span><span class="hl-ds-val">${baseStr}${bon ? ' ' + bon : ''}</span></div>`;
     };
@@ -972,9 +979,9 @@
       statRow('Projectile', mergeDisplay(base.proj || 0, vals.proj || 0, (vals.proj || 0) - (base.proj || 0), fmt), mergePositive && ((vals.proj || 0) - (base.proj || 0)) > 0 ? '' : bonusInt((vals.proj || 0) - (base.proj || 0))),
       statRow('Cast Range', mergeDisplay(base.castRange || 0, vals.castRange || 0, (vals.castRange || 0) - (base.castRange || 0), fmt), mergePositive && ((vals.castRange || 0) - (base.castRange || 0)) > 0 ? '' : bonusInt(vals.castRange - base.castRange)),
       statRow('Move Speed', mergeDisplay(base.ms, vals.ms, vals.ms - base.ms, fmt), mergePositive && (vals.ms - base.ms) > 0 ? '' : msBonus),
-      statRow('Spell Amp', mergeDisplay(base.spellAmp, vals.spellAmp, vals.spellAmp - base.spellAmp, fmtPct), mergePositive && (vals.spellAmp - base.spellAmp) > 0 ? '' : spellAmpBonus),
-      statRow('Lifesteal', mergeDisplay(base.lifesteal, vals.lifesteal, vals.lifesteal - base.lifesteal, fmtPct), mergePositive && (vals.lifesteal - base.lifesteal) > 0 ? '' : lifestealBonus),
-      statRow('Spell Lifesteal', mergeDisplay(base.spellLifesteal, vals.spellLifesteal, vals.spellLifesteal - base.spellLifesteal, fmtPct), mergePositive && (vals.spellLifesteal - base.spellLifesteal) > 0 ? '' : spellLifestealBonus),
+      statRow('Spell Amp', mergeDisplay(base.spellAmp, vals.spellAmp, vals.spellAmp - base.spellAmp, fmtPct), mergePositive && (vals.spellAmp - base.spellAmp) > 0 ? '' : spellAmpBonus, 'spellAmp'),
+      statRow('Lifesteal', mergeDisplay(base.lifesteal, vals.lifesteal, vals.lifesteal - base.lifesteal, fmtPct), mergePositive && (vals.lifesteal - base.lifesteal) > 0 ? '' : lifestealBonus, 'lifesteal'),
+      statRow('Spell Lifesteal', mergeDisplay(base.spellLifesteal, vals.spellLifesteal, vals.spellLifesteal - base.spellLifesteal, fmtPct), mergePositive && (vals.spellLifesteal - base.spellLifesteal) > 0 ? '' : spellLifestealBonus, 'spellLifesteal'),
       statRow('Mana Regen', mergeDisplay(base.mpr, vals.mpr, vals.mpr - base.mpr, v => Number(v || 0).toFixed(2)), mergePositive && (vals.mpr - base.mpr) > 0 ? '' : mprBonus),
     ].join('');
 
@@ -991,15 +998,15 @@
       statRow('Armor', mergeDisplay(base.armor, vals.armor, vals.armor - base.armor, fmtStat), mergePositive && (vals.armor - base.armor) > 0 ? '' : armorBonus),
       statRow('Physical Resist', mergeDisplay(base.armorPct, vals.armorPct, vals.armorPct - base.armorPct, fmtPct), mergePositive && (vals.armorPct - base.armorPct) > 0 ? '' : armorPctBonus),
       statRow('Magic Resist', mergeDisplay(base.mr, vals.mr, vals.mr - base.mr, fmtPct), mergePositive && (vals.mr - base.mr) > 0 ? '' : mrBonus),
-      statRow('Status Resist', mergeDisplay(base.statusRes, vals.statusRes, vals.statusRes - base.statusRes, fmtPct), mergePositive && (vals.statusRes - base.statusRes) > 0 ? '' : statusResBonus),
-      statRow('Slow Resist', mergeDisplay(base.slowRes, vals.slowRes, vals.slowRes - base.slowRes, fmtPct), mergePositive && (vals.slowRes - base.slowRes) > 0 ? '' : slowResBonus),
-      statRow('Evasion', mergeDisplay(base.evasion, vals.evasion, vals.evasion - base.evasion, fmtPct), mergePositive && (vals.evasion - base.evasion) > 0 ? '' : evasionBonus),
+      statRow('Status Resist', mergeDisplay(base.statusRes, vals.statusRes, vals.statusRes - base.statusRes, fmtPct), mergePositive && (vals.statusRes - base.statusRes) > 0 ? '' : statusResBonus, 'statusRes'),
+      statRow('Slow Resist', mergeDisplay(base.slowRes, vals.slowRes, vals.slowRes - base.slowRes, fmtPct), mergePositive && (vals.slowRes - base.slowRes) > 0 ? '' : slowResBonus, 'slowRes'),
+      statRow('Evasion', mergeDisplay(base.evasion, vals.evasion, vals.evasion - base.evasion, fmtPct), mergePositive && (vals.evasion - base.evasion) > 0 ? '' : evasionBonus, 'evasion'),
       statRow('Health Regen', mergeDisplay(base.hpr, vals.hpr, vals.hpr - base.hpr, v => Number(v || 0).toFixed(2)), mergePositive && (vals.hpr - base.hpr) > 0 ? '' : hprBonus),
-      statRow('Health Restoration', mergeDisplay(base.healthRestoration || 0, vals.healthRestoration || 0, (vals.healthRestoration || 0) - (base.healthRestoration || 0), fmtPct), mergePositive && ((vals.healthRestoration || 0) - (base.healthRestoration || 0)) > 0 ? '' : bonusPct1((vals.healthRestoration || 0) - (base.healthRestoration || 0))),
+      statRow('Health Restoration', mergeDisplay(base.healthRestoration || 0, vals.healthRestoration || 0, (vals.healthRestoration || 0) - (base.healthRestoration || 0), fmtPct), mergePositive && ((vals.healthRestoration || 0) - (base.healthRestoration || 0)) > 0 ? '' : bonusPct1((vals.healthRestoration || 0) - (base.healthRestoration || 0)), 'healthRestoration'),
       statRow('Day Vision', mergeDisplay(base.dvision || 0, vals.dvision || 0, (vals.dvision || 0) - (base.dvision || 0), fmt), mergePositive && ((vals.dvision || 0) - (base.dvision || 0)) > 0 ? '' : bonusInt(vals.dvision - base.dvision)),
       statRow('Night Vision', mergeDisplay(base.nvision || 0, vals.nvision || 0, (vals.nvision || 0) - (base.nvision || 0), fmt), mergePositive && ((vals.nvision || 0) - (base.nvision || 0)) > 0 ? '' : bonusInt(vals.nvision - base.nvision)),
-      statRow('Cooldown Reduction', mergeDisplay(base.cooldownReduction || 0, vals.cooldownReduction || 0, (vals.cooldownReduction || 0) - (base.cooldownReduction || 0), fmtPct), mergePositive && ((vals.cooldownReduction || 0) - (base.cooldownReduction || 0)) > 0 ? '' : bonusPct1((vals.cooldownReduction || 0) - (base.cooldownReduction || 0))),
-      (vals.itemCdr || base.itemCdr) ? statRow('Item CDR', mergeDisplay(base.itemCdr || 0, vals.itemCdr || 0, (vals.itemCdr || 0) - (base.itemCdr || 0), fmtPct), mergePositive && ((vals.itemCdr || 0) - (base.itemCdr || 0)) > 0 ? '' : bonusPct1((vals.itemCdr || 0) - (base.itemCdr || 0))) : '',
+      statRow('Cooldown Reduction', mergeDisplay(base.cooldownReduction || 0, vals.cooldownReduction || 0, (vals.cooldownReduction || 0) - (base.cooldownReduction || 0), fmtPct), mergePositive && ((vals.cooldownReduction || 0) - (base.cooldownReduction || 0)) > 0 ? '' : bonusPct1((vals.cooldownReduction || 0) - (base.cooldownReduction || 0)), 'cooldownReduction'),
+      statRow('Item CDR', mergeDisplay(base.itemCdr || 0, vals.itemCdr || 0, (vals.itemCdr || 0) - (base.itemCdr || 0), fmtPct), mergePositive && ((vals.itemCdr || 0) - (base.itemCdr || 0)) > 0 ? '' : bonusPct1((vals.itemCdr || 0) - (base.itemCdr || 0)), 'itemCdr'),
     ].join('');
 
     // Attribute rows builder — shows base attr + item bonus on the number
@@ -1281,11 +1288,12 @@
     });
     renderHeroHud(panels[0], aState, a);
     renderHeroHud(panels[1], bState, b);
-    renderTotals(panels[0], a, aState);
-    renderTotals(panels[1], b, bState);
+    renderTotals(panels[0], a, aState, b);
+    renderTotals(panels[1], b, bState, a);
     const diff = document.getElementById('hl-diff-list');
     const diffPctOn = heroLabDiffPercentOn();
     diff.innerHTML = METRICS.map(([key, label]) => {
+      if (HIDE_WHEN_BOTH_ZERO.has(key) && heroLabStatIsZero(key, a, b)) return '';
       const leftVal = Number(a[key] || 0);
       const rightVal = Number(b[key] || 0);
       const rawDelta = leftVal - rightVal;
