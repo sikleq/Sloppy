@@ -60,7 +60,9 @@ def test_layout_fixes_of_the_audit():
     css = lambda n: (ROOT / "src" / "css" / f"{n}.css").read_text(encoding="utf-8")
     assert ".terrain-stats-page .ts-table-wrap { overflow-x: visible; }" in css("terrain-controls")
     assert ".terrain-stats-page .tf-tiles.ts-tiles { grid-template-columns: repeat(3," in css("terrain-controls")
-    assert "@media (max-width: 1500px) { .ec-hs-table .ec-hs-face { display: none; } }" in css("overrides")
+    # Min / Max heroes are portraits alone (owner 2026-11-16): the face never hides, no name span
+    assert ".ec-hs-face { display: none; }" not in css("overrides")
+    assert "a.ec-hstat-who span" not in css("overrides")
     assert ".mr-table { display: block; overflow-x: auto; }" in css("mana-items")
     assert "@media (min-width: 821px) and (max-width: 1500px)" in css("hero-lab-tooltip")
     assert ".creeps-page.ec-index .creeps-scroll { min-height:" in css("creeps-table")

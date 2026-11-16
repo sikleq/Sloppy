@@ -67,7 +67,7 @@ NAV_TABS = [
     ("main",       "Main",         "index.html"),
     ("changelogs", "Patches",      None),
     ("calendar",   "Calendar",     "calendar.html"),
-    ("materials",  "Materials",    "unit_changes.html"),
+    ("materials",  "Materials",    "hero_changes.html"),
 ]
 
 
@@ -78,9 +78,17 @@ NAV_TABS = [
 #   (group_key, group_label, group_href, [ (child_key, child_label, child_href|None), ... ])
 # child_href=None ⇒ an unbuilt "soon" placeholder (Summons / Lane Creeps).
 # The Changes page opens each group and stands first in it (owner 2026-10-21).
+# Group order Heroes, Creeps, Items, Terrain, Structures; Materials opens Hero Changes (owner 2026-11-16).
 # TERRAIN_LATEST stands for the newest Terrain page; resolve_href() turns it into terrain_<patch>.html.
 TERRAIN_LATEST = "<terrain-latest>"
 MATERIALS_GROUPS = [
+    ("heroes_grp", "Heroes", "hero_changes.html", [
+        ("hero_changes", "Hero Changes",  "hero_changes.html"),
+        ("heroes_stats", "Hero Stats",    "heroes_stats.html"),
+        ("hero_lab",     "Hero Lab",      "hero_lab.html"),
+        ("aoe_increase", "AoE Increase",  "aoe_increase.html"),
+        ("heroes_dyn",   "Hero Dynamics", "heroes_dyn.html"),
+    ]),
     ("creeps_grp", "Creeps", "unit_changes.html", [
         ("unit_changes", "Unit Changes",   "unit_changes.html"),
         # Neutral Abilities nests UNDER Neutral Stats (4th tuple element = its
@@ -93,13 +101,6 @@ MATERIALS_GROUPS = [
         ("item_changes", "Item Changes", "item_changes.html"),
         ("mana_items", "Mana Items",    "mana_items.html"),
         ("items_dyn",  "Item Dynamics", "items_dyn.html"),
-    ]),
-    ("heroes_grp", "Heroes", "hero_changes.html", [
-        ("hero_changes", "Hero Changes",  "hero_changes.html"),
-        ("heroes_stats", "Hero Stats",    "heroes_stats.html"),
-        ("hero_lab",     "Hero Lab",      "hero_lab.html"),
-        ("aoe_increase", "AoE Increase",  "aoe_increase.html"),
-        ("heroes_dyn",   "Hero Dynamics", "heroes_dyn.html"),
     ]),
     # Terrain Stats nests under Terrain (the owner 2026-10-04: "a sub-tab of the Terrain button — Terrain Stats,
     # with more info"): the map history 7.08 → now, builders/terrain_stats.py

@@ -16,8 +16,10 @@ def test_each_group_opens_its_changes_page_and_lists_it_first():
         assert href == page and children[0][2] == page
 
 
-def test_materials_tab_opens_unit_changes():
-    assert dict((k, h) for k, _l, h in site.NAV_TABS)["materials"] == "unit_changes.html"
+def test_materials_tab_opens_hero_changes():
+    # Owner 2026-11-16: Materials opens Hero Changes, groups Heroes, Creeps, Items, Terrain, Structures.
+    assert dict((k, h) for k, _l, h in site.NAV_TABS)["materials"] == "hero_changes.html"
+    assert [g[1] for g in site.MATERIALS_GROUPS] == ["Heroes", "Creeps", "Items", "Terrain", "Structures"]
     html = site.render_materials_subnav("hero_changes")
     assert html.index('href="hero_changes.html">Hero Changes') < html.index('href="heroes_stats.html">Hero Stats')
 

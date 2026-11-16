@@ -1168,7 +1168,7 @@ def _unit_card(e: dict) -> str:
     return f'<a {attrs} href="{_esc(href)}">{img}</a>'
 
 
-def _unit_grid(groups) -> str:
+def _unit_grid(groups, fill=False) -> str:
     """Category columns (camps / Lane Creeps / Summons, or Structures), icon-only
     cards row by row — mirrors the hero picker. Camp columns get a small
     difficulty badge beside the title."""
@@ -1182,7 +1182,8 @@ def _unit_grid(groups) -> str:
                  if camp else '')
         cols.append(f'<section class="ec-ucol"><h3 class="ec-group-title">{badge}{_esc(label)}</h3>'
                     f'<div class="ec-ucards">{cards}</div></section>')
-    return f'<div class="ec-ugrid">{"".join(cols)}</div>'
+    # fill: the columns spread over the whole row (Unit Changes, owner 2026-11-16)
+    return f'<div class="ec-ugrid{" ec-ugrid-fill" if fill else ""}">{"".join(cols)}</div>'
 
 
 def _item_card(e: dict) -> str:
@@ -1279,12 +1280,13 @@ def _hero_group_stats(label, lst):
         return f'<td colspan="{span}"{klass}>{html}</td>'
 
     def who(w, val):
-        """Two cells (owner 2026-09-26): the hero, left-aligned, then the value in its own column."""
-        return (td(f'<a class="ec-hstat-who" href="heroes/{_esc(w["slug"])}.html">'
+        """Two cells (owner 2026-09-26): the hero, then the value in its own column.
+        The hero is its portrait alone, no name (owner 2026-11-16); the name stays as the image's alt."""
+        return (td(f'<a class="ec-hstat-who" href="heroes/{_esc(w["slug"])}.html" aria-label="{_esc(w["name"])}">'
                    # the record table sits on a top-level page: "../icons" left /Sloppy/ on GitHub Pages and 404'd
                    # 15 faces (audit 2026-10-05; the local server at / hid it) — strip it like the other cards do
-                   f'<img class="ec-hs-face" src="{_esc(w["icon"].replace("../", "", 1))}" alt="" loading="lazy">'
-                   f'<span>{_esc(w["name"])}</span></a>', 2, "ec-hs-hero")
+                   f'<img class="ec-hs-face" src="{_esc(w["icon"].replace("../", "", 1))}" alt="{_esc(w["name"])}" loading="lazy">'
+                   '</a>', 2, "ec-hs-hero")
                 + td(f'<b>{num(val)}</b>', 1, "ec-hs-val"))
 
     def row(label, cells):
@@ -1356,7 +1358,7 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
         plural = "structures"
     elif kind == "unit":
         groups = _unit_groups(ents)
-        grid = _unit_grid(groups)
+        grid = _unit_grid(groups, fill=True)
         n_old = sum(1 for _, lst in groups for e in lst if not e["_current"])
         plural = "units"
     else:

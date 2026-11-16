@@ -276,6 +276,11 @@ def test_a_unit_column_that_wraps_keeps_its_width():
     css = read_css()
     assert ".ec-ugrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));" in css
     assert ".ec-ucol { flex:" not in css
+    # Unit Changes spreads its columns over the whole row; Structures keeps auto-fill (owner 2026-11-16)
+    assert ".ec-ugrid.ec-ugrid-fill { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }" in css
+    from builders import entity_changes as ec
+    assert 'class="ec-ugrid ec-ugrid-fill"' in ec._unit_grid([], fill=True)
+    assert 'class="ec-ugrid"' in ec._unit_grid([])
 
 
 def test_rune_rows_become_blocks_with_the_rune_s_icon_and_name():

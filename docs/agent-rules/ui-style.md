@@ -23,8 +23,13 @@
 ## Materials: Changes — первая вкладка группы (2026-10-21)
 
 Кнопка группы (Heroes / Items / Creeps) открывает её страницу Changes (Hero / Item / Unit Changes), и в выпадающем
-списке Changes стоит первой; вкладка Materials в шапке ведёт на Unit Changes (`MATERIALS_GROUPS` / `NAV_TABS` в
-`patch/site_common.py`, тест `tests/test_materials_nav.py`).
+списке Changes стоит первой; вкладка Materials в шапке ведёт на Hero Changes, порядок групп: Heroes, Creeps, Items,
+Terrain, Structures (владелец 2026-11-16; `MATERIALS_GROUPS` / `NAV_TABS` в `patch/site_common.py`, тест
+`tests/test_materials_nav.py`).
+
+В таблице Min / Max под колонками Hero Changes герой — только портрет, без имени (2026-11-16). Колонки Unit Changes
+растянуты на всю ширину (`ec-ugrid-fill`, auto-fit); Structures оставлен на auto-fill, иначе три колонки раздувают
+карточки.
 
 ## Materials page vertical rhythm (правило отступов)
 
