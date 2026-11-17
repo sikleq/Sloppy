@@ -7,15 +7,15 @@
  "checks": {
   "247040": {
    "version": 7505,
-   "checked": "2026-11-17T08:33:22Z"
+   "checked": "2026-11-17T17:54:15Z"
   },
   "2305270": {
-   "version": 3365,
-   "checked": "2026-11-17T08:33:22Z"
+   "version": 3366,
+   "checked": "2026-11-17T17:54:15Z"
   },
   "570": {
    "version": 6976,
-   "checked": "2026-11-17T08:33:22Z"
+   "checked": "2026-11-17T17:54:15Z"
   }
  },
  "builds": [
@@ -2577,6 +2577,7 @@
   {"branch": "staging", "from": 3361, "version": 3363, "time": "2026-11-16T07:02:35Z", "after": "2026-11-16T00:17:10Z", "source": "valve-api", "timed": false},
   {"branch": "staging", "from": 3363, "version": 3364, "time": "2026-11-17T00:45:17Z", "after": "2026-11-16T17:00:21Z", "source": "valve-api", "timed": false},
   {"branch": "public", "from": 6975, "version": 6976, "time": "2026-11-17T08:33:22Z", "after": "2026-11-17T00:45:17Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3364, "version": 3365, "time": "2026-11-17T08:33:22Z", "after": "2026-11-17T00:45:17Z", "source": "valve-api", "timed": false}
+  {"branch": "staging", "from": 3364, "version": 3365, "time": "2026-11-17T08:33:22Z", "after": "2026-11-17T00:45:17Z", "source": "valve-api", "timed": false},
+  {"branch": "staging", "from": 3365, "version": 3366, "time": "2026-11-17T17:54:15Z", "after": "2026-11-17T12:27:45Z", "source": "valve-api", "timed": false}
  ]
 }
