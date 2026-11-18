@@ -101,6 +101,25 @@ def test_generator_adds_the_stats_the_notes_kept_quiet_about():
     assert g._postprocess_silent_stats(out, "7.38") == out                              # idempotent
 
 
+def test_generator_invents_no_stat_row_the_notes_already_say_or_for_a_gone_item():
+    # 7.42 proofread 2026-11-18: Phase Boots got "Now also provides +15 Damage" beside Valve's own Damage row, and the
+    # cycled-out Dagger of Ristul "Damage bonus increased from +25 to +30"
+    import pytest
+    import tools.generate_patch_code_v2 as g
+    from patch.cards_item_stats import item_stats_pair
+    if not item_stats_pair("Phase Boots", "7.42"):
+        pytest.skip("no items.txt of 7.41f / 7.42 here")
+    phase = ['W(item_header("Phase Boots"))', 'W(ul_open())',
+             'W(li("Damage bonus changed from +18/12 for melee/ranged heroes to +15 for any wearer", t("REWORK")))',
+             'W(li("Movement Speed bonus changed from +50 to +45/55 for Ranged/Melee Heroes", b(50, [45, 55])))',
+             'W(ul_close())']
+    assert g._postprocess_silent_stats(phase, "7.42") == phase
+    gone = ['W(item_header("Dagger of Ristul"))', 'W(ul_open())', 'W(li("Item Cycled Out", t("DEL")))', 'W(ul_close())']
+    out = g._postprocess_silent_stats(gone, "7.42")                # the file's change stays, marked as ours
+    assert out[2] == ('W(li("Damage bonus increased from +25 to +30", b(25.0, 30.0), '
+                      'extra=inline_note("Not in the patch notes: found in the game files")))')
+
+
 def test_generator_never_folds_an_ability_into_the_card():
     import tools.generate_patch_code_v2 as g
     lines = ['W(item_header("Heaven\'s Halberd", changed=True))', 'W(auto_components_change("Heaven\'s Halberd", "7.41"))',

@@ -34,6 +34,20 @@ def _hero_blocks(version):
     return out
 
 
+@functools.lru_cache(maxsize=None)
+def _unit_blocks(version):
+    """{ability slug: its KV block} of npc_abilities.txt in a version: the abilities of creeps and other units, which
+    the hero files do not hold (7.42 Black Dragon's Fireball → Searing Swoop card needed both patches' texts)."""
+    path = os.path.join(_STATS, version, "npc_abilities.txt")
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            text = _decode_bytes(f.read())
+    else:
+        text = game_files.npc(version, "npc_abilities.txt") if version in game_files.versions() else None
+    root = hero_ability_blocks(parse_kv(text)) if text else {}
+    return {k: v for k, v in (root or {}).items() if isinstance(v, dict)}
+
+
 def _store_blocks(version):
     """A patch without data/stats/<v>/heroes (7.08-7.34, owner 2026-10-25: "мы должны решать такое и добыть все
     данные"): the store's own build — one npc_abilities.txt for every ability then, or per-hero files if it has them."""

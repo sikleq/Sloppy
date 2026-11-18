@@ -715,6 +715,16 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Watcher capture time decreased from 1.5s to 1s", "BUFF"),
     ("Watchers now can't be activated before the start of the game", "NERF"),
     ("Ability is moved to the 4th ability slot", "MISC"),       # an ability's key slot is not the map
+    # 7.42 proofread 2026-11-18: the canon in Valve's new words
+    ("Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be", "REWORK"),
+    ("Radiant Tier 1 tower moved ever so slightly to the south", "REWORK"),
+    ("Dire fountain moved ~300 units closer to the Dire Ancient", "REWORK"),
+    ("Dire base shop moved 256 units west", "REWORK"),
+    ("Slightly rearranged the trees around Radiant Safelane Tier 1 small camp", "REWORK"),
+    ("Slightly increased the amount of highground to the north of the Radiant midlane ramp", "REWORK"),
+    ("Spawn boxes of the Safelane Tier 1 small and large camps have been decreased", "REWORK"),
+    # an extra lane creep earlier is its buff whatever the verb (7.42 said "changed")
+    ("Time at which 1 Ranged creep is added changed from 40:00 to 35:00", "BUFF"),
 ])
 def test_terrain_canon(text, tag):
     assert g._guess_tag(text) == tag

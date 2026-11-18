@@ -72,7 +72,7 @@ def build():
     W(subgroup("Miscellaneous"))
     W(ul_open())
     W(li("Fountain's True Sight radius increased from 1200 to 1800", b(1200, 1800)))
-    W(li("Dire fountain moved ~300 units closer to the Dire Ancient", t("MISC"), extra=inline_note("Now closer to the distance between Radiant fountain and Ancient")))
+    W(li("Dire fountain moved ~300 units closer to the Dire Ancient", t("REWORK"), extra=inline_note("Now closer to the distance between Radiant fountain and Ancient")))
     W(ul_close())
     W(unit_header("Courier", "../icons/units/npc_dota_courier.png", general=False, track=True))
     W(ul_open())
@@ -96,7 +96,7 @@ def build():
     W(ul_close())
     W(unit_header("Siege Creep", "../icons/units/npc_dota_goodguys_siege.png", general=False, page="siege-creep"))
     W(ul_open())
-    W(li("Reworked Siege creep spawn count after the 30:00 mark", t("REWORK"), extra=inline_note("OLD:<br>&nbsp;&nbsp;– 0:00-29:59: Every 5 minutes, 1 siege creep spawns per wave<br>&nbsp;&nbsp;– 30:00-59:59: Every 5 minutes, 2 siege creeps spawn per wave<br>&nbsp;&nbsp;– 60:00+: Every 5 minutes, 3 siege creeps spawn per wave<br>NEW:<br>&nbsp;&nbsp;– 0:00-29:59: Every 5 minutes, 1 siege creep spawns per wave<br>&nbsp;&nbsp;– 30:00-59:59: Every 2.5 minutes, 1 siege creep spawns per wave<br>&nbsp;&nbsp;– 60:00+: Every 2.5 minutes, 2 siege creeps spawn per wave"), also_dyn=['unit|siege-creep']))
+    W(li("Reworked Siege creep spawn count after the 30:00 mark", t("REWORK"), extra=mech_before_after("Game time", [("0:00-29:59", "Every 5 minutes, 1 siege creep spawns per wave", "Every 5 minutes, 1 siege creep spawns per wave"), ("30:00-59:59", "Every 5 minutes, 2 siege creeps spawn per wave", "Every 2.5 minutes, 1 siege creep spawns per wave"), ("60:00+", "Every 5 minutes, 3 siege creeps spawn per wave", "Every 2.5 minutes, 2 siege creeps spawn per wave")]), also_dyn=['unit|siege-creep']))
     W(li("Siege creeps no longer switch aggro to the towers that attack heroes", t("MISC"), also_dyn=['unit|siege-creep']))
     W(ul_close())
 
@@ -132,36 +132,54 @@ def build():
     W(li("Illusions created by Illusion Rune now have 40% Item Potency", t("MISC")))
     W(ul_close())
 
-    W(plain_header("Terrain Changes"))
+    W(plain_header("Terrain Changes", terrain_link="7.42"))
     W(subgroup("Twin Gates"))
     W(ul_open())
     W(li("Moved small flooded camps at the top/bottom rims closer to stream ends", t("REWORK")))
     W(li("Moved medium non-flooded camps at the end of streams to the highground that was previously occupied by the Twin Gates", t("REWORK")))
-    W(li("Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be", t("MISC"), extra=inline_note("The Radiant one is in the exact position where that camp used to be, while Dire one is located above it, on the rim")))
+    W(li("Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be", t("REWORK"), extra=inline_note("The Radiant one is in the exact position where that camp used to be, while Dire one is located above it, on the rim")))
     W(ul_close())
     W(subgroup("Mid Lane"))
     W(ul_open())
     W(li("Added some trees to the sides of Mid lane where they meet to break some lines of sight", t("NEW")))
     W(li("Added more trees to the north of Radiant Tier 1 tower, and narrowed down the lane width where the Tier 1 tower is", t("NEW")))
     W(li("Moved Radiant and Dire Tier 2 tower roughly 260 units away from Radiant base and Radiant and Dire Tier 1 towers roughly 350 units away from Radiant base", t("REWORK"), extra=inline_note("This equalizes the distances from the respective Radiant/Dire bases to the corresponding tiers of towers <span class=\"pop-note\">(Previously, the distance between the Radiant highground and Radiant Tier 2 was significantly shorter than between Dire highground and Dire Tier 2, whereas now they are closer in length)</span><br>To accommodate the move, reworked the geometry of the river where mid lanes meet, and moved Radiant mid wave creep spawn to be in front of the Radiant Tier 3 tower, as was already the case with the Dire mid wave spawn")))
-    W(li("Slightly increased the amount of highground to the north of the Radiant midlane ramp", t("BUFF")))
+    W(li("Slightly increased the amount of highground to the north of the Radiant midlane ramp", t("REWORK")))
     W(li("Cleaned up the trees by Dire Mid Tier 1 tower and did another pass on the cliff line on the radiant side", t("MISC")))
-    W(li("Radiant Tier 1 tower moved ever so slightly to the south", t("MISC")))
+    W(li("Radiant Tier 1 tower moved ever so slightly to the south", t("REWORK")))
     W(ul_close())
     W(subgroup("Miscellaneous"))
     W(ul_open())
-    W(li("Spawn boxes of the Safelane Tier 1 small and large camps have been decreased", t("NERF")))
+    W(li("Spawn boxes of the Safelane Tier 1 small and large camps have been decreased", t("REWORK")))
     W(li("Removed a bunch of trees on the cliff overlooking the stream near the Safelane Tier 1 Towers", t("DEL")))
     W(li("Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu", t("MISC")))
-    W(li("Slightly rearranged the trees around Radiant Safelane Tier 1 small camp", t("MISC")))
-    W(li("Dire base shop moved 256 units west", t("MISC"), extra=inline_note("Not in the patch notes: found in the game files")))
+    W(li("Slightly rearranged the trees around Radiant Safelane Tier 1 small camp", t("REWORK")))
+    W(li("Dire base shop moved 256 units west", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====
     W(section("Neutral Creep Updates"))
 
-    # General changes (label — no own changes; sub-units follow)
+    # General changes: Valve's own rows of the label (the 7.42 draft dropped them; generator _render_neutral_creep)
     W(plain_header("General changes", dynamics=False))
+    W(ul_open())
+    W(li("Now gold bounty upgrade alternates between +1 min gold bounty and +1 max bounty every minute", t("NEW")))
+    W(li("XP bounty upgrade decreased from 5 to 4 per cycle", b(5, 4)))
+    W(li("Gold bounty no longer increases by 1 per cycle", t("DEL")))
+    W(li("Neutral creeps can now walk through both Radiant and Dire defender's gates", t("MISC")))
+    W(li("Each non-amphibian and non-ancient Neutral camp unit now has a \"home jungle\", meaning it will spawn only on its own side of the map", t("MISC"), extra=mech_table(["Jungle", "Small camps", "Medium camps", "Large camps"], [["Radiant", "Kobold camp<br>Hill Troll Berserker and Kobold camp<br>Hill Troll camp", "Wolf camp<br>Ogre camp<br>Radigull camp (new!)", "Centaur camp<br>Wildwing camp<br>Eimermole camp (new!)"], ["Dire", "Vhoul camp<br>Ghost camp<br>Harpy camp", "Satyr camp<br>Golem camp<br>Odobenus camp (new!)", "Large Satyr camp<br>Hellbear camp<br>Dark Troll camp"]])))
+    W(li("Added a Radigull camp: New Medium camp for Radiant", t("NEW"), extra=inline_note("Each camp consists of 2 Radigulls")))
+    W(li("Added an Odobenus camp: New Medium camp for Dire", t("NEW"), extra=inline_note("Each camp consists of 1 Odobenus Frostmage and 2 Odobenus Footmen")))
+    W(li("Added an Eimermole camp: New Large camp for Radiant", t("NEW"), extra=inline_note("Each camp consists of 1 Eimermole Foreman and 1 Eimermole")))
+    W(li("Added an Ancient Ogre Seal camp: New Ancient camp", t("NEW"), extra=inline_note(" Each camp consists of 1 Ancient Ogre Seal and 2 Ancient Ogre Seal Pups")))
+    W(li("Satyr Banisher in Large Satyr camp replaced with the second Satyr Mindstealer", t("REWORK")))
+    W(li("Amount of Kobolds in Kobold camp decreased from 3 to 2", b(3, 2)))
+    W(li("Medium Centaur camp removed", t("DEL")))
+    W(li("Large Warpine Raider camp removed", t("DEL")))
+    W(li("Ancient Thunderhide camp removed", t("DEL")))
+    W(li("Updated neutral creep cast behavior to be less deterministic for most neutral creeps", t("MISC")))
+    W(li("Satyr Tormenter, Ancient Black Dragon, Ancient Ice Shaman, Mud Golems, are now more likely to cast their active abilities", t("MISC")))
+    W(ul_close())
 
     # Hill Troll Berserker
     W(unit_header("Hill Troll Berserker", NEUTRAL_CDN + "forest_troll_berserker.png"))
@@ -191,7 +209,8 @@ def build():
     W(ability("Steal Weapon", icon_url="../icons/abilities/kobold_disarm.png"))
     W(ul_open())
     W(li("Ability Reworked", t("REWORK"), extra=inline_note("No longer disarms enemies on the third attack")))
-    W(li("After a 1s cast time, pierces all enemies in a line, dealing 50/60/70/80 magical damage and applying Break for 3/3.5/4/4.5s to all affected units", t("MISC")))
+    # Valve's 4.5s at level 4 is not what the game has: kobold_disarm break_duration is "3.0 3.5 4.0 5.0" in 7.42
+    W(li('After a 1s cast time, pierces all enemies in a line, dealing 50/60/70/80 magical damage and applying Break for 3/3.5/4/<span class="wrong-word">4.5s</span> to all affected units', t("MISC"), extra=note_box('This value is wrongly stated. Break lasts 3/3.5/4/5s in the game files of 7.42')))
     W(li("Cast Range 500. No Mana Cost. Cooldown: 9s", t("MISC")))
     W(ul_close())
 
@@ -214,7 +233,8 @@ def build():
     W(unit_header("Ogre Bruiser", NEUTRAL_CDN + "ogre_mauler.png"))
     W(ability("Ogre Smash!", icon_url="../icons/abilities/ogre_bruiser_ogre_smash.png"))
     W(ul_open())
-    W(li("Now has 1.4s cast point when cast as a player-controlled unit", t("NERF"), extra=inline_note("Neutral Ogre Bruisers still have cast point of 2.8s")))
+    # half the cast point for a player's Ogre (2.8s in 7.41f for everyone): a gain, not a new delay
+    W(li("Now has 1.4s cast point when cast as a player-controlled unit", b(2.8, 1.4, l=True), extra=inline_note("Neutral Ogre Bruisers still have cast point of 2.8s")))
     W(ul_close())
 
     # Satyr Mindstealer
@@ -234,7 +254,8 @@ def build():
     W(ability("Purge", icon_url="../icons/abilities/satyr_trickster_purge.png"))
     W(ul_open())
     W(li("Cooldown increased from 3s to 8s", b(3, 8, l=True)))
-    W(li("Cast Range increased from 350/400/450/500 to 400/450/500/600", b([350, 400, 450, 500], [400, 450, 500, 600])))
+    # Valve's "500" at level 4 is wrong: satyr_trickster_purge AbilityCastRange is "350 400 450 550" in 7.41f
+    W(li('Cast Range increased from 350/400/450/<span class="wrong-word">500</span> to 400/450/500/600', b([350, 400, 450, 550], [400, 450, 500, 600]), extra=note_box('This change is wrongly stated. Level 4 was 550; the real change is 350/400/450/550 &rarr; 400/450/500/600')))
     W(li("Slow duration decreased from 5s to 4s", b(5, 4)))
     W(li("Base slow increased from 50% to 80%", b(50, 80)))
     W(ul_close())
@@ -314,15 +335,20 @@ def build():
 
     # Ancient Black Dragon
     W(unit_header("Ancient Black Dragon", NEUTRAL_CDN + "black_dragon.png"))
-    W(ability("Searing Swoop", icon_url="../icons/abilities/black_dragon_fireball.png"))
-    W(ul_open())
-    W(li("Now causes the Black Dragon to take flight in an arc toward the targeted direction and loop back to its starting position, leaving a trail of fire in its wake. Once the flight starts it cannot be cancelled by the caster, but disables can interrupt it", t("NEW")))
-    W(li("Duration decreased from 8/9/10/12s to 5/6/7/9s", b([8, 9, 10, 12], [5, 6, 7, 9])))
-    W(li("Damage per second rescaled from 85 to 65/75/85/85", b(85, [65, 75, 85, 85])))
-    W(li("Cast Point increased from 0.3s to 0.6s when cast by a neutral creep", b(0.3, 0.6, l=True), extra=inline_note("Casts by player-controlled units still have cast point of 0.3s")))
-    W(li("Fireball ability renamed into Searing Swoop", t("MISC")))
-    W(li("Flame width: 150. Dive length: 800. Dive width: 400 (affected by AoE bonuses)", t("MISC")))
-    W(ul_close())
+    _black_dragon_fireball_old, _black_dragon_fireball_new = game_ability_pair("black_dragon_fireball", "7.42")
+    W(ability_change(
+        old=dict(name="Fireball", icon_url="../icons/abilities/black_dragon_fireball.png", desc=_black_dragon_fireball_old),
+        new=dict(name="Searing Swoop", icon_url="../icons/abilities/black_dragon_fireball.png", desc=_black_dragon_fireball_new),
+        summary="Ability reworked.",
+        tag="rework",
+        rows_first=lambda: [
+            li("Now causes the Black Dragon to take flight in an arc toward the targeted direction and loop back to its starting position, leaving a trail of fire in its wake. Once the flight starts it cannot be cancelled by the caster, but disables can interrupt it", t("NEW"), covered=True),
+            li("Duration decreased from 8/9/10/12s to 5/6/7/9s", b([8, 9, 10, 12], [5, 6, 7, 9])),
+            li("Damage per second rescaled from 85 to 65/75/85/85", b(85, [65, 75, 85, 85])),
+            li("Cast Point increased from 0.3s to 0.6s when cast by a neutral creep", b(0.3, 0.6, l=True), extra=inline_note("Casts by player-controlled units still have cast point of 0.3s")),
+            li("Fireball ability renamed into Searing Swoop", t("MISC"), covered=True),
+            li("Flame width: 150. Dive length: 800. Dive width: 400 (affected by AoE bonuses)", t("MISC"), covered=True),
+        ]))
 
     # Ancient Granite Golem
     W(unit_header("Ancient Granite Golem", NEUTRAL_CDN + "granite_golem.png"))
@@ -754,7 +780,6 @@ def build():
     W(ul_close())
     W(item_header("Phase Boots"))
     W(ul_open())
-    W(li("Now also provides +15 Damage", t("NEW")))
     W(li("Damage bonus changed from +18/12 for melee/ranged heroes to +15 for any wearer", t("REWORK")))
     W(li("Movement Speed bonus changed from +50 to +45/55 for Ranged/Melee Heroes", b(50, [45, 55])))
     W(ul_close())
@@ -942,12 +967,12 @@ def build():
     W(plain_header("Artifact Changes", dynamics=False, sublabel=True))
     W(item_header("Dagger of Ristul"))
     W(ul_open())
-    W(li("Damage bonus increased from +25 to +30", b(25.0, 30.0)))
+    W(li("Damage bonus increased from +25 to +30", b(25.0, 30.0), extra=inline_note("Not in the patch notes: found in the game files")))
     W(li("Item Cycled Out", t("DEL")))
     W(ul_close())
     W(item_header("Duelist Gloves"))
     W(ul_open())
-    W(li("Attack Speed bonus increased from +20 to +26", b(20.0, 26.0)))
+    W(li("Attack Speed bonus increased from +20 to +26", b(20.0, 26.0), extra=inline_note("Not in the patch notes: found in the game files")))
     W(li("Item Cycled Out", t("DEL")))
     W(ul_close())
     W(item_header("Occult Bracelet", removed="Neutral Item cycled out"))

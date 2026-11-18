@@ -513,6 +513,8 @@ ul.changes li.unit-sheet::before { content: none; display: none; }
   padding: 2px 30px 2px 8px; border: 1px solid rgba(0, 0, 0, 0.6); border-radius: 2px;
   color: #fff; font-size: 13.5px; text-shadow: 0 1px 1px #000; font-variant-numeric: tabular-nums;
 }
+/* a unit without mana (7.42 Eimermole) has the health bar alone: one tile row high, not stretched over both */
+.us-bar:only-child { align-self: start; height: calc(50% - 2px); }
 .us-hp { background: linear-gradient(#3f8f3a, #2a6a27); }
 .us-mp { background: linear-gradient(#3a6fc0, #27518f); }
 .us-regen { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 12px; opacity: 0.85; }
@@ -529,6 +531,7 @@ ul.changes li.unit-sheet::before { content: none; display: none; }
 @media (max-width: 760px) {
   ul.changes li.unit-sheet { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
   .us-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .us-bar:only-child { height: auto; }
 }
 /* CHIP-LESS DESCRIPTION ROWS — a li with no tag (Flooded Camps / Map Objectives
    mechanics, new-entity notes). Drop the 76px phantom tag column the change

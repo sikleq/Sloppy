@@ -551,6 +551,85 @@ def _postprocess_per_death(lines):
     return out
 
 
+_OLD_NEW_NOTE_RE = re.compile(r'^(?P<head>\s*W\(li\("[^"]*", t\("\w+"\)), extra=inline_note\("OLD:<br>(?P<old>(?:[^"\\]|\\.)*?)'
+                              r'<br>NEW:<br>(?P<new>(?:[^"\\]|\\.)*)"\)(?P<tail>(?:, also_dyn=\[[^\]]*\])?\)\))\s*$')
+_KEYED_PART_RE = re.compile(r'^(?:&nbsp;|\s|–|-)*(?P<key>[^:<]{1,24}(?::\d{2}[^:<]{0,12})*): (?P<val>.+)$')
+
+
+def _keyed_parts(raw):
+    """"&nbsp;&nbsp;– 0:00-29:59: Every 5 minutes …<br>…" → [(key, value)] or None when a line has no "key: "."""
+    out = []
+    for part in raw.split("<br>"):
+        m = _KEYED_PART_RE.match(part.strip())
+        if not m:
+            return None
+        out.append((m.group("key").strip(), m.group("val").strip()))
+    return out
+
+
+def _postprocess_old_new_table(lines):
+    """A row whose "?" is Valve's "OLD:" list and "NEW:" list over the same keys (7.42 "Reworked Siege creep spawn
+    count after the 30:00 mark": three game-time spans each) → a before / after table under the row, a line per key
+    (owner 2026-11-18: "тайминги OLD/NEW … нашими таблицами, как принято"). Lists with different keys stay a "?"."""
+    out = []
+    for ln in lines:
+        m = _OLD_NEW_NOTE_RE.match(ln)
+        old = _keyed_parts(m.group("old")) if m else None
+        new = _keyed_parts(m.group("new")) if m else None
+        if not old or not new or [k for k, _ in old] != [k for k, _ in new]:
+            out.append(ln)
+            continue
+        title = "Game time" if all(re.match(r"\d+:\d{2}", k) for k, _ in old) else ""
+        rows = ", ".join(f"({_py_str(k)}, {_py_str(a)}, {_py_str(b)})" for (k, a), (_, b) in zip(old, new))
+        out.append(f'{m.group("head")}, extra=mech_before_after({_py_str(title)}, [{rows}]){m.group("tail")}')
+    return out
+
+
+_UNIT_ABILITY_RE = re.compile(r'^(?P<ind>\s*)W\(ability\("(?P<new>[^"]+)", icon_url="(?P<icon>[^"]*/(?P<slug>\w+)\.png)"\)\)\s*$')
+_RENAMED_ROW_RE = re.compile(r'^\s*W\(li\("(?P<old>[A-Z][\w\' -]+?)(?: ability)? renamed (?:in)?to (?P<new>[A-Z][\w\' -]+?)"')
+
+
+def _postprocess_renamed_unit_ability(lines, version=None):
+    """A unit's ability that the patch reworks and renames ("Fireball ability renamed into Searing Swoop" among the
+    rows of Searing Swoop, 7.42 Ancient Black Dragon) → the old → new card with both patches' game texts
+    (game_ability_pair: the old side only from the files of the patch before), the rows above it; the rename row and
+    the word rows the card already says stay hidden (owner 2026-11-18: "переделанная способность: карточки old →
+    new"). Left alone when the files of either patch have no text for it."""
+    from patch.aghs_text import ability_text
+    from patch.meta import _prev_patch_version
+    out, i = [], 0
+    while i < len(lines):
+        m = _UNIT_ABILITY_RE.match(lines[i])
+        end = next((k for k in range(i + 2, len(lines)) if lines[k].strip() == "W(ul_close())"), None) \
+            if m and i + 1 < len(lines) and lines[i + 1].strip() == "W(ul_open())" else None
+        rows = lines[i + 2:end] if end else []
+        ren = next((r for r in map(_RENAMED_ROW_RE.match, rows) if r and r.group("new") == m.group("new")), None)
+        if not ren or not version or not all(ln.lstrip().startswith("W(li") for ln in rows):
+            out.append(lines[i])
+            i += 1
+            continue
+        slug, ind, icon = m.group("slug"), m.group("ind"), m.group("icon")
+        prev = _prev_patch_version(version)
+        if not (prev and ability_text(slug, prev) and ability_text(slug, version)):
+            out.append(lines[i])
+            i += 1
+            continue
+
+        def inner(row):
+            row = row.strip()[2:-1]                                           # W(li(…)) -> li(…)
+            if re.search(r', t\("(?:NEW|MISC)"\)', row) and "covered=" not in row:
+                row = row[:-1] + ", covered=True)"
+            return f"{ind}        {row},"
+        out += [f'{ind}_{slug}_old, _{slug}_new = game_ability_pair("{slug}", "{version}")',
+                f'{ind}W(ability_change(',
+                f'{ind}    old=dict(name="{ren.group("old")}", icon_url="{icon}", desc=_{slug}_old),',
+                f'{ind}    new=dict(name="{m.group("new")}", icon_url="{icon}", desc=_{slug}_new),',
+                f'{ind}    summary="Ability reworked.",', f'{ind}    tag="rework",', f'{ind}    rows_first=lambda: [',
+                *map(inner, rows), f'{ind}    ]))']
+        i = end + 1
+    return out
+
+
 def _drop_empty_lists(body):
     """A list left empty goes: its ul_open / ul_close pair."""
     body = [ln for k, ln in enumerate(body) if not (ln.strip() == "W(ul_open())" and k + 1 < len(body)

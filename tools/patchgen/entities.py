@@ -447,8 +447,13 @@ def _render_neutral_creep(creep):
     # changes). Its `name` field is a loc key like "#DOTA_Patch_7_39e_...",
     # not a unit slug. Emit plain_header so it renders as a text label only.
     if creep.get('is_general_note'):
-        out.append(f'\n# {display} (label — no own changes; sub-units follow)')
+        out.append(f'\n# {display} (a label; its own rows, if Valve wrote any, follow)')
         out.append(f'W(plain_header("{display}", dynamics=False))')
+        # 7.42: the label carried 24 rows of its own (home jungles, removed camps, bounty upgrades) and every one of
+        # them was dropped — the page showed an empty "General changes" (owner 2026-11-18 proofread)
+        if any(not n.get('hide_dot') and _strip_html(n.get('note') or '').strip() for n in notes):
+            body, _ = _emit_notes(notes, general=True)
+            out.extend(body)
         return out
 
     # Strip the npc_dota_neutral_ prefix to get the icon slug.

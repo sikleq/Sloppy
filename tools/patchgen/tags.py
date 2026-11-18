@@ -172,6 +172,15 @@ CANONICAL_TAGS = [
     (re.compile(r'\b(?:slightly )?moved (?:slightly )?(?:closer|away|towards?|north|south|east|west|farther|further)\b'
                 r'(?![^.]*\bslot\b)', re.I), 'REWORK'),
     (re.compile(r'\bspawn ?box(?:es)? (?:has|have) been (?:moved|enlarged|increased|decreased|reduced|resized)\b', re.I), 'REWORK'),
+    # 7.42 proofread (2026-11-18): the same canon in other words — "Twin Gates moved to the top and bottom rim",
+    # "tower moved ever so slightly to the south", "Dire fountain moved ~300 units closer", "Slightly rearranged the
+    # trees", "Slightly increased the amount of highground", "Spawn boxes of the … camps have been decreased" came out
+    # MISC / BUFF / NERF
+    (re.compile(r'\bmoved to the (?:top|bottom|north|south|east|west|highground|lowground|high ground|low ground)\b'
+                r'(?![^.]*\bslot\b)|\bmoved (?:ever so )?slightly to the\b|\bmoved ~?\d+ units\b|'
+                r'^(?:Slightly )?rearranged\b|\bthe amount of (?:high|low) ?ground\b|'
+                r'\bspawn ?box(?:es)?\b[^.]*\b(?:has|have) been (?:moved|enlarged|increased|decreased|reduced|resized)\b',
+                re.I), 'REWORK'),
     # interface, not gameplay
     (re.compile(r'\bfor the "[^"]+" option\b', re.I),               'QoL'),
     (re.compile(r'\bnow has a distinct sound\b', re.I),             'QoL'),

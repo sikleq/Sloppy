@@ -310,6 +310,10 @@ _CARD_LINE_RE = re.compile(r'^(W\(properties_change\(old=\[)(.*?)(\], new=\[)(.*
 _GRANT_TOKEN_RE = re.compile(r"\+[\d./]+%?\s+[A-Za-z' ]+")
 
 
+_LOOSE_PROP_CHANGE_RE = re.compile(r"^([A-Z][a-zA-Z'/ ]+?)\s+bonus\s+(?:increased|decreased|rescaled|changed)\s+from\b")
+_SILENT_ROW_NOTE = "Not in the patch notes: found in the game files"
+
+
 def _postprocess_silent_stats(lines, version):
     """Owner 2026-09-27 (Gleipnir 7.38 lost +25 Damage and +25 Attack Speed without a word in the notes):
     the stats card also gets what the game's items.txt shows changed between the previous patch and this
@@ -332,15 +336,22 @@ def _postprocess_silent_stats(lines, version):
         li_texts = re.findall(r'li\(\s*"([^"]*)"', "\n".join(block))
         grants = " ".join(_GRANT_TOKEN_RE.findall(" ".join(li_texts)))
         changes = " ".join(m.group(1) for t in li_texts for m in [_PROP_CHANGE_RE.match(t)] if m)
+        # a stat the notes change in more words than _PROP_CHANGE_RE reads is said too (7.42 Phase Boots "Damage bonus
+        # changed from +18/12 for melee/ranged heroes to +15 for any wearer" got a second, invented "Now also provides
+        # +15 Damage" row)
+        changes += " " + " ".join(m.group(1) for t in li_texts for m in [_LOOSE_PROP_CHANGE_RE.match(t)] if m)
         removed, added, changed = silent_stat_changes(m_hdr.group(1), version,
                                                       (card_rows + " " + grants + " " + changes).lower())
         has_build = any(ln.startswith('W(auto_components_change(') for ln in block)
         if (removed or added or changed) and not has_build and card_at is None:
             # no build change -> no stats card (owner 2026-09-28): plain rows, like the notes' own
-            rows = [f'W(li("No longer provides {_stat_text(s, a)}", t("DEL")))' for s, a, _ in removed]
-            rows += [f'W(li("Now also provides {_stat_text(s, b)}", t("NEW")))' for s, _, b in added]
+            # the reader must see these rows are ours, not Valve's (7.42 proofread 2026-11-18: the cycled-out Dagger of
+            # Ristul read "Damage bonus increased from +25 to +30" as if the notes said so)
+            ours = f', extra=inline_note("{_SILENT_ROW_NOTE}")))'
+            rows = [f'W(li("No longer provides {_stat_text(s, a)}", t("DEL"){ours}' for s, a, _ in removed]
+            rows += [f'W(li("Now also provides {_stat_text(s, b)}", t("NEW"){ours}' for s, _, b in added]
             rows += [f'W(li("{_stat_line_name(s)} bonus {"increased" if b > a else "decreased"} from '
-                     f'{_stat_text(s, a).split(" ")[0]} to {_stat_text(s, b).split(" ")[0]}", b({_py_repr(a)}, {_py_repr(b)})))'
+                     f'{_stat_text(s, a).split(" ")[0]} to {_stat_text(s, b).split(" ")[0]}", b({_py_repr(a)}, {_py_repr(b)}){ours}'
                      for s, a, b in changed]
             k = next((j for j, ln in enumerate(block) if ln.strip() == "W(ul_open())"), None)
             block = (block[:k + 1] + rows + block[k + 1:]) if k is not None else block + ["W(ul_open())"] + rows + ["W(ul_close())"]
