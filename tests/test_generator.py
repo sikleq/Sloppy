@@ -1075,6 +1075,13 @@ def test_scaffold_versions_have_a_committed_datafeed(version):
         assert tracked, f"git add -f data/{v}_datafeed.json"
 
 
+def test_a_cooldown_formula_keeps_lower_is_better():
+    # 7.42 Marci: the formula's numbers are not parsed, but a shorter cooldown is still the better side
+    from tools.patchgen.normalize import _normalize_note_text
+    rec = _normalize_note_text("Cooldown decreased from 215s - 5s per level to 200s - 5s per level")
+    assert rec["tag"] == "buff" and rec.get("lower_is_better") is True
+
+
 def test_properties_card_puts_shared_stats_first():
     # 7.42 Butterfly: new +30 Attack Speed stood above the shared Evasion
     from tools.patchgen.post_stats import _shared_props_first

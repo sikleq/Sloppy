@@ -137,8 +137,10 @@ def _normalize_note_text(text):
         rec['new'] = new
         if is_range:
             rec['range'] = True
-        if lower:
-            rec['lower_is_better'] = True
+    if lower:
+        # also when the numbers are a formula the parser leaves out (7.42 Marci "Cooldown decreased from 215s - 5s
+        # per level to 200s - 5s per level": the validator read a BUFF on "decreased" as a contradiction)
+        rec['lower_is_better'] = True
     return rec
 
 

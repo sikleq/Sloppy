@@ -325,11 +325,13 @@
         {
           "text": "No longer resets cooldown when specific buildings are destroyed",
           "tag": "del",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
           "text": "Now has 2 charges with a 6 minute replenish time and a 7s cooldown between uses",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -649,11 +651,13 @@
         {
           "text": "After a 1s cast time, pierces all enemies in a line, dealing 50/60/70/80 magical damage and applying Break for 3/3.5/4/4.5s to all affected units",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
           "text": "Cast Range 500. No Mana Cost. Cooldown: 9s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -729,6 +733,7 @@
         {
           "text": "Ogre Smash!: Now has 1.4s cast point when cast as a player-controlled unit",
           "tag": "nerf",
+          "lower_is_better": true,
           "scope": "Ogre Smash!"
         }
       ]
@@ -853,6 +858,7 @@
         {
           "text": "Cast Range: 800. No Mana Cost. Cooldown: 15s. Cast Point: 1s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -880,6 +886,7 @@
         {
           "text": "Cast Range: 400. Mana Cost: 75. Cooldown: 15s. Cast Point: 0.4s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -907,6 +914,7 @@
         {
           "text": "Cast Range: 575. Mana Cost: 100. Cooldown: 15s. Cast Point: 0.2s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -1041,6 +1049,7 @@
         {
           "text": "No Cast Range. Mana Cost: 50. Cooldown: 12s. Cast Point: 1s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -1191,6 +1200,7 @@
         {
           "text": "No Cast Range. Mana Cost: 25. Cooldown: 25s. Cast Point: 0.6s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -1235,6 +1245,7 @@
         {
           "text": "Global Cast Range. No Mana Cost. No cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1296,6 +1307,7 @@
         {
           "text": "No longer has reduced damage taken from allies on the first pip of health",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1382,6 +1394,7 @@
         {
           "text": "No longer has reduced damage taken from allies on the first pip of health",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1449,6 +1462,7 @@
         {
           "text": "Requires Sage Mask (175), Mantle of Intelligence (140), Mantle of Intelligence (140), Blood Grenade (50), and a recipe (420). Total cost: 925g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1459,11 +1473,13 @@
         {
           "text": "Active: Sling Grenade. Launch a grenade at the target area. Enemies in the area will take 50 impact damage and get their movement speed slowed by 30%. The slow gradually decreases down to 15% over the 5s duration, dealing 15 magical damage per second to affected enemies. Radius: 300. Cast Range: 1200. Health Cost: 75. Cooldown: 30s",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
           "text": "Shares cooldown with Blood Grenade",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1488,6 +1504,7 @@
         {
           "text": "Requires Force Staff (2200), Phylactery (2600), and a recipe (600). Total cost: 5400g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1528,6 +1545,7 @@
         {
           "text": "Requires Vladmir's Offering (2200), Splintmail (950), and a Voodoo Mask (650). Total cost: 3800g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1560,6 +1578,7 @@
         {
           "text": "Requires Phase Boots (1450), Armlet of Mordiggian (2500), and a recipe (2000). Total cost: 5950g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1597,6 +1616,7 @@
         {
           "text": "Requires Heaven's Halberd (2400), Sange (2000), Talisman of Evasion (1300), and a recipe (300). Total cost: 6000g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1607,6 +1627,7 @@
         {
           "text": "Active: Disarm. Prevents a target from attacking for 3s. Cast Range: 500. Mana Cost: 50. Cooldown: 15s",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base",
           "info": "Identical to Heaven's Halberd's spell"
         },
@@ -1618,11 +1639,13 @@
         {
           "text": "Cooldown is shared with Heaven's Halberd",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
           "text": "Passive: Riposte. Whenever the wielder is within 500 range of an enemy hero, Disarm gains 125% cooldown acceleration",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base",
           "info": "For every 1s of time, 2.25s are reduced from the cooldown of Disarm"
         },
@@ -1641,6 +1664,7 @@
         {
           "text": "Requires Meteor Hammer (2750), Ultimate Orb (2800) and recipe (450). Total cost: 6000g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2112,6 +2136,7 @@
         {
           "text": "Total cost unchanged at 4700g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2488,6 +2513,7 @@
         {
           "text": "Total cost unchanged at 2950g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2581,6 +2607,7 @@
         {
           "text": "Total cost unchanged at 5000g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -3440,6 +3467,7 @@
         {
           "text": "Active: Most Wanted. Generates a list of 2-5 enemy heroes that share a trait. Killing blows on those heroes generates an extra 50 gold + 12 per each level the slain hero is above you. Assisting in hero kill provides 75% of the bounty and still considers it closed. Once every hero on the list has been killed or when the spell is activated, a new list is created. Each hero bounty can only be claimed once until the new list is created. No Mana Cost. Cooldown: 120s",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -3702,6 +3730,7 @@
         {
           "text": "Active: Brick. Tosses a brick at the target enemy, removing 200 health from barriers and dealing 150 physical damage. Cast Range: 600. No Mana Cost. Cooldown: 30s.",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -3739,6 +3768,7 @@
         {
           "text": "Passive: Critical Strike. Empowers your next attack, causing it to be a critical strike dealing 130% damage. Cooldown: 7s",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -4330,6 +4360,7 @@
         {
           "text": "Active: Flicker. Applies basic dispel and blinks you in a random forward direction between 200 and 600 units away. If the wielder took any damage from an enemy player within the last 3 seconds, the blink will not move the caster. No Mana Cost. Cooldown: 8s",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -4391,6 +4422,7 @@
         {
           "text": "Passive: Silence Strike. Your next attack silences the enemy for 2s. Cooldown: 14s",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -5294,6 +5326,7 @@
         {
           "text": "Health Regen penalty is now reflected on the health regen bar value, but cannot put your health regeneration below zero",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -5536,6 +5569,7 @@
         {
           "text": "Mana Cost: 100. Cooldown: 120s. Cast point: 0.5s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Summon Lone Druid"
         },
         {
@@ -5574,11 +5608,13 @@
         {
           "text": "The Self Damage portion of the ability has been replaced with a Health Cost. The value is unchanged",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Mist Coil"
         },
         {
           "text": "As a result, the current cost is shown on the ability icon and in the tooltip",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Mist Coil"
         },
         {
@@ -6266,6 +6302,7 @@
         {
           "text": "Mana Cost: 100. Cooldown: 60s. Cast Point: 0.3s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Summon Ancient Thunderhide"
         },
         {
@@ -6301,6 +6338,7 @@
         {
           "text": "Mana Cost: 50. Cooldown: 15s. Cast Point: 0.3s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Summon Ancient Thunderhide"
         },
         {
@@ -6311,6 +6349,7 @@
         {
           "text": "This ability starts on a 5s cooldown when Thunderhide is summoned",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Summon Ancient Thunderhide"
         },
         {
@@ -6434,6 +6473,7 @@
         {
           "text": "Aghanim's Scepter now also decreases cooldown by 10s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Rupture",
           "info": "From 75/70/65s to 65/60/55s"
         }
@@ -6528,6 +6568,7 @@
         {
           "text": "Now has an internal 15s cooldown",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "Liquid Courage"
         },
         {
@@ -6648,6 +6689,7 @@
         {
           "text": "Fire Brewling grabs the target and pulls it 400/500/600/700 in the selected direction, while dealing 50/100/150/200 damage to it if it's an enemy. Pull Duration: 0.5s. Cast Range: 150. Mana Cost: 50. Cooldown: 8s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Primal Split"
         },
         {
@@ -6986,6 +7028,7 @@
         {
           "text": "Global Cast Range. Mana Cost: 50. Cooldown: 30s. Cast Point: 0.4s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Ahead, Armageddon"
         },
         {
@@ -7031,6 +7074,7 @@
         {
           "text": "Aghanim's Shard illusion no longer has 15% damage penalty and deals full damage",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "Chaos Bolt"
         },
         {
@@ -7093,6 +7137,7 @@
         {
           "text": "No Mana Cost. Cooldown: 60s - 1s per hero level",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Zealot"
         },
         {
@@ -7135,6 +7180,7 @@
         {
           "text": "Chen may now target himself to teleport all his controlled creeps to himself after a 6/5/4/3 second delay. This places the ability on a 3s cooldown.",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Holy Persuasion"
         },
         {
@@ -7206,6 +7252,7 @@
         {
           "text": "Level 15 Talent -10s Death Pact Charge Restore Time replaced with +300 Death Pact Bonus Health",
           "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         },
         {
@@ -7514,6 +7561,7 @@
         {
           "text": "Active. No target. No Mana Cost. No Cooldown. No Cast Point, instant",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Through the Realm"
         },
         {
@@ -7669,6 +7717,7 @@
         {
           "text": "Grants 2 charges with 1s cooldown between uses and 10/9/8/7s charge restoration time. Crypt Swarm slows movement of affected enemies by 100% for 0.5s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Crypt Swarm"
         },
         {
@@ -8426,6 +8475,7 @@
         {
           "text": "Damage Interval improved from every 1.1s to every 1s",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "Time Dilation"
         },
         {
@@ -8925,6 +8975,7 @@
         {
           "text": "Damage Penalty improved from 51% - 1% per level to 50% - 1% per level",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "Double Trouble",
           "info": "From 50-21% to 49-20%"
         },
@@ -9453,6 +9504,7 @@
         {
           "text": "Mana Cost: 125. Cooldown: 25s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Nihilism"
         },
         {
@@ -9732,6 +9784,7 @@
         {
           "text": "Level 15 Talent +15/15% To Hell And Back Debuff/Spell Amp replaced with +45 Mana Drain Mana Per Second",
           "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         }
       ]
@@ -9924,6 +9977,7 @@
         {
           "text": "Cooldown decreased from 215s - 5s per level to 200s - 5s per level",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "Special Delivery"
         },
         {
@@ -10215,6 +10269,7 @@
         {
           "text": "Experience penalty reworked",
           "tag": "rework",
+          "lower_is_better": true,
           "scope": "Divided We Stand"
         },
         {
@@ -10240,6 +10295,7 @@
         {
           "text": "Cast Range: 250; Mana Cost: 40; Cooldown 25/20/15/10s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Divided We Stand"
         },
         {
@@ -10398,6 +10454,7 @@
         {
           "text": "Non-player controlled creeps no longer cause the ability to go on cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Tree Dance"
         },
         {
@@ -10514,6 +10571,7 @@
         {
           "text": "Now has 2 ability charges with 12s restore time",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "Spectral Slug"
         },
         {
@@ -10581,6 +10639,7 @@
         {
           "text": "Level 15 Talent -75% Mirror Image Illusion Damage Taken replaced with +3% Eelskin Evasion per Naga",
           "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         },
         {
@@ -10836,6 +10895,7 @@
         {
           "text": "After 3s without taking damage, Nyx Assassin gains bonus movement speed, and regenerates portions of max health and mana per second",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Scarab Metabolism"
         },
         {
@@ -11294,6 +11354,7 @@
         {
           "text": "Now makes Phantom Assassin invisible to enemies outside the Vanish radius",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "Blur",
           "info": "Has True Sight immunity"
         },
@@ -11607,6 +11668,7 @@
         {
           "text": "Aghanim's Shard no longer refunds 50% of cooldown when hitting an ally",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Meat Hook"
         },
         {
@@ -11694,11 +11756,13 @@
         {
           "text": "The ability gains charges. Pugna can cast any of his abilities an additional time while they're on cooldown, consuming an Oblivion Savant charge",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Oblivion Savant"
         },
         {
           "text": "Charges: 2. Charge Restore Time: 20s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Oblivion Savant"
         },
         {
@@ -13019,6 +13083,7 @@
         {
           "text": "Now has a 0.25s cooldown",
           "tag": "nerf",
+          "lower_is_better": true,
           "scope": "Proximity Mines"
         },
         {
@@ -13417,6 +13482,7 @@
         {
           "text": "No longer has a 35% damage penalty against creeps",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "Nature's Grasp"
         },
         {
@@ -13614,6 +13680,7 @@
         {
           "text": "Cast Range: Attack Range + 250 (400 total). Mana Cost: 70. Cooldown: 18s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Zombie Bite"
         },
         {
@@ -13624,6 +13691,7 @@
         {
           "text": "The ability goes on cooldown and spends mana the moment the lunge begins",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Zombie Bite"
         },
         {
@@ -14000,6 +14068,7 @@
         {
           "text": "Aghanim's Scepter upgrade moved into a separate ability with shared cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Time Lapse"
         },
         {
