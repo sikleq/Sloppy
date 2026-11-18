@@ -27,7 +27,8 @@ slims the game files, runs the top-ups and the writers of the shared tables (`to
 drafts `content/p<v>.py`, builds and runs `patch_check.py` — see [workflow.md](workflow.md#the-one-command-2026-10-21).
 Every shared file has a writer and a freshness gate (`tests/test_snapshots_fresh.py`). Silent Changes
 (`builders/silent.py`) diffs the per-hero files and the root `items.txt` / `npc_units.txt` / `npc_abilities.txt` of
-consecutive patches.
+consecutive patches, plus the heroes' own numbers (section "Hero stats": attributes, armor, damage, ability slots —
+from `npc_heroes.txt` up to 7.41e, from each hero file's `DOTAHeroes` block and `npc_dota_hero_base.txt` since 7.41f).
 
 ## The `patch/` package
 

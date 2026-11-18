@@ -6,7 +6,7 @@
 build_site.py                ← ЕДИНЫЙ entrypoint. python build_site.py [steps] [--latest]
 builders/
   build_patches.py           ← Авто-обнаруживает content/p*.py + calendar + index
-  silent.py                  ← Дифф KV-файлов (heroes/ + items/npc_units/npc_abilities.txt) → dist/patches/silent/*.html
+  silent.py                  ← Дифф KV-файлов (heroes/ + статы героев + items/npc_units/npc_abilities.txt) → dist/patches/silent/*.html
   terrain.py                 ← terrain_<code>.html (сравнение карт; terrain_stats.py ← terrain_stats.html)
   creeps.py (+ creeps_common / creeps_history / creeps_abilities.py), heroes_stats.py, hero_lab.py,
   mana_items.py, heroes_dyn.py, items_dyn.py

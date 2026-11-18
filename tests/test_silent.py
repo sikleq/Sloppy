@@ -180,3 +180,43 @@ def test_old_snapshots_without_root_files_get_no_extra_sections(tmp_path, monkey
     (tmp_path / "1.00" / "items.txt").unlink()
     titles = [t for t, _, _ in sc.diff_root_files("1.00", "1.01")]
     assert titles == ["Units"]
+
+
+# --- Hero stats: since 7.41f they live in each hero file, not in npc_heroes.txt (7.42 audit) ----------------
+
+HEROES_OLD_MONOLITH = '''"DOTAHeroes" { "Version" "1"
+  "npc_dota_hero_base" { "StatusHealth" "120" "Model" "a.vmdl" }
+  "npc_dota_hero_axe" { "HeroID" "2" "AttributeAgilityGain" "1.7" "AttackDamageMin" "27" "Ability10" "t1" } }'''
+HERO_FILE_NEW = '''"DOTAHeroes" { "npc_dota_hero_axe" { "HeroID" "2" "AttributeAgilityGain" "1.50000" "AttackDamageMin" "27.0"
+  "Ability10" "t2" "DirectKeybindAbilities" { "Ability1" "x" } "AbilityDefinitions" { "axe_x" { "AbilityCooldown" "5" } } } }'''
+BASE_FILE_NEW = '"DOTAHeroes" { "npc_dota_hero_base" { "StatusHealth" "200" "Model" "b.vmdl" } }'
+
+
+def test_hero_stats_compare_monolithic_npc_heroes_with_per_hero_files(tmp_path, monkeypatch):
+    sc = _two_patches(tmp_path, monkeypatch)
+    (tmp_path / "1.00" / "npc_heroes.txt").write_text(HEROES_OLD_MONOLITH, encoding="utf-8")
+    new = tmp_path / "1.01"
+    (new / "npc_heroes.txt").write_text('#base "heroes/npc_dota_hero_base.txt"', encoding="utf-8")
+    (new / "npc_dota_hero_base.txt").write_text(BASE_FILE_NEW, encoding="utf-8")
+    (new / "heroes").mkdir()
+    (new / "heroes" / "npc_dota_hero_axe.txt").write_text(HERO_FILE_NEW, encoding="utf-8")
+    sections = {t: (k, e) for t, k, e in sc.diff_root_files("1.00", "1.01")}
+    kind, heroes = sections["Hero stats"]
+    assert kind == "hero"
+    assert heroes == {
+        "npc_dota_hero_base": {"StatusHealth": ("120", "200")},           # the model is noise
+        "npc_dota_hero_axe": {"AttributeAgilityGain": ("1.7", "1.50000"), "Ability10": ("t1", "t2")},
+    }                                                                     # 27 == 27.0, keybinds and abilities left out
+    monkeypatch.setattr(sc, "_hero_display", lambda s: "Axe")
+    html = sc.render_diff_html("1.01", "1.00", {}, sc.diff_root_files("1.00", "1.01"))
+    assert "<h2>Hero stats</h2>" in html and ">All heroes (base)</h3>" in html and ">Axe</h3>" in html
+
+
+def test_real_742_hero_stats_show_base_health_and_meepo_attribute():
+    from builders.silent import diff_root_files, DATA_DIR
+    import pytest
+    if not (DATA_DIR / "7.42" / "heroes").exists():
+        pytest.skip("raw game files not materialized")
+    heroes = dict((t, e) for t, _, e in diff_root_files("7.41f", "7.42"))["Hero stats"]
+    assert heroes["npc_dota_hero_base"]["StatusHealth"] == ("120", "200")
+    assert heroes["npc_dota_hero_meepo"]["AttributePrimary"] == ("DOTA_ATTRIBUTE_AGILITY", "DOTA_ATTRIBUTE_ALL")

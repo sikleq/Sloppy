@@ -80,6 +80,11 @@ UNIT_FIELDS = {
     "MovementCapabilities", "MovementSpeed", "MovementTurnRate", "VisionDaytimeRange", "VisionNighttimeRange",
     "CombatClassAttack", "CombatClassDefend", "IsAncient", "IsNeutralUnitType", "ConsideredHero", "HasInventory",
 }
+# heroes: the unit fields above + attributes
+HERO_FIELDS = {
+    "AttributePrimary", "AttributeBaseStrength", "AttributeStrengthGain", "AttributeBaseAgility",
+    "AttributeAgilityGain", "AttributeBaseIntelligence", "AttributeIntelligenceGain", "AttackRangeBonus",
+}
 # (file in data/stats/<v>/, section title, which fields count)
 ROOT_FILES = (
     ("items.txt", "Items", "item"),
@@ -187,12 +192,60 @@ def _interesting_unit(field: str) -> bool:
     return top in UNIT_FIELDS or (top.startswith("Ability") and top[len("Ability"):].isdigit())
 
 
+def _interesting_hero(field: str) -> bool:
+    """A hero's numbers: the unit fields + attributes; Ability1..N are its ability and talent slots."""
+    top = field.split(".", 1)[0]
+    return _interesting_unit(field) or top in HERO_FIELDS
+
+
 _FILTERS = {"ability": _interesting, "item": _interesting_item, "unit": _interesting_unit}
+
+
+def _same_number(old, new) -> bool:
+    """"3.30000" vs "3.3": the same value written differently (Troll's agility gain in 7.42), not a change."""
+    try:
+        return old is not None and new is not None and float(old) == float(new)
+    except (TypeError, ValueError):
+        return False
+
+
+def _hero_blocks(kv: dict) -> dict[str, dict]:
+    """{ npc_dota_hero_x: flat hero fields } of one parsed DOTAHeroes file, abilities left out."""
+    out = {}
+    for hero, block in (kv.get("DOTAHeroes") or {}).items():
+        if isinstance(block, dict) and hero.startswith("npc_dota_hero_"):
+            out[hero] = _flatten({k: v for k, v in block.items() if k != "AbilityDefinitions"})
+    return out
+
+
+def load_hero_stats(version: str) -> dict[str, dict]:
+    """{ hero: { flat_field: value } } — the hero's own numbers (attributes, armor, damage, speed, ability slots).
+    Up to 7.41e they sit in npc_heroes.txt; since 7.41f each hero file carries its DOTAHeroes block and
+    npc_heroes.txt only lists #base files (the 7.42 audit found the page had lost them: base HP 120 → 200,
+    Meepo's primary attribute and every base damage change were missing)."""
+    root = DATA_DIR / version
+    out: dict[str, dict] = {}
+    files = [root / "npc_heroes.txt", root / "npc_dota_hero_base.txt"]
+    files += sorted((root / "heroes").glob("npc_dota_hero_*.txt")) if (root / "heroes").exists() else []
+    for p in files:
+        if not p.exists():
+            continue
+        try:
+            out.update(_hero_blocks(parse_kv(_decode_bytes(p.read_bytes()))))
+        except Exception as e:      # one broken file must not hide the rest; the warning names it
+            print(f"  ⚠ parse failed: {p.name}: {e}", file=sys.stderr)
+    return out
 
 
 def diff_root_files(prev: str, curr: str) -> list[tuple[str, str, dict]]:
     """[(section title, kind, { entity: { field: (old, new) } })] for the root files both patches have."""
     out = []
+    a, b = load_hero_stats(prev), load_hero_stats(curr)
+    if a and b:
+        d = diff_versions({"h": a}, {"h": b}, _interesting_hero).get("h") or {}
+        d = {h: kept for h, f in d.items() if (kept := {k: v for k, v in f.items() if not _same_number(*v)})}
+        if d:
+            out.append(("Hero stats", "hero", d))
     for name, title, kind in ROOT_FILES:
         a, b = load_root_file(prev, name), load_root_file(curr, name)
         if not a or not b:
@@ -292,6 +345,8 @@ def _entity_display(kind: str, slug: str) -> str:
         return slug
     if kind == "unit":
         return _entity_names()[1].get(slug.lower()) or slug
+    if kind == "hero":
+        return "All heroes (base)" if slug == "npc_dota_hero_base" else _hero_display(slug)
     return _ability_display(slug)
 
 
