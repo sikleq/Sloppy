@@ -78,6 +78,33 @@ def test_chart_geometry_is_the_same_in_python_and_js():
     assert want in js
 
 
+ASSIST_BLOCK = ('W(formula_change("Assist Gold Formula", "60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )", '
+                '"15 + ( ( 50 + ( VictimNetworth * 0.037 ) ) / NumHeroes )", tag="REWORK", '
+                'inputs={"VictimNetworth": 10000, "NumHeroes": 1}, chart=("NumHeroes", "Heroes", 1, 5), unit="Gold"))')
+
+
+def test_name_row_then_old_and_new_rows_become_one_block():
+    # 7.40: Valve writes the name, then "OLD: …" and "NEW: …" as rows of their own
+    lines = ['W(ul_open())', 'W(li("Assist Gold Formula Reworked", t("REWORK")))',
+             'W(li("OLD: 60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )", t("MISC")))',
+             'W(li("NEW: 15 + ( ( 50 + ( VictimNetworth * 0.037 ) ) / NumHeroes )", t("MISC")))', 'W(ul_close())']
+    assert g._postprocess_formula_rows(lines) == [ASSIST_BLOCK]
+    # 430 -> 435 gold for one hero, 134 -> 99 for five: the curves cross -> REWORK
+    assert 'tag="REWORK"' in ASSIST_BLOCK
+
+
+def test_old_row_without_its_new_row_stays():
+    lines = ['W(li("Assist Gold Formula Reworked", t("REWORK")))',
+             'W(li("OLD: 60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )", t("MISC")))',
+             'W(li("Roshan gold per player decreased from 135 to 125", b(135, 125)))']
+    assert g._postprocess_formula_rows(lines) == lines
+
+
+def test_740_assist_gold_is_the_live_block():
+    src = (ROOT / "content" / "p740.py").read_text(encoding="utf-8")
+    assert ASSIST_BLOCK in src and "vary=" not in src.split("Assist Gold Formula", 1)[1][:400]
+
+
 def test_742_bounty_is_the_live_block():
     src = (ROOT / "content" / "p742.py").read_text(encoding="utf-8")
     assert BOUNTY_BLOCK in src and "OLD: 125 + (8 * VictimLevel)" not in src

@@ -39,14 +39,8 @@ def build():
     W(li("Tier 4 Towers now have a Barracks Reinforcement buff. Each allied barracks that has not been destroyed provides +4 armor to both Tier 4 towers", t("NEW"), extra=inline_note("Bonus is for each individual building, totaling in +24 Armor for 6 Barracks")))
     W(li("Talents no longer require a skill point to level", t("REWORK"), extra=inline_note("Now talents are learned by using their own talent points available at levels 10, 15, 20, 25, 27, 28, 29, and 30. This results in all +2 All Attributes bonuses skilled by level 22")))
     W(ul_close())
-    W(formula_change(
-        "Assist Gold Formula",
-        "60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )",
-        "15 + ( ( 50 + ( VictimNetworth * 0.037 ) ) / NumHeroes )",
-        vary=("NumHeroes", "Heroes", [1, 2, 3, 4, 5]),
-        fixed={"VictimNetworth": 10000},
-        unit="Gold",
-    ))
+    # the live form (owner 2026-11-19): a field per variable, both results, a chart over the heroes sharing it
+    W(formula_change("Assist Gold Formula", "60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )", "15 + ( ( 50 + ( VictimNetworth * 0.037 ) ) / NumHeroes )", tag="REWORK", inputs={"VictimNetworth": 10000, "NumHeroes": 1}, chart=("NumHeroes", "Heroes", 1, 5), unit="Gold"))
     W(ul_open())
     W(li("All illusions now have 800 daytime vision and 400 nighttime vision", b([1800, 800], [800, 400], slash=True),
          extra=inline_note("Previously inherited the hero's full vision (typically 1800 daytime / 800 nighttime)")))

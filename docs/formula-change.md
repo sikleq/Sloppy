@@ -123,8 +123,12 @@ W(formula_change("Hero kill bounty",
   leaves the note as it was: add the variable there with a default you can stand behind.
   The tag is computed over the chart: new ≥ old everywhere → BUFF, ≤ → NERF, the curves
   cross → REWORK (7.42 bounty: less gold below level 12.5, more above).
-- The 7.40 block keeps the older `vary=` / `fixed=` table form; older patches are moved to
-  the live form only on the owner's word.
+- The generator also takes Valve's three-row form: the name row ("Assist Gold Formula
+  Reworked"), then an "OLD: <formula>" row and a "NEW: <formula>" row (`_formula_triple`).
+- 7.40 Assist Gold moved to the live form on the owner's word (2026-11-19): fields
+  VictimNetworth (10000) + NumHeroes (1), chart over Heroes 1–5. The `vary=` / `fixed=`
+  table form still works but is no longer used; other patches move only on the owner's word
+  (the formulas of patches not yet on the site are listed in `docs/todo.md`).
 
 ## Formula changes to expect across patches (reference)
 
