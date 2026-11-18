@@ -44,6 +44,14 @@
   .nav-subtab { flex: 0 0 auto; padding-left: 10px; padding-right: 10px; font-size: 17px; }
   .nav-submenu { min-width: 160px; }
   .materials-subnav-links > .nav-subgroup:nth-child(n+3) > .nav-submenu { left: auto; right: 0; border-radius: 8px 0 8px 8px; }
+  /* the nested flyout (Neutral Abilities) has no room to the right of its menu on a phone: hidden, it still stood
+     48px past the screen edge and gave hero / item / unit pages a sideways scroll (2026-11-19). It is a plain indented
+     row of the open menu instead, shown and hidden with it */
+  .nav-submenu-flyout {
+    position: static; margin: 0; padding: 0 0 0 12px; min-width: 0; border: 0; box-shadow: none; background: none;
+    opacity: 1; visibility: inherit; transform: none; transition: none;
+  }
+  .nav-caret-side { display: none; }
 
   /* ---- Patch toolbar: one row of filter chips that scrolls inside itself ---- */
   .toolbar-inner {
