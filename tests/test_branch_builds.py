@@ -696,3 +696,47 @@ def test_739_is_dated_by_its_live_build():
     rels = bb.releases(RELEASE_HISTORY)
     moment, exact = bb.patch_moments(rels, bb.load_builds())["7.39"]
     assert exact and moment.strftime("%d.%m.%Y %H:%M") == "22.05.2025 22:12"
+
+
+class _Resp:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+    def read(self):
+        return b"{}"
+
+
+def _sent_headers(monkeypatch, tmp_path, url, token):
+    seen = {}
+
+    def fake_urlopen(req, timeout=None):
+        seen.update({k.lower(): v for k, v in req.header_items()})
+        return _Resp()
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(fetch, "CACHE", tmp_path)
+    if token:
+        monkeypatch.setenv("GITHUB_TOKEN", token)
+    else:
+        monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    fetch._get(url, "x.json")
+    return seen
+
+
+def test_history_fetch_sends_the_job_token_to_github(monkeypatch, tmp_path):
+    # 2026-11-18: the daily log fetch failed with "403 rate limit exceeded" without a token
+    assert _sent_headers(monkeypatch, tmp_path, fetch.HISTORY_API, "t0k")["authorization"] == "Bearer t0k"
+    assert "authorization" not in _sent_headers(monkeypatch, tmp_path, fetch.HISTORY_API, None)
+
+
+def test_valve_poll_never_gets_the_token(monkeypatch, tmp_path):
+    assert "authorization" not in _sent_headers(monkeypatch, tmp_path, fetch.API.format(app=570), "t0k")
+
+
+def test_workflow_hands_the_token_to_the_poll_step():
+    wf = (ROOT / ".github" / "workflows" / "branch-builds.yml").read_text(encoding="utf-8")
+    step = wf[wf.index("- name: Poll Valve's Web API"):wf.index("- name: Save the last checks")]
+    assert "GITHUB_TOKEN: ${{ github.token }}" in step

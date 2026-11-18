@@ -25,6 +25,7 @@ takes that copy in (--offline --merge-from) before building. main's copy is refr
 """
 import argparse
 import json
+import os
 import re
 import sys
 import urllib.request
@@ -39,7 +40,8 @@ DATA = ROOT / "data" / "branch_builds.json"
 CACHE = ROOT / ".cache" / "branch_builds"
 DATA_BRANCH = "data-branch-builds"       # the job's own branch (not protected); .github/workflows/branch-builds.yml
 API = "https://api.steampowered.com/IGCVersion_{app}/GetClientVersion/v1/"
-HISTORY_API = "https://api.github.com/repos/muk-as/DOTA2_WEB/contents/steam_api/_HISTORY_by_date.txt"
+GITHUB_API = "https://api.github.com/"
+HISTORY_API = GITHUB_API + "repos/muk-as/DOTA2_WEB/contents/steam_api/_HISTORY_by_date.txt"
 HISTORY_SOURCE = "muk-as/DOTA2_WEB"
 POLL_SOURCE = "valve-api"
 # The same author's Telegram channel posts every change since 2021, also before the GitHub log (owner 2026-11-10):
@@ -162,6 +164,12 @@ def _get(url, cache_name, accept=None):
     headers = {"User-Agent": "sloppy-site-fetch"}
     if accept:
         headers["Accept"] = accept
+    # GitHub's API without a token shares a 60-an-hour limit with every job on the runner's address: the daily log
+    # fetch got "403 rate limit exceeded" on 2026-11-18. The job's own token gets a limit of its own. GitHub only —
+    # never send it to Valve.
+    token = os.environ.get("GITHUB_TOKEN")
+    if token and url.startswith(GITHUB_API):
+        headers["Authorization"] = f"Bearer {token}"
     with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=60) as r:
         raw = r.read()
     CACHE.mkdir(parents=True, exist_ok=True)

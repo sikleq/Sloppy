@@ -54,6 +54,8 @@ jobs:
       - name: Poll Valve's Web API
         env:
           PYTHONIOENCODING: utf-8
+          # the daily log comes from GitHub's API: with the job's token it has its own rate limit (403 on 2026-11-18)
+          GITHUB_TOKEN: ${{ github.token }}
           DAILY: ${{ github.event.schedule == '41 3 * * *' || github.event_name == 'workflow_dispatch' }}
           COPY: ${{ steps.data.outputs.copy }}
         run: |
