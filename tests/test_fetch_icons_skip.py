@@ -10,11 +10,15 @@ SCRIPT = os.path.join(ROOT, "scripts", "fetch", "fetch_icons.py")
 
 
 def _skip_set():
-    src = open(SCRIPT, encoding="utf-8").read()
-    head = src.split("_SKIP = removed_on_purpose()")[0]          # the module runs the fetch below this line
-    mod = types.ModuleType("fetch_icons_head")
-    mod.__file__ = SCRIPT
-    exec(compile(head, SCRIPT, "exec"), mod.__dict__)
+    # only the function: the script imports requests and fetches at import, and CI has no requests
+    import ast
+    import sys
+    from pathlib import Path
+    tree = ast.parse(open(SCRIPT, encoding="utf-8").read())
+    fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "removed_on_purpose")
+    mod = types.ModuleType("fetch_icons_skip")
+    mod.__dict__.update(ROOT=Path(ROOT), sys=sys, Path=Path)
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), SCRIPT, "exec"), mod.__dict__)
     return mod.removed_on_purpose()
 
 
