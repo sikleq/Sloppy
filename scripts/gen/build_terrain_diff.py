@@ -269,11 +269,17 @@ def _load(code):
 
 
 def _wards(old_code, new_code):
-    """{"old", "new", "lost", "gained", "cells"} from data/map/gridnav_<code>.gnv.gz, or None without them."""
+    """{"old", "new", "lost", "gained", "cells"} from data/map/gridnav_<code>.gnv.gz.
+
+    A missing grid is an error, not a diff without the layer: on 2026-11-18 the 7.42 diff was built 3 minutes before
+    gridnav_742 was added, came out with "wards": null and the No-ward ground picture vanished from the page unnoticed.
+    Extract the grid first (scripts/gen/gridnav.py), then build the diff."""
     import gridnav
     paths = [os.path.join(_OWN, f"gridnav_{c}.gnv.gz") for c in (old_code, new_code)]
-    if not all(os.path.exists(p) for p in paths):
-        return None
+    missing = [os.path.relpath(p, _ROOT) for p in paths if not os.path.exists(p)]
+    if missing:
+        raise FileNotFoundError(f"no gridnav for {old_code}->{new_code}: {', '.join(missing)} "
+                                "(run scripts/gen/gridnav.py first)")
     (_, a), (hb, b) = gridnav.load(paths[0]), gridnav.load(paths[1])
     lost, gained = gridnav.ward_changes(a, b)
     to_no_ward, to_wardable = gridnav.changed_cells(hb, a, b)

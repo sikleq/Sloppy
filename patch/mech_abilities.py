@@ -196,6 +196,8 @@ def _item_ability(name, version):
     from .item_ability_text import item_abilities
     from .loc_history import tooltip
     slug = _item_slug(name)
+    if not version or not slug:           # no patch to read (a scaffold run outside a page build): no ability
+        return None
     for text in item_abilities(slug, version) or []:
         m = re.match(r"(?:Active|Use): ([^.!]+)", text)
         if m:

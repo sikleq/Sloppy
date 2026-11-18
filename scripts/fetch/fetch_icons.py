@@ -51,7 +51,9 @@ if URLS_FILE.exists():
 # like aoe_increase (which don't use _ability_icons.txt) are covered.
 DIST = ROOT / "dist"
 if DIST.is_dir():
-    for html_file in DIST.glob("*.html"):
+    # every built page, the patch pages in dist/patches too (2026-11-19: the 7.42 creeps' New ability cards name
+    # their icons by icon_url, which _ability_icons.txt does not list, and dist/*.html alone missed them)
+    for html_file in DIST.rglob("*.html"):
         for m in re.finditer(r'icons/abilities/([^"\']+)\.png', html_file.read_text(encoding="utf-8", errors="ignore")):
             slugs.append(m.group(1))
 

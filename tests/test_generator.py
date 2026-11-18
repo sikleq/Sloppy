@@ -732,6 +732,7 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Shine now provides all bonuses on self-cast, but they will be reduced by 50%", "BUFF"),
     ("Aghanim's Scepter now also decreases cooldown by 10s", "BUFF"),
     ("Fire now has Cinder Dash ability", "NEW"),
+    ("Damage rescaled from 325 to 300 + 1x Primal Beast's Strength", "REWORK"),
     # 7.42 proofread 2026-11-18: the canon in Valve's new words
     ("Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be", "REWORK"),
     ("Radiant Tier 1 tower moved ever so slightly to the south", "REWORK"),
@@ -797,6 +798,8 @@ def test_canonical_tags_from_the_second_audit(text, tag):
     "Channel duration decreased from 3.5s to 3.5/3.25/3s",
     "Salvo restore duration decreased from 10s to 8s",
     "Respite Health Regen bonus lost during Respite decreased from 14 to 12",
+    "Thread establishing time decreased from 1.5s to 1.25s",
+    "Soul Return Time decreased from 0.75s to 0.5s",
 ])
 def test_lower_is_better_from_the_second_audit(text):
     assert g._is_lower_better(text)
@@ -809,6 +812,7 @@ def test_lower_is_better_from_the_second_audit(text):
     "Item grace period for swapping into the main inventory without a cooldown increased from 3s to 5s",
     "Level 20 Talent Astral Step Charge Restore Time Reduction decreased from 4s to 3s",
     "Incoming Damage Buff Duration increased from 8s to 12s",
+    "Level 25 Talent Duel Advances Cooldown on Victory decreased from 30s to 25s",   # 7.42: the talent's cut
 ])
 def test_not_lower_is_better_from_the_cross_check(text):
     assert not g._is_lower_better(text)

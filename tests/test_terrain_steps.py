@@ -225,6 +225,14 @@ def test_one_chip_per_object_names_each_part():
     assert '<span class="tf-chip-word">spawns moved</span>' in html
 
 
+def test_a_chip_of_several_kinds_is_as_tall_as_the_others():
+    # the owner 2026-11-19: stacked kinds made the Camps / Lanes chips 2-3 times taller than the one-kind chips
+    import pathlib
+    css = (pathlib.Path(__file__).resolve().parents[1] / "src" / "css" / "terrain-controls.css").read_text(encoding="utf-8")
+    assert ".tf-chip-lines { display: inline-flex; flex-direction: row; align-items: center; flex-wrap: nowrap; }" in css
+    assert ".tf-chip-line + .tf-chip-line { margin-left: 8px; padding-left: 8px; border-left: 1px solid" in css
+
+
 def test_every_kind_of_object_has_a_tile_under_trees_and_camps():
     """The owner 2026-10-03: "add all the other objects the way you show trees and camps — only with a gap, so trees
     and camps stand on one row and everything else on the others"."""
