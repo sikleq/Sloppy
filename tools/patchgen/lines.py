@@ -84,11 +84,15 @@ def _boss_abilities(prefix):
 
 
 def _drop_empty_ul(lines):
-    """W(ul_open()) right before W(ul_close()) — every row of the block moved into a card — is dropped."""
+    """W(ul_open()) right before W(ul_close()) — every row of the block moved into a card — is dropped, and so is the
+    subgroup it was the list of (7.42 "Creep Spawn Intervals": every row went to a lane creep card, the title
+    stayed over nothing)."""
     out = []
     for ln in lines:
         if ln.strip() == "W(ul_close())" and out and out[-1].strip() == "W(ul_open())":
             out.pop()
+            if out and out[-1].strip().startswith("W(subgroup("):
+                out.pop()
             continue
         out.append(ln)
     return out

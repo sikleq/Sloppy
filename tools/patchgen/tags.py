@@ -560,6 +560,24 @@ def _heal_stats_renamed(clean):
     return bool(before) and before == after
 
 
+_EXTRA_CREEP_AT = re.compile(r'\b(?:time at which|timing)\b[^.]*\b(?:melee|ranged|siege|flagbearer|lane) creeps?\b'
+                             r'[^.]*\bfrom (\d{1,2}):(\d{2}) to (\d{1,2}):(\d{2})\b'
+                             r'|\b(?:melee|ranged|siege|flagbearer) creeps?[^.]*\b(?:is|are) added\b[^.]*'
+                             r'\bfrom (\d{1,2}):(\d{2}) to (\d{1,2}):(\d{2})\b', re.I)
+
+
+def _extra_creep_timing(clean):
+    """An extra lane creep coming earlier is its BUFF, later its NERF, whatever Valve's verb (owner 2026-10-16, 7.41
+    "+1 siege creep timing decreased from 35:00 to 30:00"; 7.42 "Time at which 1 Ranged creep is added changed from
+    40:00 to 35:00" said "changed" and came out REWORK). None for any other row."""
+    m = _EXTRA_CREEP_AT.search(clean)
+    if not m:
+        return None
+    g = [int(x) for x in m.groups() if x is not None]
+    old, new = g[0] * 60 + g[1], g[2] * 60 + g[3]
+    return None if old == new else ('BUFF' if new < old else 'NERF')
+
+
 def _guess_tag(text):
     """Heuristic tag from row text. Returns 'BUFF'/'NERF'/'REWORK'/'NEW'/'DEL'/
     'MISC'/'QoL'/None. None means caller should derive from b()/badge."""
@@ -571,6 +589,9 @@ def _guess_tag(text):
     for substr, tag in TAG_OVERRIDES.items():
         if substr.lower() in clean_lower:
             return tag
+    extra_creep = _extra_creep_timing(clean)
+    if extra_creep:
+        return extra_creep
     for rx, tag in CANONICAL_TAGS:
         if rx.search(clean):
             return tag

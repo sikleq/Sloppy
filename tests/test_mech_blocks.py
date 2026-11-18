@@ -270,6 +270,50 @@ def test_a_tooltips_named_parts_are_paragraphs():
     assert _named_parts("Deals damage. Slows - enemies.") == ["Deals damage. Slows - enemies."]
 
 
+def test_general_rows_about_roshan_join_an_existing_roshan_block():
+    """Owner 2026-11-18, 7.42: "Roshan gold per player decreased from 135 to 125" stood in Gold and Experience while
+    Valve's own Roshan block was below it."""
+    gold = 'W(li("Roshan gold per player decreased from 135 to 125", b(135, 125)))'
+    lines = ['W(section("General Updates"))', 'W(subgroup("Gold and Experience"))', 'W(ul_open())',
+             'W(li("Building bounty decreased", t("NERF")))', gold, 'W(ul_close())',
+             g.ROSHAN_HEADER, 'W(ul_open())', 'W(li("Base respawn timer now decreases", t("MISC")))', 'W(ul_close())']
+    out = g._postprocess_roshan_block(lines)
+    k = out.index(g.ROSHAN_HEADER)
+    assert gold not in out[:k] and out[k + 2:k + 5] == [lines[8], gold, 'W(ul_close())']
+    assert out[:k] == lines[:4] + ['W(ul_close())']
+
+
+def test_a_bosss_drops_by_death_are_a_table():
+    """Owner 2026-11-18, 7.42 Tormentor "Now drops several items, similarly to Roshan": the list sat in the "?"."""
+    row = ('W(li("Now drops several items, similarly to Roshan", t("NEW"), extra=inline_note("Now always drops '
+           'Aghanim\'s Shard — New thing<br>Starting with the 2nd death, always drops Cheese with the same rules '
+           '<span class=\\"pop-note\\">(Gold if everyone has it)</span>")))')
+    out = g._postprocess_drop_table([row])[0]
+    assert 'extra=mech_table(["When", "Drops", "Details"], [["Every death", item_link("Aghanim\'s Shard"), ' \
+           '"New thing"], ["From the 2nd death", item_link("Cheese"), "With the same rules. Gold if everyone has it"]]' in out
+    other = 'W(li("Now drops gold", t("NEW"), extra=inline_note("Only at night<br>And only once")))'
+    assert g._postprocess_drop_table([other]) == [other]
+
+
+def test_a_value_per_death_or_per_use_is_a_formula_table():
+    """Owner 2026-11-18, 7.42 Tormentor: "175 to 125 + 50 per Tormentor's death" had no formula table."""
+    gold = 'W(li("Gold reward per player changed from 175 to 125 + 50 per Tormentor\'s death", b(175, 125)))'
+    out = g._postprocess_per_death([gold])[0]
+    assert out.startswith('W(li_formula("Gold reward per player changed", "175", "125 + 50 per Tormentor\'s death", '
+                          'lambda N: 175, lambda N: 125 + 50 * N, levels=[0, 1, 2, 3, 4, 5], label="Tormentor deaths"')
+    capped = ('W(li("Base damage reflection decreased from 35% to 15% + 5% per Tormentor death, up to 30%", b(35, 15), '
+              'extra=inline_note("Still grows over time")))')
+    out = g._postprocess_per_death([capped])[0]
+    assert 'lambda N: min(30, 15 + 5 * N)' in out and 'value_fmt="{:g}%"' in out
+    assert 'inline_note_text="Still grows over time"' in out
+    shrine = ('W(li("Wisdom Shrine experience decreased from 200 + 300 per subsequent use to 200 + 200 per subsequent '
+              'use", t("NERF")))')
+    out = g._postprocess_per_death([shrine])[0]
+    assert 'lambda N: 200 + 300 * (N - 1), lambda N: 200 + 200 * (N - 1)' in out and 'level_fmt=lambda N: f"#{N}"' in out
+    plain = 'W(li("Gold reward per player decreased from 175 to 125", b(175, 125)))'
+    assert g._postprocess_per_death([plain]) == [plain]
+
+
 def test_an_existing_roshan_blocks_items_link_too():
     """Owner 2026-10-30, 7.38 "Roshan no longer drops Aghanim's Blessing": a link, as 7.37's drops."""
     lines = ['W(section("General Updates"))', g.ROSHAN_HEADER, 'W(ul_open())',

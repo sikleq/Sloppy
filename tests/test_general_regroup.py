@@ -193,6 +193,64 @@ def test_general_changes_split_into_mechanic_blocks_with_every_valve_row():
     assert "Bind Effects" in rest and "Heal Amplification" not in rest
 
 
+def test_mechanics_section_subtitle_groups_of_rule_changes_are_blocks():
+    # owner 2026-11-18, 7.42 Global Mechanics: Pip Health / Spell Power Reduction rows never repeat the group's name,
+    # so the Subtitle names the block; a Subtitle group of number changes stays a subgroup; no name shown twice
+    sub = lambda name: {"indent_level": 1, "hide_dot": True, "note": f'<span class="Subtitle">{name}</span>'}
+    br = {"indent_level": 1, "hide_dot": True, "note": "<br>"}
+    note = {"title": "Global Mechanics", "generic": [
+        sub("Hero Stats"),
+        {"indent_level": 1, "note": "Base hero Health increased from 120 to 200"},
+        {"indent_level": 1, "note": "Health gained per point of Strength decreased from 22 to 20"}, br,
+        sub("Pip Health"),
+        {"indent_level": 1, "note": "Standardized rules for units that take a fixed number of hits to destroy"},
+        {"indent_level": 1, "note": "All units are now able to damage units with health bar pips"}, br,
+        sub("Item Potency"),
+        {"indent_level": 1, "note": "Attacks from heroes now have an attribute called Item Potency"},
+        {"indent_level": 1, "note": "The default Item Potency value for an attack is 100%"}, br,
+        sub("Miscellaneous"),
+        {"indent_level": 1, "note": "Outposts can now be captured while silenced"},
+        {"indent_level": 1, "note": "Couriers now have fragile pip health"}, br,
+    ]}
+    out = "\n".join(g._render_general_note(note))
+    assert 'W(plain_header("Pip Health", new="Reworked mechanic"))' in out
+    assert 'W(plain_header("Item Potency", new="Reworked mechanic"))' in out
+    assert 'subgroup("Item Potency")' not in out and 'subgroup("Pip Health")' not in out
+    assert 'W(subgroup("Hero Stats"))' in out and 'W(subgroup("Miscellaneous"))' in out
+    # outside a mechanics section a Subtitle group stays a subgroup (7.42 Glyph of Fortification)
+    lane = {"title": "Lane Creeps, Towers and Bases", "generic": [
+        sub("Glyph of Fortification"),
+        {"indent_level": 1, "note": "No longer resets cooldown when specific buildings are destroyed"},
+        {"indent_level": 1, "note": "Now has 2 charges with a 6 minute replenish time"}, br]}
+    assert "Reworked mechanic" not in "\n".join(g._render_general_note(lane))
+
+
+def test_742_lane_creep_rows_go_to_their_creeps_cards():
+    # owner 2026-11-18: "Lane creeps now move … slower if pulled" stood in Miscellaneous, the melee / ranged rows in
+    # "Creep Spawn Intervals" — rows about lane creeps go to their cards (shared ones to "Lane Creeps"), as units
+    sub = lambda name: {"indent_level": 1, "hide_dot": True, "note": f'<span class="Subtitle">{name}</span>'}
+    br = {"indent_level": 1, "hide_dot": True, "note": "<br>"}
+    note = {"title": "Lane Creeps, Towers and Bases", "generic": [
+        sub("Creep Spawn Intervals"),
+        {"indent_level": 1, "note": "Number of melee creeps spawned no longer increases at 30:00"},
+        {"indent_level": 1, "note": "Time at which 1 Ranged creep is added changed from 40:00 to 35:00"}, br,
+        sub("Miscellaneous"),
+        {"indent_level": 1, "note": "Fountain's True Sight radius increased from 1200 to 1800"},
+        {"indent_level": 1, "note": "Lane creeps now move up to 25% slower if they are pulled out of lane"}, br]}
+    out = g._render_general_note(note)
+    text = "\n".join(out)
+    assert 'subgroup("Creep Spawn Intervals")' not in text                 # its rows all left: no empty title
+    k = out.index('W(unit_header("Ranged Creep", "../icons/units/npc_dota_creep_goodguys_ranged.png", '
+                  'general=False, page="ranged-creep"))')
+    assert 'Ranged creep is added' in out[k + 2] and 't("BUFF")' in out[k + 2]      # comes 5 minutes earlier
+    melee = out.index('W(unit_header("Melee Creep", "../icons/units/npc_dota_creep_goodguys_melee.png", '
+                      'general=False, page="melee-creep"))')
+    assert "melee creeps spawned" in out[melee + 2]
+    pulled = next(l for l in out if "pulled out of lane" in l)
+    assert "'unit|melee-creep', 'unit|ranged-creep', 'unit|flagbearer-creep', 'unit|siege-creep'" in pulled
+    assert out.index(pulled) > out.index('W(subgroup("Lane Creeps"))')
+
+
 def test_misc_rows_on_one_topic_become_their_own_mechanic():
     # owner 2026-10-28, 7.41: the reflected-damage rows of Miscellaneous are a block, their sources a table of icons
     rows = ['W(li("Reflected damage cannot be reflected back", t("DEL")))',

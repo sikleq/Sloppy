@@ -381,7 +381,8 @@ def _postprocess_innate_level0(lines, version):
 # a General row about Roshan himself: "Roshan now …", "… death, Roshan now drops …", "Roshan's HP / armor / Base …";
 # not his outposts, pit or banner item (7.37 "Teleport time to Roshan's outposts" stays a map row)
 _ROSHAN_ROW_RE = re.compile(r"""^\s*W\(li\(["'](?:[^"']*?\bRoshan(?:'s)? (?:now|no longer|will|is|has|gains|drops|"""
-                            r"""HP|health|armor|base|attack|damage|magic|respawn|bounty|ability)\b)""", re.I)
+                            r"""HP|health|armor|base|attack|damage|magic|respawn|bounty|gold|experience|"""
+                            r"""ability)\b)""", re.I)
 _SECTION_RE = re.compile(r'^\s*W\(section\("([^"]+)"')
 ROSHAN_HEADER = 'W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))'
 
@@ -465,6 +466,99 @@ def _link_items(row):
     return f'{m.group(1)}"{linked}"{m.group(3)}'.replace('"" + ', "").replace(' + ""', "")
 
 
+_DROP_PART_RE = re.compile(r'^(?:Now always|Starting (?:with|from) (?:the |his |its )?(?P<nth>\w+) death,? (?:now )?always)'
+                           r' drops (?P<rest>.+)$', re.I)
+_POP_NOTE_RE = re.compile(r'\s*<span class=\\?"pop-note\\?">\((.+?)\)</span>')
+
+
+def _drop_part(part):
+    """One "?" line of a drops row → (when, item, details) or None: "Now always drops Greater Horn of Battle — New
+    consumable …" / "Starting with the 2nd death, always drops Aghanim's Shard with the same …"."""
+    from patch.item_links import _roster
+    pop = _POP_NOTE_RE.search(part)
+    m = _DROP_PART_RE.match(_POP_NOTE_RE.sub("", part).strip())
+    if not m:
+        return None
+    rest = m.group("rest")
+    item = next((n for n in sorted(_roster(), key=len, reverse=True) if rest.startswith(n)), None)
+    if not item:
+        return None
+    details = re.sub(r"^\s*(?:—|-|–|,)?\s*", "", rest[len(item):]).strip()
+    details = (details[:1].upper() + details[1:]) if details else ""
+    if pop:
+        details = (details.rstrip(".") + ". " if details else "") + pop.group(1).strip()
+    when = f"From the {m.group('nth')} death" if m.group("nth") else "Every death"
+    return when, item, details
+
+
+def _postprocess_drop_table(lines):
+    """A row whose "?" lists what a boss drops and from which death ("Now drops several items, similarly to Roshan",
+    7.42 Tormentor) → a table under the row: when | the item (a link to its page) | details (owner 2026-11-18: "список
+    не раскрыт удобной таблицей"). A "?" with any other line stays."""
+    out = []
+    for ln in lines:
+        m = re.match(r'^(\s*W\(li\("[^"]*\bdrops\b[^"]*", t\("\w+"\)), extra=inline_note\("((?:[^"\\]|\\.)*)"\)\)\)\s*$',
+                     ln)
+        parts = [_drop_part(p) for p in m.group(2).split("<br>")] if m else []
+        if len(parts) < 2 or not all(parts):
+            out.append(ln)
+            continue
+        rows = ", ".join(f'[{_py_str(w)}, item_link({_py_str(i)}), {_py_str(d)}]' for w, i, d in parts)
+        out.append(f'{m.group(1)}, extra=mech_table(["When", "Drops", "Details"], [{rows}], wide_last=True)))')
+    return out
+
+
+_PER_DEATH_ROW_RE = re.compile(
+    r'^(?P<ind>\s*)W\(li\("(?P<pre>[^"]+?) (?P<verb>changed|decreased|increased|rescaled) from (?P<a>\d+(?:\.\d+)?)'
+    r'(?P<pct>%?) to (?P<b>\d+(?:\.\d+)?)%? \+ (?P<c>\d+(?:\.\d+)?)%? per (?P<who>[A-Z]\w+)(?:\'s)? death'
+    r'(?:, up to (?P<cap>\d+(?:\.\d+)?)%?)?",\s*(?:b\([^)]*\)|t\("\w+"\))(?:, extra=inline_note\((?P<note>"(?:[^"\\]|\\.)*")\))?'
+    r'\)\)\s*$')
+_PER_USE_ROW_RE = re.compile(
+    r'^(?P<ind>\s*)W\(li\("(?P<pre>[^"]+?) (?P<verb>changed|decreased|increased|rescaled) from (?P<a>\d+) \+ (?P<b>\d+) '
+    r'per subsequent use to (?P<c>\d+) \+ (?P<d>\d+) per subsequent use",\s*(?:b\([^)]*\)|t\("\w+"\))\)\)\s*$')
+
+
+def _postprocess_per_death(lines):
+    """A value that now grows with a boss's deaths, or with each use ("Gold reward per player changed from 175 to 125
+    + 50 per Tormentor's death", "Wisdom Shrine experience decreased from 200 + 300 per subsequent use to 200 + 200 per
+    subsequent use", 7.42) → li_formula with a table over the deaths (0, 1, 2 …) / the uses (#1, #2 …), as 7.41's
+    Wisdom Shrine row (owner 2026-11-18: "нет formula table"). The deaths are counted as Valve words them: the column
+    is the number of deaths, not the number of the kill."""
+    out = []
+    for ln in lines:
+        m = _PER_DEATH_ROW_RE.match(ln)
+        if m:
+            pct, cap = m.group("pct"), m.group("cap")
+            new_fn = f'{m.group("b")} + {m.group("c")} * N'
+            if cap:
+                new_fn = f'min({cap}, {new_fn})'
+            new_txt = ln[m.start("b"):ln.index('",', m.start("b"))]
+            note = f', inline_note_text={m.group("note")}' if m.group("note") else ""
+            fmt = ', value_fmt="{:g}%"' if pct else ""
+            out.append(f'{m.group("ind")}W(li_formula("{m.group("pre")} {m.group("verb")}", "{m.group("a")}{pct}", '
+                       f'"{new_txt}", lambda N: {m.group("a")}, lambda N: {new_fn}, levels=[0, 1, 2, 3, 4, 5], '
+                       f'label="{m.group("who")} deaths", rework_badge=False{fmt}{note}))')
+            continue
+        m = _PER_USE_ROW_RE.match(ln)
+        if m:
+            a, b_, c, d = (m.group(k) for k in "abcd")
+            out.append(f'{m.group("ind")}W(li_formula("{m.group("pre")} {m.group("verb")}", "{a} + {b_} per subsequent use", '
+                       f'"{c} + {d} per subsequent use", lambda N: {a} + {b_} * (N - 1), lambda N: {c} + {d} * (N - 1), '
+                       f'levels=[1, 2, 3, 4, 5, 6, 7], level_fmt=lambda N: f"#{{N}}", rework_badge=False, '
+                       f'headline_level=2))')
+            continue
+        out.append(ln)
+    return out
+
+
+def _drop_empty_lists(body):
+    """A list left empty goes: its ul_open / ul_close pair."""
+    body = [ln for k, ln in enumerate(body) if not (ln.strip() == "W(ul_open())" and k + 1 < len(body)
+                                                     and body[k + 1].strip() == "W(ul_close())")
+            and not (ln.strip() == "W(ul_close())" and k > 0 and body[k - 1].strip() == "W(ul_open())")]
+    return body
+
+
 def _postprocess_roshan_block(lines):
     """General Updates rows about Roshan himself → a Roshan block at the end of the section, as 7.38–7.41's pages
     (owner 2026-10-30, 7.37: "Starting from his second death, Roshan now always drops Roshan's Banner" — "надо в
@@ -472,10 +566,15 @@ def _postprocess_roshan_block(lines):
     start = next((k for k, ln in enumerate(lines) if _SECTION_RE.match(ln) and "General" in ln), None)
     head = next((k for k, ln in enumerate(lines) if ROSHAN_HEADER in ln), None)
     if head is not None:
-        # a Roshan block already there: its rows' items link too (owner 2026-10-30, 7.38 "Roshan no longer drops
-        # Aghanim's Blessing": "подчеркнуть с ссылкой … научить генератор такое сразу подчеркивать")
+        # a Roshan block already there (Valve's "Roshan" Subtitle, 7.42): General rows about him join it — "Roshan
+        # gold per player" stood in Gold and Experience (owner 2026-11-18) — and its rows' items link too (owner
+        # 2026-10-30, 7.38 "Roshan no longer drops Aghanim's Blessing": "подчеркнуть с ссылкой")
         stop = next((k for k in range(head + 1, len(lines)) if "W(ul_close())" in lines[k]), len(lines))
-        return lines[:head + 1] + [_link_items(ln) for ln in lines[head + 1:stop]] + lines[stop:]
+        own = lines[head + 1:stop]
+        moved = {k for k in range(start + 1 if start is not None else head, head) if _ROSHAN_ROW_RE.match(lines[k])}
+        before = _drop_empty_lists([ln for k, ln in enumerate(lines[:head]) if k not in moved])
+        return before + [lines[head]] + [_link_items(ln) for ln in own + [lines[k] for k in sorted(moved)]] \
+            + lines[stop:]
     if start is None:
         return lines
     end = next((k for k in range(start + 1, len(lines)) if _SECTION_RE.match(lines[k])), len(lines))
@@ -485,11 +584,7 @@ def _postprocess_roshan_block(lines):
     rows = [ln for ln in body if _ROSHAN_ROW_RE.match(ln)]
     if not rows:
         return lines
-    body = _merge_adjacent_lists([ln for ln in body if ln not in rows])
-    # a list left empty goes
-    body = [ln for k, ln in enumerate(body) if not (ln.strip() == "W(ul_open())" and k + 1 < len(body)
-                                                     and body[k + 1].strip() == "W(ul_close())")
-            and not (ln.strip() == "W(ul_close())" and k > 0 and body[k - 1].strip() == "W(ul_open())")]
+    body = _drop_empty_lists(_merge_adjacent_lists([ln for ln in body if ln not in rows]))
     while body and not body[-1].strip():
         body.pop()
     ind = rows[0][:len(rows[0]) - len(rows[0].lstrip())]
