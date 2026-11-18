@@ -155,6 +155,10 @@ def build():
     W(li("Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu", t("MISC")))
     W(li("Slightly rearranged the trees around Radiant Safelane Tier 1 small camp", t("REWORK")))
     W(li("Dire base shop moved 256 units west", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
+    # the map file of 7.42 (data/terrain/terrain_diff_7.42.json, entities.heroSpawns): all 10 points moved, Dire ones
+    # with the fountain, toward the Ancient; no row of Valve's says it. Distances point to point, in the file's order
+    # (650–720 Dire, 62–198 Radiant); to the nearest new point the Dire ones read 637–701
+    W(li("Dire hero spawn points moved 650–720 units toward the Dire Ancient; Radiant ones moved 62–198 units", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====

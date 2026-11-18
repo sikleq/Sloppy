@@ -827,7 +827,8 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - Ландшафт другими словами: «moved to the top…», «moved ever so slightly to…», «moved ~300 units», «rearranged»,
   «amount of highground», «Spawn boxes of … have been decreased» — REWORK.
 - Меньше — лучше (`LOWER_IS_BUFF`): «Initial delay», «Channel duration», «restore duration», «bonus lost».
-- Исключения линтера, оставленные сознательно: Mordiggian's Oath нового предмета — NEW (описание новой способности);
+- Исключения линтера, оставленные сознательно: Mordiggian's Oath нового предмета и Zombie Bite (новая способность Undying
+  от Aghanim's Shard) — NEW (описание новой способности, канон читает «increase» как BUFF);
   Blur «Now the effect is removed only if the revealing enemy stays…» — BUFF (раскрыть труднее; канон читает «removed»);
   Requiem «Now has a base … duration … and no longer has a max duration» — REWORK (смена правила, не удаление).
 
