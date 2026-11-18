@@ -60,14 +60,16 @@ from .post_late import (
     _postprocess_mechanic_lists,
     _postprocess_new_facet_rows,
     _postprocess_new_innate_cards,
-    _postprocess_drop_table,
-    _postprocess_old_new_table,
-    _postprocess_renamed_unit_ability,
-    _postprocess_per_death,
     _postprocess_returning_rows,
     _postprocess_roshan_block,
     _postprocess_row_notes,
     _postprocess_stance_blocks,
+)
+from .post_tables import (
+    _postprocess_drop_table,
+    _postprocess_old_new_table,
+    _postprocess_per_death,
+    _postprocess_renamed_unit_ability,
 )
 from .post_stats import (
     _postprocess_aghs_merge,

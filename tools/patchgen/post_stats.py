@@ -37,6 +37,47 @@ _FORMULA_DIFF_LINE_RE = re.compile(
     r'^W\(li\("(?P<prefix>[^"]+?) from (?P<old>[^"]+?) to (?P<new>[^"]+?)",\s*'
     r't\("(?:REWORK|MISC|BUFF|NERF)"\)\)\)$'
 )
+# … and with Valve's "?" behind it ("From 15-36.75% to 11-40%"), which goes under the table as inline_note_text
+_FORMULA_DIFF_NOTE_RE = re.compile(
+    r'^(?P<ind>\s*)W\(li\("(?P<prefix>[^"]+?) from (?P<old>[^"]+?) to (?P<new>[^"]+?)",\s*'
+    r't\("(?:REWORK|MISC|BUFF|NERF)"\)(?:, extra=inline_note\((?P<note>"(?:[^"\\]|\\.)*")\))?\)\)$'
+)
+# one side of such a row, whole: "29.5% + 0.5% per hero level", "14.25 + 0.75% per level", "51% - 1% per level",
+# "215s - 5s per level", "0.5% per level"
+_SIDE_FORMULA_RE = re.compile(
+    r"^(?:(?P<base>\d+(?:\.\d+)?)(?P<u1>%|s)?\s*(?P<sign>[+-])\s*)?(?P<inc>\d+(?:\.\d+)?)(?P<u2>%|s)?"
+    r"\s+per(?:\s+(?:hero|[A-Z][\w'-]*))?\s+level(?: up)?$")
+
+
+def _side_formula(text):
+    """(the lambda's body over L, the unit "%" / "s" / "") of one side of a per-level row, or None."""
+    m = _SIDE_FORMULA_RE.match(text.strip())
+    if not m:
+        return None
+    body = f'{m.group("inc")}*L' if m.group("base") is None else f'{m.group("base")} {m.group("sign")} {m.group("inc")}*L'
+    return body, m.group("u1") or m.group("u2") or ""
+
+
+def _formula_diff_row(line):
+    """"X from <formula> to <formula>" with both sides per-level formulas → the li_formula line, else None. Reads the
+    forms the first rule (_PER_LEVEL_FORMULA_RE: "A + B per level" on both sides, no "?") did not — 7.42 proofread
+    2026-11-18: "per hero level" with a "?" (Abaddon, Broodmother), a formula that falls with level (Jakiro "51% - 1%
+    per level", Marci "215s - 5s per level"), a "%" on one number only (Hoodwink) and a side with no base (Death
+    Prophet "0.5% per level") all stayed plain rows or a pill round one side. A cost / cooldown / penalty row
+    (_is_lower_better) gets l=True, so the tag follows the reader's gain."""
+    from .tags import _is_lower_better
+    m = _FORMULA_DIFF_NOTE_RE.match(line)
+    if not m:
+        return None
+    old, new = _side_formula(m.group("old")), _side_formula(m.group("new"))
+    if not old or not new:
+        return None
+    unit = old[1] or new[1]
+    fmt = f', value_fmt="{{:g}}{unit}"' if unit else ', value_fmt="{:g}"'
+    lower = ", l=True" if _is_lower_better(m.group("prefix")) else ""
+    note = f', inline_note_text={m.group("note")}' if m.group("note") else ""
+    return (f'{m.group("ind")}W(li_formula("{m.group("prefix")}", "{m.group("old")}", "{m.group("new")}", '
+            f'lambda L: {old[0]}, lambda L: {new[0]}{lower}{fmt}{note}))')
 
 
 def _postprocess_scale_pill(lines):
@@ -55,6 +96,10 @@ def _postprocess_scale_pill(lines):
     for line in lines:
         if not line.startswith('W(li("'):
             out.append(line)
+            continue
+        whole = _formula_diff_row(line)
+        if whole:
+            out.append(whole)
             continue
         m = _PER_LEVEL_FORMULA_RE.search(line)
         if not m:
