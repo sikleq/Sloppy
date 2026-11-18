@@ -55,6 +55,22 @@ def _wards(patch):
     return terrain_index._load_diff(patch)["wards"]
 
 
+def test_a_diff_without_its_grid_stops_instead_of_dropping_the_layer():
+    """2026-11-18: the 7.42 diff was built 3 minutes before gridnav_742 was added; the builder silently wrote
+    "wards": null and the No-ward ground picture vanished from terrain_742.html. A missing grid must stop the build."""
+    import build_terrain_diff as btd
+    with pytest.raises(FileNotFoundError, match="gridnav_999"):
+        btd._wards("741f", "999")
+
+
+def test_every_terrain_step_has_its_no_ward_layer():
+    """Each committed diff carries the no-ward data of its own two map files (the picture, the chip, the highlights)."""
+    for s in mv.steps():
+        w = terrain_index._load_diff(s.patch).get("wards")
+        assert w, f"terrain_diff_{s.patch}.json has no wards: rebuild it (scripts/gen/build_terrain_diff.py)"
+        assert (w["old"], w["new"]) == (s.old_pic, s.new_pic), s.patch
+
+
 def test_what_the_grids_say_about_valves_ward_fixes():
     """7.39b "Fixed some locations that were incorrectly blocked for warding": not one cell changed — it was no map
     change. 7.39d "Fixed a ward spot in Radiant safe lane hard camp": cells there turned no-ward. 7.41c opened 149
