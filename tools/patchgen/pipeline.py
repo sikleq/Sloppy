@@ -20,6 +20,7 @@ from .post_cards import (
     _postprocess_silent_stats,
     _postprocess_stack_note_into_ability,
 )
+from .post_formula import _postprocess_formula_rows
 from .post_general import (
     _postprocess_before_after,
     _postprocess_boss_rows_home,
@@ -236,6 +237,7 @@ def generate(version):
     out = _postprocess_courier_rows(out)              # Courier rows -> the unit's own category (owner 2026-11-04)
     out = _postprocess_team_abilities(out)            # Glyph, Scan rows -> an ability's header (owner 2026-11-04)
     out = _postprocess_minute_formula(out)
+    out = _postprocess_formula_rows(out)              # "OLD: <formula><br>NEW: <formula>" -> live formula block (11-18)
     out = _postprocess_scale_pill(out)
     out = _postprocess_mechanic_rules_row(out)        # a row restating its header goes (owner 2026-10-27)
     out = _postprocess_misc_topics(out)               # rows on one topic -> a mechanic block (owner 2026-10-28)

@@ -1,0 +1,70 @@
+"""Live game formula (owner 2026-11-18, pilot 7.42 "Hero kill bounty rescaled"): the generator turns an
+"OLD: <formula><br>NEW: <formula>" row into formula_change(inputs=, chart=), the element gives a field for every
+variable, both results and a chart of both curves. Kept apart from test_generator.py so branches merge cleanly."""
+import re
+from pathlib import Path
+
+import tools.generate_patch_code_v2 as g
+from patch.formula_rows import formula_change
+
+ROOT = Path(__file__).resolve().parent.parent
+BOUNTY_ROW = ('W(li("Hero kill bounty rescaled", t("REWORK"), extra=inline_note('
+              '"OLD: 125 + (8 * VictimLevel) + KillstreakFactor<br>NEW: 100 + (10 * VictimLevel) + KillstreakFactor")))')
+BOUNTY_BLOCK = ('W(formula_change("Hero kill bounty", "125 + (8 * VictimLevel) + KillstreakFactor", '
+                '"100 + (10 * VictimLevel) + KillstreakFactor", tag="REWORK", '
+                'inputs={"VictimLevel": 15, "KillstreakFactor": 0}, '
+                'chart=("VictimLevel", "Victim Level", 1, 30), unit="Gold"))')
+
+
+def test_old_new_formula_row_becomes_a_live_formula_block():
+    lines = ['W(subgroup("Gold and Experience"))', 'W(ul_open())', BOUNTY_ROW,
+             'W(li("Roshan gold per player decreased from 135 to 125", b(135, 125)))', 'W(ul_close())']
+    out = g._postprocess_formula_rows(lines)
+    assert out == ['W(subgroup("Gold and Experience"))', BOUNTY_BLOCK, 'W(ul_open())', lines[3], 'W(ul_close())']
+
+
+def test_formula_tag_follows_the_curves():
+    up = BOUNTY_ROW.replace("NEW: 100 +", "NEW: 130 +")        # more gold at every level
+    assert 'tag="BUFF"' in g.formula_block(up)
+    down = BOUNTY_ROW.replace("(10 * VictimLevel)", "(8 * VictimLevel)")   # 25 less at every level
+    assert 'tag="NERF"' in g.formula_block(down)
+    assert 'tag="REWORK"' in g.formula_block(BOUNTY_ROW)      # the curves cross at level 12.5
+
+
+def test_rows_that_are_not_a_computable_formula_stay_notes():
+    siege = ('W(li("Reworked Siege creep spawn count", t("REWORK"), extra=inline_note('
+             '"OLD: Every 5 minutes, 1 siege creep<br>NEW: Every 2.5 minutes, 1 siege creep")))')
+    unknown = BOUNTY_ROW.replace("KillstreakFactor", "MysteryThing")     # no default we could stand behind
+    for line in (siege, unknown, 'W(li("Roshan gold per player decreased from 135 to 125", b(135, 125)))'):
+        assert g._postprocess_formula_rows([line]) == [line]
+
+
+def test_live_formula_has_a_field_per_variable_results_and_chart():
+    html = formula_change("Hero kill bounty", "125 + (8 * VictimLevel) + KillstreakFactor",
+                          "100 + (10 * VictimLevel) + KillstreakFactor",
+                          inputs={"VictimLevel": 15, "KillstreakFactor": 0},
+                          chart=("VictimLevel", "Victim Level", 1, 30), unit="Gold")
+    assert re.findall(r'data-var="(\w+)"', html) == ["VictimLevel", "KillstreakFactor"]
+    assert '<span class="fx-val fx-val-old">245</span>' in html
+    assert '<span class="fx-val fx-val-new">250</span>' in html
+    assert html.count('<polyline class="fx-line') == 2 and 'fx-ruler' in html
+    assert 'data-fx-chart="VictimLevel" data-fx-lo="1" data-fx-hi="30"' in html
+
+
+def test_the_740_table_form_is_unchanged():
+    html = formula_change("Assist Gold Formula", "60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )",
+                          "15 + ( ( 50 + ( VictimNetworth * 0.037 ) ) / NumHeroes )",
+                          vary=("NumHeroes", "Heroes", [1, 2, 3, 4, 5]), fixed={"VictimNetworth": 10000}, unit="Gold")
+    assert 'formula-live' not in html and 'class="formula-ex"' in html and 'data-fx-invar="VictimNetworth"' in html
+
+
+def test_chart_geometry_is_the_same_in_python_and_js():
+    from patch import formula_rows as fr
+    js = (ROOT / "src" / "js" / "formula-calculator.js").read_text(encoding="utf-8")
+    want = f"const W = {fr.FX_W}, H = {fr.FX_H}, PL = {fr.FX_PAD_L}, PR = {fr.FX_PAD_R}, PT = {fr.FX_PAD_T}, PB = {fr.FX_PAD_B};"
+    assert want in js
+
+
+def test_742_bounty_is_the_live_block():
+    src = (ROOT / "content" / "p742.py").read_text(encoding="utf-8")
+    assert BOUNTY_BLOCK in src and "OLD: 125 + (8 * VictimLevel)" not in src
