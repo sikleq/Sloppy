@@ -610,7 +610,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   | 7.41a | 1 tree removed by the Dire secret shop |
   | 7.41c | 149 cells by the Twin Gates and Tormentors became wardable |
   | 7.41d | 23 cells turned no-ward (by Dire small camp 11, a Tormentor, a watcher); 693 cells at the map's edge out of bounds |
-  | 7.42 | the Dire base shop 256 units W ((6697, 6809) -> (6441, 6809)); Radiant ancient camp 8 moved 9 units |
+  | 7.42 | the Dire base shop 256 units W ((6697, 6809) -> (6441, 6809)); the 10 hero spawn points by the fountains moved (Dire 637–701 units, Radiant 62–198); Radiant ancient camp 8 moved 9 units |
   | 7.41e | 2 cells by Radiant top T2 turned no-ward |
 - **Heights layer (2026-10-05)** — the owner: "decode dota.vhcg and make a height layer" — from our own files only (a ward map that knows high ground comes later). Every map file since 7.08 carries `maps/dota.vhcg`; decoded
   from the file alone (`scripts/gen/heightmap.py`, format in its docstring): a 128-byte header ("vhcg", version 1,
