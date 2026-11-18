@@ -103,7 +103,7 @@ DISPEL_MANUAL = {
 TYPE_MANUAL = {
     'enraged_wildkin_tornado': 'Active, Magic Damage',
     'kobold_tunneler_prospecting': 'Passive, Buff Aura',
-    'kobold_disarm': 'Passive, Debuff',
+    'kobold_disarm': 'Active, Magic Damage',   # 7.42 rework
     'hill_troll_rally': 'Passive, Buff Aura',
     'berserker_troll_break': 'Passive, Debuff',
     'gnoll_assassin_envenomed_weapon': 'Passive, HP Removal Damage',
@@ -165,6 +165,7 @@ DMGTYPE_MANUAL = {
     'alpha_wolf_critical_strike': 'Physical',
     'enraged_wildkin_tornado': 'Magical',
     'ogre_bruiser_ogre_smash': 'Magical',
+    'kobold_disarm': 'Magical',            # 7.42 rework: magical line damage
     'harpy_storm_chain_lightning': 'Magical',
     'mud_golem_hurl_boulder': 'Magical',
     'frogmen_arm_of_the_deep': 'Magical',
@@ -236,7 +237,7 @@ def _dmg_qhint(text: str, tip: str) -> str:
 # files of this patch. tests/test_roster_guards.py compares the KV blocks of
 # every neutral-creep ability between this patch and the latest one and fails
 # with the changed keys — re-check those cells, then set this to the latest.
-ABIL_MANUAL_CHECKED = "7.41f"
+ABIL_MANUAL_CHECKED = "7.42"
 
 ABIL_MANUAL = {
     'enraged_wildkin_tornado': {
@@ -257,7 +258,7 @@ ABIL_MANUAL = {
     'kobold_tunneler_prospecting': {
         'effect': '+20/25/30/40 gold per minute'},
     'kobold_disarm': {
-        'effect': 'Disarms 1 target', 'effect2': 'Requires 3 attacks'},
+        'effect': 'Break on all enemies in a line', 'effect2': 'Line damage'},   # 7.42 rework
     'hill_troll_rally': {
         'effect': '+2 attack damage to allies'},
     'berserker_troll_break': {
@@ -305,10 +306,10 @@ ABIL_MANUAL = {
         'ms_effect': '+10/12/14/16%',
         'effect': 'Outgoing damage +10/12/14/16%'},
     'satyr_trickster_purge': {
-        # Slow decays from -50% to -10% over 5 seconds; not in any av_* field.
+        # 7.42: base slow 80% (av_base_slow), decaying over 4s (av_duration)
         'ms_effect': _val_qhint(
-            '-50% to -10%',
-            'Movement slow decays by 10% each second over 5 seconds'),
+            '-80%',
+            'Movement slow decays over 4 seconds'),
         'effect': 'Dispel', 'effect2': 'Movement slow'},
     'giant_wolf_intimidate': {
         'effect': 'Reduces attack damage by 60%'},
@@ -450,11 +451,11 @@ ABIL_MANUAL = {
         'effect': '+3/5/7/11 HP/sec regen'},
     'satyr_hellcaller_shockwave': {
         # av_radius_start:"180", av_radius_end:"200" — cone widens.
-        # av_distance:"1380" + av_speed:"900"; effective max range ~1580.
+        # 7.42 av_distance:"1100" (1380 before); the old ~1580 max range was 1380 + the 200 end radius.
         'aoe': _val_qhint(
             '180', '200 at the end (cone widens along the path)'),
         'cast_range': _val_qhint(
-            '700', 'Max travel distance is 1580'),
+            '700', 'Max travel distance is 1300'),
         'effect': 'AoE damage with a projectile'},
     'dark_troll_warlord_raise_dead': {
         'manacost': '50', 'cooldown': '20', 'duration': '35',
@@ -484,10 +485,10 @@ ABIL_MANUAL = {
     'black_dragon_dragonhide_aura': {
         'effect': '+3 armor'},
     'black_dragon_fireball': {
-        # av_damage:"85" is mislabeled — actual game effect is 85/sec
-        # (total 722.5 over 8s); av_damage path takes priority, so override.
-        'damage': '85 per sec.',
-        'effect': 'AoE damage', 'effect2': 'Flying vision 300/300'},
+        # av_damage is per second (7.42 notes "Damage per second rescaled from 85 to 65/75/85/85");
+        # av_damage path takes priority, so override.
+        'damage': '65/75/85/85 per sec.',
+        'effect': 'Flies in an arc, leaving a trail of fire', 'effect2': 'Flame damage over time'},
     'black_dragon_splash_attack': {
         # av_range:"250" is the splash radius, but our auto-derive reads
         # av_radius only.
@@ -497,9 +498,9 @@ ABIL_MANUAL = {
         'effect': '+16/17/18/19% max HP increase'},
     'big_thunder_lizard_slam': {
         'duration': _val_qhint(
-            '2/2.25/2.5/3 or 4',
-            'Scaling duration on heroes. Lasts longer on creeps (4)'),
-        'as_effect': '-60%',
+            '3 or 4',
+            'On heroes 3 (7.42). Lasts longer on creeps (4)'),
+        'as_effect': '-50%',
         'effect': 'AoE damage', 'effect2': 'AoE slow'},
     'big_thunder_lizard_frenzy': {
         'effect': 'Attack speed bonus on 1 ally'},

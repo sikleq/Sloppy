@@ -191,7 +191,9 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
              + f" -> data/stats/{version}/, data/*_english.txt", fetch,
              skip=None if source != "game" or local_game else f"no pak01_dir.vpk under {dota_path} (use --source gametracking)"),
         Step("slim", f"slim JSONs of data/stats/{version}/", [PY, "tools/slim_from_kv.py", version]),
-        Step("meta", "data/site_meta.json with the new patch (before the top-ups)", [PY, "build_site.py", "patch"]),
+        # only the patch builder: build_site.py patch also runs its dependents (Hero / Item Changes), which need
+        # heroes_raw.json, written by a top-up below (7.42, 2026-11-18: the meta step failed on it)
+        Step("meta", "data/site_meta.json with the new patch (before the top-ups)", [PY, "builders/build_patches.py"]),
         Step("store", f"the patch's game files -> the store ({'installed game' if source == 'game' else 'archives'})",
              store, skip=None if history else no_hist),
         # the minute the patch went live: its first build with notes -> its ClientVersion (owner 2026-11-11)
@@ -268,6 +270,12 @@ def remaining(version, source, map_state):
     return out
 
 
+def step_env(base) -> dict:
+    """The steps' environment: UTF-8 output, and SLOPPY_DIR = this checkout, so the store's tools read THIS
+    RELEASE_HISTORY (7.42, 2026-11-18: their default was the folder from before the move to E:)."""
+    return dict(base, PYTHONIOENCODING="utf-8", SLOPPY_DIR=str(ROOT))
+
+
 def _run(step, version, date):
     if step.func == "register":
         with open(META, encoding="utf-8", newline="") as f:
@@ -286,7 +294,7 @@ def _run(step, version, date):
             f.write(register(text, version, date).replace("\n", eol))
         print("  " + entry_line(version, date).strip())
         return 0
-    env = dict(os.environ, PYTHONIOENCODING="utf-8")
+    env = step_env(os.environ)
     return subprocess.run(step.argv, cwd=ROOT, env=env, stdin=subprocess.DEVNULL).returncode
 
 

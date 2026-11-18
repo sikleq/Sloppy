@@ -19,6 +19,20 @@ def _load(code):
         return json.load(f)["data"]
 
 
+def test_a_map_that_decompiles_to_nothing_stops_with_an_error(monkeypatch):
+    # 7.42: Source2Viewer 20.0 exited 0 on the new KV3 type 26 and mapdata_742.json came out with 0 trees
+    monkeypatch.setattr(xm, "_run", lambda *a: "")
+    with pytest.raises(RuntimeError, match="Source2Viewer"):
+        xm.extract("x.vpk")
+
+
+def test_an_empty_entity_list_never_goes_into_the_store(monkeypatch, tmp_path):
+    monkeypatch.setattr(xm, "raw_entities", lambda vpk: [])
+    with pytest.raises(RuntimeError, match="Source2Viewer"):
+        xm.write_ents(str(tmp_path), "118cfcea" + "0" * 32, "x.vpk")
+    assert not (tmp_path / "ents").exists()
+
+
 def test_the_lump_parser_reads_both_the_new_and_the_legacy_format():
     ents = xm.parse_vents('====0====\nclassname "ent_dota_tree"\norigin [ -852.0, 4940.4, 265.3 ]\n\n'
                           '====1====\nclassname "trigger_multiple"\norigin "2560.000000 -4096.000000 -64.0"\n'

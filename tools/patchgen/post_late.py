@@ -219,7 +219,8 @@ def _postprocess_facets_first(lines):
 
 
 _NEW_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("New innate ability\b', re.I)
-_NEW_BASIC_ROW_RE = re.compile(r'^\s*W\(li\("New basic ability\b', re.I)
+# 7.42 "New ability granted with Aghanim's Scepter" (Summon Lone Druid, Summon Ancient Thunderhide): a "New ability." card
+_NEW_BASIC_ROW_RE = re.compile(r'^\s*W\(li\("New (?:basic ability\b|ability granted (?:with|by) Aghanim)', re.I)
 _ANY_ABILITY_LINE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"(?:, innate=True)?\)\)\s*$')
 _HERO_LINE_RE = re.compile(r'^\s*W\(hero_header\("([^"]+)"')
 
@@ -256,7 +257,8 @@ def _postprocess_new_innate_cards(lines, version):
                 out.append(f'{m.group(1)}W(new_ability("{m.group(2)}", "{m.group(3)}", version="{version}"))')
                 out.append(lines[i + 1])
                 for r in lines[i + 2:end]:
-                    plain = r.lstrip().startswith("W(li(") and "extra=" not in r and "Aghanim" not in r
+                    plain = (r.lstrip().startswith("W(li(") and "extra=" not in r
+                             and ("Aghanim" not in r or bool(_NEW_BASIC_ROW_RE.match(r))))
                     out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if plain else r)
                 out.append(lines[end] if end < len(lines) else "")
                 i = end + 1
@@ -271,7 +273,12 @@ def _postprocess_new_innate_cards(lines, version):
         olds = sorted(s for s in old_innates if hero and s.startswith(f"{hero}_") and s != slug)
         out.append(f'{ind}W(ability_change(')
         if olds:
-            old = olds[0]
+            # several innates last patch (7.41f Nyx: Mana Burn + Nyxth Sense): the one the notes say was removed
+            hero_part = "\n".join(out[max((k for k, ln in enumerate(out) if _HERO_LINE_RE.match(ln)), default=0):])
+            named = [s for s in olds if re.search(
+                rf'Removed {re.escape(loc_history.tooltip(f"DOTA_Tooltip_Ability_{s}", prev) or s)} innate',
+                hero_part, re.I)]
+            old = (named or olds)[0]
             old_name = loc_history.tooltip(f"DOTA_Tooltip_Ability_{old}", prev) or old
             _drop_removed_block(out, old)               # the card's old side shows it: no "Ability removed" twice
             out.append(f'{ind}    old=dict(name="{old_name}", slug="{old}", innate=True, '
@@ -302,13 +309,23 @@ def _drop_removed_block(out, slug):
     """Take out of `out` (this hero's part) the block `ability(…, slug)` + "Ability removed" — 7.37 Abaddon's Font of
     Avernus, Enchantress's Forest Freebie: the new innate's card shows the old one on its left side."""
     start = max((k for k, ln in enumerate(out) if _HERO_LINE_RE.match(ln)), default=0)
+    removed_row = re.compile(r'^\s*W\(li\("(?:Ability removed|Removed [^"]+ innate ability)"', re.I)
     for k in range(start, len(out) - 3):
         if (f'slug="{slug}"' in out[k] and out[k].lstrip().startswith("W(ability(")
-                and out[k + 1].strip() == "W(ul_open())" and out[k + 2].lstrip().startswith('W(li("Ability removed"')
+                and out[k + 1].strip() == "W(ul_open())" and removed_row.match(out[k + 2])
                 and out[k + 3].strip() == "W(ul_close())"):
-            del out[k:k + 4]
+            # 7.42 Lycan: "Removed Apex Predator innate ability" had its own block under a TODO[innate-swap]
+            first = k - 1 if k > start and out[k - 1].lstrip().startswith("# TODO[innate-swap]") else k
+            del out[first:k + 4]
             return True
-    return False
+    # 7.42 Chaos Knight, Nyx: "Removed <old> Innate Ability" sits in the hero's list; the card says it
+    old_name = None
+    for k in range(start, len(out)):
+        m = re.match(r'^(\s*W\(li\("Removed ([^"]+?) Innate Ability", t\("DEL"\))\)\)\s*$', out[k], re.I)
+        if m:
+            out[k] = f'{m.group(1)}, covered=True))'
+            old_name = m.group(2)
+    return bool(old_name)
 
 
 def _postprocess_innate_level0(lines, version):
@@ -375,6 +392,11 @@ ROW_NOTES = {
     "Teleport time to Roshan's outposts decreased from 6s to 4s":
         "The two corner outposts next to Roshan's pits (added in 7.33 by the Twin Gates, removed in 7.38). "
         "The jungle outposts got 4s in 7.35",
+    # 7.42 Nimble (game files of build 6978, checked in the game code; not yet in a match): the penalty read a value
+    # the item did not have, so it was 0 since the enchantment came in
+    "Health Regen penalty is now reflected on the health regen bar value, but cannot put your health regeneration "
+    "below zero":
+        "Not in the patch notes: before 7.42 the penalty did not apply at all (found in the game files)",
 }
 
 

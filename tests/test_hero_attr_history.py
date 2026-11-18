@@ -56,7 +56,7 @@ def test_attribute_headers_carry_their_rule_history(monkeypatch):
     from patch import game_constants as gc
     agi = gc.attribute_history("agi")
     assert "7.27|28.06.2020|F|Armor|0.16|0.167|hi" in agi
-    assert gc.attribute_today("str") == ('Per Strength<span class="tip-now">22 HP</span>'
+    assert gc.attribute_today("str") == ('Per Strength<span class="tip-now">20 HP</span>'
                                          '<span class="tip-now">0.1 HP regen</span>')
     # one value per line: the long "attr" header made the window too wide (owner 2026-10-23)
     assert gc.attribute_today("attr").count('class="tip-now"') == 2

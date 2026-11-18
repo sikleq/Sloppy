@@ -94,6 +94,14 @@ ITEM_SLUG = {
     # (lowercase + spaces->underscores + strip apostrophes). Verify against
     # the live Valve datafeed: dota2.com/datafeed/itemlist
     "Khanda": "angels_demise",
+    # 7.42 names (itemlist datafeed of 18.11.2026)
+    "Armlet of Mordiggian": "armlet",
+    "Greater Horn of Battle": "horn_of_battle_greater",
+    "Mantle of Intelligence": "mantle",
+    "Morbid Mask": "lifesteal",
+    "Sabatons of Mordiggian": "berserkers_sabatons",
+    "Sage Mask": "sobi_mask",
+    "Skull Basher": "basher",
     "Parasma": "devastator",
     "Book of the Dead": "demonicon",
     "Witchbane": "heavy_blade",

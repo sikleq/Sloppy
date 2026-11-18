@@ -48,7 +48,7 @@ def test_neutral_headline_bonuses_are_extracted(items):
     bonuses = items["item_harmonizer"]["tip"]["neutralBonuses"]
     assert bonuses == [
         {"value": "7", "label": "Mana Cost Reduction", "pct": True},
-        {"value": "6", "label": "Spell Amplification", "pct": True},
+        {"value": "9", "label": "Spell Lifesteal", "pct": True},     # 7.42: was 6% Spell Amplification
     ]
 
 
@@ -81,11 +81,12 @@ def test_no_raw_dollar_placeholders_reach_tooltips(items):
 
 def test_enchantment_attribute_values_are_resolved(items):
     crude = items["item_enhancement_crude"]["tip"]["attribs"]
-    assert "+9% Health Restoration" in crude
-    assert "-6% Base Attack Time" in crude
+    # 7.42: two tiers (Base Attack Time +6/9/12% -> +7/12%), Evolved +40 -> +20
+    assert "+10% Health Restoration" in crude
+    assert "-7% Base Attack Time" in crude
 
     evolved = items["item_enhancement_evolved"]["tip"]["attribs"]
-    assert "+40 Primary Attribute" in evolved
+    assert "+20 Primary Attribute" in evolved
 
     # 7.41e replaced Feverish's mana-cost penalty with a max-mana penalty.
     # Valve encodes it as a bare `max_mana` KV value — it must render as a

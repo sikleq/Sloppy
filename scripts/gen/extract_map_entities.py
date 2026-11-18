@@ -298,6 +298,9 @@ def extract(vpk):
                 if f.endswith(".vents") and "_destruction" not in f:
                     with open(os.path.join(dirpath, f), encoding="utf-8", errors="replace") as fh:
                         ents += parse_vents(fh.read())
+        if not ents:
+            # 7.42: Source2Viewer 20.0 could not read the new KV3 type 26, exited 0, and the map came out empty
+            raise RuntimeError(f"no map entities decompiled from {vpk}: update Source2Viewer-CLI (S2V_CLI)")
         by = {}
         for e in ents:
             by.setdefault(str(e.get("classname", "")), []).append(e)
@@ -340,9 +343,13 @@ def write_ents(store, sha, vpk, refresh=False):
     path = os.path.join(store, "ents", f"{sha[:8]}.json.gz")
     if os.path.exists(path) and not refresh:
         return path
+    ents = raw_entities(vpk)
+    if not ents:
+        # 7.42: an old Source2Viewer read nothing and an empty list sat in the store as if it were the map's
+        raise RuntimeError(f"no entities decompiled from {vpk}: update Source2Viewer-CLI (S2V_CLI)")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with gzip.open(path + ".part", "wt", encoding="utf-8") as f:
-        json.dump(raw_entities(vpk), f, ensure_ascii=False, separators=(",", ":"))
+        json.dump(ents, f, ensure_ascii=False, separators=(",", ":"))
     os.replace(path + ".part", path)
     return path
 

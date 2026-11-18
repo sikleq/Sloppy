@@ -259,6 +259,17 @@
      "chaos_knight_reins_of_chaos"
     ],
     "source": "files"
+   },
+   {
+    "since": "7.42",
+    "innates": [
+     "chaos_knight_armageddon",
+     "chaos_knight_armageddons_flank",
+     "chaos_knight_armageddons_flank_end",
+     "chaos_knight_fundamental_forging",
+     "chaos_knight_reins_of_chaos"
+    ],
+    "source": "files"
    }
   ],
   "chen": [
@@ -849,6 +860,14 @@
      "lycan_apex_predator"
     ],
     "source": "files"
+   },
+   {
+    "since": "7.42",
+    "innates": [
+     "lycan_apex_predator",
+     "lycan_pack_hunter"
+    ],
+    "source": "files"
    }
   ],
   "magnataur": [
@@ -1030,6 +1049,15 @@
     "innates": [
      "nyx_assassin_neuro_sting",
      "nyx_assassin_nyxth_sense"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.42",
+    "innates": [
+     "nyx_assassin_neuro_sting",
+     "nyx_assassin_nyxth_sense",
+     "nyx_assassin_scarab_metabolism"
     ],
     "source": "files"
    }

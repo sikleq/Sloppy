@@ -13,6 +13,12 @@ import tools.generate_patch_code_v2 as g
 # ── _guess_tag: canonical phrase → expected tag ────────────────────────────
 
 @pytest.mark.parametrize("text, expected", [
+    # 7.42 proofreading
+    ("No longer has a 35% damage penalty against creeps", "BUFF"),
+    ("No longer has 50% reduced proc chance on echo attacks", "BUFF"),
+    ("Aghanim's Shard illusion no longer has 15% damage penalty and deals full damage", "BUFF"),
+    ("No longer resets cooldown when specific buildings are destroyed", "DEL"),
+    ("No longer reduces enemy Magic Resistance by 5/10/15%", "DEL"),
     # NEW
     ("Added to Captains Mode", "NEW"),
     ("Can now be disassembled", "NEW"),
@@ -1067,3 +1073,61 @@ def test_scaffold_versions_have_a_committed_datafeed(version):
         tracked = subprocess.run(["git", "ls-files", f"data/{v}_datafeed.json"], cwd=root,
                                  capture_output=True, text=True).stdout.strip()
         assert tracked, f"git add -f data/{v}_datafeed.json"
+
+
+def test_properties_card_puts_shared_stats_first():
+    # 7.42 Butterfly: new +30 Attack Speed stood above the shared Evasion
+    from tools.patchgen.post_stats import _shared_props_first
+    old, new = _shared_props_first([("NERF", "+35% Evasion"), ("DEL", "+20% Base Attack Speed Percentage")],
+                                   [("NEW", "+30 Attack Speed"), ("", "+30% Evasion", (35, 30))])
+    assert [r[1] for r in old] == ["+35% Evasion", "+20% Base Attack Speed Percentage"]
+    assert [r[1] for r in new] == ["+30% Evasion", "+30 Attack Speed"]
+
+
+def test_nimble_742_row_says_the_penalty_did_not_work_before():
+    from tools.patchgen.post_late import ROW_NOTES
+    assert any("Health Regen penalty is now reflected" in k and "before 7.42" in v for k, v in ROW_NOTES.items())
+
+
+def test_spirit_bear_is_a_unit_block_of_lone_druid():
+    # Valve lists the bear as hero_id 1961; 7.42's draft printed a hero "hero_1961"
+    from tools.patchgen.pipeline import _spirit_bear_block, SPIRIT_BEAR_ID
+    out = _spirit_bear_block({"hero_id": SPIRIT_BEAR_ID, "hero_notes": [{"indent_level": 1, "note": "Base Armor increased by 1"}]},
+                             "7.42", {}, {})
+    assert not any("hero_1961" in ln for ln in out)
+    assert any(ln.startswith('W(unit_header("Spirit Bear"') for ln in out)
+
+
+def test_innates_are_found_in_ability_definitions():
+    # since 7.41f the abilities sit one level deeper in the hero files; 7.42 Lycan / Chaos Knight / Nyx got old=None
+    from tools.patchgen.entities import innate_slugs_of
+    assert {"lycan_apex_predator", "nyx_assassin_neuro_sting"} <= innate_slugs_of("7.41f")
+
+
+def test_removed_innate_rows_go_under_the_card():
+    from tools.patchgen.post_late import _drop_removed_block
+    out = ['W(hero_header("Lycan"))', "# TODO[innate-swap]: x", 'W(ability("Apex Predator", slug="lycan_apex_predator", innate=True))',
+           "W(ul_open())", 'W(li("Removed Apex Predator innate ability", t("DEL")))', "W(ul_close())"]
+    assert _drop_removed_block(out, "lycan_apex_predator") and out == ['W(hero_header("Lycan"))']
+    out = ['W(hero_header("Nyx Assassin"))', "W(ul_open())", 'W(li("Removed Mana Burn Innate ability", t("DEL")))',
+           "W(ul_close())"]
+    assert _drop_removed_block(out, "nyx_assassin_neuro_sting")
+    assert out[2] == 'W(li("Removed Mana Burn Innate ability", t("DEL"), covered=True))'
+
+
+def test_max_base_damage_row_reads_the_max_field():
+    # 7.42 "Max Base Damage decreased by 5" was compared on AttackDamageMin
+    from tools.patchgen.rows import _emit_li
+    mx = _emit_li("Max Base Damage decreased by 5", hero_name="Chaos Knight", version="7.42")
+    mn = _emit_li("Min Base Damage increased by 5", hero_name="Chaos Knight", version="7.42")
+    assert '"AttackDamageMax"' in mx and "AttackDamageMin" not in mx
+    assert '"AttackDamageMin"' in mn
+
+
+def test_new_ability_ids_get_their_names_from_the_snapshot():
+    # 7.42: data/abilities_by_id.json did not know the patch's new abilities, the draft said "ability_1921"
+    from tools.patchgen import data
+    ids = data._abilities_from_snapshot()
+    assert ids, "the newest snapshot's ability_ids.json gives names"
+    assert all(not name.startswith("ability_") for name, _slug in ids.values())
+    assert all(aid in data.ABILS for aid in ids)

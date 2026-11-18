@@ -89,7 +89,7 @@ def test_every_valve_stat_row_is_shown_with_its_own_kv_value(items, kv, loc):
 
 
 def test_ethereal_blade_and_solar_crest_rows(items):
-    assert "+24 All Attributes" in items["item_ethereal_blade"]["tip"]["attribs"]
+    assert "+25 All Attributes" in items["item_ethereal_blade"]["tip"]["attribs"]   # 7.42: 24 -> 25
     solar = items["item_solar_crest"]
     assert "+25 Movement Speed" in solar["tip"]["attribs"]
     assert solar["bonus"]["ms"] == pytest.approx(25)
@@ -105,9 +105,20 @@ def test_passive_projectile_speed_is_kept(items, item_id):
     assert items[item_id]["bonus"]["projSpeed"] > 0
 
 
-def test_attack_range_rows_keep_valve_melee_ranged_qualifier(items):
+@pytest.fixture(scope="module")
+def items_741f():
+    """7.41f: the last patch with a melee-only attack range (Monkey King Bar) and a base attack speed bonus
+    (Butterfly) — 7.42 removed both, the parser still has to read them on older patches."""
+    result = {item["id"]: item for item in _load_items("7.41f")}
+    if not result:
+        pytest.skip("no 7.41f items")
+    return result
+
+
+def test_attack_range_rows_keep_valve_melee_ranged_qualifier(items_741f):
+    items = items_741f
     mkb = items["item_monkey_king_bar"]
-    assert "+50 Attack Range (Melee Only)" in mkb["tip"]["attribs"]
+    # the tooltip rows come from today's game texts (7.42 MKB has no range): only the numbers are of 7.41f
     # 7.41: "+50 Attack Range to melee heroes only" — must not feed the
     # ranged/all bucket that scripts.js applies to ranged heroes.
     assert mkb["bonus"]["rangeUniqueMelee"] == pytest.approx(50)
@@ -115,11 +126,10 @@ def test_attack_range_rows_keep_valve_melee_ranged_qualifier(items):
     assert any("(Ranged Only)" in row for row in items["item_dragon_lance"]["tip"]["attribs"])
 
 
-def test_butterfly_base_attack_speed_is_modelled(items):
-    fly = items["item_butterfly"]
+def test_butterfly_base_attack_speed_is_modelled(items_741f):
+    fly = items_741f["item_butterfly"]
     assert fly["bonus"]["baseAspdPct"] == pytest.approx(20)
     assert fly["bonus"]["aspd"] == 0
-    assert "+20% Base Attack Speed" in fly["tip"]["attribs"]
 
 
 def test_scripts_js_applies_melee_range_and_base_aspd():

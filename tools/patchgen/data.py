@@ -119,6 +119,31 @@ def _load_abilities():
     for aid_str, meta in d.items():
         aid = int(aid_str)
         out[aid] = (meta.get('dname'), meta.get('slug'))
+    out.update({aid: v for aid, v in _abilities_from_snapshot().items() if aid not in out})
+    return out
+
+
+def _abilities_from_snapshot():
+    """Ability ids the herodata file does not know yet (a new patch's new abilities: 7.42 printed
+    "ability_1921" for Lycan's Pack Hunter): id -> (name, slug) from the newest snapshot's ability_ids.json
+    and the names in data/abilities_slim.json."""
+    slim_p = os.path.join(_HERE, 'data', 'abilities_slim.json')
+    stats = os.path.join(_HERE, 'data', 'stats')
+    if not os.path.exists(slim_p) or not os.path.isdir(stats):
+        return {}
+    import sys
+    if _HERE not in sys.path:
+        sys.path.insert(0, _HERE)
+    from patch.meta import latest_stats_version
+    ids_p = os.path.join(stats, latest_stats_version(), 'ability_ids.json')
+    if not os.path.exists(ids_p):
+        return {}
+    slim = json.load(open(slim_p, encoding='utf-8'))
+    out = {}
+    for aid_str, slug in json.load(open(ids_p, encoding='utf-8')).items():
+        name = (slim.get(slug) or {}).get('dname')
+        if name and aid_str.isdigit():
+            out[int(aid_str)] = (name, slug)
     return out
 
 

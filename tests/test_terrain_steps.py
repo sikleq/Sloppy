@@ -30,7 +30,7 @@ def test_the_site_has_every_map_file_from_737c_to_741f():
     # and 7.37b ran 7.36's map file (2026-10-29)
     got = [s.patch for s in mv.steps()]
     assert got == ["7.37c", "7.37d", "7.37e", "7.38", "7.38b", "7.38c", "7.39", "7.39b", "7.39c", "7.39d", "7.39e", "7.40", "7.40c",
-                   "7.41", "7.41a", "7.41c", "7.41d", "7.41e", "7.41f"]
+                   "7.41", "7.41a", "7.41c", "7.41d", "7.41e", "7.41f", "7.42"]
     same = mv.same_file_as()
     assert same["7.40b"] == "7.40" and same["7.41b"] == "7.41a"
 
@@ -156,12 +156,13 @@ def test_a_patch_that_changed_nothing_gets_no_page_but_the_newest_does():
     """The owner: "if nothing changed in a patch, there's nothing to compare" — no object moved, no notes. 2026-10-03:
     the newest patch keeps its page all the same, "or one could think the patch doesn't exist" (7.41f)."""
     steps, notes, quiet = _quiet_set()
-    assert quiet == {"7.37c", "7.37d", "7.37e", "7.39e", "7.40c"}                   # 7.41c-e changed where wards can stand
+    # 7.41c-e changed where wards can stand; 7.41f changed nothing and lost its page once 7.42 became the newest
+    assert quiet == {"7.37c", "7.37d", "7.37e", "7.39e", "7.40c", "7.41f"}
     pages = terrain_index._pages([p for p in steps if p not in quiet], notes)
-    assert pages == ["7.41f", "7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39",
+    assert pages == ["7.42", "7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39",
                      "7.38c", "7.38b", "7.38"]
-    html = terrain._build_terrain_page("7.41f", pages, notes, steps["7.41f"], terrain_index._load_diff("7.41f"), "")
-    assert '<div class="tf-none">Nothing</div>' in html and "NEW &nbsp;7.41f →" in html
+    html = terrain._build_terrain_page("7.42", pages, notes, steps["7.42"], terrain_index._load_diff("7.42"), "")
+    assert '<div class="tf-none">Nothing</div>' not in html and "NEW &nbsp;7.42 →" in html
 
 
 def test_7_38_has_its_page_and_its_map_notes():

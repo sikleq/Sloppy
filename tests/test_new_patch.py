@@ -79,6 +79,12 @@ def test_plan_skips_what_does_not_apply(monkeypatch, tmp_path):
     # new icons get their small WebP copies before the build points the pages at them (audit 2026-10-26)
     assert steps["thumbs"].argv[1:] == ["tools/make_thumbs.py"] and steps["thumbs"].skip is None
     assert steps["publish"].argv[-1].endswith("publish.py")
+    # meta runs only the patch builder: build_site.py patch also runs Hero / Item Changes, which need
+    # heroes_raw.json from a later top-up (7.42, 2026-11-18)
+    assert steps["meta"].argv[1:] == ["builders/build_patches.py"]
+    # the store's tools read THIS checkout's RELEASE_HISTORY, not a default folder from before the move to E:
+    env = np_.step_env({"SLOPPY_DIR": "C:/old/place"})
+    assert env["SLOPPY_DIR"] == str(np_.ROOT) and env["PYTHONIOENCODING"] == "utf-8"
     # source game without a local game: the fetch says why it cannot run
     game = {s.name: s for s in np_.plan("7.41f", None, "game", dota_path=str(tmp_path))}
     assert "pak01_dir.vpk" in game["fetch"].skip

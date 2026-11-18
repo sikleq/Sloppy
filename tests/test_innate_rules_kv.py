@@ -23,7 +23,8 @@ def _active(eff, version):
 def _kv_effects(rules):
     for slug, hero in rules["heroes"].items():
         for eff in hero.get("effects", []):
-            if eff.get("kv"):
+            # an effect with "until" ended (7.42 Death Prophet's cooldown reduction): its KV keys are gone for good
+            if eff.get("kv") and not eff.get("until"):
                 yield slug, eff.get("kv_ability") or hero["innate"], eff
 
 

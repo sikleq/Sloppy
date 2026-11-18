@@ -165,6 +165,12 @@ def innate_slugs_of(version):
         folder = os.path.join(_HERE, "data", "stats", str(version), "heroes")
         found = set()
         if version and os.path.isdir(folder):
+            # since 7.41f the abilities sit in AbilityDefinitions, one level deeper than _KV_BLOCK_RE reads (7.42:
+            # it found the hero blocks, so Lycan / Chaos Knight / Nyx got no old innate in their cards)
+            from patch.aghs_text import _blocks
+            found = {s for s, b in _blocks(str(version)).items()
+                     if isinstance(b, dict) and str(b.get("Innate", "0")).strip() == "1"}
+        if version and os.path.isdir(folder) and not found:
             for f in os.listdir(folder):
                 text = open(os.path.join(folder, f), encoding="utf-8", errors="replace").read()
                 found |= {s for s, body in _KV_BLOCK_RE.findall(text) if re.search(r'"Innate"\s+"1"', body)}

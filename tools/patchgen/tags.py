@@ -55,7 +55,11 @@ CANONICAL_TAGS = [
     # BUFF first — removing a penalty / restriction is positive (memory rule
     # sloppy_no_longer_penalty_is_buff). Tightly anchored so legitimate DEL
     # phrasings don't accidentally match.
-    (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){0,5}(?:penalt(?:y|ies)|restrictions?|drawbacks?|downsides?|debuff slow)\b', re.I), 'BUFF'),
+    # 7.42: a cooldown reset on an event is a benefit taken away (Glyph); an ENEMY stat debuff taken away (Requiem)
+    (re.compile(r'\bno longer resets (?:its |the )?cooldown\b', re.I), 'DEL'),
+    (re.compile(r"\bno longer (?:reduces|decreases) (?:enemy|enemies'?) (?:\w+ ){0,3}resistance\b", re.I), 'DEL'),
+    # "(?:[\w%.]+ )": 7.42 "No longer has a 35% damage penalty", "No longer has 50% reduced proc chance"
+    (re.compile(r'\bno longer has (?:an? |the )?(?:[\w%.]+ ){0,5}(?:penalt(?:y|ies)|restrictions?|drawbacks?|downsides?|debuff slow)\b', re.I), 'BUFF'),
     # ── 2026-09-22 generator-vs-proofread diff (7.38): confident direction flips ──
     (re.compile(r"\bno longer (?:reduces|decreases) (?:enemy |enemies'? |their |the target'?s? )?vision\b", re.I), 'DEL'),  # enemy vision debuff removed (NS Void)
     (re.compile(r'\bno longer reduces health restoration\b', re.I), 'DEL'),   # an ENEMY heal debuff taken away (Freezing Aura, 7.41)
@@ -113,7 +117,7 @@ CANONICAL_TAGS = [
     (re.compile(r'\bNow provides \d+% of the bonuses to all allies\b', re.I), 'NEW'),      # Mars's Arena Of Blood
     (re.compile(r'\bAllied Tangos provide double\b', re.I), 'NEW'),                        # Soothing Saplings
     (re.compile(r'\bspirit is now added to both\b', re.I), 'NEW'),                         # Exorcism
-    (re.compile(r'\bno longer has (?:a |an )?(?:reduced|decreased|lower|fixed|illusion vision)\b', re.I), 'BUFF'),
+    (re.compile(r'\bno longer has (?:a |an )?(?:[\d.]+%? )?(?:reduced|decreased|lower|fixed|illusion vision)\b', re.I), 'BUFF'),
     (re.compile(r'\bno longer (?:freezes|loses|pauses|resets|delays)\b', re.I), 'BUFF'),
     (re.compile(r'\bis no longer (?:decreased|reduced|lowered) on \w+ from (?:his|her|their|its) own\b', re.I), 'BUFF'),
     (re.compile(r'\brequirement\b.*\b(?:is |was )?removed\b', re.I), 'BUFF'),

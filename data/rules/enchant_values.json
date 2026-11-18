@@ -232,5 +232,69 @@
     "+2 Health Regen"
    ]
   }
+ },
+ "7.42": {
+  "Audacious": {
+   "5": [
+    "+100 Attack Speed",
+    "+80 Magic Attack Damage",
+    "+10% Incoming Damage"
+   ]
+  },
+  "Feverish": {
+   "5": [
+    "+15% Cooldown Reduction",
+    "+20% Mana Cost/Loss Increase"
+   ]
+  },
+  "Fleetfooted": {
+   "5": [
+    "+115 Movement Speed",
+    "Does not stack with boots"
+   ]
+  },
+  "Greedy": {
+   "2": [
+    "+80 GPM",
+    "+200 Mana",
+    "−70 Attack Damage"
+   ],
+   "3": [
+    "+80 GPM",
+    "+200 Mana",
+    "−70 Attack Damage"
+   ]
+  },
+  "Hulking": {
+   "5": [
+    "+5% Max Health",
+    "+1.5% Max Health Regen",
+    "−30% Attack Speed"
+   ]
+  },
+  "Manic": {
+   "5": [
+    "−18% Base Attack Time",
+    "+20% Cast Speed",
+    "−20% Vision"
+   ]
+  },
+  "Timeless": {
+   "4": [
+    "+15% Debuff Amplification",
+    "+10% Spell Amplification"
+   ],
+   "5": [
+    "+15% Debuff Amplification",
+    "+10% Spell Amplification"
+   ]
+  },
+  "Vampiric": {
+   "5": [
+    "+30% Lifesteal",
+    "+20% Spell Lifesteal",
+    "+300 Bonus Night Vision"
+   ]
+  }
  }
 }

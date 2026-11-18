@@ -179,7 +179,7 @@ _DMG_L1_RE = re.compile(
 )
 
 _BSTAT_RE = re.compile(
-    r'\bBase\s+(?P<stat>Damage|Armor|Strength|Agility|Intelligence|Attack Speed|Health Regen|Mana Regen|Move(?:ment)? Speed)\s+'
+    r'\b(?P<minmax>Min\s+|Max\s+)?Base\s+(?P<stat>Damage|Armor|Strength|Agility|Intelligence|Attack Speed|Health Regen|Mana Regen|Move(?:ment)? Speed)\s+'
     r'(?P<dir>increased|decreased)\s+by\s+(?P<delta>\d+(?:\.\d+)?)\b',
     re.I,
 )
@@ -278,6 +278,8 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
     if bstat_m:
         stat_key = bstat_m.group('stat').lower()
         field = _BSTAT_FIELD.get(stat_key, 'AttackDamageMin')
+        if stat_key == 'damage' and (bstat_m.group('minmax') or '').strip().lower() == 'max':
+            field = 'AttackDamageMax'     # 7.42 "Max Base Damage decreased by 5": the max end, not the min
         delta = float(bstat_m.group('delta'))
         if bstat_m.group('dir').lower() == 'decreased':
             delta = -delta

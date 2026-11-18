@@ -138,5 +138,10 @@
     {"match": "All sections of currents now give a max movement speed bonus of 150", "spots": [[1650, -5600], [-2560, 5600]], "r": 2000, "show": ["currents"], "phrase": "sections of currents"},
     {"match": "Spawn preference has switched", "spots": [[0, 0]], "r": 8400, "show": [], "phrase": "Spawn preference", "first": {"kind": "tormentors", "label": "20:00", "old": [-7202, 7947], "new": [7744, -6208]}},
     {"match": "Pit preference has switched", "spots": [[-180, -170]], "r": 4300, "show": [], "phrase": "Pit preference", "first": {"kind": "roshan", "label": "0:00", "old": [2831, -2740], "new": [-3194, 2395]}}
+  ],
+  "7.42": [
+    {"match": "Twin Gates moved to the top and bottom rim of the map", "spots": [[-4644, 8031], [4614, -7882]], "r": 2300, "show": ["twinGates", "camps"], "phrase": "Twin Gates"},
+    {"match": "Moved Radiant and Dire Tier 2 tower roughly 260 units", "spots": [[-150, -150]], "r": 3400, "show": ["towers"], "phrase": "Tier 2 tower"},
+    {"match": "Dire base shop moved 256 units west", "spots": [[6640, 6180]], "r": 900, "show": ["shopzones", "nowardzones"], "phrase": "Dire base shop"}
   ]
 }

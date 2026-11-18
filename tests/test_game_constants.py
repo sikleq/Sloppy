@@ -142,7 +142,8 @@ def test_armor_formula_by_patch():
 
 
 def test_today_values_are_the_last_rows():
-    assert (gc.ARMOR_PER_AGI, gc.MR_PER_INT, gc.HPREG_PER_STR) == (1 / 6, 0.1, 0.1)
+    # 7.42: 0.125% magic resistance per Intelligence, 20 HP per Strength
+    assert (gc.ARMOR_PER_AGI, gc.MR_PER_INT, gc.HPREG_PER_STR, gc.HP_PER_STR) == (1 / 6, 0.125, 0.1, 20)
     assert gc.for_js()["armorAgi"] == gc.per_point(gc.AGI_ARMOR_HIST)
 
 

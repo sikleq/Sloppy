@@ -236,7 +236,7 @@
 
     // Attack-type filters on Neutral Stats. Uses the same toolbar button
     // markup/style as Hero Stats, but operates on the creeps-table rows.
-    const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
+    const attackBtns = [...document.querySelectorAll('.hs-attack-filter[data-attack-filter]')];
     if (attackBtns.length && table.querySelector('tbody tr[data-attack-type]')) {
       let attackFilter = '';
       const applyAttackFilter = () => {
@@ -266,6 +266,30 @@
         });
       });
       applyAttackFilter();
+    }
+
+    // "Removed": rows of creeps whose camp left the game (data-removed) stay hidden until pressed
+    const removedBtn = document.getElementById('removed-toggle');
+    if (removedBtn && table.querySelector('tbody tr[data-removed]')) {
+      let showRemoved = false;
+      const applyRemoved = () => {
+        table.querySelectorAll('tbody tr[data-removed]').forEach(tr => {
+          tr.classList.toggle('mr-removed-out', !showRemoved);
+        });
+        removedBtn.classList.toggle('active', showRemoved);
+        removedBtn.setAttribute('aria-pressed', showRemoved ? 'true' : 'false');
+        if (table._groupRows) {
+          table._groupRows([...table.querySelectorAll('tbody tr')]);
+        }
+        applyLeftOffsets();
+      };
+      removedBtn.addEventListener('click', () => {
+        showRemoved = !showRemoved;
+        applyRemoved();
+      });
+      applyRemoved();
+    } else if (removedBtn) {
+      removedBtn.hidden = true;
     }
     positionFramesRaf();
   }

@@ -21,7 +21,10 @@ def test_an_older_patch_says_the_gap_and_how_long_it_ran():
 def test_the_newest_patch_says_it_is_live():
     newest = max(RELEASE_HISTORY, key=lambda p: _parse_date(p["date"]))
     _, age = _patch_meta_parts(newest["version"])
-    assert age.startswith("Live: ") or age == "Released today"
+    assert age.startswith("Live: ")
+    # the patch card splits "<label>: <value>": on release day too (7.42 "Released today" broke the build)
+    from patch.page import patch_info_html
+    assert "Live" in patch_info_html(newest["version"], newest["date"])
 
 
 def test_the_unused_second_copy_stays_gone():

@@ -187,6 +187,14 @@ CREEP_NAME_TO_NPC = {
     'granite':            'npc_dota_neutral_granite_golem',
     'drake':              'npc_dota_neutral_black_drake',
     'black_dragon':       'npc_dota_neutral_black_dragon',
+    # 7.42 camps: Radigull (Radiant medium), Odobenus (Dire medium), Eimermole (Radiant large), Ancient Ogre Seal
+    'radigull':           'npc_dota_neutral_radigull',
+    'odobenus_footman':   'npc_dota_neutral_odobenus_footman',
+    'odobenus_frostmage': 'npc_dota_neutral_odobenus_frostmage',
+    'eimermole':          'npc_dota_neutral_eimermole',
+    'eimermole_foreman':  'npc_dota_neutral_eimermole_foreman',
+    'ogre_seal':          'npc_dota_neutral_ogre_seal',
+    'ogre_seal_pup':      'npc_dota_neutral_ogre_seal_pup',
     # Hero-summoned unit surfaced in the table — Dark Troll
     # Summoner's skeleton (data lives in the npc_dota_dark_troll_
     # warlord_skeleton_warrior block, captured by the broadened
@@ -206,6 +214,13 @@ NOT_CAMP_UNITS = {
     'npc_dota_neutral_mud_golem_split_doom',  # the same, for a Doom-devoured golem
     'npc_dota_neutral_jungle_stalker',        # in the files, in no camp
     'npc_dota_neutral_elder_jungle_stalker',
+    # 7.42: "_gold" copies with the hidden ability neutral_gold_upgrade_ability; no patch note, no camp of their own
+    'npc_dota_neutral_alpha_wolf_gold',
+    'npc_dota_neutral_enraged_wildkin_gold',
+    'npc_dota_neutral_gnoll_assassin_gold',
+    'npc_dota_neutral_kobold_tunneler_gold',
+    'npc_dota_neutral_mud_golem_gold',
+    'npc_dota_neutral_polar_furbolg_champion_gold',
 }
 
 # Full display name (Russian/English) shown in the new Крип column.
@@ -239,7 +254,7 @@ CREEP_DISPLAY_NAMES = {
     'npc_dota_neutral_ancient_frog_mage':    'Ancient Marshmage',
     'npc_dota_neutral_mud_golem':            'Mud Golem',
     'npc_dota_neutral_mud_golem_split':      'Shard Golem',
-    'npc_dota_neutral_dark_troll':           'Hill Troll',
+    'npc_dota_neutral_dark_troll':           'Dark Troll Trapper',   # the game's name since 7.42 (Hill Troll before)
     'npc_dota_neutral_dark_troll_warlord':   'Dark Troll Summoner',
     'npc_dota_neutral_warpine_raider':       'Warpine Raider',
     # as in the game (dota_english): the ursa warrior (Thunder Clap, 950 HP) is the Smasher — was swapped until 2026-10-21
@@ -258,6 +273,13 @@ CREEP_DISPLAY_NAMES = {
     'npc_dota_neutral_granite_golem':        'Ancient Granite Golem',
     'npc_dota_neutral_black_drake':          'Ancient Black Drake',
     'npc_dota_neutral_black_dragon':         'Ancient Black Dragon',
+    'npc_dota_neutral_radigull':             'Radigull',                # 7.42
+    'npc_dota_neutral_odobenus_footman':     'Odobenus Footman',        # 7.42
+    'npc_dota_neutral_odobenus_frostmage':   'Odobenus Frostmage',      # 7.42
+    'npc_dota_neutral_eimermole':            'Eimermole',               # 7.42
+    'npc_dota_neutral_eimermole_foreman':    'Eimermole Foreman',       # 7.42
+    'npc_dota_neutral_ogre_seal':            'Ancient Ogre Seal',       # 7.42
+    'npc_dota_neutral_ogre_seal_pup':        'Ancient Ogre Seal Pup',   # 7.42
     # Hero-summoned units shown alongside neutrals
     'npc_dota_dark_troll_warlord_skeleton_warrior': 'Skeleton Warrior',
 }
@@ -280,9 +302,9 @@ CREEP_CAMP = {
     'mauler':               ['mid'],
     'taskmaster':           ['small'],
     'priest':               ['small'],
-    'outrunner':            ['mid', 'big'],
+    'outrunner':            ['big'],          # 7.42 "Medium Centaur camp removed"
     'tad':                  ['small'],
-    'trickster':            ['mid', 'big'],
+    'trickster':            ['mid'],          # 7.42: the Large Satyr camp's Banisher -> a second Mindstealer
     'wolf':                 ['mid'],
     'dark_troll':           ['big'],
     'ghost':                ['small'],
@@ -298,7 +320,7 @@ CREEP_CAMP = {
     'champion':             ['big'],
     'soulstealer':          ['mid', 'big'],
     'alpha':                ['mid'],
-    'khan':                 ['mid', 'big'],
+    'khan':                 ['big'],          # 7.42 "Medium Centaur camp removed"
     'warrior':              ['big'],
     'enraged':              ['big'],
     'pine':                 ['big'],
@@ -314,7 +336,19 @@ CREEP_CAMP = {
     'granite':              ['ancient'],
     'lizard':               ['ancient'],
     'ice':                  ['ancient'],
+    # 7.42 (patch notes "Neutral Creep Updates")
+    'radigull':             ['mid'],
+    'odobenus_footman':     ['mid'],
+    'odobenus_frostmage':   ['mid'],
+    'eimermole':            ['big'],
+    'eimermole_foreman':    ['big'],
+    'ogre_seal':            ['ancient'],
+    'ogre_seal_pup':        ['ancient'],
 }
+# Creeps whose camp left the game (createhero -> the patch). Their rows stay, hidden until the toolbar's
+# "Removed" button shows them (owner 2026-11-18: «убрать, но добавить переключатель»). 7.42: "Large Warpine
+# Raider camp removed", "Ancient Thunderhide camp removed".
+REMOVED_CREEPS = {'pine': '7.42', 'lizard': '7.42', 'small_thunder_lizard': '7.42'}
 CAMP_LABEL = {'small': 'Small camp', 'mid': 'Medium camp',
               'big': 'Large camp', 'ancient': 'Ancient camp'}
 
@@ -1003,7 +1037,9 @@ def _stats_row_html(row, src, unit_page_slugs):
     cells = ''.join(_stats_cell(k, row, src, unit_page_slugs) for k, _ in COLUMNS)
     rid = f' id="unit-{esc((d.get("createhero") or "").strip())}"'
     attack_type = 'ranged' if d.get('attack_range_ranged') else 'melee'
-    return f'<tr{rid} data-attack-type="{attack_type}"{tr_cls}>{cells}</tr>'
+    gone = REMOVED_CREEPS.get((d.get("createhero") or "").strip())
+    removed = f' data-removed="{esc(gone)}"' if gone else ''
+    return f'<tr{rid} data-attack-type="{attack_type}"{removed}{tr_cls}>{cells}</tr>'
 
 
 # ---- Neutral Stats: page ----
@@ -1027,6 +1063,9 @@ _STATS_TOOLBAR = (
     '<span class="atk-badge" aria-hidden="true">'
     '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
     '</span>'
+    # creeps whose camp left the game (REMOVED_CREEPS): hidden until pressed
+    '<button type="button" class="hs-attack-filter" id="removed-toggle" aria-pressed="false">'
+    '<span>Removed</span></button>'
     '</div></div>\n'
 )
 

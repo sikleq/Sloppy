@@ -42,6 +42,7 @@ AGI_MS_HIST = (                                     # % movement speed per Agili
 INT_MR_HIST = (                                     # % magic resistance per Intelligence
     ("7.13", "12.04.2018", 0.15, 0.0),               # 7.13 Old Intelligence "+0.15% Magic Resistance"; New: none
     ("7.33", "20.04.2023", 0.0, 0.1),                # "Intelligence now grants 0.1% base Magic Resistance per point"
+    ("7.42", "18.11.2026", 0.1, 0.125),              # "Magic Resistance gained per point of Intelligence increased from 0.1% to 0.125%"
 )
 # Physical damage reduction by armor: formula 0 = 0.06·A / (1 + 0.06·|A|), 1 = 0.052·A / (0.9 + 0.048·|A|),
 # 2 = 0.05·A / (1 + 0.05·|A|). 7.20 (blog notes, not in the game's patchnotes file): "Changed the Armor formula to:
@@ -77,6 +78,7 @@ STR_HP_HIST = (
     ("7.13", "12.04.2018", 20, 18),
     ("7.21", "29.01.2019", 18, 20),
     ("7.33", "20.04.2023", 20, 22),
+    ("7.42", "18.11.2026", 22, 20),                  # "Health gained per point of Strength decreased from 22 to 20"
 )
 # From 7.13 until 7.21, primary attributes granted 25% more secondary
 # benefits. For HP this applies only to Strength heroes, not to base HP.

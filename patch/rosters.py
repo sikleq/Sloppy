@@ -129,13 +129,14 @@ _NEUTRAL_REMOVED_MANUAL = {
     "clumsy_net": "7.28", "craggy_coat": "7.38", "doubloon": "7.38",
     "dragon_scale": "7.38", "elixer": "7.23d", "elven_tunic": "7.38",
     "enchanted_quiver": "7.38", "faded_broach": "7.38", "paintball": "7.32",
-    "force_boots": "7.38", "fusion_rune": "7.24", "giants_ring": "7.38",
+    "force_boots": "7.38", "fusion_rune": "7.24",
     "grove_bow": "7.38", "havoc_hammer": "7.38", "illusionsts_cape": "7.30",
-    "imp_claw": "7.30", "ironwood_tree": "7.30", "keen_optic": "7.32",
+    "ironwood_tree": "7.30", "keen_optic": "7.32",
     "lance_of_pursuit": "7.38", "light_collector": "7.38", "mirror_shield": "7.38",
     "ocean_heart": "7.32", "phoenix_ash": "7.24", "princes_knife": "7.28",
     "quicksilver_amulet": "7.32", "repair_kit": "7.28", "royal_jelly": "7.38",
-    "safety_bubble": "7.38", "seer_stone": "7.38", "spy_gadget": "7.38",
+    # giants_ring, imp_claw, safety_bubble came back in 7.42
+    "seer_stone": "7.38", "spy_gadget": "7.38",
     "the_leveller": "7.32", "third_eye": "7.23c", "tome_of_aghanim": "7.23a",
     "trickster_cloak": "7.38", "trident": "7.28", "unwavering_condition": "7.38",
     "vambrace": "7.38", "vindicators_axe": "7.38", "witless_shako": "7.28",
@@ -160,6 +161,8 @@ _PHANTOM_ITEMS = {
     "item_enhancement_curious", "item_enhancement_dominant",
     "item_enhancement_fierce", "item_enhancement_restorative",
     "item_enhancement_thick",
+    # out of neutral_items.txt since 7.41 (in it 7.38-7.40c), still in items.txt; Hero Lab offered them until 7.42
+    "item_enhancement_vast", "item_enhancement_boundless", "item_enhancement_wise",
 }
 
 _FREE_ALLOW = {
@@ -173,11 +176,10 @@ _ITEM_BLOCK = {"item_furion_gold_bag", "item_caster_rapier", "item_pocket_roshan
 _OBSOLETE_REMOVED = {
     "item_necronomicon": "7.29",
     "item_hood_of_defiance": "7.33",
-    "item_flicker": "7.33",
+    # item_flicker (removed 7.33) and item_quarterstaff (removed 7.35) came back in 7.42
     "item_nether_shawl": "7.33",
     "item_wraith_pact": "7.33",
     "item_tome_of_knowledge": "7.33",
-    "item_quarterstaff": "7.35",
     "item_stout_shield": "7.23",
 }
 

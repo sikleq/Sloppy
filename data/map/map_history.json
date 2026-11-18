@@ -2596,6 +2596,48 @@
 "tormentors": 2
 },
 "moves": {}
+},
+{
+"patch": "7.42",
+"date": "2026-11-18",
+"sha8": "118cfcea",
+"changes": "trees +113 −190; camps moved: 5; towers moved: 4; twin gates moved: 2; shops moved: 1",
+"n": {
+"trees": 2398,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 113,
+"rem": 190
+},
+"camps": {
+"moved": 5
+},
+"towers": {
+"moved": 4
+},
+"gates": {
+"moved": 2
+}
+}
 }
 ]
 }

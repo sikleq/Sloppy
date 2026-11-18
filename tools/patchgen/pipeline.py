@@ -74,6 +74,28 @@ from .post_stats import (
 )
 from .rows import _HERO_SIDE
 
+SPIRIT_BEAR_ID = 1961          # Valve lists Lone Druid's Spirit Bear as a hero (7.40b, 7.41c-e, 7.42)
+LONE_DRUID_ID = 80
+_BEAR_UNIT = "npc_dota_lone_druid_bear1"
+_BEAR_HEADER = 'W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png", kind="Creep-hero"))'
+
+
+def _spirit_bear_block(bear, version, patchnotes_loc, prev_hero_abils):
+    """The bear's notes as a unit block inside the Lone Druid section (the 7.41c-e pages, done by hand there;
+    7.42's draft printed a hero "hero_1961")."""
+    lines = _render_hero(bear, version=version, patchnotes_loc=patchnotes_loc, prev_hero_abils=prev_hero_abils)
+    out = []
+    for ln in lines:
+        if ln.strip().startswith("# hero_"):
+            out.append("# Spirit Bear (Valve's hero_id 1961) as a unit block of Lone Druid")
+        elif ln.startswith("W(hero_header("):
+            out.append(_BEAR_HEADER)
+        else:   # base-stat rows read the bear's unit, as 7.41e "Base Armor decreased by 1"
+            out.append(ln.replace('bstat_h("hero_1961"', f'bstat_u("{_BEAR_UNIT}"')
+                       .replace('note_box(hero="hero_1961"', f'note_box(unit="{_BEAR_UNIT}"'))
+    return out
+
+
 def _build_prev_hero_abils(version):
     """Load the previous patch's datafeed and return a per-hero ability snapshot.
 
@@ -177,11 +199,17 @@ def generate(version):
             for item in d['neutral_items']:
                 out.extend(_render_item(item, version, neutral=True))
         elif key == 'heroes':
-            _HERO_SIDE[0] = True               # every row below sits under a hero (see _emit_badge hero_side)
+            _HERO_SIDE[0] = True              # every row below sits under a hero (see _emit_badge hero_side)
             try:
-                for hero in sorted(d['heroes'], key=lambda h: HEROES.get(h['hero_id'], ('', ''))[0]):
+                heroes = [h for h in d['heroes'] if h.get('hero_id') != SPIRIT_BEAR_ID]
+                bear = next((h for h in d['heroes'] if h.get('hero_id') == SPIRIT_BEAR_ID), None)
+                if bear and not any(HEROES.get(h['hero_id'], ('',))[0] == 'Lone Druid' for h in heroes):
+                    heroes.append({'hero_id': LONE_DRUID_ID})   # the bear alone: an empty Lone Druid section
+                for hero in sorted(heroes, key=lambda h: HEROES.get(h['hero_id'], ('', ''))[0]):
                     out.extend(_render_hero(hero, version=version, patchnotes_loc=patchnotes_loc,
                                             prev_hero_abils=prev_hero_abils))
+                    if bear and hero['hero_id'] == LONE_DRUID_ID:
+                        out.extend(_spirit_bear_block(bear, version, patchnotes_loc, prev_hero_abils))
             finally:
                 _HERO_SIDE[0] = False
 

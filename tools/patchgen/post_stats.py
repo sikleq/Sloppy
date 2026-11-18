@@ -252,6 +252,26 @@ def _new_stat_that_was_there(item_name, version, old_rows, new_rows):
     return [o for o, _n in changed] + olds, [n for _o, n in changed] + news
 
 
+def _prop_key(stat_text):
+    """'+30% Evasion' -> 'evasion' (the stat's name, as tests/test_properties_order.py reads it)."""
+    t = re.sub(r"<[^>]+>", "", stat_text).strip()
+    t = re.sub(r"^[+\-−x×]?[\d.,/%\s]+%?\s*", "", t)
+    return re.sub(r"\s*\(.*?\)\s*$", "", t).lower().strip()
+
+
+def _shared_props_first(old_rows, new_rows):
+    """Stats on BOTH sides first, in the old side's order, then each side's own (7.42 Butterfly put the new
+    +30 Attack Speed above the shared Evasion: the two Evasion lines did not face each other)."""
+    old_keys = [_prop_key(r[1]) for r in old_rows]
+    new_keys = [_prop_key(r[1]) for r in new_rows]
+    shared = [k for k in old_keys if k in new_keys]
+    def order(rows, keys):
+        first = [rows[keys.index(k)] for k in shared]
+        rest = [r for r, k in zip(rows, keys) if k not in shared]
+        return first + rest
+    return order(old_rows, old_keys), order(new_rows, new_keys)
+
+
 def _postprocess_properties_change(lines, with_abilities=False, version=None):
     """Collapse stat-grant note patterns inside item blocks into a single
     properties_change(old=[...], new=[...]) call placed right after the
@@ -388,6 +408,7 @@ def _postprocess_properties_change(lines, with_abilities=False, version=None):
             kept_lines.append(ln)
 
         old_rows, new_rows = _new_stat_that_was_there(item_name, version, old_rows, new_rows)
+        old_rows, new_rows = _shared_props_first(old_rows, new_rows)
         if old_rows or new_rows:
             old_repr = ', '.join(
                 f'("{t}", "{s}")' for (t, s) in old_rows

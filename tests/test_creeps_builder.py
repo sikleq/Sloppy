@@ -13,6 +13,13 @@ def _hist(patches=(), dates=None, raw=None, abil=None):
                           raw_by_patch=raw or {}, abil_by_patch=abil or {})
 
 
+def test_removed_creeps_rows_carry_their_patch_and_the_toolbar_has_the_toggle():
+    # owner 2026-11-18: rows of creeps whose camp left the game stay, hidden behind a "Removed" button
+    assert creeps.REMOVED_CREEPS["pine"] == "7.42"
+    assert 'id="removed-toggle"' in creeps._STATS_TOOLBAR
+    assert 'data-attack-filter' not in creeps._STATS_TOOLBAR.split('id="removed-toggle"')[1]
+
+
 def test_numbers_use_a_decimal_comma():
     assert cc.fmt_num(0.9) == '0,9'
     assert cc.fmt_num('12') == '12'
@@ -87,7 +94,8 @@ def test_entity_changes_still_reads_the_creep_tables():
     builders/creeps.py's source text — moving them out of that file breaks it silently."""
     camp = ec._unit_camp_map()
     assert camp['npc_dota_neutral_kobold'] == 'Small'
-    assert camp['npc_dota_neutral_centaur_outrunner'] == 'Medium'   # ['mid', 'big'] → smallest
+    assert camp['npc_dota_neutral_satyr_soulstealer'] == 'Medium'   # ['mid', 'big'] → smallest
+    assert camp['npc_dota_neutral_centaur_outrunner'] == 'Large'    # 7.42: the medium Centaur camp is gone
     every_neutral = {creeps.CREEP_NAME_TO_NPC[k] for k in creeps.CREEP_CAMP
                      if creeps.CREEP_NAME_TO_NPC.get(k, '').startswith('npc_dota_neutral_')}
     assert every_neutral <= set(camp)                                 # the whole table, not a prefix of it

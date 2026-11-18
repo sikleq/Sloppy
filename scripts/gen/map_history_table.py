@@ -65,12 +65,27 @@ def moves(changes):
     return out
 
 
+def _site_date(patch):
+    """The patch's date as the site's RELEASE_HISTORY has it (the UTC day of its live build, owner 2026-11-11), as
+    yyyy-mm-dd; None for a patch it does not list (7.41f-1007). Oldgrowth's info.json dates are older and were a day
+    off for 21 patches: a rebuild of this table on 2026-11-18 put them back."""
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if root not in sys.path:
+        sys.path.insert(0, root)
+    from patch.meta import RELEASE_HISTORY
+    d = next((p["date"] for p in RELEASE_HISTORY if p["version"] == patch), None)
+    if not d:
+        return None
+    dd, mm, yy = d.split(".")
+    return f"{yy}-{mm}-{dd}"
+
+
 def main():
     with open(SRC, encoding="utf-8") as f:
         rows = json.load(f)
     out = []
     for r in rows:
-        e = {"patch": r["patch"], "date": r.get("date", ""), "sha8": r["map_sha1"][:8]}
+        e = {"patch": r["patch"], "date": _site_date(r["patch"]) or r.get("date", ""), "sha8": r["map_sha1"][:8]}
         if r.get("same_as"):
             e["same_as"] = r["same_as"]
         else:

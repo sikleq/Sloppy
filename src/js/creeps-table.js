@@ -111,6 +111,7 @@
       const cell = tr.querySelector('.lvl-cell');
       if (!cell) return;
       if (tr.classList.contains('mr-attack-out')
+          || tr.classList.contains('mr-removed-out')
           || tr.classList.contains('mr-filtered-out')
           || tr.classList.contains('mr-search-out')) return;
       const lvl = cell.dataset.lvl;

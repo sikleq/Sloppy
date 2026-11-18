@@ -2,7 +2,7 @@
   "_version": 1,
   "_doc": "Declarative source of truth for hero innate stat bonuses. Used by builders/heroes_stats.py (level-1 seeding) and src/scripts.js (per-level recompute on the heroes-stats table). Stage 1 of innate centralization — do not edit without verifying against KV files in data/stats/<patch>/heroes/.",
   "_constants_doc": "HPREG_PER_STR, ARMOR_PER_AGI and the other attribute constants named below live in patch/game_constants.py (one source for Python and scripts.js).",
-  "_checked_version": "7.41f",
+  "_checked_version": "7.42",
   "_checked_doc": "Every rule below was verified against the game files up to this patch. An effect with a \"kv\" map ({entry field: [AbilityValues key, value|hero_levelup, scale]}) follows the game by itself for newer patches (builders/innate_rules.py adds the history entries). For the rest tests/test_innate_rules_kv.py fails when a newer patch changes the innate: re-check, update the rule, then set this to the newest patch.",
   "_formula_types": {
     "attr_factor": "bonus = attrs[source] * factor",
@@ -156,7 +156,7 @@
               1
             ]
           },
-          "note": "KV movement_speed_pct (7.41a+: value=base_pct, hero_levelup=per_level_pct; 7.36-7.40c: movement_speed_pct_per_level). 7.40 note '0.75% + 0.75% per level up' = 0.75% * level, so base_pct is 0 there. Python applies it in _ms_l1() via _innate_mult(); JS via innateMult()/heroLabInnatePct(). The 7.40 entry runs to 7.41 because the 7.41 KV snapshot is identical to 7.40c (the 7.41 change is visible from 7.41a).",
+          "note": "KV movement_speed_pct (7.41a+: value=base_pct, hero_levelup=per_level_pct; 7.36-7.40c: movement_speed_pct_per_level). 7.40 note '0.75% + 0.75% per level up' = 0.75% * level, so base_pct is 0 there. Python applies it in _ms_l1() via _innate_mult(); JS via innateMult()/heroLabInnatePct(). The 7.40 entry runs to 7.41 because the 7.41 KV snapshot is identical to 7.40c (the 7.41 change is visible from 7.41a). 7.42: KV has hero_levelup +0.5 only (no value): 0.5% per level, base 0.",
           "history": [
             {
               "since": "7.36",
@@ -185,7 +185,13 @@
             {
               "since": "7.41",
               "base_pct": 0.5,
-              "per_level_pct": 0.75
+              "per_level_pct": 0.75,
+              "until": "7.41f"
+            },
+            {
+              "since": "7.42",
+              "base_pct": 0,
+              "per_level_pct": 0.5
             }
           ]
         },
@@ -199,7 +205,7 @@
               1
             ]
           },
-          "note": "Spell cooldown reduction %. KV cooldown_reduction_pct hero_levelup=+0.75 (7.36-7.40c: cooldown_reduction_pct_per_level). 7.36: 0.5%/level; 7.38: 0.75%/level; 7.40 '0.75% + 0.75% per level up' and 7.41 '0.75% per level' are the same effective value. Hero Lab only (Cooldown Reduction row) — combined multiplicatively with item CDR.",
+          "note": "Spell cooldown reduction %. KV cooldown_reduction_pct hero_levelup=+0.75 (7.36-7.40c: cooldown_reduction_pct_per_level). 7.36: 0.5%/level; 7.38: 0.75%/level; 7.40 '0.75% + 0.75% per level up' and 7.41 '0.75% per level' are the same effective value. Hero Lab only (Cooldown Reduction row) — combined multiplicatively with item CDR. 7.42 removed it (patch notes: 'No longer provides 0.75% ability cooldown reduction per hero level').",
           "history": [
             {
               "since": "7.36",
@@ -208,9 +214,11 @@
             },
             {
               "since": "7.38",
-              "per_level": 0.75
+              "per_level": 0.75,
+              "until": "7.41f"
             }
-          ]
+          ],
+          "until": "7.41f"
         }
       ]
     },
@@ -1054,7 +1062,7 @@
               1
             ]
           },
-          "note": "KV fish_health_bonus=3 per fish. Tidehunter eats a free fish every even hero level (tooltip; 7.41b 'Now gains fish on every even level instead of every level'). 7.41/7.41a: a fish on every level-up (modelled as level-1 fish). Enemy-kill fish not modelled.",
+          "note": "KV fish_health_bonus=3 per fish. Tidehunter eats a free fish every even hero level (tooltip; 7.41b 'Now gains fish on every even level instead of every level'). 7.41/7.41a: a fish on every level-up (modelled as level-1 fish). Enemy-kill fish not modelled. 7.42: 5 per fish (patch notes 'Health gain per fish increased from 3 to 5').",
           "history": [
             {
               "since": "7.41a",
@@ -1067,9 +1075,17 @@
               "since": "7.41b",
               "value": 3,
               "interval": 2,
+              "offset": 0,
+              "until": "7.41f"
+            },
+            {
+              "since": "7.42",
+              "value": 5,
+              "interval": 2,
               "offset": 0
             }
-          ]
+          ],
+          "value": null
         },
         {
           "target": "range",

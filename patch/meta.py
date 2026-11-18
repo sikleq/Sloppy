@@ -13,6 +13,8 @@ import patch.site_common as _site
 # A date is the UTC day the live game got the patch's own build when the builds log has it (owner 2026-11-11: "сделай
 # как лучше"; patch/branch_builds.release_time, tests/test_patch_release_time.py) — 21 dates moved by a day then.
 RELEASE_HISTORY = [
+    # 7.42 cycle
+    {"version": "7.42",  "date": "18.11.2026", "filename": "patches/7.42.html"},
     # 7.41 cycle
     {"version": "7.41f", "date": "15.09.2026", "filename": "patches/7.41f.html"},
     {"version": "7.41e", "date": "31.07.2026", "filename": "patches/7.41e.html"},
@@ -225,8 +227,9 @@ def _patch_meta_parts(version):
         else:
             n = (today - cur_date).days
             unit = "day" if n == 1 else "days"
+            # "Live: today", not "Released today": the card splits "<label>: <value>" (7.42 broke on its own day)
             age_part = (f'Live: <b>{n}</b> {unit}' if n > 0
-                        else 'Released today')
+                        else 'Live: today')
         return prev_part, age_part
     return "", ""
 
