@@ -66,7 +66,9 @@ def _postprocess_dash_table(lines):
         if len(parts) >= 3 and all(clock):
             # "Tier 1 - 0:00<br>Tier 2 - 15:00<br>…" (7.42 neutral item tiers): what | when, one table
             rows = ", ".join(f'[{_py_str(c.group(1))}, "<b>{c.group(2)}</b>"]' for c in clock)
-            out.append(f'{m.group("head")}, extra=mech_table(["", "Available at"], [{rows}])))')
+            words = [c.group(1).split()[0] for c in clock]
+            first = max(set(words), key=words.count)          # "Tier": the word most lines start with
+            out.append(f'{m.group("head")}, extra=mech_table([{_py_str(first)}, "Available at"], [{rows}])))')
             continue
         cells = [[c.strip() for c in p.split(" -- ")] for p in parts if " -- " in p]
         if len(cells) < 4 or len({len(c) for c in cells}) != 1 or len(cells[0]) < 3:

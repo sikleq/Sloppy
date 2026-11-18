@@ -378,7 +378,7 @@ def test_valves_text_tables_in_a_note_become_tables():
            'labels=False)' in out
     tiers = ('W(li("Number of item tiers decreased from 5 to 4", t("REWORK"), extra=inline_note("Tier 1 - 0:00<br>Tier 2 - '
              '15:00<br>Infinite Madstone - 65:00")))')
-    assert 'mech_table(["", "Available at"], [["Tier 1", "<b>0:00</b>"], ["Tier 2", "<b>15:00</b>"], ' \
+    assert 'mech_table(["Tier", "Available at"], [["Tier 1", "<b>0:00</b>"], ["Tier 2", "<b>15:00</b>"], ' \
            '["Infinite Madstone", "<b>65:00</b>"]])' in g._postprocess_dash_table([tiers])[0]
     bounty = ('W(li("Building bounty decreased", t("NERF"), extra=inline_note("Tier 1 tower gold decreased from 110-130 to '
               '100<br>Tier 2 tower gold decreased from 90 to 75<br>Barracks gold rescaled from 90-135 to 100")))')

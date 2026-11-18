@@ -994,7 +994,7 @@ def build():
 
     W(plain_header("Global Changes", dynamics=False, sublabel=True))
     W(ul_open())
-    W(li("Number of item tiers decreased from 5 to 4", t("REWORK"), extra=mech_table(["", "Available at"], [["Tier 1", "<b>0:00</b>"], ["Tier 2", "<b>15:00</b>"], ["Tier 3", "<b>30:00</b>"], ["Tier 4", "<b>50:00</b>"], ["Infinite Madstone", "<b>65:00</b>"]])))
+    W(li("Number of item tiers decreased from 5 to 4", t("REWORK"), extra=mech_table(["Tier", "Available at"], [["Tier 1", "<b>0:00</b>"], ["Tier 2", "<b>15:00</b>"], ["Tier 3", "<b>30:00</b>"], ["Tier 4", "<b>50:00</b>"], ["Infinite Madstone", "<b>65:00</b>"]])))
     W(li("Madstone cost for Tier 4 items increased from 10 to 14", b(10, 14, l=True)))
     W(li("Madstone cost increment for recrafting Tier 4 items decreased from 10 to 6", b(10, 6, l=True)))
     W(ul_close())
