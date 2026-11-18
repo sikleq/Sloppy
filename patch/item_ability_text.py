@@ -200,7 +200,7 @@ def insert_cards(lines, version, prev, name_to_slug):
         card = "\n".join(card).split("\n")
         # the card shows a brand-new ability's whole text: its row would say it twice (7.38 Pirate Hat, owner 2026-11-05)
         gone = {n.lower() for n in _ability_names(new)} - {n.lower() for n in _ability_names(old)}
-        kept = [x for x in out[k:j] if not _restates(x, gone)]
+        kept = [x for x in out[k:j] if not _restates(x, gone, new)]
         out[k:j] = card + kept
         i = k + len(card) + len(kept)
     return out
@@ -210,10 +210,21 @@ def _ability_names(texts):
     return [m.group(1) for t in texts for m in [re.match(r"\w+: ([^.!]+)", t)] if m]
 
 
-def _restates(line, names):
-    """A one-line row "Passive: Plunder. Steals …" about one of `names`."""
-    m = re.match(r'\s*W\(li\("(?:Active|Passive|Toggle|Aura|Use): ([^.!"]+)[.!].*\)\)\s*$', line)
-    return bool(m) and m.group(1).lower() in names
+def _restates(line, names, card=None):
+    """A one-line row "Passive: Plunder. Steals …" about one of `names` that says nothing the card does not: no
+    "?" of its own, every sentence of it in the card's text (7.42 Revenant's Brooch: Valve's row added "Counts as a
+    critical strike and does not work against buildings" and the Dormant Curio value — it was dropped with them)."""
+    m = re.match(r'\s*W\(li\("(?:Active|Passive|Toggle|Aura|Use): ([^.!"]+)[.!](.*)\)\)\s*$', line)
+    if not m or m.group(1).lower() not in names:
+        return False
+    if "extra=" in line:
+        return False
+    if card is None:                                  # no card text to compare with: the name decides
+        return True
+    text =re.match(r'\s*W\(li\("((?:[^"\\]|\\.)*)"', line).group(1)
+    norm = lambda s: re.sub(r"[^a-z0-9%]+", " ", s.lower()).strip()
+    said = norm(" ".join(card))
+    return all(norm(s) in said for s in re.split(r"(?<=[.!])\s+", text) if norm(s))
 
 
 def item_abilities(slug, version):

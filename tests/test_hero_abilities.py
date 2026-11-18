@@ -458,6 +458,14 @@ def test_the_card_takes_over_the_rows_of_a_brand_new_ability():
     assert item_ability_text._restates('W(li("Passive: Plunder. Steals 150 gold from heroes", t("NEW")))', names)
     assert not item_ability_text._restates('W(li("Passive: Dig. Finds a rune", t("DEL")))', names)
     assert not item_ability_text._restates('W(li("Now a Tier 5 Artifact", t("REWORK")))', names)
+    # 7.42 Revenant's Brooch: a row with words or a "?" the card does not have stays (2026-11-19)
+    card = ["Passive: Ghastly Strike. Grants each attack a 15% chance to deal 50% bonus magical damage."]
+    row = ('W(li("Passive: Ghastly Strike. Grants each attack a 15% chance to deal 50% bonus magical damage. Counts as a '
+           'critical strike", t("NEW")))')
+    assert not item_ability_text._restates(row, {"ghastly strike"}, card)
+    assert not item_ability_text._restates(row[:-2] + ', extra=inline_note("Dormant Curio: 65%")))', {"ghastly strike"})
+    same = 'W(li("Passive: Ghastly Strike. Grants each attack a 15% chance to deal 50% bonus magical damage", t("NEW")))'
+    assert item_ability_text._restates(same, {"ghastly strike"}, card)
 
 
 def test_new_abilities_rise_beside_stats_that_all_left():

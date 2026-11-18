@@ -300,11 +300,12 @@ def test_a_value_per_death_or_per_use_is_a_formula_table():
     gold = 'W(li("Gold reward per player changed from 175 to 125 + 50 per Tormentor\'s death", b(175, 125)))'
     out = g._postprocess_per_death([gold])[0]
     assert out.startswith('W(li_formula("Gold reward per player changed", "175", "125 + 50 per Tormentor\'s death", '
-                          'lambda N: 175, lambda N: 125 + 50 * N, levels=[0, 1, 2, 3, 4, 5], label="Tormentor deaths"')
+                          'lambda N: 175, lambda N: 125 + 50 * (N - 1), levels=[1, 2, 3, 4, 5, 6], '
+                          'level_fmt=lambda N: f"#{N}"')    # the N-th kill: server.dll 6978 (2026-11-19)
     capped = ('W(li("Base damage reflection decreased from 35% to 15% + 5% per Tormentor death, up to 30%", b(35, 15), '
               'extra=inline_note("Still grows over time")))')
     out = g._postprocess_per_death([capped])[0]
-    assert 'lambda N: min(30, 15 + 5 * N)' in out and 'value_fmt="{:g}%"' in out
+    assert 'lambda N: min(30, 15 + 5 * (N - 1))' in out and 'value_fmt="{:g}%"' in out   # the cap on the whole base
     assert 'inline_note_text="Still grows over time"' in out
     shrine = ('W(li("Wisdom Shrine experience decreased from 200 + 300 per subsequent use to 200 + 200 per subsequent '
               'use", t("NERF")))')
@@ -364,6 +365,78 @@ def test_a_neutral_creeps_general_label_keeps_its_own_rows():
     assert 'W(li("Medium Centaur camp removed", t("DEL")))' in text and "Kobolds in Kobold camp" in text
     label = g._render_neutral_creep({"name": "#x", "localized_name": "Flooded Camps", "is_general_note": True})
     assert [l for l in label if l.startswith("W(")] == ['W(plain_header("Flooded Camps", dynamics=False))']
+
+
+def test_valves_text_tables_in_a_note_become_tables():
+    # owner 2026-11-19, 7.42: the experience per level ("Level -- Old -- New -- …"), the building bounty list and the
+    # neutral tier timings were long "?" lists
+    xp = ('W(li("Total experience increased from 1 to 2", b(1, 2), extra=inline_note("Level -- Old -- New<br>2 -- 240 -- '
+          '250<br>3 -- 400 -- 400<br>4 -- 520 -- 550<br>An easy way is to use this formula: 0.5x^2 + 3 where X is the level")))')
+    out = g._postprocess_dash_table([xp])[0]
+    assert 'extra=mech_table(["Level", "Old", "New"], [["2", "240", "250"], ["3", "400", "400"], ["4", "520", "550"], ' \
+           '"An easy way is to use this formula: " + mech_formula("0.5x^2 + 3") + " " + "where X is the level"], ' \
+           'labels=False)' in out
+    tiers = ('W(li("Number of item tiers decreased from 5 to 4", t("REWORK"), extra=inline_note("Tier 1 - 0:00<br>Tier 2 - '
+             '15:00<br>Infinite Madstone - 65:00")))')
+    assert 'mech_table(["Tier", "Available at"], [["Tier 1", "<b>0:00</b>"], ["Tier 2", "<b>15:00</b>"], ' \
+           '["Infinite Madstone", "<b>65:00</b>"]])' in g._postprocess_dash_table([tiers])[0]
+    bounty = ('W(li("Building bounty decreased", t("NERF"), extra=inline_note("Tier 1 tower gold decreased from 110-130 to '
+              '100<br>Tier 2 tower gold decreased from 90 to 75<br>Barracks gold rescaled from 90-135 to 100")))')
+    assert 'extra=mech_before_after("Change", [("Tier 1 tower gold", "110-130", "100"), ' \
+           '("Tier 2 tower gold", "90", "75"), ("Barracks gold", "90-135", "100")])' in g._postprocess_from_to_list([bounty])[0]
+
+
+def test_valves_starred_list_is_a_list_the_block_opens():
+    row = 'W(li("Abilities that pierce", t("REWORK"), extra=inline_note("* Batrider: Flaming Lasso <br> * Pudge: Dismember")))'
+    assert g._postprocess_star_lists([row])[0] == \
+        'W(li("Abilities that pierce", t("REWORK"), extra=inline_list("Batrider: Flaming Lasso<br>Pudge: Dismember")))'
+
+
+def test_renames_are_old_new_headers():
+    # owner 2026-11-19: "все ренеймы оформляем по одному типу" — a unit as an ability: "Old → New", no rename row
+    lines = ['W(unit_header("Dark Troll Trapper", NEUTRAL_CDN + "dark_troll.png"))', 'W(ul_open())',
+             'W(li("Hill Troll (from Dark Troll camp) renamed to Dark Troll Trapper", t("MISC")))', 'W(ul_close())',
+             'W(item_header("Tranquil Boots"))', 'W(item_abilities_change(', '    old=["Passive: Break. Lose regen."],',
+             '    new=["Passive: Respite. Lose regen."]))', 'W(ul_open())',
+             'W(li("Break renamed to Respite", t("MISC")))', 'W(ul_close())']
+    out = g._postprocess_renames(lines)
+    assert out[0] == 'W(unit_header("Dark Troll Trapper", NEUTRAL_CDN + "dark_troll.png", old_title="Hill Troll"))'
+    assert out[1] == 'W(item_header("Tranquil Boots"))'                       # the unit's empty list went
+    assert 'W(li("Break renamed to Respite", t("MISC"), covered=True))' in out
+
+
+def test_new_creep_abilities_are_new_ability_cards():
+    import pytest
+    from patch.aghs_text import ability_text
+    if not ability_text("odobenus_blight", "7.42"):
+        pytest.skip("no game files of 7.42 here")
+    lines = ['W(unit_header("Odobenus Footman", NEUTRAL_CDN + "odobenus_footman.png", new="New Level 3 Melee Creep"))',
+             'W(ul_open())', 'W(unit_sheet("odobenus_footman", version="7.42"))',
+             'W(li("New Level 3 Melee Creep", t("MISC"), extra=inline_note("500 Health")))',
+             'W(li("Odobenus Blight: Passive Ability", t("MISC"), extra=inline_note("Attacks reduce armor")))', 'W(ul_close())']
+    out = g._postprocess_new_creep_abilities(lines, "7.42")
+    assert out[3] == 'W(li("New Level 3 Melee Creep", t("MISC"), extra=inline_note("500 Health"), covered=True))'
+    assert out[4:8] == ['W(ul_close())', 'W(new_ability("Odobenus Blight", "odobenus_blight", version="7.42", '
+                        'icon_url="../icons/abilities/odobenus_footman_odobenus_blight.png"))', 'W(ul_open())',
+                        'W(li("Odobenus Blight: Passive Ability", t("MISC"), extra=inline_note("Attacks reduce armor"), '
+                        'covered=True))']
+
+
+def test_a_replaced_or_reworked_unit_ability_is_a_card():
+    import pytest
+    from patch.aghs_text import ability_text
+    if not ability_text("mud_golem_hurl_boulder", "7.41f"):
+        pytest.skip("no game files of 7.41f / 7.42 here")
+    mud = ['W(ability("Hurl Boulder", icon_url="../icons/abilities/mud_golem_hurl_boulder.png"))', 'W(ul_open())',
+           'W(li("Hurl Boulder ability replaced with Hurl Big Boulder", t("REWORK")))', 'W(ul_close())']
+    text = "\n".join(g._postprocess_renamed_unit_ability(mud, "7.42"))
+    assert 'desc=game_ability_desc("mud_golem_hurl_boulder", "7.41f")' in text
+    assert 'new=dict(name="Hurl Big Boulder"' in text and 'desc=game_ability_desc("mud_golem_hurl_big_boulder", "7.42")' in text
+    assert 'summary="New ability."' in text
+    kobold = ['W(ability("Steal Weapon", icon_url="../icons/abilities/kobold_disarm.png"))', 'W(ul_open())',
+              'W(li("Ability Reworked", t("REWORK")))', 'W(ul_close())']
+    text = "\n".join(g._postprocess_renamed_unit_ability(kobold, "7.42"))
+    assert 'game_ability_pair("kobold_disarm", "7.42")' in text and 'summary="Ability reworked."' in text
 
 
 def test_an_existing_roshan_blocks_items_link_too():

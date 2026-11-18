@@ -336,7 +336,7 @@
         },
         {
           "text": "Couriers now have fragile pip health",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "As a part of the comprehensive Pip Health Standardization"
         },
@@ -365,7 +365,7 @@
         },
         {
           "text": "Dire fountain moved ~300 units closer to the Dire Ancient",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base",
           "info": "Now closer to the distance between Radiant fountain and Ancient"
         }
@@ -468,7 +468,7 @@
       "changes": [
         {
           "text": "Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -514,7 +514,7 @@
         },
         {
           "text": "Radiant Tier 1 tower moved ever so slightly to the south",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -524,7 +524,7 @@
         },
         {
           "text": "Slightly increased the amount of highground to the north of the Radiant midlane ramp",
-          "tag": "buff",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -534,7 +534,7 @@
         },
         {
           "text": "Spawn boxes of the Safelane Tier 1 small and large camps have been decreased",
-          "tag": "nerf",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -544,7 +544,7 @@
         },
         {
           "text": "Slightly rearranged the trees around Radiant Safelane Tier 1 small camp",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -1306,7 +1306,7 @@
       "changes": [
         {
           "text": "No longer has reduced damage taken from allies on the first pip of health",
-          "tag": "buff",
+          "tag": "del",
           "lower_is_better": true,
           "scope": "base"
         },
@@ -1324,7 +1324,7 @@
       "changes": [
         {
           "text": "Lesser Corruption now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -1341,7 +1341,7 @@
       "changes": [
         {
           "text": "Frost now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -1351,7 +1351,7 @@
         },
         {
           "text": "Frost now pierces debuff immunity",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -1393,7 +1393,7 @@
       "changes": [
         {
           "text": "No longer has reduced damage taken from allies on the first pip of health",
-          "tag": "buff",
+          "tag": "del",
           "lower_is_better": true,
           "scope": "base"
         },
@@ -2015,7 +2015,7 @@
       "changes": [
         {
           "text": "Corruption now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2032,7 +2032,7 @@
       "changes": [
         {
           "text": "Manabreak now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2049,7 +2049,7 @@
       "changes": [
         {
           "text": "Manabreak now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2201,7 +2201,7 @@
       "changes": [
         {
           "text": "Cold Attack now works with Illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2211,7 +2211,7 @@
         },
         {
           "text": "Cold Attack now pierces debuff immunity",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2229,7 +2229,7 @@
       "changes": [
         {
           "text": "Force's push now cannot be dispelled",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "base"
         }
       ]
@@ -2241,7 +2241,7 @@
       "changes": [
         {
           "text": "Hurricane Thrust's push now cannot be dispelled",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "base"
         },
         {
@@ -2542,7 +2542,7 @@
       "changes": [
         {
           "text": "Mage Slayer now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2624,7 +2624,7 @@
         },
         {
           "text": "Pierce now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2646,7 +2646,7 @@
       "changes": [
         {
           "text": "Nullify now also makes the target to be 60% less susceptible to forced movement effects applied by their allies",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "base"
         }
       ]
@@ -2707,7 +2707,7 @@
         },
         {
           "text": "Corrosion now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2717,7 +2717,7 @@
         },
         {
           "text": "Corrosion now pierces debuff immunity",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2780,7 +2780,7 @@
         },
         {
           "text": "Shine now provides all bonuses on self-cast, but they will be reduced by 50%",
-          "tag": "new",
+          "tag": "buff",
           "scope": "base"
         },
         {
@@ -3069,9 +3069,10 @@
         },
         {
           "text": "Respite Health Regen bonus lost during Respite decreased from 14 to 12",
-          "tag": "nerf",
+          "tag": "buff",
           "old": 14,
           "new": 12,
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -3258,7 +3259,7 @@
         },
         {
           "text": "Magic Corruption now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -3375,7 +3376,7 @@
       "changes": [
         {
           "text": "Number of item tiers decreased from 5 to 4",
-          "tag": "nerf",
+          "tag": "rework",
           "old": 5,
           "new": 4,
           "scope": "base"
@@ -4005,9 +4006,10 @@
         },
         {
           "text": "Salvo restore duration decreased from 10s to 8s",
-          "tag": "nerf",
+          "tag": "buff",
           "old": 10,
           "new": 8,
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -4263,7 +4265,7 @@
         },
         {
           "text": "Gut 'Em now works with illusions",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -5966,7 +5968,7 @@
         },
         {
           "text": "Attacks that miss Axe (due to evasion, blindness, or uphill disadvantage) now count towards the Counter Helix counter",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Counter Helix"
         },
         {
@@ -6472,7 +6474,7 @@
         },
         {
           "text": "Aghanim's Scepter now also decreases cooldown by 10s",
-          "tag": "misc",
+          "tag": "buff",
           "lower_is_better": true,
           "scope": "Rupture",
           "info": "From 75/70/65s to 65/60/55s"
@@ -6586,7 +6588,7 @@
         },
         {
           "text": "Aghanim's Shard now also increases speed increase by 20%",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Liquid Courage"
         },
         {
@@ -6678,7 +6680,7 @@
         },
         {
           "text": "Fire now has Cinder Dash ability",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Primal Split"
         },
         {
@@ -6803,7 +6805,7 @@
         },
         {
           "text": "Heal now also applies if one of Broodmother's units kills an enemy while being within the ability radius",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Spider's Milk"
         },
         {
@@ -6902,7 +6904,7 @@
       "changes": [
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Horsepower"
         },
         {
@@ -7202,7 +7204,7 @@
       "changes": [
         {
           "text": "Now partially disabled by Break: disables the gaining of new stacks, but does not remove the effect from existing ones",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Infernal Shred"
         },
         {
@@ -7473,7 +7475,7 @@
         },
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Break of Dawn"
         },
         {
@@ -7514,7 +7516,7 @@
         },
         {
           "text": "Now partially disabled by Break: disables the gaining of new stacks, but does not remove the effect from existing ones",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Weave"
         },
         {
@@ -8097,7 +8099,7 @@
       "changes": [
         {
           "text": "Now partially disabled by Break: disables bonus damage gain, but does not affect Remnant creation",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Stone Remnant"
         },
         {
@@ -8218,7 +8220,7 @@
       "changes": [
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Momentum"
         },
         {
@@ -8610,7 +8612,7 @@
       "changes": [
         {
           "text": "Now partially disabled by Break: disables the gaining of new stacks, but does not remove the effect from existing ones",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Afterburner"
         },
         {
@@ -8936,7 +8938,7 @@
         },
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Equilibrium"
         },
         {
@@ -9051,7 +9053,7 @@
       "changes": [
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Bright Speed"
         },
         {
@@ -9472,7 +9474,7 @@
         },
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Defilement"
         },
         {
@@ -10203,9 +10205,10 @@
         },
         {
           "text": "Initial delay decreased from 1s to 0.8s",
-          "tag": "nerf",
+          "tag": "buff",
           "old": 1,
           "new": 0.8,
+          "lower_is_better": true,
           "scope": "Gorgon's Grasp"
         },
         {
@@ -10501,7 +10504,7 @@
         },
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Ebb and Flow"
         },
         {
@@ -11597,7 +11600,7 @@
         },
         {
           "text": "The movement buff now cannot be dispelled",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Onslaught"
         },
         {
@@ -12459,7 +12462,7 @@
         },
         {
           "text": "Aghanim's Scepter now also increases soul speed by 30%",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Requiem of Souls"
         },
         {
@@ -12575,7 +12578,7 @@
         },
         {
           "text": "Now partially disabled by Break: disables the damage amp from/to silenced targets, but not the Intelligence steal",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Suffer In Silence"
         },
         {
@@ -12739,7 +12742,7 @@
       "changes": [
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Boomstick"
         },
         {
@@ -12881,7 +12884,7 @@
       "changes": [
         {
           "text": "Now partially disabled by Break: disables the gaining of new stacks, but does not remove the effect from existing ones",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Empowering Haste"
         },
         {
@@ -13036,7 +13039,7 @@
       "changes": [
         {
           "text": "Now partially disabled by Break: disables the mana regen, but not the barrel on death",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "M.A.D."
         },
         {
@@ -13173,7 +13176,7 @@
       "changes": [
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Dark Unity"
         },
         {
@@ -13357,7 +13360,7 @@
         },
         {
           "text": "Aghanim's Scepter now also increases missile speed and range by 20%",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Deploy Turrets"
         },
         {
@@ -13557,7 +13560,7 @@
         },
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Bitter Chill"
         },
         {
@@ -13621,13 +13624,14 @@
         },
         {
           "text": "Channel duration decreased from 3.5s to 3.5/3.25/3s",
-          "tag": "nerf",
+          "tag": "buff",
           "old": 3.5,
           "new": [
             3.5,
             3.25,
             3
           ],
+          "lower_is_better": true,
           "scope": "Fiend's Gate"
         },
         {
@@ -13824,7 +13828,7 @@
         },
         {
           "text": "Damage and movement slow now cannot be dispelled",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Noxious Plague"
         },
         {
@@ -13965,7 +13969,7 @@
         },
         {
           "text": "Now fully disabled by Break",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Intrinsic Edge"
         },
         {
@@ -14085,7 +14089,7 @@
       "changes": [
         {
           "text": "Now partially disabled by Break: disables the gaining of new stacks, but does not remove the effect from existing ones",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Tailwind"
         },
         {

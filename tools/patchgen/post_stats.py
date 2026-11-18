@@ -49,8 +49,21 @@ _SIDE_FORMULA_RE = re.compile(
     r"\s+per(?:\s+(?:hero|[A-Z][\w'-]*))?\s+level(?: up)?$")
 
 
+_SIDE_STEP_RE = re.compile(r"^(?P<base>\d+(?:\.\d+)?)(?P<u>%|s)?\s*\+\s*(?P<inc>\d+(?:\.\d+)?)(?P=u)?\s+per\s+"
+                           r"(?P<n>\d+)\s+(?:hero\s+)?levels$")
+_SIDE_FLAT_RE = re.compile(r"^(?P<v>\d+(?:\.\d+)?)(?P<u>%|s)?\s+at all times$")
+
+
 def _side_formula(text):
-    """(the lambda's body over L, the unit "%" / "s" / "") of one side of a per-level row, or None."""
+    """(the lambda's body over L, the unit "%" / "s" / "") of one side of a per-level row, or None. Also "A + B per N
+    levels" (a step every N levels) and "N at all times" (7.42 Shadow Shaman Fowl Play: "1 + 1 per 5 levels to 3 at
+    all times", "5% + 5% per 5 levels to 5% + 1% per level" — made by hand first)."""
+    s = _SIDE_STEP_RE.match(text.strip())
+    if s:
+        return f'{s.group("base")} + {s.group("inc")} * (L // {s.group("n")})', s.group("u") or ""
+    f = _SIDE_FLAT_RE.match(text.strip())
+    if f:
+        return f.group("v"), f.group("u") or ""
     m = _SIDE_FORMULA_RE.match(text.strip())
     if not m:
         return None

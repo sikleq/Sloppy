@@ -98,12 +98,14 @@ def game_ability_pair(slug, version=None):
     return side(prev, old_html), side(version, new_html)
 
 
-def new_ability(name, slug, note=None, innate=False, version=None):
+def new_ability(name, slug, note=None, innate=False, version=None, icon_url=None):
     """A brand-new ability: the "New ability." card with its game text, as every new ability on the site (owner
     2026-10-25: «разве мы так оформляем появление новой способности?» — 7.41 Objurgation / Midnight Feast / Snakebite
     were rows). The patch-note row goes under it covered, for the weights and filters. version: the patch whose text
     to show (the generator names it; a page's own patch otherwise)."""
     spec = {"name": name, "slug": slug, "desc": game_ability_desc(slug, version, note=note)}
+    if icon_url:                  # the icon the game draws when it is not <slug>.png (AbilityTextureName, 7.42 creeps)
+        spec["icon_url"] = icon_url
     if innate:
         spec["innate"] = True
     return ability_change(None, spec, summary="New ability.", tag="new")
