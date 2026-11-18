@@ -66,18 +66,17 @@ def _is_png(path):
 
 def removed_on_purpose():
     """Icons the owner took out on purpose — never fetched back (7.42: this script brought back 9 of them, e.g. the
-    unofficial axe_one_man_army.png out since 7.41): KNOWN_INNATE_NO_CDN_ICON and every icons/abilities/*.png git
-    history deleted."""
-    import subprocess
+    unofficial axe_one_man_army.png out since 7.41): KNOWN_INNATE_NO_CDN_ICON and data/rules/icons_removed.json
+    (a file, not git history: CI checks out without history). Taking an icon out: delete it and list it there."""
+    import json
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))
     from patch.known_exceptions import KNOWN_INNATE_NO_CDN_ICON
-    out = subprocess.run(["git", "log", "--diff-filter=D", "--name-only", "--format=", "--", "icons/abilities"],
-                         cwd=ROOT, capture_output=True, text=True)
-    if out.returncode:
-        raise RuntimeError(f"git log for the deleted icons failed: {out.stderr.strip()[:200]}")
-    deleted = {Path(p).stem for p in out.stdout.split() if p.endswith(".png")}
-    return set(KNOWN_INNATE_NO_CDN_ICON) | deleted
+    with open(ROOT / "data" / "rules" / "icons_removed.json", encoding="utf-8") as f:
+        removed = json.load(f)["icons"]
+    if not removed:
+        raise RuntimeError("data/rules/icons_removed.json lists no icons")
+    return set(KNOWN_INNATE_NO_CDN_ICON) | set(removed)
 
 
 _SKIP = removed_on_purpose()
