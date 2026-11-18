@@ -559,8 +559,11 @@
         if (done[btn.dataset.hl]) return;
         done[btn.dataset.hl] = true;
         const on = btn.getAttribute('aria-pressed') === 'true' && layerOn(btn.dataset.layer);
-        root.querySelectorAll('.tm-hl-' + btn.dataset.hl).forEach(function(svg) {
-          svg.classList.toggle('tm-hl-on', on);
+        // one chip per object may outline several kinds: data-hl lists their keys (2026-11-18)
+        btn.dataset.hl.split(' ').forEach(function(key) {
+          root.querySelectorAll('.tm-hl-' + key).forEach(function(svg) {
+            svg.classList.toggle('tm-hl-on', on);
+          });
         });
         if (btn.dataset.layer) dim[btn.dataset.layer] = dim[btn.dataset.layer] || on;
       });

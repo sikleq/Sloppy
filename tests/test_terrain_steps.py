@@ -203,13 +203,26 @@ def test_the_facts_read_like_the_list():
     assert '<div class="tf-name">medium <span class="tm-add-text">+4</span></div>' in html
     assert "tf-verb" not in html and "Moved</div>" not in html
     # the word in its own span since 2026-10-05 (fullscreen hides it: icon + "9/28")
-    assert 'alt="Camps" width="16" height="16"><b>9/28</b> <span class="tf-chip-word">moved</span></button>' in html
+    # one chip per object since 2026-11-18 (the owner, 7.42: "один чип"): camps moved / re-tiered / boxes resized
+    assert ('alt="Camps" width="16" height="16"><span class="tf-chip-lines">'
+            '<span class="tf-chip-line"><b>9/28</b> <span class="tf-chip-word">moved</span></span>'
+            '<span class="tf-chip-line"><b>4/28</b> <span class="tf-chip-word">re-tiered</span></span>'
+            '<span class="tf-chip-line"><b>10/28</b> <span class="tf-chip-word">boxes resized</span></span>'
+            '</span></button>') in html
+    assert 'data-hl="camps camptiers"' in html and 'alt="Camp tiers"' not in html
     assert 'alt="Towers" width="16" height="16"><b>1/22</b> <span class="tf-chip-word">moved</span></button>' in html
-    assert ('alt="Camp tiers" width="16" height="16"><b>4/28</b> <span class="tf-chip-word">re-tiered</span>'
-            '</button>') in html
-    assert ('alt="Camp spawn boxes" width="16" height="16"><b>10/28</b> <span class="tf-chip-word">resized</span>'
-            '</span>') in html
     assert '<div class="tf-none">Nothing</div>' in terrain._facts_html({}, step, {"treesOld": [], "treesNew": []})
+
+
+def test_one_chip_per_object_names_each_part():
+    # the owner 2026-11-18 (7.42): "2/6 changed" and "2/6 moved" with the same lanes icon looked like a repeat
+    groups = terrain._chip_groups([("lane paths", "changed", 2, 0, 6), ("towers", "moved", 4, 0, 22),
+                                   ("lane creep spawns", "moved", 2, 0, 6)])
+    assert [[g[0] for g in grp] for grp in groups] == [["lane paths", "lane creep spawns"], ["towers"]]
+    html = terrain._chip_of(groups[0])
+    assert html.count('class="tf-chip-line"') == 2 and 'data-hl="lanes lanespawns"' in html
+    assert '<span class="tf-chip-word">paths changed</span>' in html
+    assert '<span class="tf-chip-word">spawns moved</span>' in html
 
 
 def test_every_kind_of_object_has_a_tile_under_trees_and_camps():
@@ -244,7 +257,7 @@ def test_a_chip_outlines_removed_on_the_old_map_added_on_the_new_moved_on_both()
     html = terrain._facts_html(counts, step, diff)
     assert 'class="tf-chip tf-chip-btn" data-hl="towers" data-layer="towers"' in html
     assert 'data-hl="trees" data-layer="trees"' in html
-    assert 'alt="Camp spawn boxes"' in html and "data-hl=\"camp" not in html.split('alt="Camp spawn boxes"')[0][-90:]
+    assert 'Camp spawn boxes:' in html          # in the camps chip's tooltip (one chip per object, 2026-11-18)
     old, new = _hl(svg, "towers", "old"), _hl(svg, "towers", "new")       # the offlane tier 2 tower moved
     assert 'tm-hl-g-moved tm-hl-dashed" fill="none" stroke="#ffd23f"' in old and "<circle" in old   # dashed = old
     assert 'fill="#ffd23f" mask="url(#tm-hl-mask-towers-new-moved)"' in new
@@ -353,7 +366,7 @@ def test_fullscreen_has_a_folding_panel_with_the_change_filters():
     assert '<div class="tc-fsp-title">Layers</div>' in panel and 'data-layer="nowards"' in panel
     assert '<div class="tc-fsp-title">Changed in the map file</div>' in panel
     facts = html.split('<div class="terrain-facts">')[1]
-    for key in ("trees", "camps", "towers", "nowards"):
+    for key in ("trees", "camps camptiers", "towers", "nowards"):
         assert panel.count(f'data-hl="{key}"') == 1 and facts.count(f'data-hl="{key}"') == 1
     assert panel.count('class="tf-kind"') == facts.count('class="tf-kind"') == 3
     assert 'class="tc-sep"' not in panel                    # the grid needs no separators
