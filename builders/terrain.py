@@ -1240,6 +1240,63 @@ def _chip(name, kind, n, removed, total):
     return f'<span class="tf-chip" data-tooltip="{tip}">{img}{value}</span>'
 
 
+# One chip per object (the owner 2026-11-18, 7.42: "2/6 changed" and "2/6 moved" with the same icon — "один чип"):
+# kinds of one object share a chip, one line each, the word naming the part. kind name -> (object, part word)
+_CHIP_OBJECT = {"lane paths": ("lanes", "paths"), "lane creep spawns": ("lanes", "spawns"),
+                "camps": ("camps", ""), "camp tiers": ("camps", ""), "camp spawn boxes": ("camps", "boxes"),
+                "no-ward cells": ("nowards", "cells"), "no-ward zones": ("nowards", "zones"),
+                "Roshan pits": ("roshan", "pits"), "Roshan pit zones": ("roshan", "pit zones")}
+
+
+def _chip_groups(items):
+    """The _moved_items rows grouped by object, in their first row's order."""
+    groups, order = {}, []
+    for item in items:
+        obj = _CHIP_OBJECT.get(item[0], (item[0], ""))[0]
+        if obj not in groups:
+            groups[obj] = []
+            order.append(obj)
+        groups[obj].append(item)
+    return [groups[o] for o in order]
+
+
+def _chip_of(group):
+    """One object's chip: a single kind as _chip; several kinds one line each ("2/6 paths changed", "2/6 spawns
+    moved"), the icon of the first, pressing it outlines every kind's changes (data-hl lists their keys)."""
+    if len(group) == 1:
+        return _chip(*group[0])
+    first = group[0][0]
+    icon = _ITEM_ICON.get(first)
+    label = _esc(first[:1].upper() + first[1:])
+    img = (f'<img src="icons/{icon}.png" alt="{label}" width="16" height="16">' if icon
+           else f'<span class="tf-chip-name">{label}</span>')
+    lines, tips, keys, layer = [], [], [], ""
+    for name, kind, n, removed, total in group:
+        part = _CHIP_OBJECT.get(name, ("", ""))[1]
+        word = _CHANGED_WORD.get(name, kind)
+        if kind == "delta":
+            value = _signed(n - removed).strip() or '<span class="tf-chip-zero">±0</span>'
+            text = f'{value}{" " + part if part else ""}'
+        else:
+            text = (f'<b>{n}/{total}</b> <span class="tf-chip-word">{(part + " ") if part else ""}{word}</span>')
+        lines.append(f'<span class="tf-chip-line">{text}</span>')
+        tips.append(f"{name[:1].upper() + name[1:]}: {_strip_tags(text)}")
+        if name in _LAYER_HL:
+            key, lay = _LAYER_HL[name]
+        else:
+            key = _HL_KEY.get(name)
+            lay = _HL_LAYER.get(key, "") if key else ""
+        if key and key not in keys:
+            keys.append(key)
+        layer = layer or lay
+    body = f'{img}<span class="tf-chip-lines">{"".join(lines)}</span>'
+    tip = _esc("; ".join(tips))
+    if keys:
+        return (f'<button type="button" class="tf-chip tf-chip-btn" data-hl="{" ".join(keys)}" '
+                f'data-layer="{layer}" aria-pressed="false" data-tooltip="{tip}">{body}</button>')
+    return f'<span class="tf-chip" data-tooltip="{tip}">{body}</span>'
+
+
 def _facts_html(counts, step, diff):
     """The facts under the change list, in the list's own look (the owner
     2026-10-02: four lines of text "should be laid out better"; then the tables
@@ -1291,7 +1348,7 @@ def _change_controls(diff):
     removed or added"), each in its outline colour — scripts.js hides a kind with .hl-hide-<kind> on the map — and
     the "Changed in the map file" chips. Under the list and in the fullscreen panel alike; scripts.js keeps the
     copies in step."""
-    chips = "".join(_chip(*i) for i in _moved_items(diff))
+    chips = "".join(_chip_of(group) for group in _chip_groups(_moved_items(diff)))
     if not chips:
         return "", ""
     kinds = "".join(f'<button type="button" class="tf-kind" data-kind="{k}" aria-pressed="true">'

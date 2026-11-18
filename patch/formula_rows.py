@@ -2,6 +2,7 @@
 is a formula, with its per-level table). Cut out of elements.py (2026-11-07)."""
 
 import html as _html
+import math
 import re
 
 from .elements import inline_note, li
@@ -38,12 +39,14 @@ def _formula_pct_badge(o, n, lower=False):
 
 
 def formula_change(name, old, new, *, tag="REWORK", vary=None, fixed=None,
-                   unit="", lower_better=False):
+                   unit="", lower_better=False, inputs=None, chart=None):
     _TAG = {'NEW': ('new', 'new'), 'REWORK': ('rework', 'rework'), 'SWAP': ('swap', 'swap'),
             'BUFF': ('buff-text', 'buff'), 'NERF': ('nerf-text', 'nerf'),
             'DEL': ('del', 'del'), 'MISC': ('misc', 'misc'), 'QOL': ('qol', 'qol')}
     badge_cls, tag_id = _TAG.get(tag.upper(), (tag.lower(), tag.lower()))
     badge = f'<span class="badge {badge_cls}" data-tag="{tag_id}">{tag}</span>'
+    if inputs:
+        return _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_better)
     has_ex = bool(vary)
     has_input = bool(vary and fixed)
     input_html = ''
@@ -99,6 +102,108 @@ def formula_change(name, old, new, *, tag="REWORK", vary=None, fixed=None,
             f'<span class="ability-change-arrow">→</span>'
             f'{_pane(new, "new", False)}'
             f'</div></div>')
+
+
+# ---- Live formula (inputs= + chart=): a field for every variable, the OLD and NEW result, a chart of both curves ----
+# The chart's geometry is mirrored in src/js/formula-calculator.js (FX_* there): change both together.
+FX_W, FX_H = 480, 190
+FX_PAD_L, FX_PAD_R, FX_PAD_T, FX_PAD_B = 44, 14, 10, 40
+
+
+def _fx_nice(lo, hi, n=4):
+    """Round y-axis bounds and step (1 / 2 / 2.5 / 5 x 10^k) giving about n gaps."""
+    if hi <= lo:
+        hi = lo + 1
+    raw = (hi - lo) / n
+    mag = 10 ** math.floor(math.log10(raw))
+    step = next(m * mag for m in (1, 2, 2.5, 5, 10) if m * mag >= raw)
+    return math.floor(lo / step) * step, math.ceil(hi / step) * step, step
+
+
+def _fx_xticks(lo, hi):
+    if hi - lo <= 10:
+        return list(range(lo, hi + 1))
+    every = 5 if hi - lo <= 60 else 10
+    return [lo] + [v for v in range(lo + 1, hi + 1) if v % every == 0]
+
+
+def _fx_chart_body(old, new, env, var, label, lo, hi):
+    """The SVG inside of the chart for these inputs (the JS draws the same on every change)."""
+    xs = list(range(lo, hi + 1))
+    po = [_eval_formula(old, {**env, var: x}) for x in xs]
+    pn = [_eval_formula(new, {**env, var: x}) for x in xs]
+    y0, y1, step = _fx_nice(min(po + pn), max(po + pn))
+    pw, ph = FX_W - FX_PAD_L - FX_PAD_R, FX_H - FX_PAD_T - FX_PAD_B
+    sx = lambda x: FX_PAD_L + (x - lo) / (hi - lo) * pw
+    sy = lambda y: FX_PAD_T + (y1 - y) / (y1 - y0) * ph
+    parts = []
+    y = y0
+    while y <= y1 + step / 2:
+        yy = round(sy(y), 1)
+        parts.append(f'<line class="fx-grid" x1="{FX_PAD_L}" x2="{FX_W - FX_PAD_R}" y1="{yy}" y2="{yy}"/>'
+                     f'<text class="fx-tick fx-tick-y" x="{FX_PAD_L - 6}" y="{yy}">{_num_fmt(y)}</text>')
+        y += step
+    base = FX_H - FX_PAD_B
+    for x in _fx_xticks(lo, hi):
+        xx = round(sx(x), 1)
+        parts.append(f'<line class="fx-grid" x1="{xx}" x2="{xx}" y1="{FX_PAD_T}" y2="{base}"/>'
+                     f'<text class="fx-tick fx-tick-x" x="{xx}" y="{base + 14}">{x}</text>')
+    parts.append(f'<text class="fx-axis" x="{FX_PAD_L + pw / 2:g}" y="{FX_H - 4}">{_html.escape(label)}</text>')
+    pts = lambda vals: ' '.join(f'{round(sx(x), 1):g},{round(sy(v), 1):g}' for x, v in zip(xs, vals))
+    parts.append(f'<polyline class="fx-line fx-line-old" points="{pts(po)}"/>')
+    parts.append(f'<polyline class="fx-line fx-line-new" points="{pts(pn)}"/>')
+    cur = env.get(var)
+    if cur is not None and lo <= cur <= hi:
+        cx = round(sx(cur), 1)
+        o, n = _eval_formula(old, env), _eval_formula(new, env)
+        parts.append(f'<line class="fx-ruler" x1="{cx}" x2="{cx}" y1="{FX_PAD_T}" y2="{base}"/>'
+                     f'<rect class="fx-dot fx-dot-old" x="{cx - 3}" y="{round(sy(o), 1) - 3:g}" width="6" height="6"/>'
+                     f'<rect class="fx-dot fx-dot-new" x="{cx - 3}" y="{round(sy(n), 1) - 3:g}" width="6" height="6"/>')
+    return ''.join(parts)
+
+
+def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_better):
+    names = list(inputs)
+    env = dict(inputs)
+    fields = ''
+    for v in names:
+        d = inputs[v]
+        disp = f'{d:,}' if isinstance(d, int) else f'{d:g}'
+        rng = (f' min="{chart[2]}" max="{chart[3]}" step="1"' if chart and v == chart[0] else ' min="0"')
+        fields += (f'<label class="formula-input-cell">'
+                   f'<span class="formula-input-label">Set <span class="fx-vname">{v}</span>:</span>'
+                   f'<input type="number" class="formula-input" data-var="{v}" data-default="{d}"{rng} '
+                   f'inputmode="decimal" placeholder="By default: {disp}"></label>')
+    o, n = _eval_formula(old, env), _eval_formula(new, env)
+    unit_html = f' <span class="fx-unit">{unit}</span>' if unit else ''
+
+    def _pane(expr, cls, val, pct):
+        return (f'<div class="formula-pane formula-pane-{cls}">'
+                f'<code class="formula-expr">{_fmt_formula(expr)}</code>'
+                f'<div class="fx-result"><span class="fx-val fx-val-{cls}">{_num_fmt(val)}</span>{unit_html}{pct}</div>'
+                f'</div>')
+
+    chart_html = ''
+    attrs = (f' data-fx-old="{_html.escape(old, quote=True)}" data-fx-new="{_html.escape(new, quote=True)}"'
+             f' data-fx-vars="{",".join(names)}" data-fx-lower="{1 if lower_better else 0}"')
+    if chart:
+        var, label, lo, hi = chart
+        if var not in inputs:
+            raise ValueError(f'formula_change chart variable {var!r} has no input')
+        attrs += (f' data-fx-chart="{var}" data-fx-lo="{lo}" data-fx-hi="{hi}"'
+                  f' data-fx-label="{_html.escape(label, quote=True)}"')
+        chart_html = (f'<div class="fx-chart"><svg class="fx-svg" viewBox="0 0 {FX_W} {FX_H}" '
+                      f'preserveAspectRatio="xMidYMid meet">'
+                      f'{_fx_chart_body(old, new, env, var, label, lo, hi)}</svg></div>')
+    return (f'<div class="formula-change formula-live" data-tag="{tag_id}"{attrs}>'
+            f'<div class="formula-change-title">{badge}'
+            f'<span class="formula-change-name">{name}</span></div>'
+            f'<div class="formula-input-row">{fields}</div>'
+            f'<div class="formula-change-panes">'
+            f'{_pane(old, "old", o, "")}'
+            f'<span class="ability-change-arrow">→</span>'
+            f'{_pane(new, "new", n, _formula_pct_badge(o, n, lower_better))}'
+            f'</div>{chart_html}</div>')
 
 
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,

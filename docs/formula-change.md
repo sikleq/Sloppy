@@ -83,6 +83,43 @@ First used in **7.40** General Changes (Assist Gold, higher gold = buff) — at
 VictimNetworth 10,000: Old `430→134`, New `435→99` gold for 1→5 heroes
 (Δ% +1.2% at 1 hero → −26% at 5).
 
+### Live formula: a field per variable + chart (the form for new patches, from 7.42)
+
+Owner 2026-11-18: «формулы мы оформляем так, чтобы пользователь мог значения переменных
+ввести, а также делай наглядный график сравнения. Будем делать для всех игровых формул
+так, начнём тест с этого патча». Pilot: 7.42 "Hero kill bounty rescaled".
+
+```python
+W(formula_change("Hero kill bounty",
+                 "125 + (8 * VictimLevel) + KillstreakFactor",
+                 "100 + (10 * VictimLevel) + KillstreakFactor",
+                 tag="REWORK",
+                 inputs={"VictimLevel": 15, "KillstreakFactor": 0},   # every variable: its default
+                 chart=("VictimLevel", "Victim Level", 1, 30),        # variable, axis label, from, to
+                 unit="Gold"))
+```
+
+- `inputs=` switches the block to the live form (class `formula-live`): a number field for
+  **every** variable (placeholder "By default: …"), under each formula its **result** for
+  the entered values, Δ% beside the new one. No table of examples: the chart replaces it.
+- `chart=` draws both formulas over one variable as inline SVG (built by
+  `_fx_chart_body`, redrawn by `src/js/formula-calculator.js` on every change; the
+  geometry constants `FX_*` are the same in both, `tests/test_formula_live.py` holds them
+  together). Old = muted dashed line, new = solid gold; the result numbers carry the same
+  two colours, so no legend. A dashed ruler and two square dots mark the entered value;
+  pressing or dragging on the chart sets the variable.
+- Works without JS (the server renders results and chart for the defaults).
+- **Generator** (`tools/patchgen/post_formula.py`, `_postprocess_formula_rows`): a row
+  `li("<name> rescaled", t(..), extra=inline_note("OLD: <formula><br>NEW: <formula>"))`
+  whose two sides are plain arithmetic becomes this block by itself. It only does so when
+  every variable is one it knows (`_FX_KNOWN_VARS`: `…Level` → default 15, chart 1–30;
+  `NumHeroes` → 1, chart 1–5; `…Networth` → 10000; `…streak…` → 0) — an unknown variable
+  leaves the note as it was: add the variable there with a default you can stand behind.
+  The tag is computed over the chart: new ≥ old everywhere → BUFF, ≤ → NERF, the curves
+  cross → REWORK (7.42 bounty: less gold below level 12.5, more above).
+- The 7.40 block keeps the older `vary=` / `fixed=` table form; older patches are moved to
+  the live form only on the owner's word.
+
 ## Formula changes to expect across patches (reference)
 
 `data/patchnotes_english.txt` is a **consolidated multi-patch loc file** (keys like
