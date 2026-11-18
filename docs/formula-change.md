@@ -106,8 +106,14 @@ W(formula_change("Hero kill bounty",
   `_fx_chart_body`, redrawn by `src/js/formula-calculator.js` on every change; the
   geometry constants `FX_*` are the same in both, `tests/test_formula_live.py` holds them
   together). Old = muted dashed line, new = solid gold; the result numbers carry the same
-  two colours, so no legend. A dashed ruler and two square dots mark the entered value;
-  pressing or dragging on the chart sets the variable.
+  two colours, so no legend. A dashed ruler and two square dots mark the entered value,
+  each dot with its number beside it (the upper one above, the lower below; left of the
+  ruler near the right edge). Pressing or dragging on the chart sets the variable; a
+  mouse over the chart only shows that value (ruler, numbers, results) until it leaves.
+- The **gap between the curves** is filled: green where the new formula is better, red
+  where worse (`lower_better` flips it), split exactly where they cross
+  (`_fx_gap_pieces` / `gapPieces`); colourblind mode turns it blue / orange. The chart
+  sits in a box like the panes; the unit stands at the top of the y-axis.
 - Works without JS (the server renders results and chart for the defaults).
 - **Generator** (`tools/patchgen/post_formula.py`, `_postprocess_formula_rows`): a row
   `li("<name> rescaled", t(..), extra=inline_note("OLD: <formula><br>NEW: <formula>"))`

@@ -107,7 +107,31 @@ def formula_change(name, old, new, *, tag="REWORK", vary=None, fixed=None,
 # ---- Live formula (inputs= + chart=): a field for every variable, the OLD and NEW result, a chart of both curves ----
 # The chart's geometry is mirrored in src/js/formula-calculator.js (FX_* there): change both together.
 FX_W, FX_H = 480, 190
-FX_PAD_L, FX_PAD_R, FX_PAD_T, FX_PAD_B = 44, 14, 10, 40
+FX_PAD_L, FX_PAD_R, FX_PAD_T, FX_PAD_B = 44, 14, 22, 40
+
+
+def _fx_gap_pieces(xs, po, pn):
+    """The stretches where one curve stays above the other, split where they cross:
+    [(sign, [(x, old, new), …])], sign = +1 where new > old, -1 where new < old."""
+    pieces = []
+    for i in range(len(xs) - 1):
+        x0, x1, o0, o1, n0, n1 = xs[i], xs[i + 1], po[i], po[i + 1], pn[i], pn[i + 1]
+        d0, d1 = n0 - o0, n1 - o1
+        segs = [((x0, o0, n0), (x1, o1, n1))]
+        if d0 * d1 < 0:                     # they cross inside: split at the crossing
+            t = d0 / (d0 - d1)
+            xc, yc = x0 + t * (x1 - x0), o0 + t * (o1 - o0)
+            segs = [((x0, o0, n0), (xc, yc, yc)), ((xc, yc, yc), (x1, o1, n1))]
+        for a, b in segs:
+            mid = (a[2] - a[1]) + (b[2] - b[1])
+            sign = (mid > 0) - (mid < 0)
+            if not sign:
+                continue
+            if pieces and pieces[-1][0] == sign and pieces[-1][1][-1] == a:
+                pieces[-1][1].append(b)
+            else:
+                pieces.append((sign, [a, b]))
+    return pieces
 
 
 def _fx_nice(lo, hi, n=4):
@@ -127,7 +151,7 @@ def _fx_xticks(lo, hi):
     return [lo] + [v for v in range(lo + 1, hi + 1) if v % every == 0]
 
 
-def _fx_chart_body(old, new, env, var, label, lo, hi):
+def _fx_chart_body(old, new, env, var, label, lo, hi, unit='', lower=False):
     """The SVG inside of the chart for these inputs (the JS draws the same on every change)."""
     xs = list(range(lo, hi + 1))
     po = [_eval_formula(old, {**env, var: x}) for x in xs]
@@ -149,17 +173,35 @@ def _fx_chart_body(old, new, env, var, label, lo, hi):
         parts.append(f'<line class="fx-grid" x1="{xx}" x2="{xx}" y1="{FX_PAD_T}" y2="{base}"/>'
                      f'<text class="fx-tick fx-tick-x" x="{xx}" y="{base + 14}">{x}</text>')
     parts.append(f'<text class="fx-axis" x="{FX_PAD_L + pw / 2:g}" y="{FX_H - 4}">{_html.escape(label)}</text>')
-    pts = lambda vals: ' '.join(f'{round(sx(x), 1):g},{round(sy(v), 1):g}' for x, v in zip(xs, vals))
-    parts.append(f'<polyline class="fx-line fx-line-old" points="{pts(po)}"/>')
-    parts.append(f'<polyline class="fx-line fx-line-new" points="{pts(pn)}"/>')
+    if unit:
+        parts.append(f'<text class="fx-axis fx-axis-y" x="{FX_PAD_L - 6}" y="{FX_PAD_T - 10}">{_html.escape(unit)}</text>')
+    p = lambda x, y: f'{round(sx(x), 1):g},{round(sy(y), 1):g}'
+    for sign, seg in _fx_gap_pieces(xs, po, pn):     # the gap between the curves: green better, red worse
+        better = (sign < 0) if lower else (sign > 0)
+        ring = [p(x, n) for x, _o, n in seg] + [p(x, o) for x, o, _n in reversed(seg)]
+        parts.append(f'<polygon class="fx-gap {"fx-gain" if better else "fx-loss"}" points="{" ".join(ring)}"/>')
+    parts.append(f'<polyline class="fx-line fx-line-old" points="{" ".join(p(x, v) for x, v in zip(xs, po))}"/>')
+    parts.append(f'<polyline class="fx-line fx-line-new" points="{" ".join(p(x, v) for x, v in zip(xs, pn))}"/>')
     cur = env.get(var)
     if cur is not None and lo <= cur <= hi:
-        cx = round(sx(cur), 1)
-        o, n = _eval_formula(old, env), _eval_formula(new, env)
-        parts.append(f'<line class="fx-ruler" x1="{cx}" x2="{cx}" y1="{FX_PAD_T}" y2="{base}"/>'
-                     f'<rect class="fx-dot fx-dot-old" x="{cx - 3}" y="{round(sy(o), 1) - 3:g}" width="6" height="6"/>'
-                     f'<rect class="fx-dot fx-dot-new" x="{cx - 3}" y="{round(sy(n), 1) - 3:g}" width="6" height="6"/>')
+        parts.append(_fx_marker(sx(cur), sy(_eval_formula(old, env)), sy(_eval_formula(new, env)),
+                                _eval_formula(old, env), _eval_formula(new, env), base))
     return ''.join(parts)
+
+
+def _fx_marker(cx, yo, yn, o, n, base):
+    """The ruler at the entered value, a dot on each curve and its number beside it (on the left near the right edge);
+    the upper number sits above its dot, the lower one below, so the two never overlap."""
+    cx = round(cx, 1)
+    right = cx < FX_W - FX_PAD_R - 70
+    tx, anchor = (cx + 7, 'start') if right else (cx - 7, 'end')
+    new_up = yn <= yo
+    lab = lambda cls, y, v, up: (f'<text class="fx-mark fx-mark-{cls}" x="{tx}" y="{round(y + (-6 if up else 12), 1):g}" '
+                                 f'text-anchor="{anchor}">{_num_fmt(v)}</text>')
+    return (f'<line class="fx-ruler" x1="{cx}" x2="{cx}" y1="{FX_PAD_T}" y2="{base}"/>'
+            f'<rect class="fx-dot fx-dot-old" x="{cx - 3:g}" y="{round(yo, 1) - 3:g}" width="6" height="6"/>'
+            f'<rect class="fx-dot fx-dot-new" x="{cx - 3:g}" y="{round(yn, 1) - 3:g}" width="6" height="6"/>'
+            + lab('old', yo, o, not new_up) + lab('new', yn, n, new_up))
 
 
 def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_better):
@@ -191,10 +233,10 @@ def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_bett
         if var not in inputs:
             raise ValueError(f'formula_change chart variable {var!r} has no input')
         attrs += (f' data-fx-chart="{var}" data-fx-lo="{lo}" data-fx-hi="{hi}"'
-                  f' data-fx-label="{_html.escape(label, quote=True)}"')
+                  f' data-fx-label="{_html.escape(label, quote=True)}" data-fx-unit="{_html.escape(unit, quote=True)}"')
         chart_html = (f'<div class="fx-chart"><svg class="fx-svg" viewBox="0 0 {FX_W} {FX_H}" '
                       f'preserveAspectRatio="xMidYMid meet">'
-                      f'{_fx_chart_body(old, new, env, var, label, lo, hi)}</svg></div>')
+                      f'{_fx_chart_body(old, new, env, var, label, lo, hi, unit, lower_better)}</svg></div>')
     return (f'<div class="formula-change formula-live" data-tag="{tag_id}"{attrs}>'
             f'<div class="formula-change-title">{badge}'
             f'<span class="formula-change-name">{name}</span></div>'

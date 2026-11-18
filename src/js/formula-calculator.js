@@ -76,9 +76,45 @@
 (function () {
   const blocks = document.querySelectorAll('.formula-live[data-fx-vars]');
   if (!blocks.length) return;
-  const W = 480, H = 190, PL = 44, PR = 14, PT = 10, PB = 40;
+  const W = 480, H = 190, PL = 44, PR = 14, PT = 22, PB = 40;
   const fmt = (x) => (Math.round(x * 10) / 10).toString();
   const r1 = (x) => Math.round(x * 10) / 10;
+  // the stretches where one curve stays above the other, split where they cross: [sign, [[x, old, new] …]]
+  function gapPieces(xs, po, pn) {
+    const pieces = [];
+    for (let i = 0; i < xs.length - 1; i++) {
+      const a0 = [xs[i], po[i], pn[i]], b1 = [xs[i + 1], po[i + 1], pn[i + 1]];
+      const d0 = a0[2] - a0[1], d1 = b1[2] - b1[1];
+      let segs = [[a0, b1]];
+      if (d0 * d1 < 0) {
+        const t = d0 / (d0 - d1), xc = a0[0] + t * (b1[0] - a0[0]), yc = a0[1] + t * (b1[1] - a0[1]);
+        const c = [xc, yc, yc];
+        segs = [[a0, c], [c, b1]];
+      }
+      segs.forEach(([a, b]) => {
+        const mid = (a[2] - a[1]) + (b[2] - b[1]);
+        const sign = (mid > 0) - (mid < 0);
+        if (!sign) return;
+        const last = pieces[pieces.length - 1];
+        if (last && last[0] === sign && last[1][last[1].length - 1] === a) last[1].push(b);
+        else pieces.push([sign, [a, b]]);
+      });
+    }
+    return pieces;
+  }
+  // the ruler, a dot on each curve and its number (upper number above its dot, lower one below)
+  function marker(cxRaw, yo, yn, o, n, base) {
+    const cx = r1(cxRaw);
+    const right = cx < W - PR - 70;
+    const tx = right ? cx + 7 : cx - 7, anchor = right ? 'start' : 'end';
+    const newUp = yn <= yo;
+    const lab = (cls, y, v, up) => '<text class="fx-mark fx-mark-' + cls + '" x="' + tx + '" y="' +
+      r1(y + (up ? -6 : 12)) + '" text-anchor="' + anchor + '">' + fmt(v) + '</text>';
+    return '<line class="fx-ruler" x1="' + cx + '" x2="' + cx + '" y1="' + PT + '" y2="' + base + '"/>' +
+      '<rect class="fx-dot fx-dot-old" x="' + r1(cx - 3) + '" y="' + r1(r1(yo) - 3) + '" width="6" height="6"/>' +
+      '<rect class="fx-dot fx-dot-new" x="' + r1(cx - 3) + '" y="' + r1(r1(yn) - 3) + '" width="6" height="6"/>' +
+      lab('old', yo, o, !newUp) + lab('new', yn, n, newUp);
+  }
   const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   function nice(lo, hi, n) {
     if (hi <= lo) hi = lo + 1;
@@ -159,20 +195,25 @@
           '<text class="fx-tick fx-tick-x" x="' + xx + '" y="' + (base + 14) + '">' + x + '</text>';
       });
       s += '<text class="fx-axis" x="' + (PL + pw / 2) + '" y="' + (H - 4) + '">' + esc(ds.fxLabel || '') + '</text>';
-      const pts = (vals) => xs.map((x, i) => r1(sx(x)) + ',' + r1(sy(vals[i]))).join(' ');
-      s += '<polyline class="fx-line fx-line-old" points="' + pts(po) + '"/>';
-      s += '<polyline class="fx-line fx-line-new" points="' + pts(pn) + '"/>';
+      if (ds.fxUnit) s += '<text class="fx-axis fx-axis-y" x="' + (PL - 6) + '" y="' + (PT - 10) + '">' + esc(ds.fxUnit) + '</text>';
+      const p = (x, y) => r1(sx(x)) + ',' + r1(sy(y));
+      gapPieces(xs, po, pn).forEach(([sign, seg]) => {   // the gap between the curves: green better, red worse
+        const better = lower ? sign < 0 : sign > 0;
+        const ring = seg.map((q) => p(q[0], q[2])).concat(seg.slice().reverse().map((q) => p(q[0], q[1])));
+        s += '<polygon class="fx-gap ' + (better ? 'fx-gain' : 'fx-loss') + '" points="' + ring.join(' ') + '"/>';
+      });
+      s += '<polyline class="fx-line fx-line-old" points="' + xs.map((x, i) => p(x, po[i])).join(' ') + '"/>';
+      s += '<polyline class="fx-line fx-line-new" points="' + xs.map((x, i) => p(x, pn[i])).join(' ') + '"/>';
       const cur = e[cv];
       if (cur >= lo && cur <= hi) {
-        const cx = r1(sx(cur));
-        s += '<line class="fx-ruler" x1="' + cx + '" x2="' + cx + '" y1="' + PT + '" y2="' + base + '"/>' +
-          '<rect class="fx-dot fx-dot-old" x="' + (cx - 3) + '" y="' + r1(r1(sy(call(fOld, e))) - 3) + '" width="6" height="6"/>' +
-          '<rect class="fx-dot fx-dot-new" x="' + (cx - 3) + '" y="' + r1(r1(sy(call(fNew, e))) - 3) + '" width="6" height="6"/>';
+        const o = call(fOld, e), n = call(fNew, e);
+        s += marker(sx(cur), sy(o), sy(n), o, n, base);
       }
       svg.innerHTML = s;
     }
-    function recalc() {
+    function recalc(over) {      // over: a level shown while the mouse is on the chart, the field untouched
       const e = env();
+      if (over !== undefined) e[cv] = over;
       let o, n;
       try { o = call(fOld, e); n = call(fNew, e); } catch (err) { return; }
       if (valOld) valOld.textContent = fmt(o);
@@ -183,20 +224,29 @@
       }
       if (svg && cv) draw(e);
     }
-    inputs.forEach((i) => i.addEventListener('input', recalc));
+    inputs.forEach((i) => i.addEventListener('input', () => recalc()));
     if (!svg || !cv) return;
     const cvInput = inputs.find((i) => i.dataset.var === cv);
-    function pick(ev) {      // the chart's x under the pointer -> the chart variable
+    function levelAt(ev) {   // the chart's x under the pointer -> a value of the chart variable
       const r = svg.getBoundingClientRect();
       const scale = Math.min(r.width / W, r.height / H);
       const x = (ev.clientX - r.left - (r.width - W * scale) / 2) / scale;
-      const c = Math.max(lo, Math.min(hi, Math.round(lo + (x - PL) / (W - PL - PR) * (hi - lo))));
+      return Math.max(lo, Math.min(hi, Math.round(lo + (x - PL) / (W - PL - PR) * (hi - lo))));
+    }
+    function pick(ev) {
+      const c = levelAt(ev);
       if (cvInput && String(c) !== cvInput.value) { cvInput.value = c; recalc(); }
     }
-    let down = false;
-    svg.addEventListener('pointerdown', (ev) => { down = true; svg.setPointerCapture(ev.pointerId); pick(ev); });
-    svg.addEventListener('pointermove', (ev) => { if (down) pick(ev); });
+    let down = false, shown = null;
+    svg.addEventListener('pointerdown', (ev) => { down = true; shown = null; svg.setPointerCapture(ev.pointerId); pick(ev); });
+    svg.addEventListener('pointermove', (ev) => {
+      if (down) { pick(ev); return; }
+      if (ev.pointerType !== 'mouse') return;
+      const c = levelAt(ev);                     // a mouse over the chart shows that level until it leaves
+      if (c !== shown) { shown = c; recalc(c); }
+    });
     svg.addEventListener('pointerup', () => { down = false; });
     svg.addEventListener('pointercancel', () => { down = false; });
+    svg.addEventListener('pointerleave', () => { if (!down && shown !== null) { shown = null; recalc(); } });
   });
 })();

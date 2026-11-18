@@ -244,7 +244,13 @@ ul.subnote-items > li::before {
 .fx-val-old { color: #a8a397; }
 .fx-val-new { color: #e0b87a; }
 .fx-unit { font-size: 11px; color: #8c8880; }
-.fx-chart { margin-top: 10px; }
+.fx-chart {                     /* the chart sits in a box like the two formula panes above it */
+  margin-top: 12px;
+  padding: 10px 12px 6px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
 .fx-svg {
   display: block;
   width: 100%;
@@ -260,9 +266,19 @@ ul.subnote-items > li::before {
 .fx-svg .fx-tick-y { text-anchor: end; dominant-baseline: middle; }
 .fx-svg .fx-tick-x { text-anchor: middle; }
 .fx-svg .fx-axis { fill: #aaa59b; font-size: 10.5px; text-anchor: middle; }
+.fx-svg .fx-axis-y { text-anchor: end; }
+/* the gap between the curves: green where the new formula is better, red where worse (BUFF / NERF colours) */
+.fx-svg .fx-gain { fill: rgba(85, 205, 115, 0.16); }
+.fx-svg .fx-loss { fill: rgba(199, 101, 115, 0.32); }   /* red reads fainter on the dark ground than green */
+html.cb-mode .fx-svg .fx-gain { fill: rgba(117, 194, 237, 0.16); }
+html.cb-mode .fx-svg .fx-loss { fill: rgba(238, 135, 57, 0.28); }
 .fx-svg .fx-line { fill: none; stroke-width: 2; stroke-linejoin: miter; }
 .fx-svg .fx-line-old { stroke: #a8a397; stroke-dasharray: 5 4; }
-.fx-svg .fx-line-new { stroke: #e0b87a; }
+.fx-svg .fx-line-new { stroke: #e0b87a; stroke-width: 2.5; }
+.fx-svg .fx-mark { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums;
+  paint-order: stroke; stroke: #17140f; stroke-width: 3px; stroke-linejoin: round; }
+.fx-svg .fx-mark-old { fill: #a8a397; }
+.fx-svg .fx-mark-new { fill: #e0b87a; }
 .fx-svg .fx-ruler { stroke: rgba(182, 177, 166, 0.45); stroke-dasharray: 2 3; shape-rendering: crispEdges; }
 .fx-svg .fx-dot { shape-rendering: crispEdges; }
 .fx-svg .fx-dot-old { fill: #a8a397; }
