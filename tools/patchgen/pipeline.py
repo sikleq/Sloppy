@@ -66,6 +66,12 @@ from .post_late import (
     _postprocess_row_notes,
     _postprocess_stance_blocks,
 )
+from .post_tables import (
+    _postprocess_drop_table,
+    _postprocess_old_new_table,
+    _postprocess_per_death,
+    _postprocess_renamed_unit_ability,
+)
 from .post_stats import (
     _postprocess_aghs_merge,
     _postprocess_cost_components,
@@ -270,6 +276,10 @@ def generate(version):
     out = _postprocess_stance_blocks(out)              # "Earth Brawler …" rows -> stance blocks, as 7.40 (10-30)
     out = _merge_no_longer_innate(out)                 # "No longer an innate ability" leads its level-0 row (10-30)
     out = _postprocess_roshan_block(out)               # General rows about Roshan himself -> his block (owner 2026-10-30)
+    out = _postprocess_drop_table(out)                 # a boss's drops by death -> a table (owner 2026-11-18, 7.42)
+    out = _postprocess_old_new_table(out)              # Valve's OLD: / NEW: lists over the same keys -> before / after
+    out = _postprocess_renamed_unit_ability(out, version)   # a unit's ability reworked and renamed -> old -> new card
+    out = _postprocess_per_death(out)                # "A to B + C per Tormentor's death" -> a table (2026-11-18)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)
     out = _postprocess_returning_rows(out)             # a returning / new item's description rows are NEW (as 7.38)
     out = _postprocess_mechanic_lists(out)             # General subgroups of lists -> mechanic blocks, tables (10-30)

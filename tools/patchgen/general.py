@@ -30,7 +30,7 @@ def _render_general_note(note):
     notes = note.get('generic', [])
     mech = []
     if title not in _BOSSES and not _MAP_SECTION.search(title):
-        notes, mech = _mechanic_blocks(notes)
+        notes, mech = _mechanic_blocks(notes, by_subtitle=bool(_MECH_SECTION.search(title)))
     elif title:
         out.append(f'\nW(plain_header("{title}"))')
     if mech:
@@ -64,12 +64,40 @@ def _mechanic_name(texts):
     return best[0][1] if best else None
 
 
-def _mechanic_blocks(notes):
+_MECH_SECTION = re.compile(r"\bmechanics?\b", re.I)       # "Global Mechanics" (7.42), "Mechanics Changes" (7.41)
+_SUBTITLE_RE = re.compile(r'class="Subtitle">\s*([^<]+?)\s*<')
+_NUMBER_CHANGE_RE = re.compile(r"\bfrom\s+[-+]?\d[\d.:,%-]*.*?\bto\s+[-+]?\d", re.I)
+_NOT_A_MECHANIC = {"miscellaneous", "other", "general"}
+
+
+def _subtitle(group):
+    """The name of Valve's Subtitle row of a group ("Pip Health"), else None."""
+    for n in group:
+        m = _SUBTITLE_RE.search(n.get('note', '')) if n.get('hide_dot') else None
+        if m:
+            return m.group(1)
+    return None
+
+
+def _subtitle_mechanic(group, texts):
+    """A mechanics section's Subtitle group that changes rules, not numbers (no "from N to M" row) is a mechanic named
+    by its Subtitle (owner 2026-11-18, 7.42 Global Mechanics: Pip Health, Spell Mechanics, Spell Power Reduction stood
+    as plain subgroups — their rows never repeat the name, so _mechanic_name found none). Hero Stats / Gold and
+    Experience (number changes) and Miscellaneous stay subgroups."""
+    name = _subtitle(group)
+    if not name or name.lower() in _NOT_A_MECHANIC or len(texts) < 2:
+        return None
+    return None if any(_NUMBER_CHANGE_RE.search(_strip_html(t)) for t in texts) else name
+
+
+def _mechanic_blocks(notes, by_subtitle=False):
     """(the notes left, lines of mechanic blocks): a general section's group of rows (Valve splits them with a "<br>"
     row) about one named thing becomes its own block — plain_header(<name>, new="New mechanic" / "Reworked
     mechanic") — with every Valve row a row of its own (its "info" its "?"), as 7.38 Lifesteal (owner 2026-10-26, 7.39
     General Changes: Health Restoration's sub-rows had been folded into one row's "?" and an intro). A group of one
-    row, or without a shared name, stays in the section."""
+    row, or without a shared name, stays in the section. In a mechanics section (by_subtitle) a Subtitle group of
+    rule changes is a block too (_subtitle_mechanic). The block's header already names it: Valve's Subtitle row of the
+    same name is dropped (7.42 Item Potency showed the name twice)."""
     groups, cur = [], []
     for n in notes:
         if n.get('hide_dot') and _strip_html(n.get('note', '')).strip() in ('', ):
@@ -82,6 +110,10 @@ def _mechanic_blocks(notes):
     for group in groups:
         texts = [n.get('note', '') for n in group if not n.get('hide_dot')]
         name = _mechanic_name(texts) if len(texts) >= 2 else None
+        if not name and by_subtitle:
+            name = _subtitle_mechanic(group, texts)
+        if name and _subtitle(group) == name:
+            group = [n for n in group if not (n.get('hide_dot') and _SUBTITLE_RE.search(n.get('note', '')))]
         if not name:
             if left and group:
                 left.append({'indent_level': 1, 'hide_dot': True, 'note': '<br>'})
@@ -280,6 +312,15 @@ _LANE_LINKS = [
                 r'\blane creep paths?\b', re.I), [_MELEE, _RANGED, _FLAG, _SIEGE]),
     # where the first waves meet — no Siege Creep in them (owner 2026-10-06, 7.41 "meeting point")
     (re.compile(r'\b(?:lane )?creeps? meet|\bmeeting point\b', re.I), [_MELEE, _RANGED, _FLAG]),
+    # one kind named anywhere in the row (7.42 "Number of melee creeps spawned no longer increases at 30:00", "Time
+    # at which 1 Ranged creep is added …"); both named — both pages
+    (re.compile(r'\bmelee creeps?\b.*\branged creeps?\b|\branged creeps?\b.*\bmelee creeps?\b', re.I),
+     [_MELEE, _RANGED]),
+    (re.compile(r'\bmelee creeps?\b', re.I), [_MELEE]),
+    (re.compile(r'\branged creeps?\b', re.I), [_RANGED]),
+    # any other row about lane creeps is about all of them (owner 2026-11-18, 7.42 "Lane creeps now move up to 25%
+    # slower if they are pulled out of lane" stood in Miscellaneous, not on the creeps' pages)
+    (re.compile(r'\blane creeps?\b', re.I), [_MELEE, _RANGED, _FLAG, _SIEGE]),
 ]
 
 

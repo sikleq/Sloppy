@@ -715,6 +715,33 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Watcher capture time decreased from 1.5s to 1s", "BUFF"),
     ("Watchers now can't be activated before the start of the game", "NERF"),
     ("Ability is moved to the 4th ability slot", "MISC"),       # an ability's key slot is not the map
+    # 7.42 proofread 2026-11-18: tags the draft got wrong by class
+    ("Tier changed from 5 to 4", "REWORK"),                     # 27 rows stood as b(5, 4): a red "-20%"
+    ("Tiers changed from 1-4 to 1-3", "REWORK"),
+    ("Number of item tiers decreased from 5 to 4", "REWORK"),
+    ("Force's push now cannot be dispelled", "BUFF"),
+    ("Frost now pierces debuff immunity", "NEW"),
+    ("Corruption now works with illusions", "NEW"),
+    ("Couriers now have fragile pip health", "NEW"),
+    ("Now fully disabled by Break", "NERF"),                    # IsBreakable absent in 7.41f, "1" in 7.42
+    ("Now partially disabled by Break: disables the gaining of new stacks", "NERF"),
+    ("No longer has reduced damage taken from allies on the first pip of health", "DEL"),
+    ("No longer has a 35% damage penalty against creeps", "BUFF"),          # a penalty gone stays BUFF
+    ("Nullify now also makes the target to be 60% less susceptible to forced movement effects applied by their "
+     "allies", "BUFF"),
+    ("Shine now provides all bonuses on self-cast, but they will be reduced by 50%", "BUFF"),
+    ("Aghanim's Scepter now also decreases cooldown by 10s", "BUFF"),
+    ("Fire now has Cinder Dash ability", "NEW"),
+    # 7.42 proofread 2026-11-18: the canon in Valve's new words
+    ("Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be", "REWORK"),
+    ("Radiant Tier 1 tower moved ever so slightly to the south", "REWORK"),
+    ("Dire fountain moved ~300 units closer to the Dire Ancient", "REWORK"),
+    ("Dire base shop moved 256 units west", "REWORK"),
+    ("Slightly rearranged the trees around Radiant Safelane Tier 1 small camp", "REWORK"),
+    ("Slightly increased the amount of highground to the north of the Radiant midlane ramp", "REWORK"),
+    ("Spawn boxes of the Safelane Tier 1 small and large camps have been decreased", "REWORK"),
+    # an extra lane creep earlier is its buff whatever the verb (7.42 said "changed")
+    ("Time at which 1 Ranged creep is added changed from 40:00 to 35:00", "BUFF"),
 ])
 def test_terrain_canon(text, tag):
     assert g._guess_tag(text) == tag
@@ -765,6 +792,11 @@ def test_canonical_tags_from_the_second_audit(text, tag):
     "Imp explosion delay increased from 0.2s to 0.3s",
     "Ally Fade Time decreased from 1.0s to 0.5s",
     "Glass Cannon self damage amp decreased from 8% to 6%",
+    # 7.42 proofread 2026-11-18
+    "Initial delay decreased from 1s to 0.8s",
+    "Channel duration decreased from 3.5s to 3.5/3.25/3s",
+    "Salvo restore duration decreased from 10s to 8s",
+    "Respite Health Regen bonus lost during Respite decreased from 14 to 12",
 ])
 def test_lower_is_better_from_the_second_audit(text):
     assert g._is_lower_better(text)
@@ -1103,6 +1135,21 @@ def test_spirit_bear_is_a_unit_block_of_lone_druid():
                              "7.42", {}, {})
     assert not any("hero_1961" in ln for ln in out)
     assert any(ln.startswith('W(unit_header("Spirit Bear"') for ln in out)
+
+
+def test_per_level_rows_with_a_note_a_minus_or_hero_level_become_formula_tables():
+    # 7.42 proofread 2026-11-18: 8 "X + Y per level" rows stood without a level table
+    out = g._postprocess_scale_pill([
+        'W(li("Heal Amount increased from 1.9% + 0.1% per hero level to 2.9% + 0.1% per hero level", t("BUFF")))',
+        'W(li("Redirect Chance rescaled from 14.25 + 0.75% per level to 10 + 1% per level", t("REWORK"), '
+        'extra=inline_note("From 15-36.75% to 11-40%")))',
+        'W(li("Cooldown decreased from 215s - 5s per level to 200s - 5s per level", t("BUFF")))',
+        'W(li("Movement Speed decreased from 0.5% + 0.75% per level to 0.5% per level", t("NERF")))'])
+    assert out[0] == ('W(li_formula("Heal Amount increased", "1.9% + 0.1% per hero level", "2.9% + 0.1% per hero level", '
+                      'lambda L: 1.9 + 0.1*L, lambda L: 2.9 + 0.1*L, value_fmt="{:g}%"))')
+    assert 'lambda L: 14.25 + 0.75*L, lambda L: 10 + 1*L' in out[1] and 'inline_note_text="From 15-36.75% to 11-40%"' in out[1]
+    assert 'lambda L: 215 - 5*L, lambda L: 200 - 5*L, l=True, value_fmt="{:g}s"' in out[2]      # a cooldown: lower is better
+    assert 'lambda L: 0.5 + 0.75*L, lambda L: 0.5*L' in out[3]
 
 
 def test_innates_are_found_in_ability_definitions():

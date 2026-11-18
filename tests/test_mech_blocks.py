@@ -270,6 +270,102 @@ def test_a_tooltips_named_parts_are_paragraphs():
     assert _named_parts("Deals damage. Slows - enemies.") == ["Deals damage. Slows - enemies."]
 
 
+def test_general_rows_about_roshan_join_an_existing_roshan_block():
+    """Owner 2026-11-18, 7.42: "Roshan gold per player decreased from 135 to 125" stood in Gold and Experience while
+    Valve's own Roshan block was below it."""
+    gold = 'W(li("Roshan gold per player decreased from 135 to 125", b(135, 125)))'
+    lines = ['W(section("General Updates"))', 'W(subgroup("Gold and Experience"))', 'W(ul_open())',
+             'W(li("Building bounty decreased", t("NERF")))', gold, 'W(ul_close())',
+             g.ROSHAN_HEADER, 'W(ul_open())', 'W(li("Base respawn timer now decreases", t("MISC")))', 'W(ul_close())']
+    out = g._postprocess_roshan_block(lines)
+    k = out.index(g.ROSHAN_HEADER)
+    assert gold not in out[:k] and out[k + 2:k + 5] == [lines[8], gold, 'W(ul_close())']
+    assert out[:k] == lines[:4] + ['W(ul_close())']
+
+
+def test_a_bosss_drops_by_death_are_a_table():
+    """Owner 2026-11-18, 7.42 Tormentor "Now drops several items, similarly to Roshan": the list sat in the "?"."""
+    row = ('W(li("Now drops several items, similarly to Roshan", t("NEW"), extra=inline_note("Now always drops '
+           'Aghanim\'s Shard — New thing<br>Starting with the 2nd death, always drops Cheese with the same rules '
+           '<span class=\\"pop-note\\">(Gold if everyone has it)</span>")))')
+    out = g._postprocess_drop_table([row])[0]
+    assert 'extra=mech_table(["When", "Drops", "Details"], [["Every death", item_link("Aghanim\'s Shard"), ' \
+           '"New thing"], ["From the 2nd death", item_link("Cheese"), "With the same rules. Gold if everyone has it"]]' in out
+    other = 'W(li("Now drops gold", t("NEW"), extra=inline_note("Only at night<br>And only once")))'
+    assert g._postprocess_drop_table([other]) == [other]
+
+
+def test_a_value_per_death_or_per_use_is_a_formula_table():
+    """Owner 2026-11-18, 7.42 Tormentor: "175 to 125 + 50 per Tormentor's death" had no formula table."""
+    gold = 'W(li("Gold reward per player changed from 175 to 125 + 50 per Tormentor\'s death", b(175, 125)))'
+    out = g._postprocess_per_death([gold])[0]
+    assert out.startswith('W(li_formula("Gold reward per player changed", "175", "125 + 50 per Tormentor\'s death", '
+                          'lambda N: 175, lambda N: 125 + 50 * N, levels=[0, 1, 2, 3, 4, 5], label="Tormentor deaths"')
+    capped = ('W(li("Base damage reflection decreased from 35% to 15% + 5% per Tormentor death, up to 30%", b(35, 15), '
+              'extra=inline_note("Still grows over time")))')
+    out = g._postprocess_per_death([capped])[0]
+    assert 'lambda N: min(30, 15 + 5 * N)' in out and 'value_fmt="{:g}%"' in out
+    assert 'inline_note_text="Still grows over time"' in out
+    shrine = ('W(li("Wisdom Shrine experience decreased from 200 + 300 per subsequent use to 200 + 200 per subsequent '
+              'use", t("NERF")))')
+    out = g._postprocess_per_death([shrine])[0]
+    assert 'lambda N: 200 + 300 * (N - 1), lambda N: 200 + 200 * (N - 1)' in out and 'level_fmt=lambda N: f"#{N}"' in out
+    plain = 'W(li("Gold reward per player decreased from 175 to 125", b(175, 125)))'
+    assert g._postprocess_per_death([plain]) == [plain]
+
+
+def test_valves_old_and_new_lists_over_the_same_keys_are_a_before_after_table():
+    """Owner 2026-11-18, 7.42 Siege creep spawn count: the OLD / NEW game-time spans sat in the "?"."""
+    row = ('W(li("Reworked Siege creep spawn count", t("REWORK"), extra=inline_note("OLD:<br>&nbsp;&nbsp;– 0:00-29:59: '
+           'Every 5 minutes, 1 spawns<br>&nbsp;&nbsp;– 60:00+: Every 5 minutes, 3 spawn<br>NEW:<br>&nbsp;&nbsp;– '
+           '0:00-29:59: Every 5 minutes, 1 spawns<br>&nbsp;&nbsp;– 60:00+: Every 2.5 minutes, 2 spawn"), '
+           'also_dyn=[\'unit|siege-creep\']))')
+    out = g._postprocess_old_new_table([row])[0]
+    assert out == ('W(li("Reworked Siege creep spawn count", t("REWORK"), extra=mech_before_after("Game time", '
+                   '[("0:00-29:59", "Every 5 minutes, 1 spawns", "Every 5 minutes, 1 spawns"), '
+                   '("60:00+", "Every 5 minutes, 3 spawn", "Every 2.5 minutes, 2 spawn")]), '
+                   'also_dyn=[\'unit|siege-creep\']))')
+    other = 'W(li("Reworked", t("REWORK"), extra=inline_note("OLD:<br>A: 1<br>NEW:<br>B: 2")))'
+    assert g._postprocess_old_new_table([other]) == [other]
+
+
+def test_a_units_reworked_and_renamed_ability_is_an_old_new_card():
+    """Owner 2026-11-18, 7.42 Ancient Black Dragon: Fireball → Searing Swoop stood as plain rows."""
+    import pytest
+    from patch.aghs_text import ability_text
+    if not (ability_text("black_dragon_fireball", "7.41f") and ability_text("black_dragon_fireball", "7.42")):
+        pytest.skip("no game files of 7.41f / 7.42 here")
+    assert ability_text("black_dragon_fireball", "7.41f").startswith("Hurls a fire blast on the ground")
+    head = 'W(ability("Searing Swoop", icon_url="../icons/abilities/black_dragon_fireball.png"))'
+    lines = [head, 'W(ul_open())', 'W(li("Now causes the Black Dragon to take flight", t("NEW")))',
+             'W(li("Duration decreased from 8/9/10/12s to 5/6/7/9s", b([8, 9, 10, 12], [5, 6, 7, 9])))',
+             'W(li("Fireball ability renamed into Searing Swoop", t("MISC")))', 'W(ul_close())']
+    out = g._postprocess_renamed_unit_ability(lines, "7.42")
+    assert out[0] == '_black_dragon_fireball_old, _black_dragon_fireball_new = game_ability_pair("black_dragon_fireball", "7.42")'
+    text = "\n".join(out)
+    assert 'old=dict(name="Fireball", icon_url="../icons/abilities/black_dragon_fireball.png", desc=_black_dragon_fireball_old)' in text
+    assert 'li("Fireball ability renamed into Searing Swoop", t("MISC"), covered=True),' in text
+    assert 'li("Duration decreased from 8/9/10/12s to 5/6/7/9s", b([8, 9, 10, 12], [5, 6, 7, 9])),' in text
+    assert head not in out
+    plain = [head, 'W(ul_open())', lines[3], 'W(ul_close())']                 # no rename row: an ability's block
+    assert g._postprocess_renamed_unit_ability(plain, "7.42") == plain
+
+
+def test_a_neutral_creeps_general_label_keeps_its_own_rows():
+    """7.42 proofread 2026-11-18: "General changes" of Neutral Creep Updates carried 24 rows (home jungles, removed
+    camps) and the page showed none — the label was emitted without them."""
+    out = g._render_neutral_creep({"name": "#DOTA_Patch_7_42_General_changes_Title", "localized_name": "General changes",
+                                   "is_general_note": True, "neutral_creep_notes": [
+                                       {"indent_level": 1, "note": "Medium Centaur camp removed"},
+                                       {"indent_level": 1, "hide_dot": True, "note": "<br>"},
+                                       {"indent_level": 1, "note": "Amount of Kobolds in Kobold camp decreased from 3 to 2"}]})
+    text = "\n".join(out)
+    assert 'W(plain_header("General changes", dynamics=False))' in text
+    assert 'W(li("Medium Centaur camp removed", t("DEL")))' in text and "Kobolds in Kobold camp" in text
+    label = g._render_neutral_creep({"name": "#x", "localized_name": "Flooded Camps", "is_general_note": True})
+    assert [l for l in label if l.startswith("W(")] == ['W(plain_header("Flooded Camps", dynamics=False))']
+
+
 def test_an_existing_roshan_blocks_items_link_too():
     """Owner 2026-10-30, 7.38 "Roshan no longer drops Aghanim's Blessing": a link, as 7.37's drops."""
     lines = ['W(section("General Updates"))', g.ROSHAN_HEADER, 'W(ul_open())',

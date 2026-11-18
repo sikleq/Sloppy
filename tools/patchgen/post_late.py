@@ -381,7 +381,8 @@ def _postprocess_innate_level0(lines, version):
 # a General row about Roshan himself: "Roshan now …", "… death, Roshan now drops …", "Roshan's HP / armor / Base …";
 # not his outposts, pit or banner item (7.37 "Teleport time to Roshan's outposts" stays a map row)
 _ROSHAN_ROW_RE = re.compile(r"""^\s*W\(li\(["'](?:[^"']*?\bRoshan(?:'s)? (?:now|no longer|will|is|has|gains|drops|"""
-                            r"""HP|health|armor|base|attack|damage|magic|respawn|bounty|ability)\b)""", re.I)
+                            r"""HP|health|armor|base|attack|damage|magic|respawn|bounty|gold|experience|"""
+                            r"""ability)\b)""", re.I)
 _SECTION_RE = re.compile(r'^\s*W\(section\("([^"]+)"')
 ROSHAN_HEADER = 'W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))'
 
@@ -465,6 +466,14 @@ def _link_items(row):
     return f'{m.group(1)}"{linked}"{m.group(3)}'.replace('"" + ', "").replace(' + ""', "")
 
 
+def _drop_empty_lists(body):
+    """A list left empty goes: its ul_open / ul_close pair."""
+    body = [ln for k, ln in enumerate(body) if not (ln.strip() == "W(ul_open())" and k + 1 < len(body)
+                                                     and body[k + 1].strip() == "W(ul_close())")
+            and not (ln.strip() == "W(ul_close())" and k > 0 and body[k - 1].strip() == "W(ul_open())")]
+    return body
+
+
 def _postprocess_roshan_block(lines):
     """General Updates rows about Roshan himself → a Roshan block at the end of the section, as 7.38–7.41's pages
     (owner 2026-10-30, 7.37: "Starting from his second death, Roshan now always drops Roshan's Banner" — "надо в
@@ -472,10 +481,15 @@ def _postprocess_roshan_block(lines):
     start = next((k for k, ln in enumerate(lines) if _SECTION_RE.match(ln) and "General" in ln), None)
     head = next((k for k, ln in enumerate(lines) if ROSHAN_HEADER in ln), None)
     if head is not None:
-        # a Roshan block already there: its rows' items link too (owner 2026-10-30, 7.38 "Roshan no longer drops
-        # Aghanim's Blessing": "подчеркнуть с ссылкой … научить генератор такое сразу подчеркивать")
+        # a Roshan block already there (Valve's "Roshan" Subtitle, 7.42): General rows about him join it — "Roshan
+        # gold per player" stood in Gold and Experience (owner 2026-11-18) — and its rows' items link too (owner
+        # 2026-10-30, 7.38 "Roshan no longer drops Aghanim's Blessing": "подчеркнуть с ссылкой")
         stop = next((k for k in range(head + 1, len(lines)) if "W(ul_close())" in lines[k]), len(lines))
-        return lines[:head + 1] + [_link_items(ln) for ln in lines[head + 1:stop]] + lines[stop:]
+        own = lines[head + 1:stop]
+        moved = {k for k in range(start + 1 if start is not None else head, head) if _ROSHAN_ROW_RE.match(lines[k])}
+        before = _drop_empty_lists([ln for k, ln in enumerate(lines[:head]) if k not in moved])
+        return before + [lines[head]] + [_link_items(ln) for ln in own + [lines[k] for k in sorted(moved)]] \
+            + lines[stop:]
     if start is None:
         return lines
     end = next((k for k in range(start + 1, len(lines)) if _SECTION_RE.match(lines[k])), len(lines))
@@ -485,11 +499,7 @@ def _postprocess_roshan_block(lines):
     rows = [ln for ln in body if _ROSHAN_ROW_RE.match(ln)]
     if not rows:
         return lines
-    body = _merge_adjacent_lists([ln for ln in body if ln not in rows])
-    # a list left empty goes
-    body = [ln for k, ln in enumerate(body) if not (ln.strip() == "W(ul_open())" and k + 1 < len(body)
-                                                     and body[k + 1].strip() == "W(ul_close())")
-            and not (ln.strip() == "W(ul_close())" and k > 0 and body[k - 1].strip() == "W(ul_open())")]
+    body = _drop_empty_lists(_merge_adjacent_lists([ln for ln in body if ln not in rows]))
     while body and not body[-1].strip():
         body.pop()
     ind = rows[0][:len(rows[0]) - len(rows[0].lstrip())]

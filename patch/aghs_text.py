@@ -230,6 +230,9 @@ def ability_text(slug, version, kind="base"):
     ("hero_levelup") reads "10% + 1% per level" (7.41 innates). kind: the Aghanim's upgrade that grants it, whose
     values ("special_bonus_scepter": "800") are its numbers. None when the files don't have it."""
     block = _blocks(version).get(slug)
+    if not isinstance(block, dict):                     # a creep's / unit's ability: not in the hero files
+        from patch.ability_kv import _unit_blocks
+        block = _unit_blocks(version).get(slug)
     desc = tooltip(f"DOTA_Tooltip_ability_{slug}_Description", version)
     if not isinstance(block, dict) or not desc:
         return None

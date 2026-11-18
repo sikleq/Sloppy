@@ -58,6 +58,9 @@ CANONICAL_TAGS = [
     # 7.42: a cooldown reset on an event is a benefit taken away (Glyph); an ENEMY stat debuff taken away (Requiem)
     (re.compile(r'\bno longer resets (?:its |the )?cooldown\b', re.I), 'DEL'),
     (re.compile(r"\bno longer (?:reduces|decreases) (?:enemy|enemies'?) (?:\w+ ){0,3}resistance\b", re.I), 'DEL'),
+    # a protection that is gone, not a penalty: "No longer has reduced damage taken from allies on the first pip of
+    # health" (7.42 wards) read BUFF by the rules below
+    (re.compile(r'\bno longer has reduced damage taken\b', re.I), 'DEL'),
     # "(?:[\w%.]+ )": 7.42 "No longer has a 35% damage penalty", "No longer has 50% reduced proc chance"
     (re.compile(r'\bno longer has (?:an? |the )?(?:[\w%.]+ ){0,5}(?:penalt(?:y|ies)|restrictions?|drawbacks?|downsides?|debuff slow)\b', re.I), 'BUFF'),
     # ── 2026-09-22 generator-vs-proofread diff (7.38): confident direction flips ──
@@ -172,6 +175,41 @@ CANONICAL_TAGS = [
     (re.compile(r'\b(?:slightly )?moved (?:slightly )?(?:closer|away|towards?|north|south|east|west|farther|further)\b'
                 r'(?![^.]*\bslot\b)', re.I), 'REWORK'),
     (re.compile(r'\bspawn ?box(?:es)? (?:has|have) been (?:moved|enlarged|increased|decreased|reduced|resized)\b', re.I), 'REWORK'),
+    # 7.42 proofread (2026-11-18): a neutral item's tier is where it sits, not a number that grew — "Tier changed from
+    # 5 to 4" (27 rows) came out as b(5, 4), a red "-20%"; as "Moved from Tier 5 to Tier 3" it is REWORK. So is the
+    # number of tiers itself
+    (re.compile(r'^Tiers? changed from \d+(?:[-/]\d+)? to \d+(?:[-/]\d+)?\b|^Number of item tiers (?:decreased|increased|changed) from \d+ to \d+\b',
+                re.I), 'REWORK'),
+    # … an item's own effect that enemies can no longer dispel got stronger (canon "Now cannot be dispelled" = BUFF;
+    # "Force's push now cannot be dispelled" came out MISC), an effect that now also reaches illusions or goes
+    # through debuff immunity is a new property (7.38–7.41 "Now pierces Debuff Immunity" = NEW; "Frost now pierces
+    # debuff immunity" came out MISC)
+    (re.compile(r"\bnow (?:cannot|can't|can not) be dispelled\b", re.I), 'BUFF'),
+    (re.compile(r'\bnow pierces debuff immunity\b|\bnow works? (?:with|on) illusions\b', re.I), 'NEW'),
+    (re.compile(r'\bnow (?:has|have) fragile pip health\b', re.I), 'NEW'),
+    # an innate Break could not touch can now be switched off by it — a new weakness, as "is now dispellable" (the
+    # files: IsBreakable absent in 7.41f, "1" in 7.42, for all 19 rows of the patch; they stood NEW)
+    (re.compile(r'^Now (?:fully|partially) disabled by Break\b', re.I), 'NERF'),
+    # plain gains worded "now also …" that came out MISC: an upgrade that also cuts the cooldown / raises a value, a
+    # heal that also applies in one more case, missed attacks that now count for the hero's counter
+    (re.compile(r"^Aghanim's (?:Scepter|Shard) now also (?:decreases|reduces) (?:the )?cooldown\b|"
+                r"^Aghanim's (?:Scepter|Shard) now also increases\b|\bheal now also applies\b|"
+                r"\bnow count towards the\b", re.I), 'BUFF'),
+    (re.compile(r'^[A-Z]\w+ now has [A-Z][\w\' ]+ ability$'), 'NEW'),            # "Fire now has Cinder Dash ability"
+    # the item's debuff does more now ("Nullify now also makes the target … 60% less susceptible to forced movement")
+    (re.compile(r'\bnow also makes the target\b', re.I), 'BUFF'),
+    # a self-cast that gave nothing now gives half ("Shine now provides all bonuses on self-cast, but they will be
+    # reduced by 50%"): a gain, not a new ability
+    (re.compile(r'\bnow provides all bonuses on self-cast\b', re.I), 'BUFF'),
+    # 7.42 proofread (2026-11-18): the same canon in other words — "Twin Gates moved to the top and bottom rim",
+    # "tower moved ever so slightly to the south", "Dire fountain moved ~300 units closer", "Slightly rearranged the
+    # trees", "Slightly increased the amount of highground", "Spawn boxes of the … camps have been decreased" came out
+    # MISC / BUFF / NERF
+    (re.compile(r'\bmoved to the (?:top|bottom|north|south|east|west|highground|lowground|high ground|low ground)\b'
+                r'(?![^.]*\bslot\b)|\bmoved (?:ever so )?slightly to the\b|\bmoved ~?\d+ units\b|'
+                r'^(?:Slightly )?rearranged\b|\bthe amount of (?:high|low) ?ground\b|'
+                r'\bspawn ?box(?:es)?\b[^.]*\b(?:has|have) been (?:moved|enlarged|increased|decreased|reduced|resized)\b',
+                re.I), 'REWORK'),
     # interface, not gameplay
     (re.compile(r'\bfor the "[^"]+" option\b', re.I),               'QoL'),
     (re.compile(r'\bnow has a distinct sound\b', re.I),             'QoL'),
@@ -335,6 +373,10 @@ LOWER_IS_BUFF = re.compile(
     r'|vanish\s+radius'
     r'|time\s+until\s+max(?:imum)?\s+\w+'
     r'|time\s+to\s+max(?:imum)?\s+\w+'           # 7.37b Solar Flare "Time to max damage/attack speed"
+    # 7.42 proofread 2026-11-18: a wait before the spell acts (Gorgon's Grasp "Initial delay 1s -> 0.8s"), a shorter
+    # channel (Fiend's Gate), a charge that comes back sooner (Spellslinger "Salvo restore duration"), less of an own
+    # bonus lost (Tranquil Boots "Health Regen bonus lost … 14 -> 12") — all came out NERF
+    r'|initial\s+delay|channel\s+(?:duration|time)|restore\s+duration|bonus\s+lost'
     r')\b',
     re.I,
 )
@@ -560,6 +602,24 @@ def _heal_stats_renamed(clean):
     return bool(before) and before == after
 
 
+_EXTRA_CREEP_AT = re.compile(r'\b(?:time at which|timing)\b[^.]*\b(?:melee|ranged|siege|flagbearer|lane) creeps?\b'
+                             r'[^.]*\bfrom (\d{1,2}):(\d{2}) to (\d{1,2}):(\d{2})\b'
+                             r'|\b(?:melee|ranged|siege|flagbearer) creeps?[^.]*\b(?:is|are) added\b[^.]*'
+                             r'\bfrom (\d{1,2}):(\d{2}) to (\d{1,2}):(\d{2})\b', re.I)
+
+
+def _extra_creep_timing(clean):
+    """An extra lane creep coming earlier is its BUFF, later its NERF, whatever Valve's verb (owner 2026-10-16, 7.41
+    "+1 siege creep timing decreased from 35:00 to 30:00"; 7.42 "Time at which 1 Ranged creep is added changed from
+    40:00 to 35:00" said "changed" and came out REWORK). None for any other row."""
+    m = _EXTRA_CREEP_AT.search(clean)
+    if not m:
+        return None
+    g = [int(x) for x in m.groups() if x is not None]
+    old, new = g[0] * 60 + g[1], g[2] * 60 + g[3]
+    return None if old == new else ('BUFF' if new < old else 'NERF')
+
+
 def _guess_tag(text):
     """Heuristic tag from row text. Returns 'BUFF'/'NERF'/'REWORK'/'NEW'/'DEL'/
     'MISC'/'QoL'/None. None means caller should derive from b()/badge."""
@@ -571,6 +631,9 @@ def _guess_tag(text):
     for substr, tag in TAG_OVERRIDES.items():
         if substr.lower() in clean_lower:
             return tag
+    extra_creep = _extra_creep_timing(clean)
+    if extra_creep:
+        return extra_creep
     for rx, tag in CANONICAL_TAGS:
         if rx.search(clean):
             return tag

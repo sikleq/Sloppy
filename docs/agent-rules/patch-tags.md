@@ -779,3 +779,67 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   текстов игры обоих патчей, строка `covered=True`; врождённая с «Now levels up with …» / «Instead of …» (не MISC) и
   другим текстом игры → карточка «Innate reworked.» + `# TODO[covered]` для строк, которые она показывает
   (`_postprocess_innate_cards`). Тест `tests/test_generator_review_739.py`.
+
+## Вычитка 7.42 (2026-11-18) — замечания владельца и полная построчная вычитка
+
+Каждый пункт — правило генератора (`tools/patchgen`) с тестом; страница правилась теми же функциями.
+
+**Структура General Updates**
+- **Раздел механик: группа под подзаголовком Valve — свой блок** (`general._subtitle_mechanic`). В разделе с «Mechanics» в
+  названии группа строк под `Subtitle`, где меняются правила, а не числа (ни одной строки «from N to M»), — блок
+  `plain_header(<подзаголовок>, new="Reworked mechanic")`, как Item Potency. Почему не сработало: имя механики искали
+  только в тексте строк, а строки Pip Health / Spell Mechanics / Spell Power Reduction своё имя не повторяют. Hero Stats,
+  Gold and Experience (числа) и Miscellaneous остаются подгруппами. Подзаголовок Valve с тем же именем, что у блока,
+  не выводится (имя стояло дважды). Тест `test_mechanics_section_subtitle_groups_of_rule_changes_are_blocks`.
+- **Строка о Roshan — в его блок, даже когда блок уже есть** (`_postprocess_roshan_block`). Почему не сработало: при
+  готовом блоке (подзаголовок «Roshan» у Valve) функция только ставила ссылки на предметы и выходила; слова «gold» не было
+  в списке. Тест `test_general_rows_about_roshan_join_an_existing_roshan_block`.
+- **Лайн крипы — по карточкам крипов** (`_LANE_LINKS`): вид крипа, названный где угодно в строке («Number of melee creeps
+  spawned…», «Time at which 1 Ranged creep is added…»), — на его карточку; любая другая строка о «lane creeps» — в
+  подгруппу Lane Creeps и на страницы всех четырёх. Подзаголовок, из-под которого ушли все строки, убирается
+  (`_drop_empty_ul`). Лишний лайн крип раньше — BUFF при любом глаголе Valve (`tags._extra_creep_timing`: «changed from
+  40:00 to 35:00» давал REWORK).
+- **Дроп босса по смертям — таблицей** (`_postprocess_drop_table`): «Now always drops X» / «Starting with the Nth death,
+  always drops Y» в [?] → `mech_table(["When", "Drops", "Details"])`, предмет ссылкой.
+- **Значение растёт со смертями босса или с каждым использованием — `li_formula`** (`_postprocess_per_death`): «from 175 to
+  125 + 50 per Tormentor's death» → таблица по числу смертей 0…5 (столбец — число смертей, как пишет Valve, а не номер
+  убийства: по коду игры не проверено, с какой смерти идёт отсчёт); «200 + 300 per subsequent use → 200 + 200» → таблица
+  #1…#7, как Wisdom Shrine 7.41.
+- **Списки OLD: / NEW: с одинаковыми ключами — таблица «было / стало»** (`_postprocess_old_new_table`,
+  `mech_before_after`): осадные крипы 7.42 по отрезкам времени.
+- **Переделанная и переименованная способность юнита — карточка old → new** (`_postprocess_renamed_unit_ability`): строка
+  «Fireball ability renamed into Searing Swoop» среди строк Searing Swoop → `ability_change` с текстами игры обоих патчей
+  (`game_ability_pair`; способности крипов теперь читаются из `npc_abilities.txt` — `ability_kv._unit_blocks`), подпись
+  «Ability reworked.», строка о переименовании и словесные строки — `covered=True`.
+- **«General changes» нейтральных крипов со своими строками** (`entities._render_neutral_creep`): запись-ярлык
+  (`is_general_note`) выводилась без строк — на странице 7.42 пропали все 24 строки Valve (родные джунгли, убранные
+  лагеря, награды). Таблица «родные джунгли» на странице сделана руками.
+
+**Теги (канон в `tags.py`, тест `test_terrain_canon`)**
+- Ярус нейтрального предмета — REWORK, не число: «Tier changed from 5 to 4» (29 строк), «Tiers changed from 1-4 to 1-3»,
+  «Number of item tiers decreased…» стояли `b(5, 4)` — красный «−20%».
+- «Now fully / partially disabled by Break» — NERF: у всех 19 врождённых `IsBreakable` в 7.41f нет, в 7.42 «1» — новая
+  слабость, как «is now dispellable». Стояли NEW.
+- «… now works with illusions», «… now pierces debuff immunity», «now has fragile pip health» — NEW (новое свойство;
+  7.38–7.41 «Now pierces Debuff Immunity» = NEW). Стояли MISC.
+- «… now cannot be dispelled» у своего эффекта — BUFF и не в начале строки («Force's push now cannot be dispelled»).
+- «No longer has reduced damage taken from allies…» (варды) — DEL: ушла защита, а не штраф.
+- Ландшафт другими словами: «moved to the top…», «moved ever so slightly to…», «moved ~300 units», «rearranged»,
+  «amount of highground», «Spawn boxes of … have been decreased» — REWORK.
+- Меньше — лучше (`LOWER_IS_BUFF`): «Initial delay», «Channel duration», «restore duration», «bonus lost».
+- Исключения линтера, оставленные сознательно: Mordiggian's Oath нового предмета и Zombie Bite (новая способность Undying
+  от Aghanim's Shard) — NEW (описание новой способности, канон читает «increase» как BUFF);
+  Blur «Now the effect is removed only if the revealing enemy stays…» — BUFF (раскрыть труднее; канон читает «removed»);
+  Requiem «Now has a base … duration … and no longer has a max duration» — REWORK (смена правила, не удаление).
+
+**Числа**
+- **«X + Y per level» с обеих сторон — всегда `li_formula`** (`post_stats._formula_diff_row`): генератор не читал «per hero
+  level», формулу с минусом («51% - 1% per level», «215s - 5s per level»), «%» только у одного числа, сторону без базы
+  («0.5% per level») и строку с [?] — 8 строк стояли без таблицы или с кнопкой вокруг одной стороны. Строка о кулдауне /
+  штрафе получает `l=True`.
+- **Тихие строки статов помечены** (`_postprocess_silent_stats`): строка, которую генератор добавил по файлам игры,
+  получает [?] «Not in the patch notes: found in the game files»; стат, который заметка меняет другими словами («Damage
+  bonus changed from +18/12 for melee/ranged heroes to +15 for any wearer»), второй строкой не добавляется.
+- **Ошибки Valve 7.42** (`wrong-word` + `note_box`, значения из `data/stats/7.41f` и 7.42): Mandible 65% (было 50%), Ice
+  Blast 450 (400), Raptor Dive 150 (130), Tormentor Reflect 35% (30% с 7.41), Satyr Banisher Purge 500 (550), Kobold
+  Soldier Break 4.5s (в файлах 7.42 — 5s).

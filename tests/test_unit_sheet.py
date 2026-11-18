@@ -116,6 +116,8 @@ def test_the_sheet_has_no_tag_chips_but_keeps_its_tags_for_filters():
         assert 'class="badge' not in html and "us-chips" not in html
     assert 'data-tag="buff new"' in us.render(nums)
     assert re.search(r"ul\.changes li\.unit-sheet \{\s*display: grid; grid-template-columns: 130px", read_css())  # short bars
+    # owner 2026-11-18, 7.42 Eimermole (0 mana): the health bar alone must not stretch over both tile rows
+    assert re.search(r"\.us-bar:only-child \{ align-self: start; height: calc\(50% - 2px\); \}", read_css())
 
 
 def test_the_rows_under_the_sheet_keep_the_patch_cells_counted():

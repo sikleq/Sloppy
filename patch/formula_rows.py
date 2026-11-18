@@ -250,7 +250,8 @@ def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_bett
 
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
                rework_badge=True, inline_note_text=None, label=None,
-               force_rework=False, **bf_kwargs):
+               force_rework=False, extra_html=None, **bf_kwargs):
+    """extra_html: a box that goes before the table (note_box of a wrongly stated "from", 7.42 Tormentor Reflect)."""
     from .badges import bf
     if label:
         bf_kwargs.setdefault('axis_label', label)
@@ -282,4 +283,6 @@ def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
     extra = table
     if inline_note_text:
         extra = inline_note(inline_note_text) + extra
+    if extra_html:
+        extra = extra_html + extra
     return li(full_text, full_badge, extra=extra)
