@@ -51,6 +51,19 @@ def test_live_formula_has_a_field_per_variable_results_and_chart():
     assert 'data-fx-chart="VictimLevel" data-fx-lo="1" data-fx-hi="30"' in html
 
 
+def test_gap_between_curves_splits_where_they_cross():
+    # 7.42 bounty: less gold below level 12.5 (red), more above (green)
+    from patch.formula_rows import _fx_gap_pieces
+    xs = list(range(1, 31))
+    pieces = _fx_gap_pieces(xs, [125 + 8 * x for x in xs], [100 + 10 * x for x in xs])
+    assert [s for s, _ in pieces] == [-1, 1]
+    assert pieces[0][1][-1] == pieces[1][1][0] and abs(pieces[0][1][-1][0] - 12.5) < 1e-9
+    html = formula_change("Hero kill bounty", "125 + (8 * VictimLevel)", "100 + (10 * VictimLevel)",
+                          inputs={"VictimLevel": 15}, chart=("VictimLevel", "Victim Level", 1, 30), unit="Gold")
+    assert html.index('fx-gap fx-loss') < html.index('fx-gap fx-gain') < html.index('fx-line-old')
+    assert '>250</text>' in html and '>245</text>' in html and 'fx-axis-y' in html
+
+
 def test_the_740_table_form_is_unchanged():
     html = formula_change("Assist Gold Formula", "60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )",
                           "15 + ( ( 50 + ( VictimNetworth * 0.037 ) ) / NumHeroes )",
