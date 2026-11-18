@@ -442,7 +442,8 @@ def hero_header(name):
 </div>'''
 
 
-def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, new_mech=None, track=False, page=None):
+def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, new_mech=None, track=False, page=None,
+                old_title=None):
     """`new="New Neutral Creep"` renders the same NEW-entity block as
     item_header(new=...): is-new block + type label after the name. Pair it with unit_sheet(slug) for its numbers and t("NEW") ability rows (the
     is-new CSS hides per-row chips but keeps data-tag="new" for the filter).
@@ -481,6 +482,9 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
         name_html = f'<a class="entity-link" href="{href}">{name}</a>'
     else:            # General Updates (Roshan, Tormentor…): no dynamics id, no page
         name_html = name
+    if old_title and old_title != name:   # a renamed unit: "Old → New", as an ability, an item, a facet (2026-11-19)
+        name_html = (f'<span class="ability-title-rename"><span class="ability-title-old">{old_title}</span>'
+                     f'<span class="ability-title-arrow">→</span>{name_html}</span>')
     return head + f'''<div class="entity unit-entity"{kind_attr}{eid}>
   <div class="entity-icon hero-icon">{img}</div>
   <div class="entity-name">{name_html}{type_label}</div>

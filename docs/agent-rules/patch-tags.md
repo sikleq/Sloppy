@@ -843,3 +843,34 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - **Ошибки Valve 7.42** (`wrong-word` + `note_box`, значения из `data/stats/7.41f` и 7.42): Mandible 65% (было 50%), Ice
   Blast 450 (400), Raptor Dive 150 (130), Tormentor Reflect 35% (30% с 7.41), Satyr Banisher Purge 500 (550), Kobold
   Soldier Break 4.5s (в файлах 7.42 — 5s).
+
+### Вычитка 7.42, второй круг (владелец 2026-11-19)
+
+- **Таблица Valve текстом в [?] — настоящая таблица** (`post_tables._postprocess_dash_table`): строки «Level -- Old -- New
+  -- Total Increase» → `mech_table`, фраза Valve с формулой — последней строкой таблицы, формула в виде формул сайта
+  (`mech_formula`); «Tier 1 - 0:00» → таблица «что / когда». Список «X decreased from A to B» в [?] (награда за
+  здания) → таблица «было / стало» (`_postprocess_from_to_list`). Группы «Radiant Jungle» + «Small camps: a; b» →
+  одна таблица (`_postprocess_grouped_lists`). Список Valve со звёздочками («* Couriers<br>* …») → `inline_list` без
+  звёздочек: блок механики открывает его таблицей значков (`_postprocess_star_lists`).
+- **Новые способности новых крипов — карточки «New ability»** с текстом игры (`_postprocess_new_creep_abilities`), строка
+  Valve и строка «New Level N … Creep» с числами — под карточкой скрыты (числа уже в листе юнита). Значок — тот, что
+  рисует игра (`AbilityTextureName`, `new_ability(icon_url=)`). `fetch_icons.py` теперь читает все страницы `dist/**`
+  — страницы патчей лежат в `dist/patches/`, их значки раньше не докачивались.
+- **Способность юнита заменена или переделана — карточка old → new** (`_postprocess_renamed_unit_ability`): кроме
+  переименования, «X ability replaced with Y» (Mud Golem, «New ability.», старая сторона из файлов 7.41f) и «Ability
+  Reworked» (Kobold Soldier, «Ability reworked.»).
+- **Все переименования — одним видом** (`_postprocess_renames`): «Старое → Новое» в заголовке, строки о переименовании нет;
+  у юнита — `unit_header(old_title=)` (Dark Troll Trapper ← Hill Troll), у способности предмета, которую карточка уже
+  показывает под новым именем, строка скрыта (`covered=True`, Tranquil Boots Break → Respite).
+- **Строка новой способности предмета остаётся, если добавляет что-то к карточке** (`item_ability_text._restates`):
+  Revenant's Brooch терял «Counts as a critical strike…» и число с Dormant Curio.
+- **Формулы «per N levels» и «N at all times»** (`post_stats._side_formula`): Shadow Shaman Fowl Play.
+- **Tormentor — по коду игры** (server.dll 6978, агент dota2-ida-researcher, CONFIRMED_DLL): один счётчик смертей на
+  матч; N-е убийство платит 125 + 50 × (N − 1), без потолка; Reflect = min(15 + 5 × смерти, 30) + 1.5% за минуту
+  после потолка. Столбцы таблиц — номер Tormentor в матче (#1, #2 …). Если со 2-го убийства Aghanim's Shard никто не
+  получает — по 415 золота каждому (в заметках Valve числа нет).
+- Направление: «establishing time», «return time» — меньше лучше; «Advances Cooldown» у таланта — меньше хуже; «from 325
+  to 300 + 1x <Hero>'s Strength» — REWORK. Исключение линтера: Lone Druid «Disarm Range bonus changed from Global to
+  +200» — NERF (была вся карта), канон читает REWORK.
+- Чипы Terrain с несколькими видами изменений — виды в одну строку через тонкую черту (`terrain-controls.css`):
+  столбиком такие чипы были в 2–3 раза выше остальных.

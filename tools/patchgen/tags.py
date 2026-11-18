@@ -196,6 +196,9 @@ CANONICAL_TAGS = [
                 r"^Aghanim's (?:Scepter|Shard) now also increases\b|\bheal now also applies\b|"
                 r"\bnow count towards the\b", re.I), 'BUFF'),
     (re.compile(r'^[A-Z]\w+ now has [A-Z][\w\' ]+ ability$'), 'NEW'),            # "Fire now has Cinder Dash ability"
+    # a flat number traded for one that grows with an attribute ("Damage rescaled from 325 to 300 + 1x Primal
+    # Beast's Strength", 7.42): no single %, the row is a change of form
+    (re.compile(r"\bfrom \d+(?:\.\d+)? to \d+(?:\.\d+)? \+ [\d.]+x [\w' ]+?(?:Strength|Agility|Intelligence)\b"), 'REWORK'),
     # the item's debuff does more now ("Nullify now also makes the target … 60% less susceptible to forced movement")
     (re.compile(r'\bnow also makes the target\b', re.I), 'BUFF'),
     # a self-cast that gave nothing now gives half ("Shine now provides all bonuses on self-cast, but they will be
@@ -377,12 +380,15 @@ LOWER_IS_BUFF = re.compile(
     # channel (Fiend's Gate), a charge that comes back sooner (Spellslinger "Salvo restore duration"), less of an own
     # bonus lost (Tranquil Boots "Health Regen bonus lost … 14 -> 12") — all came out NERF
     r'|initial\s+delay|channel\s+(?:duration|time)|restore\s+duration|bonus\s+lost'
+    # … and the waits of 7.42's heroes (Weaver "Thread establishing time", Dazzle "Soul Return Time")
+    r'|establishing\s+time|return\s+time'
     r')\b',
     re.I,
 )
 _NOT_LOWER_IS_BUFF = re.compile(
     r'\bcooldown\s+reduction\b'
     r'|\bcooldown\s+advance\b'
+    r'|\badvances\s+cooldown\b'                       # 7.42 "Duel Advances Cooldown on Victory decreased" = a cut
     r'|\bcooldown\s+(?:speed|recovery)\b'
     r'|\bmana\s+cost\s+reduction\b'
     r'|\bmana\s*cost(?:/\w+)?\s+reduction\b'          # "Manacost/Manaloss Reduction increased" (7.40 talent)

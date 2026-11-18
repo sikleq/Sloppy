@@ -10,7 +10,7 @@ def build():
     W(plain_header("Pip Health", new="Reworked mechanic"))
     W(ul_open())
     W(li("Standardized rules for units that take a fixed number of hits to destroy and unified the terminology", t("REWORK"), force_tag="rework misc"))
-    W(li("All units are now able to damage units with health bar pips", t("REWORK"), extra=inline_note("* Couriers<br>* Observer Wards<br>* Sentry Wards<br>* Clinkz' Skeleton Archers<br>* Clockwerk's Power Cogs<br>* Grimstroke's Phantom's Embrace<br>* Gyrocopter's Homing Missile<br>* Juggernaut's Healing Ward<br>* Keeper of the Light's Will-O-Wisp<br>* Lich's Ice Spire<br>* Phoenix's Supernova<br>* Pugna's Nether Ward<br>* Radigull's Eggstremism<br>* Roshan's Banner<br>* Shadow Shaman's Mass Serpent Wards<br>* Shadow Shaman's Urnaconda<br>* Techies' M.A.D.<br>* Techies' Proximity Mines<br>* Templar Assassin's Psionic Trap<br>* Tidehunter's Dead in the Water<br>* Treant Protector's Eyes in the Forest<br>* Undying's Tombstone<br>* Undying's Tombstone Zombies<br>* Weaver's The Swarm<br>* Zeus' Nimbus"), force_tag="rework misc"))
+    W(li("All units are now able to damage units with health bar pips", t("REWORK"), extra=inline_list("Couriers<br>Observer Wards<br>Sentry Wards<br>Clinkz' Skeleton Archers<br>Clockwerk's Power Cogs<br>Grimstroke's Phantom's Embrace<br>Gyrocopter's Homing Missile<br>Juggernaut's Healing Ward<br>Keeper of the Light's Will-O-Wisp<br>Lich's Ice Spire<br>Phoenix's Supernova<br>Pugna's Nether Ward<br>Radigull's Eggstremism<br>Roshan's Banner<br>Shadow Shaman's Mass Serpent Wards<br>Shadow Shaman's Urnaconda<br>Techies' M.A.D.<br>Techies' Proximity Mines<br>Templar Assassin's Psionic Trap<br>Tidehunter's Dead in the Water<br>Treant Protector's Eyes in the Forest<br>Undying's Tombstone<br>Undying's Tombstone Zombies<br>Weaver's The Swarm<br>Zeus' Nimbus"), force_tag="rework misc"))
     W(li("Attacks from heroes, Roshan, towers, and the fountain deal 1 full pip per attack", t("REWORK"), force_tag="rework misc"))
     W(li("Attacks from illusions and creeps deal 1/4 pip per attack", t("REWORK"), force_tag="rework misc"))
     W(li("Some units have a Fragile debuff that causes them to take two pips of damage from melee heroes", t("REWORK"), extra=inline_note("Courier, Templar Assassin's Psionic Trap, Zeus's Nimbus, and Roshan's Banner"), force_tag="rework misc"))
@@ -20,7 +20,7 @@ def build():
     W(plain_header("Spell Mechanics", new="Reworked mechanic"))
     W(ul_open())
     W(li("Leashes that do not expressly pierce debuff immunity (such as Slark's Pounce) will no longer prevent movement-based abilities from being executed even if they are applied after the target becomes debuff immune", t("REWORK"), force_tag="rework misc"))
-    W(li("Abilities that pierce debuff immunity no longer ignore the magic resistance provided by debuff immunity", t("REWORK"), extra=inline_note("* Ancient Apparition: Ice Blast <br> * Batrider: Flaming Lasso <br> * Beastmaster: Primal Roar <br> * Clockwerk: Hookshot <br> * Dark Seer: Wall of Replica <br> * Dawnbreaker: Solar Guardian <br> * Dragon Knight: Elder Dragon Form (Corrosive Breath) <br> * Earth Spirit: Magnetize <br> * Elder Titan: Earth Splitter <br> * Faceless Void: Time Lock <br> * Huskar: Life Break <br> * Lifestealer: Infest <br> * Lone Druid: Entangle <br> * Magnus: Reverse Polarity <br> * Phoenix: Supernova <br> * Primal Beast: Pulverize <br> * Pudge: Dismember <br> * Shadow Demon: Demonic Purge <br> * Spirit Breaker: Nether Strike <br> * Treant Protector: Overgrowth <br> * Vengeful Spirit: Nether Swap <br> * Viper: Viper Strike <br> * Void Spirit: Astral Step <br> * Warlock: Chaotic Offering (Permanent Immolation)"), force_tag="rework misc"))
+    W(li("Abilities that pierce debuff immunity no longer ignore the magic resistance provided by debuff immunity", t("REWORK"), extra=inline_list("Ancient Apparition: Ice Blast<br>Batrider: Flaming Lasso<br>Beastmaster: Primal Roar<br>Clockwerk: Hookshot<br>Dark Seer: Wall of Replica<br>Dawnbreaker: Solar Guardian<br>Dragon Knight: Elder Dragon Form (Corrosive Breath)<br>Earth Spirit: Magnetize<br>Elder Titan: Earth Splitter<br>Faceless Void: Time Lock<br>Huskar: Life Break<br>Lifestealer: Infest<br>Lone Druid: Entangle<br>Magnus: Reverse Polarity<br>Phoenix: Supernova<br>Primal Beast: Pulverize<br>Pudge: Dismember<br>Shadow Demon: Demonic Purge<br>Spirit Breaker: Nether Strike<br>Treant Protector: Overgrowth<br>Vengeful Spirit: Nether Swap<br>Viper: Viper Strike<br>Void Spirit: Astral Step<br>Warlock: Chaotic Offering (Permanent Immolation)"), force_tag="rework misc"))
     W(li("Spell Lifesteal from multiple copies of the same item now stack additively (e.g. two Voodoo Masks will provide +30%)", t("REWORK"), extra=inline_note("Previously they did not stack at all"), force_tag="rework misc"))
     W(li("Breakability rules of many innates updated", t("REWORK"), force_tag="rework misc"))
     W(li("Specifics for this changes can be found in the corresponding ability notes", t("REWORK"), force_tag="rework misc"))
@@ -56,8 +56,8 @@ def build():
     W(subgroup("Gold and Experience"))
     W(formula_change("Hero kill bounty", "125 + (8 * VictimLevel) + KillstreakFactor", "100 + (10 * VictimLevel) + KillstreakFactor", tag="REWORK", inputs={"VictimLevel": 15, "KillstreakFactor": 0}, chart=("VictimLevel", "Victim Level", 1, 30), unit="Gold"))
     W(ul_open())
-    W(li("Total amount of experience needed to reach level 30 increased from 64400 to 66600", b(64400, 66600), extra=inline_note("Level -- Old -- New -- Total Increase<br>2 -- 240 -- 250 -- 10<br>3 -- 400 -- 400 -- 10<br>4 -- 520 -- 550 -- 40<br>5 -- 600 -- 800 -- 240<br>6 -- 680 -- 850 -- 410<br>7 -- 760 -- 925 -- 575<br>8 -- 800 -- 1050 -- 825<br>9 -- 900 -- 1150 -- 1075<br>10 -- 1000 -- 1225 -- 1300<br>11 -- 1100 -- 1300 -- 1500<br>12 -- 1200 -- 1375 -- 1675<br>13 -- 1300 -- 1450 -- 1825<br>14 -- 1400 -- 1525 -- 1950<br>15 -- 1500 -- 1600 -- 2050<br>16 -- 1600 -- 1675 -- 2125<br>17 -- 1700 -- 1750 -- 2175<br>18 -- 1800 -- 1825 -- 2200<br>19 -- 1900 -- 1900 -- 2200<br>20 -- 2000 -- 2000 -- 2200<br>21 -- 2200 -- 2200 -- 2200<br>22 -- 2400 -- 2400 -- 2200<br>23 -- 2600 -- 2600 -- 2200<br>24 -- 2800 -- 2800 -- 2200<br>25 -- 3000 -- 3000 -- 2200<br>26 -- 4000 -- 4000 -- 2200<br>27 -- 5000 -- 5000 -- 2200<br>28 -- 6000 -- 6000 -- 2200<br>29 -- 7000 -- 7000 -- 2200<br>30 -- 8000 -- 8000 -- 2200<br><br>An easy way to approximate the xp needed per level is to use this formula: 0.000976484x^5 − 0.0159378x^4 − 0.247763x^3 + 1.81832x^2 + 132.642x + 147.113 where X is the current level of the hero")))
-    W(li("Building bounty decreased", t("NERF"), extra=inline_note("Tier 1 tower last hit gold decreased from 110-130 to 100<br>Tier 1 tower gold per player decreased from 90 to 75<br>Tier 2 tower last hit gold decreased from 130-150 to 125<br>Tier 2 tower gold per player decreased from 110 to 100<br>Tier 3 tower last hit gold decreased from 150-170 to 150<br>Tier 4 tower last hit gold rescaled from 170-190 to 175<br>Tier 4 tower gold per player increased from 145 to 150<br>Barracks last hit gold rescaled from 90-135 to 100<br>Melee Barracks gold per player decreased from 155 to 125<br>Ranged Barracks gold per player increased from 90 to 100")))
+    W(li("Total amount of experience needed to reach level 30 increased from 64400 to 66600", b(64400, 66600), extra=mech_table(["Level", "Old", "New", "Total Increase"], [["2", "240", "250", "10"], ["3", "400", "400", "10"], ["4", "520", "550", "40"], ["5", "600", "800", "240"], ["6", "680", "850", "410"], ["7", "760", "925", "575"], ["8", "800", "1050", "825"], ["9", "900", "1150", "1075"], ["10", "1000", "1225", "1300"], ["11", "1100", "1300", "1500"], ["12", "1200", "1375", "1675"], ["13", "1300", "1450", "1825"], ["14", "1400", "1525", "1950"], ["15", "1500", "1600", "2050"], ["16", "1600", "1675", "2125"], ["17", "1700", "1750", "2175"], ["18", "1800", "1825", "2200"], ["19", "1900", "1900", "2200"], ["20", "2000", "2000", "2200"], ["21", "2200", "2200", "2200"], ["22", "2400", "2400", "2200"], ["23", "2600", "2600", "2200"], ["24", "2800", "2800", "2200"], ["25", "3000", "3000", "2200"], ["26", "4000", "4000", "2200"], ["27", "5000", "5000", "2200"], ["28", "6000", "6000", "2200"], ["29", "7000", "7000", "2200"], ["30", "8000", "8000", "2200"], "An easy way to approximate the xp needed per level is to use this formula: " + mech_formula("0.000976484x^5 − 0.0159378x^4 − 0.247763x^3 + 1.81832x^2 + 132.642x + 147.113") + " " + "where X is the current level of the hero"], labels=False)))
+    W(li("Building bounty decreased", t("NERF"), extra=mech_before_after("Change", [("Tier 1 tower last hit gold", "110-130", "100"), ("Tier 1 tower gold per player", "90", "75"), ("Tier 2 tower last hit gold", "130-150", "125"), ("Tier 2 tower gold per player", "110", "100"), ("Tier 3 tower last hit gold", "150-170", "150"), ("Tier 4 tower last hit gold", "170-190", "175"), ("Tier 4 tower gold per player", "145", "150"), ("Barracks last hit gold", "90-135", "100"), ("Melee Barracks gold per player", "155", "125"), ("Ranged Barracks gold per player", "90", "100")])))
     W(li("Passive gold per minute no longer scales over game time", t("MISC"), extra=inline_note("Used to increase from 90 to 111 at 60:00. Now it's a constant 90 gold per minute — " + b(90, 111))))
     W(li("Buildings no longer have variable last hit bounties", t("MISC")))
     W(li("All heroes now passively receive 50 experience per minute after the starting horn", t("MISC"), extra=inline_note("Experience is gained even while dead")))
@@ -103,9 +103,11 @@ def build():
     W(plain_header("Map Objectives"))
     W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
-    W(li("Now drops several items, similarly to Roshan", t("NEW"), extra=mech_table(["When", "Drops", "Details"], [["Every death", item_link("Greater Horn of Battle"), "New consumable item that summons a wave of Mega creeps on each of your lanes"], ["From the 2nd death", item_link("Aghanim's Shard"), "With the same automatic distribution mechanics as before. If everyone on the killing team has an Aghanim’s Shard, a gold bounty is awarded instead"]], wide_last=True)))
+    W(li("Now drops several items, similarly to Roshan", t("NEW"), extra=mech_table(["When", "Drops", "Details"], [["Every death", item_link("Greater Horn of Battle"), "New consumable item that summons a wave of Mega creeps on each of your lanes"], ["From the 2nd death", item_link("Aghanim's Shard"), "With the same automatic distribution mechanics as before. If everyone on the killing team has an Aghanim’s Shard, a gold bounty is awarded instead (415 gold to each hero, found in the game\'s code)"]], wide_last=True)))
     W(li("Initial spawn time decreased from 20:00 to 15:00", t("REWORK")))
-    W(li_formula("Gold reward per player changed", "175", "125 + 50 per Tormentor's death", lambda N: 175, lambda N: 125 + 50 * N, levels=[0, 1, 2, 3, 4, 5], label="Tormentor deaths", rework_badge=False))
+    # server.dll of build 6978: one deaths counter for the match, raised before the payout — the N-th kill pays
+    # 125 + 50 × (N − 1), no cap (dota2-ida-researcher 2026-11-19, CONFIRMED_DLL)
+    W(li_formula("Gold reward per player changed", "175", "125 + 50 per Tormentor's death", lambda N: 175, lambda N: 125 + 50 * (N - 1), levels=[1, 2, 3, 4, 5, 6], level_fmt=lambda N: f"#{N}", jump_at=None, rework_badge=False, inline_note_text="Columns: the Tormentor's number in the match. No upper limit"))
     W(ul_close())
     W(ability("Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png"))
     W(ul_open())
@@ -115,7 +117,7 @@ def build():
     W(ul_open())
     # Valve's "from 35%" is wrong: miniboss_reflect passive_reflection_pct is 30 in the files of 7.41c–7.41f (7.41:
     # "decreased from 50% to 30%"); the old column is the real 30%
-    W(li_formula("Base damage reflection decreased", '<span class="wrong-word">35%</span>', "15% + 5% per Tormentor death, up to 30%", lambda N: 30, lambda N: min(30, 15 + 5 * N), levels=[0, 1, 2, 3, 4, 5], label="Tormentor deaths", rework_badge=False, value_fmt="{:g}%", inline_note_text="Still grows over time",
+    W(li_formula("Base damage reflection decreased", '<span class="wrong-word">35%</span>', "15% + 5% per Tormentor death, up to 30%", lambda N: 30, lambda N: min(30, 15 + 5 * (N - 1)), levels=[1, 2, 3, 4, 5, 6], level_fmt=lambda N: f"#{N}", jump_at=None, rework_badge=False, value_fmt="{:g}%", inline_note_text="Still grows over time: +1.5% per minute of the game, on top of the 30% limit. Columns: the Tormentor's number in the match",
                  extra_html=note_box('This change is wrongly stated. It was 30% since 7.41; the real change is 30% &rarr; 15% + 5% per Tormentor death, up to 30%')))
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
@@ -210,13 +212,18 @@ def build():
     W(ul_open())
     W(li("Gold Bounty decreased from 12-14 to 11-13", br(12, 14, 11, 13)))
     W(ul_close())
-    W(ability("Steal Weapon", icon_url="../icons/abilities/kobold_disarm.png"))
-    W(ul_open())
-    W(li("Ability Reworked", t("REWORK"), extra=inline_note("No longer disarms enemies on the third attack")))
-    # Valve's 4.5s at level 4 is not what the game has: kobold_disarm break_duration is "3.0 3.5 4.0 5.0" in 7.42
-    W(li('After a 1s cast time, pierces all enemies in a line, dealing 50/60/70/80 magical damage and applying Break for 3/3.5/4/<span class="wrong-word">4.5s</span> to all affected units', t("MISC"), extra=note_box('This value is wrongly stated. Break lasts 3/3.5/4/5s in the game files of 7.42')))
-    W(li("Cast Range 500. No Mana Cost. Cooldown: 9s", t("MISC")))
-    W(ul_close())
+    _kobold_disarm_old, _kobold_disarm_new = game_ability_pair("kobold_disarm", "7.42")
+    W(ability_change(
+        old=dict(name="Steal Weapon", icon_url="../icons/abilities/kobold_disarm.png", desc=_kobold_disarm_old),
+        new=dict(name="Steal Weapon", icon_url="../icons/abilities/kobold_disarm.png", desc=_kobold_disarm_new),
+        summary="Ability reworked.",
+        tag="rework",
+        rows_first=lambda: [
+            li("Ability Reworked", t("REWORK"), extra=inline_note("No longer disarms enemies on the third attack"), covered=True),
+            # Valve's 4.5s at level 4 is not what the game has: kobold_disarm break_duration is "3.0 3.5 4.0 5.0" in 7.42
+            li('After a 1s cast time, pierces all enemies in a line, dealing 50/60/70/80 magical damage and applying Break for 3/3.5/4/<span class="wrong-word">4.5s</span> to all affected units', t("MISC"), extra=note_box('This value is wrongly stated. Break lasts 3/3.5/4/5s in the game files of 7.42')),
+            li("Cast Range 500. No Mana Cost. Cooldown: 9s", t("MISC"), covered=True),
+        ]))
 
     # Kobold
     W(unit_header("Kobold", NEUTRAL_CDN + "kobold.png"))
@@ -266,33 +273,46 @@ def build():
 
     # Mud Golem
     W(unit_header("Mud Golem", NEUTRAL_CDN + "mud_golem.png"))
-    W(ability("Hurl Boulder", icon_url="../icons/abilities/mud_golem_hurl_boulder.png"))
-    W(ul_open())
-    W(li("Hurl Boulder ability replaced with Hurl Big Boulder", t("REWORK"), extra=inline_note("After a 1s windup, throws a big slow boulder that deals 75/85/95/105 physical damage and stuns all enemies for 2s in a 175 area<br>Cast Range: 800. No Mana Cost. Cooldown: 15s. Cast Point: 1s")))
-    W(ul_close())
+    W(ability_change(
+        old=dict(name="Hurl Boulder", icon_url="../icons/abilities/mud_golem_hurl_boulder.png", desc=game_ability_desc("mud_golem_hurl_boulder", "7.41f")),
+        new=dict(name="Hurl Big Boulder", icon_url="../icons/abilities/mud_golem_hurl_boulder.png", desc=game_ability_desc("mud_golem_hurl_big_boulder", "7.42")),
+        summary="New ability.",
+        tag="new",
+        rows_first=lambda: [
+            li("Hurl Boulder ability replaced with Hurl Big Boulder", t("REWORK"), extra=inline_note("After a 1s windup, throws a big slow boulder that deals 75/85/95/105 physical damage and stuns all enemies for 2s in a 175 area<br>Cast Range: 800. No Mana Cost. Cooldown: 15s. Cast Point: 1s"), covered=True),
+        ]))
 
     # Radigull
     W(unit_header("Radigull", NEUTRAL_CDN + "radigull.png", new="New Level 4 Ranged Creep"))
     W(ul_open())
     W(unit_sheet("radigull", version="7.42"))
-    W(li("New Level 4 Ranged Creep", t("MISC"), extra=inline_note("800 Health<br>30-32 Damage<br>400 Mana<br>0 Armor<br>30% Magic Resistance<br>400 Attack Range<br>310 Movement Speed<br>34-36 Gold Bounty<br>62 XP Bounty")))
-    W(li("Eggstremism: Active Ability", t("MISC"), extra=inline_note("Radigull places 2 eggs on both sides near the aggressor. Eggs explode 2s later, dealing 125/150/175/200 magical damage and silencing enemies caught in the 150 AoE. Eggs have 1 pip of health and can be destroyed to prevent the explosion. Silence Duration: 2s<br>Cast Range: 400. Mana Cost: 75. Cooldown: 15s. Cast Point: 0.4s")))
+    W(li("New Level 4 Ranged Creep", t("MISC"), extra=inline_note("800 Health<br>30-32 Damage<br>400 Mana<br>0 Armor<br>30% Magic Resistance<br>400 Attack Range<br>310 Movement Speed<br>34-36 Gold Bounty<br>62 XP Bounty"), covered=True))
+    W(ul_close())
+    W(new_ability("Eggstremism", "radigull_eggstremism", version="7.42", icon_url="../icons/abilities/radigull_eggstremism.png"))
+    W(ul_open())
+    W(li("Eggstremism: Active Ability", t("MISC"), extra=inline_note("Radigull places 2 eggs on both sides near the aggressor. Eggs explode 2s later, dealing 125/150/175/200 magical damage and silencing enemies caught in the 150 AoE. Eggs have 1 pip of health and can be destroyed to prevent the explosion. Silence Duration: 2s<br>Cast Range: 400. Mana Cost: 75. Cooldown: 15s. Cast Point: 0.4s"), covered=True))
     W(ul_close())
 
     # Odobenus Frostmage
     W(unit_header("Odobenus Frostmage", NEUTRAL_CDN + "odobenus_frostmage.png", new="New Level 5 Melee Creep"))
     W(ul_open())
     W(unit_sheet("odobenus_frostmage", version="7.42"))
-    W(li("New Level 5 Melee Creep", t("MISC"), extra=inline_note("600 Health<br>26-30 Damage<br>300 Mana<br>350 Movement Speed<br>150 Attack Speed<br>3 Armor<br>0% Magic Resistance<br>32-34 Gold Bounty<br>60 XP Bounty")))
-    W(li("Snowball Shot: Active Ability", t("MISC"), extra=inline_note("Launches a snowball at the target enemy. The snowball bounces between allied and enemy units, slowing and damaging enemies, while healing allies. Damage/Heal: 70/80/90/100. Bounces: 4/6/8/12. Bounce Range: 500. Slow: 100%. Slow Duration: 1s<br>Cast Range: 575. Mana Cost: 100. Cooldown: 15s. Cast Point: 0.2s")))
+    W(li("New Level 5 Melee Creep", t("MISC"), extra=inline_note("600 Health<br>26-30 Damage<br>300 Mana<br>350 Movement Speed<br>150 Attack Speed<br>3 Armor<br>0% Magic Resistance<br>32-34 Gold Bounty<br>60 XP Bounty"), covered=True))
+    W(ul_close())
+    W(new_ability("Snowball Shot", "warpine_raider_seed_shot", version="7.42", icon_url="../icons/abilities/odobenus_frostmage_snowball_shot.png"))
+    W(ul_open())
+    W(li("Snowball Shot: Active Ability", t("MISC"), extra=inline_note("Launches a snowball at the target enemy. The snowball bounces between allied and enemy units, slowing and damaging enemies, while healing allies. Damage/Heal: 70/80/90/100. Bounces: 4/6/8/12. Bounce Range: 500. Slow: 100%. Slow Duration: 1s<br>Cast Range: 575. Mana Cost: 100. Cooldown: 15s. Cast Point: 0.2s"), covered=True))
     W(ul_close())
 
     # Odobenus Footman
     W(unit_header("Odobenus Footman", NEUTRAL_CDN + "odobenus_footman.png", new="New Level 3 Melee Creep"))
     W(ul_open())
     W(unit_sheet("odobenus_footman", version="7.42"))
-    W(li("New Level 3 Melee Creep", t("MISC"), extra=inline_note("500 Health<br>16-18 Damage<br>200 Mana<br>350 Movement Speed<br>125 Attack Speed<br>1 Armor<br>0% Magic Resistance<br>18-22 Gold Bounty<br>40 XP Bounty")))
-    W(li("Odobenus Blight: Passive Ability", t("MISC"), extra=inline_note("Attacks reduce the target's armor by 2/3/4/5 for 4 seconds")))
+    W(li("New Level 3 Melee Creep", t("MISC"), extra=inline_note("500 Health<br>16-18 Damage<br>200 Mana<br>350 Movement Speed<br>125 Attack Speed<br>1 Armor<br>0% Magic Resistance<br>18-22 Gold Bounty<br>40 XP Bounty"), covered=True))
+    W(ul_close())
+    W(new_ability("Odobenus Blight", "odobenus_blight", version="7.42", icon_url="../icons/abilities/odobenus_footman_odobenus_blight.png"))
+    W(ul_open())
+    W(li("Odobenus Blight: Passive Ability", t("MISC"), extra=inline_note("Attacks reduce the target's armor by 2/3/4/5 for 4 seconds"), covered=True))
     W(ul_close())
 
     # Centaur Conqueror
@@ -308,10 +328,7 @@ def build():
     W(ul_close())
 
     # Dark Troll Trapper
-    W(unit_header("Dark Troll Trapper", NEUTRAL_CDN + "dark_troll.png"))
-    W(ul_open())
-    W(li("Hill Troll (from Dark Troll camp) renamed to Dark Troll Trapper", t("MISC")))
-    W(ul_close())
+    W(unit_header("Dark Troll Trapper", NEUTRAL_CDN + "dark_troll.png", old_title="Hill Troll"))
 
     # Satyr Tormenter
     W(unit_header("Satyr Tormenter", NEUTRAL_CDN + "satyr_hellcaller.png"))
@@ -325,16 +342,22 @@ def build():
     W(unit_header("Eimermole Foreman", NEUTRAL_CDN + "eimermole_foreman.png", new="New Level 5 Melee Creep"))
     W(ul_open())
     W(unit_sheet("eimermole_foreman", version="7.42"))
-    W(li("New Level 5 Melee Creep", t("MISC"), extra=inline_note("950 Health<br>49-55 Damage<br>300 Mana<br>320 Movement Speed<br>135 Attack Speed<br>4 Armor<br>0% Magic Resistance<br>62-66 Gold Bounty<br>90 XP Bounty")))
-    W(li("Miner's Slam: Active Ability", t("MISC"), extra=inline_note("The Foreman slowly winds up for an overhead slam, then hammers the ground in front of itself. Stricken area pulses 3 times, dealing 50/65/80/95 magic damage to enemies and slowing their movement speed by 100% for 0.2 seconds. Radius: 300. Pulses Interval: 0.3s<br>No Cast Range. Mana Cost: 50. Cooldown: 12s. Cast Point: 1s")))
+    W(li("New Level 5 Melee Creep", t("MISC"), extra=inline_note("950 Health<br>49-55 Damage<br>300 Mana<br>320 Movement Speed<br>135 Attack Speed<br>4 Armor<br>0% Magic Resistance<br>62-66 Gold Bounty<br>90 XP Bounty"), covered=True))
+    W(ul_close())
+    W(new_ability("Miner's Slam", "eimermole_miners_slam", version="7.42", icon_url="../icons/abilities/eimermole_miners_slam.png"))
+    W(ul_open())
+    W(li("Miner's Slam: Active Ability", t("MISC"), extra=inline_note("The Foreman slowly winds up for an overhead slam, then hammers the ground in front of itself. Stricken area pulses 3 times, dealing 50/65/80/95 magic damage to enemies and slowing their movement speed by 100% for 0.2 seconds. Radius: 300. Pulses Interval: 0.3s<br>No Cast Range. Mana Cost: 50. Cooldown: 12s. Cast Point: 1s"), covered=True))
     W(ul_close())
 
     # Eimermole
     W(unit_header("Eimermole", NEUTRAL_CDN + "eimermole.png", new="New Level 4 Melee Creep"))
     W(ul_open())
     W(unit_sheet("eimermole", version="7.42"))
-    W(li("New Level 4 Melee Creep", t("MISC"), extra=inline_note("700 Health<br>39-44 Damage<br>0 Mana<br>320 Movement Speed<br>135 Attack Speed<br>3 Armor<br>0% Magic Resistance<br>30-38 Gold Bounty<br>66 XP Bounty")))
-    W(li("Miner's Aura: Passive. Aura", t("MISC"), extra=inline_note("All enemies within a 1000 range have their health restoration decreased by 20%. Doesn't stack")))
+    W(li("New Level 4 Melee Creep", t("MISC"), extra=inline_note("700 Health<br>39-44 Damage<br>0 Mana<br>320 Movement Speed<br>135 Attack Speed<br>3 Armor<br>0% Magic Resistance<br>30-38 Gold Bounty<br>66 XP Bounty"), covered=True))
+    W(ul_close())
+    W(new_ability("Miner's Aura", "eimermole_miners_aura", version="7.42", icon_url="../icons/abilities/eimermole_miners_aura.png"))
+    W(ul_open())
+    W(li("Miner's Aura: Passive. Aura", t("MISC"), extra=inline_note("All enemies within a 1000 range have their health restoration decreased by 20%. Doesn't stack"), covered=True))
     W(ul_close())
 
     # Ancient Black Dragon
@@ -370,16 +393,22 @@ def build():
     W(unit_header("Ancient Ogre Seal", NEUTRAL_CDN + "ogre_seal.png", new="New Level 6 Ancient Melee Creep"))
     W(ul_open())
     W(unit_sheet("ogre_seal", version="7.42"))
-    W(li("New Level 6 Ancient Melee Creep", t("MISC"), extra=inline_note("1700 Health<br>60-65 Damage<br>400 Mana<br>270 Movement Speed<br>150 Attack Range<br>3 Armor<br>30% Magic Resistance<br>68-72 Gold Bounty<br>124 XP Bounty")))
-    W(li("Seal Flop: Active Ability", t("MISC"), extra=inline_note("Ogre Seal flops forward 2 times, slamming the ground after each one. Enemies caught in the area take 250 damage and have their movement speed slowed by 100% for 1.5s. Slam radius: 250. Flop Distance: 400<br>No Cast Range. Mana Cost: 25. Cooldown: 25s. Cast Point: 0.6s <span class=\"pop-note\">(Cast Point decreases from 0.6s to 0.3s when cast by a player-controlled Ancient Ogre Seal)</span>")))
+    W(li("New Level 6 Ancient Melee Creep", t("MISC"), extra=inline_note("1700 Health<br>60-65 Damage<br>400 Mana<br>270 Movement Speed<br>150 Attack Range<br>3 Armor<br>30% Magic Resistance<br>68-72 Gold Bounty<br>124 XP Bounty"), covered=True))
+    W(ul_close())
+    W(new_ability("Seal Flop", "ogre_seal_flop", version="7.42", icon_url="../icons/abilities/ogre_seal_flop.png"))
+    W(ul_open())
+    W(li("Seal Flop: Active Ability", t("MISC"), extra=inline_note("Ogre Seal flops forward 2 times, slamming the ground after each one. Enemies caught in the area take 250 damage and have their movement speed slowed by 100% for 1.5s. Slam radius: 250. Flop Distance: 400<br>No Cast Range. Mana Cost: 25. Cooldown: 25s. Cast Point: 0.6s <span class=\"pop-note\">(Cast Point decreases from 0.6s to 0.3s when cast by a player-controlled Ancient Ogre Seal)</span>"), covered=True))
     W(ul_close())
 
     # Ancient Ogre Seal Pup
     W(unit_header("Ancient Ogre Seal Pup", NEUTRAL_CDN + "ogre_seal_pup.png", new="New Level 5 Ancient Melee Creep"))
     W(ul_open())
     W(unit_sheet("ogre_seal_pup", version="7.42"))
-    W(li("New Level 5 Ancient Melee Creep", t("MISC"), extra=inline_note("800 Health<br>32-34 Damage<br>400 Mana<br>270 Movement Speed<br>128 Attack Range<br>3 Armor<br>50% Magic Resistance<br>76-80 Gold Bounty<br>124 XP Bounty")))
-    W(li("Seal of Disapproval Aura: Passive. Aura. Doesn't pierce Debuff Immunity", t("MISC"), extra=inline_note("All enemies within a 1200 range have their movement slowed by 15/17/19/21%. Doesn't stack")))
+    W(li("New Level 5 Ancient Melee Creep", t("MISC"), extra=inline_note("800 Health<br>32-34 Damage<br>400 Mana<br>270 Movement Speed<br>128 Attack Range<br>3 Armor<br>50% Magic Resistance<br>76-80 Gold Bounty<br>124 XP Bounty"), covered=True))
+    W(ul_close())
+    W(new_ability("Seal of Disapproval Aura", "ogre_seal_pup_disapproval_aura", version="7.42", icon_url="../icons/abilities/ogre_seal_pup_disapproval_aura.png"))
+    W(ul_open())
+    W(li("Seal of Disapproval Aura: Passive. Aura. Doesn't pierce Debuff Immunity", t("MISC"), extra=inline_note("All enemies within a 1200 range have their movement slowed by 15/17/19/21%. Doesn't stack"), covered=True))
     W(ul_close())
 
     # ===== ITEM UPDATES =====
@@ -878,7 +907,7 @@ def build():
     W(ul_open())
     # less regen lost: lower is better
     W(li("Respite Health Regen bonus lost during Respite decreased from 14 to 12", b(14, 12, l=True), extra=inline_note("Now provides 2 Health Regen while on cooldown instead of 0")))
-    W(li("Break renamed to Respite", t("MISC")))
+    W(li("Break renamed to Respite", t("MISC"), covered=True))
     W(ul_close())
     W(item_header("Urn of Shadows"))
     W(ul_open())
@@ -965,7 +994,7 @@ def build():
 
     W(plain_header("Global Changes", dynamics=False, sublabel=True))
     W(ul_open())
-    W(li("Number of item tiers decreased from 5 to 4", t("REWORK"), extra=inline_note("Tier 1 - 0:00<br>Tier 2 - 15:00<br>Tier 3 - 30:00<br>Tier 4 - 50:00<br>Infinite Madstone - 65:00")))
+    W(li("Number of item tiers decreased from 5 to 4", t("REWORK"), extra=mech_table(["", "Available at"], [["Tier 1", "<b>0:00</b>"], ["Tier 2", "<b>15:00</b>"], ["Tier 3", "<b>30:00</b>"], ["Tier 4", "<b>50:00</b>"], ["Infinite Madstone", "<b>65:00</b>"]])))
     W(li("Madstone cost for Tier 4 items increased from 10 to 14", b(10, 14, l=True)))
     W(li("Madstone cost increment for recrafting Tier 4 items decreased from 10 to 6", b(10, 6, l=True)))
     W(ul_close())
@@ -1905,9 +1934,10 @@ def build():
     W(ability("Nothl Projection", slug="dazzle_nothl_projection"))
     W(ul_open())
     W(li("Aghanim's Shard: Increases cast range by 250 and the leash range by 500", t("NEW")))
-    W(li("Min Duration decreased from 5s to 1s", b(5, 1)))
+    # a shorter forced minimum: Dazzle may return sooner — lower is better
+    W(li("Min Duration decreased from 5s to 1s", b(5, 1, l=True)))
     W(li("Travel speed on cast increased from 1200 to 1700", b(1200, 1700)))
-    W(li("Soul Return Time decreased from 0.75s to 0.5s", b(0.75, 0.5)))
+    W(li("Soul Return Time decreased from 0.75s to 0.5s", b(0.75, 0.5, l=True)))
     W(ul_close())
     W(ability("Through the Realm", slug="dazzle_through_the_realm"))
     W(ul_open())
@@ -2435,7 +2465,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 25 Talent Duel Advances Cooldown on Victory decreased from 30s to 25s", b(30, 25, l=True)))
+    # the talent takes this much off the cooldown: less of it is the cut
+    W(li("Level 25 Talent Duel Advances Cooldown on Victory decreased from 30s to 25s", b(30, 25)))
     W(li("Level 10 Talent -2s Overwhelming Odds Cooldown replaced with +30 Overwhelming Odds Attack Speed", t("SWAP")))
     W(li("Level 25 Talent +100% Moment of Courage Lifesteal replaced with Moment of Courage Has a 180% Critical Strike", t("SWAP")))
     W(ul_close())
@@ -2549,7 +2580,8 @@ def build():
     # Spirit Bear (Valve's hero_id 1961) as a unit block of Lone Druid
     W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png", kind="Creep-hero"))
     W(ul_open())
-    W(li("Aghanim's Scepter Disarm Range bonus changed from Global to +200 (from 1100 to 1300)", b(1100, 1300)))
+    # global before: +200 over the base range is a cut, whatever the two numbers say
+    W(li("Aghanim's Scepter Disarm Range bonus changed from Global to +200 (from 1100 to 1300)", t("NERF")))
     W(ul_close())
     W(new_ability("Summon Lone Druid", "lone_druid_spirit_bear_summon_druid", version="7.42"))
     W(ul_open())
@@ -3060,7 +3092,8 @@ def build():
     W(ul_close())
     W(ability("Rock Throw", slug="primal_beast_rock_throw"))
     W(ul_open())
-    W(li("Damage rescaled from 325 to 300 + 1x Primal Beast's Strength", b(325, 300)))
+    # a flat value traded for one that grows with Strength: no single % (canon "… + Nx <hero>'s Strength")
+    W(li("Damage rescaled from 325 to 300 + 1x Primal Beast's Strength", t("REWORK")))
     W(ul_close())
 
     # Puck
@@ -3844,7 +3877,7 @@ def build():
     W(ability("Threads of Fate", slug="weaver_threads_of_fate", innate=True))
     W(ul_open())
     W(li("Now applies the slow every 6s if the thread is not broken over this time", t("NEW")))
-    W(li("Thread establishing time decreased from 1.5s to 1.25s", b(1.5, 1.25)))
+    W(li("Thread establishing time decreased from 1.5s to 1.25s", b(1.5, 1.25, l=True)))
     W(ul_close())
     W(ability("Geminate Attack", slug="weaver_geminate_attack"))
     W(ul_open())
@@ -3868,7 +3901,8 @@ def build():
     W(ul_close())
     W(ability("Focus Fire", slug="windrunner_focusfire"))
     W(ul_open())
-    W(li("Damage Reduction decreased from 25% to 18%", b(25, 18)))
+    # Focus Fire's own penalty on Windranger's attacks: less of it is the gain
+    W(li("Damage Reduction decreased from 25% to 18%", b(25, 18, l=True)))
     W(li("Attacks now have 75% item potency", t("MISC")))
     W(ul_close())
     W(subgroup("Talents"))

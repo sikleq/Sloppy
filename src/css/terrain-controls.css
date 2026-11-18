@@ -119,9 +119,11 @@
 }
 .tf-chip b { color: var(--text-bright); font-weight: 600; }
 .tf-chip .tf-chip-zero { color: var(--text-main); font-weight: 600; }    /* as many added as removed */
-/* one object, several kinds of change: one line each in the same chip (the owner 2026-11-18) */
-.tf-chip-lines { display: inline-flex; flex-direction: column; align-items: flex-start; }
+/* one object, several kinds of change: side by side in the same chip, a thin line between them (the owner
+   2026-11-18: one chip per object; 2026-11-19: stacked kinds made those chips two-three times taller than the rest) */
+.tf-chip-lines { display: inline-flex; flex-direction: row; align-items: center; flex-wrap: wrap; }
 .tf-chip-line { white-space: nowrap; }
+.tf-chip-line + .tf-chip-line { margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--line-soft); }
 /* a chip that rings its changes red on the map (scripts.js initChangeHighlights) */
 button.tf-chip-btn { font: inherit; cursor: pointer; }
 button.tf-chip-btn:hover { border-color: rgba(227, 196, 106, 0.45); }
