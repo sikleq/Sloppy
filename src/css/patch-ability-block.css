@@ -201,6 +201,12 @@ ul.changes li > .badge-group {
 ul.changes li > .formula-table {
   grid-column: 1 / -1;
 }
+/* a tagged row's own table (mech_table / mech_level_table / mech_before_after under li()): the formula table's edges
+   (the owner 2026-11-19: the tables' left and right edges differed from every other table) */
+ul.changes li > .row-table { grid-column: 1 / -1; display: block; }
+ul.changes li > .row-table > .mech-abils, ul.changes li > .row-table > .mech-levels-wrap { margin-top: 4px; }
+.ability-block ul.changes li > .row-table { margin-left: -60px; width: calc(100% + 60px); }
+.mech-levels-wrap { display: block; }
 /* Raw <li> without .row-text wrapper (rare special-case manual rows) — block layout
    with auto-generated left tag from data-tag attribute via ::before. */
 ul.changes li.li-notext {

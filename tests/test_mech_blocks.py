@@ -395,15 +395,16 @@ def test_long_level_tables_lie_across_and_shared_values_pivot():
     assert '["Total Increase", "2", "3",' in out
     from patch.mech_abilities import mech_level_table
     html = mech_level_table(["Level", "2", "3"], [["Old", "20", "30"], ["New", "20", "35"]])
-    assert 'style="--mech-lv:2"' in html and '<span class="mech-lv-changed">35</span>' in html and \
-        '<span class="mech-lv-changed">20</span>' not in html
+    assert 'style="--mech-lv:2"' in html and '<span class="iab-lv iab-buff mech-lv-changed">35</span>' in html and \
+        'mech-lv-changed">20</span>' not in html
     bounty = ('W(li("Building bounty decreased", t("NERF"), extra=inline_note("Tier 1 tower last hit gold decreased from '
               '110-130 to 100<br>Tier 1 tower gold per player decreased from 90 to 75<br>Tier 2 tower last hit gold '
               'decreased from 130-150 to 125<br>Tier 2 tower gold per player decreased from 110 to 100<br>Barracks last '
               'hit gold rescaled from 90-135 to 100")))')
     out = g._postprocess_from_to_list([bounty])[0]
-    assert 'extra=mech_table(["", "Last hit gold", "Gold per player"], [["Tier 1 tower", "110-130 &rarr; <b>100</b>", ' \
-           '"90 &rarr; <b>75</b>"], ["Tier 2 tower", ' in out and '["Barracks", "90-135 &rarr; <b>100</b>", "–"]' in out
+    assert 'extra=mech_table(["", "Last hit gold", "Gold per player"], [["Tier 1 tower", mech_change_cell("110-130", ' \
+           '"100"), mech_change_cell("90", "75")], ["Tier 2 tower", ' in out
+    assert '["Barracks", mech_change_cell("90-135", "100"), "–"]' in out and 'cls="mech-grid"' in out
 
 
 def test_a_list_of_summons_is_written_as_hero_and_ability():
@@ -426,6 +427,93 @@ def test_every_item_a_mechanic_row_names_is_an_icon():
     assert out[2].endswith(", examples={'Evolved Enchantment': 'Evolved Enchantment', 'Desolator': 'Desolator'}))")
     assert ", examples={'Voodoo Masks': 'Voodoo Mask" in out[3] and "'Lifesteal'" not in out[3]   # a stat, no icon
     assert out[6] == lines[6]                                                          # not a mechanic block
+
+
+def test_round_three_rules_of_the_742_proofread():
+    # owner 2026-11-19, third round on 7.42
+    # Glyph under Valve's Subtitle -> Team Abilities, after the whole category (not between its cards)
+    lines = ['W(plain_header("Lane Creeps, Towers and Bases"))', 'W(subgroup("Glyph of Fortification"))', 'W(ul_open())',
+             'W(li("Now has 2 charges", t("NEW")))', 'W(ul_close())', 'W(unit_header("Courier", "x.png"))',
+             'W(ul_open())', 'W(li("Couriers now have fragile pip health", t("NEW")))', 'W(ul_close())',
+             'W(plain_header("Map Objectives"))']
+    out = g._postprocess_team_abilities(lines)
+    k = out.index('W(plain_header("Team Abilities"))')
+    assert out[k - 1] == 'W(ul_close())' and out[k - 4].startswith('W(unit_header("Courier"')
+    assert out[k + 3] == 'W(li("Now has 2 charges", t("NEW")))' and out[-1] == 'W(plain_header("Map Objectives"))'
+    # a rune named without Valve's colon -> its block with the rune's icon
+    runes = ['W(section("General Updates"))', 'W(ul_open())',
+             'W(li("Invisibility Rune now also provides Disguise buff", t("NEW")))',
+             'W(li("Illusions created by Illusion Rune now have 40% Item Potency", t("MISC")))', 'W(ul_close())']
+    text = "\n".join(g._postprocess_rune_rows(runes))
+    assert 'W(ability("Invisibility Rune", icon_url="../icons/runes/invisibility.png"' in text
+    assert 'W(li("Now also provides Disguise buff", t("NEW")))' in text
+    assert 'W(ability("Illusion Rune", icon_url="../icons/runes/illusion.png"' in text
+    # a changed value in a table: dim old, coloured new with its %
+    from patch.mech_abilities import mech_change_cell, mech_level_table
+    cell = mech_change_cell("110-130", "100")
+    # as the cards: the new value coloured and dotted, "old → new (%)" on hover (owner 2026-11-19)
+    assert cell.startswith('<b class="iab-num iab-nerf"><span class="iab-hint abil-ico-hint" data-tooltip="110-130 → 100 ')
+    assert '−17%' in cell and cell.endswith('>100</span></b>')
+    assert 'iab-buff' in mech_change_cell("90", "100")
+    # more experience to a level is worse: red with l=True
+    html = mech_level_table(["Level", "2"], [["Old", "240"], ["New", "250"]], l=True)
+    assert 'iab-lv iab-nerf mech-lv-changed">250<' in html
+
+
+def test_a_system_block_is_told_as_a_paragraph():
+    # owner 2026-11-19, Pip Health: the intro and the rules as people say them, the units a table of icons
+    group = [{"indent_level": 1, "note": "Standardized rules for units that take a fixed number of hits"},
+             {"indent_level": 1, "note": "All units are now able to damage units with health bar pips",
+              "info": "* Couriers<br>* Gyrocopter's Homing Missile"},
+             {"indent_level": 2, "note": "Attacks from heroes deal 1 full pip per attack"},
+             {"indent_level": 2, "note": "Attacks from illusions and creeps deal 1/4 pip per attack"},
+             {"indent_level": 1, "note": "Some units have a Fragile debuff", "info": "Courier and Roshan's Banner"}]
+    from tools.patchgen import general
+    story = general._story_of(group, "REWORK")
+    assert story.startswith('W(mech_story(["Standardized rules for units that take a fixed number of hits. All units are '
+                            'now able to damage units with health bar pips: attacks from heroes deal 1 full pip per '
+                            'attack; attacks from illusions and creeps deal 1/4 pip per attack.", "Some units have a '
+                            'Fragile debuff (" + mech_example("Courier", label="Courier")')
+    assert 'table=mech_list(info_tip("Couriers", "Gyrocopter: Homing Missile"))' in story
+
+
+def test_a_teaser_row_has_its_own_chip_and_no_place_in_the_cells():
+    from patch.badges import t
+    from patch.row_scores import _DYN_TAG_WHITELIST
+    assert t("TEASER") == '<span class="badge teaser" data-tag="teaser">TEASER</span>'
+    assert "teaser" not in _DYN_TAG_WHITELIST
+    assert g._guess_tag("Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu") == "TEASER"
+    import pathlib                                    # its tile on the patch pages has an icon of its own
+    css = (pathlib.Path(__file__).resolve().parents[1] / "src" / "css" / "patch-tag-marks.css").read_text(encoding="utf-8")
+    assert '.tag-marks .badge[data-tag~="teaser"], .filter-btn[data-filter="teaser"] { --tm: url(' in css
+
+
+def test_round_five_rules_of_the_742_proofread():
+    # owner 2026-11-19, fifth round on 7.42
+    lines = ['W(li("Added a Radigull camp: New Medium camp for Radiant", t("NEW"), extra=inline_note("Each camp consists '
+             'of 2 Radigulls")))',
+             'W(li("Added an Odobenus camp: New Medium camp for Dire", t("NEW"), extra=inline_note("Each camp consists of '
+             '1 Odobenus Frostmage and 2 Odobenus Footmen")))', 'W(li("Medium Centaur camp removed", t("DEL")))']
+    out = g._postprocess_new_camps(lines, None)          # no game files: the averages stay empty
+    assert out[0].startswith('W(li("New neutral camps", t("NEW"), extra="<!--MECHTABLE-->" + camp_table([("Radigull camp ')
+    assert '(2, "Radigull", NEUTRAL_CDN + "radigull.png")' in out[0]
+    assert '(1, "Odobenus Frostmage", NEUTRAL_CDN + "odobenus_frostmage.png"), (2, "Odobenus Footman"' in out[0]
+    assert out[1].endswith(', covered=True))') and out[3] == lines[2]
+    # the runes after Roshan's card are not his abilities: no "Abilities" heading over them
+    from patch.state import _State
+    from patch import elements
+    _State.current_unit, _State.current_hero, _State.seen_abilities_subgroup = "Roshan", None, False
+    elements.subgroup("Runes")
+    assert _State.current_unit is None
+    import importlib.util, pathlib
+    spec = importlib.util.spec_from_file_location(
+        "tsa", pathlib.Path(__file__).resolve().parents[1] / "scripts" / "gen" / "terrain_spots_auto.py")
+    tsa = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tsa)
+    want = tsa.wanted("Moved small flooded camps at the top/bottom rims closer to stream ends")
+    assert want["camp"] == {"small"} and {"top", "bot"} <= want["lanes"]
+    assert tsa.wanted("Added more trees to the north of Radiant Tier 1 tower")["trees"] == "added"
+    assert tsa._lane(6606, 5867) != "mid" and tsa._lane(-600, -600) == "mid"          # the bases are not mid
 
 
 def test_valves_starred_list_is_a_list_the_block_opens():

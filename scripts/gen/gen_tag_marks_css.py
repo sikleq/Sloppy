@@ -15,6 +15,9 @@ BEGIN, END = "/* generated icons: begin */", "/* generated icons: end */"
 # 14 x 14 strokes, thicker and clearer than the first 12 x 12 set (owner 2026-11-06: "лучше и чётче оформить значки",
 # mock variant 2); the order is the cascade: a "del nerf" badge shows the cross
 ICONS = [
+    # TEASER (owner 2026-11-19): Valve's wink at a coming event — a curled tentacle (7.42 "Shuggoth fhtagn"); first, as
+    # no row carries it with another tag
+    ("teaser", "M4 12.5C4 9 9.5 9.5 9.5 6S6 2.5 5 4.5S7 7 8 5.5", 1.9),
     ("misc", "M3.5 7h.01M7 7h.01M10.5 7h.01", 2.9),
     ("qol", "M2.6 7.4l3 3L11.4 3.8", 2),
     ("buff", "M7 12V2.6M3 6.6l4-4 4 4", 2),

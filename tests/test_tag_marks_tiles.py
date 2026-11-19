@@ -130,7 +130,7 @@ def test_tiles_are_solid_with_a_dark_icon():
     assert not hasattr(page, "TAG_MARK_LABELS") and "tm-label" not in css
     # a little brighter than the first try (owner 2026-11-06: "чуть-чуть ярче")
     assert "background: color-mix(in srgb, currentColor 94%, #000); }" in css and "background: #15120f;" in css
-    assert css.count("viewBox='0 0 14 14'") == 7
+    assert css.count("viewBox='0 0 14 14'") == 8          # + TEASER's tentacle (owner 2026-11-19)
     # REWORK is a filled gear like the owner's reference picture (2026-11-07; pixel gears were "маленькая и толстая",
     # "опять ужасная"), shown 16px: a ring, 8 teeth, a hole
     rework = css.split('.filter-btn[data-filter="rework"] {', 1)[1].split("\n", 1)[0]

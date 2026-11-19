@@ -385,6 +385,9 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
   border-bottom: 1px solid var(--line-soft); border-left: 1px solid var(--line-soft);
 }
 .camp-table .camp-name { color: var(--text-dim, #969289); padding-left: 0; border-left: 0; }
+/* the camp's size and side under its name (7.42 new camps, owner 2026-11-19) */
+.camp-table .camp-name { flex-wrap: wrap; align-content: center; }
+.camp-table .camp-name .camp-where { flex-basis: 100%; font-size: 11.5px; color: var(--text-dimmer, #7d786f); }
 .camp-table .camp-num { justify-content: center; font-variant-numeric: tabular-nums; font-weight: 700; }
 .camp-table .camp-head { color: var(--text-dim, #969289); font-size: 12px; font-weight: 400; }
 

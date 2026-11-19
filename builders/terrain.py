@@ -898,6 +898,8 @@ _TAG_CLS = {
     "DEL": ("del", "del", ' data-overall="nerf"'),
     "MISC": ("misc", "misc", ""),
     "QoL": ("qol", "qol", ""),
+    # Valve's wink at a coming event (7.42 "Y'ai 'ng'ngah, Shuggoth h'ee…"): its own chip, not a number (owner 2026-11-19)
+    "TEASER": ("teaser", "teaser", ""),
 }
 
 
@@ -922,6 +924,8 @@ def _change_li(text, tag, note=None, patch=None, num=None):
         text = terrain_button(text, phrase)
     # the chip is the row's number in its category, as on the patch page — no tag (the owner 2026-10-03)
     chip = terrain_num_chip(num) if num else '<span class="row-tag-empty"></span>'
+    if tag == "TEASER":                     # Valve's wink at a coming event: its own chip, no number (2026-11-19)
+        chip = '<span class="badge teaser" data-tag="teaser">TEASER</span>'
     return (f'<li class="terrain-row" data-tag="{" ".join(tags)}">{chip}'
             f'<span class="row-text">{text}</span>{shots}</li>')
 

@@ -67,7 +67,7 @@ def moves(changes):
 
 def _site_date(patch):
     """The patch's date as the site's RELEASE_HISTORY has it (the UTC day of its live build, owner 2026-11-11), as
-    yyyy-mm-dd; None for a patch it does not list (7.41f-1007). Oldgrowth's info.json dates are older and were a day
+    yyyy-mm-dd; None for a patch it does not list (7.41f-v2). Oldgrowth's info.json dates are older and were a day
     off for 21 patches: a rebuild of this table on 2026-11-18 put them back."""
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if root not in sys.path:

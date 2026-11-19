@@ -18,9 +18,11 @@ import builders.terrain_stats as ts  # noqa: E402
 
 def test_every_map_file_is_one_row_with_the_patches_that_shipped_it():
     files = ts.load()
-    # 66 since 2026-10-20: 7.41f-1007, the map file of the 2026-10-07 client update inside 7.41f; 67 with 7.42
-    assert len(files) == 67 and files[0]["patch"] == "7.08" and files[-1]["patch"] == "7.42"
+    # 66 since 2026-10-20: 7.41f-v2, the map file of the 2026-10-07 client update inside 7.41f; 67 with 7.42;
+    # 68 with 7.42-v2, the client update of the same evening (one tree fewer at the Dire base)
+    assert len(files) == 68 and files[0]["patch"] == "7.08" and files[-1]["patch"] == "7.42-v2"
     by = {f["patch"]: f for f in files}
+    assert by["7.42-v2"]["n"]["trees"] == by["7.42"]["n"]["trees"] - 1 and ts.is_update("7.42-v2")
     assert by["7.22"]["also"][:2] == ["7.22b", "7.22c"]
     assert by["7.41"]["n"]["watchers"] == 10 and by["7.41"]["n"]["outposts"] == 2      # lanterns, not outposts
     assert [by["7.41"]["n"][f"tier{t}"] for t in range(4)] == [6, 14, 6, 2]
@@ -32,11 +34,11 @@ def test_cells_show_added_removed_and_moved():
     files = ts.load()
     table = ts.table_html(files, {"7.41", "7.40"})
     rows = ts.group(files)                                             # identical files glued (7.41a … 7.41f)
-    assert table.count("<tr>") == len(rows) + 1 and len(rows) < 67
+    assert table.count("<tr>") == len(rows) + 1 and len(rows) < 68
     assert table.index(">7.41a<") < table.index(">7.08<")              # newest first
     glued = next(r for r in rows if r["patch"] == "7.41a")
-    assert glued["also"] == ["7.41b", "7.41c", "7.41d", "7.41e", "7.41f", "7.41f-1007"]   # nothing counted moved
-    assert '7.41a<span class="ts-range"> – 7.41f-1007</span>' in table                # a range, not a list (the owner)
+    assert glued["also"] == ["7.41b", "7.41c", "7.41d", "7.41e", "7.41f", "7.41f-v2"]   # nothing counted moved
+    assert '7.41a<span class="ts-range"> – 7.41f-v2</span>' in table                # a range, not a list (the owner)
     assert '7.35<span class="ts-range"> – 7.37e</span>' in table and "also " not in table
     assert ">Map version<" in table and ">Map file<" not in table
     assert "Spawn boxes" not in table and "icon_calendar" not in table and "icon_terrain" not in table
@@ -60,9 +62,9 @@ def test_tiles_chart_and_the_terrain_menu():
     chart = ts.chart_svg(files)
     # 10-04: no labels; a version without a letter is a bolder point; a faint trend line through it all
     assert 'class="ts-mark"' not in chart and chart.count('class="ts-trend"') == 1
-    majors = sum(1 for f in files if re.fullmatch(r"\d+\.\d+", f["patch"]))        # not "7.41f-1007"
+    majors = sum(1 for f in files if re.fullmatch(r"\d+\.\d+", f["patch"]))        # not "7.41f-v2"
     assert chart.count('class="ts-dot ts-dot-major"') == majors and majors > 10
-    assert chart.count('class="ts-pt"') == 67 and '">7.38 · 2496</text>' in chart       # version + count on hover
+    assert chart.count('class="ts-pt"') == 68 and '">7.38 · 2496</text>' in chart       # version + count on hover
     assert 'class="ts-grid ts-grid-major" x1=' in chart and 'class="ts-axis"' in chart
     groups = {g[0]: g for g in site.MATERIALS_GROUPS}
     assert [c[0] for c in groups["terrain_grp"][3]] == ["terrain", "terrain_stats"]
@@ -70,11 +72,13 @@ def test_tiles_chart_and_the_terrain_menu():
 
 
 def test_a_client_update_map_file_sorts_after_its_patch_and_is_not_a_patch():
-    # 2026-10-17: Valve shipped a new map file inside 7.41f (2026-10-07, no patch notes), keyed '7.41f-1007'
-    keys = ["7.42", "7.41f-1007", "7.41f", "7.41e", "7.41"]
-    assert sorted(keys, key=ts._key) == ["7.41", "7.41e", "7.41f", "7.41f-1007", "7.42"]
-    assert ts.is_update("7.41f-1007") and not ts.is_update("7.41f") and not ts.is_update("7.41")
-    assert ts.count_patches([{"patch": "7.41f"}, {"patch": "7.41f-1007"}, {"patch": "7.42"}]) == 2
+    # 2026-10-17: Valve shipped a new map file inside 7.41f (2026-10-07, no patch notes), keyed '7.41f-1007' until
+    # 2026-11-19, now '7.41f-v2' (the owner: "v2"); a third file of one patch is v3, after v2 (not "v10" < "v2")
+    keys = ["7.42a", "7.42-v10", "7.42-v2", "7.42", "7.41f-v2", "7.41f", "7.41e", "7.41"]
+    assert sorted(keys, key=ts._key) == ["7.41", "7.41e", "7.41f", "7.41f-v2", "7.42", "7.42-v2", "7.42-v10", "7.42a"]
+    assert not ts.is_update("7.41f-1007")                                          # the old key is gone
+    assert ts.is_update("7.41f-v2") and not ts.is_update("7.41f") and not ts.is_update("7.41")
+    assert ts.count_patches([{"patch": "7.41f"}, {"patch": "7.41f-v2"}, {"patch": "7.42"}]) == 2
 
 
 def test_terrain_pages_never_delete_the_stats_page_and_styles_stay_scoped():
