@@ -469,21 +469,24 @@ h4.subgroup {
 .pip-sticks > i { display: block; width: 3px; height: 14px; border-radius: 99px; background: #6fbf73; }
 .pip-sticks.pip-fragile > i { background: #e0a96a; }
 .pip-sep { margin: 0 9px; color: var(--text-dim); font-weight: 700; }
-.pip-legend { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 8px 10px 2px; color: var(--text-dim); font-size: 12px; align-items: center; }
-/* toggles over the table: a talent's / Aghanim's / Marci's extra pips, light and outlined (owner 2026-11-19) */
+/* one small panel over the table, icons only, the words in their hovers (owner 2026-11-19: "в мини-панельке красивой
+   и без текста"): the sticks' meaning, a line, then the toggles — a talent's / Aghanim's / Marci's extra pips */
 .pip-block { display: block; }
-.pip-toggles { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 10px 8px; }
-.pip-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 5px; border-radius: 4px;
-  border: 1px solid var(--line-soft); background: rgba(255, 255, 255, 0.03); color: var(--text-dim); font-size: 12px;
-  cursor: pointer; }
-.pip-toggle img { width: 18px; height: 18px; border-radius: 3px; opacity: 0.6; }
-.pip-toggle[aria-pressed="true"] { border-color: var(--gold); color: var(--text-main); background: rgba(227, 196, 106, 0.10); }
-.pip-toggle[aria-pressed="true"] img { opacity: 1; }
+.pip-panel { display: inline-flex; align-items: center; gap: 6px; margin: 2px 10px 8px; padding: 4px 6px;
+  border: 1px solid var(--line-soft); border-radius: 6px; background: rgba(0, 0, 0, 0.25); }
+.pip-key { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+  border-radius: 4px; background: rgba(255, 255, 255, 0.03); }
+.pip-panel-sep { width: 1px; align-self: stretch; margin: 2px 4px; background: var(--line-soft); }
+.pip-toggle { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0;
+  border-radius: 5px; border: 1px solid transparent; background: rgba(255, 255, 255, 0.03); cursor: pointer; }
+.pip-toggle img { width: 20px; height: 20px; border-radius: 3px; opacity: 0.45; filter: grayscale(0.6); }
+.pip-toggle:hover img { opacity: 0.8; }
+.pip-toggle[aria-pressed="true"] { border-color: var(--gold); background: rgba(227, 196, 106, 0.12); }
+.pip-toggle[aria-pressed="true"] img { opacity: 1; filter: none; }
 .pip-sticks > i.pip-x { display: none; background: #d9f2c9; box-shadow: 0 0 0 1px rgba(111, 191, 115, 0.9); }
 .pip-sticks > i.pip-x-shown { display: block; }
 .pip-block.pip-on-talent .pip-x[data-src="talent"], .pip-block.pip-on-scepter .pip-x[data-src="scepter"],
 .pip-block.pip-on-shard .pip-x[data-src="shard"], .pip-block.pip-on-marci .pip-x[data-src="marci"] { display: block; }
-.pip-legend .pip-sticks { margin-right: 6px; }
 /* a phone: one pair of columns, a row's levels on one line — the name wraps instead (visual review 2026-11-19: the
    levels broke apart and left "/" at a line's end) */
 @media (max-width: 760px) {
@@ -491,7 +494,6 @@ h4.subgroup {
   .mech-abils.pip-table .pip-cell { flex-wrap: nowrap; white-space: nowrap; padding-right: 6px; }
   .mech-abils.pip-table .pip-sep { margin: 0 5px; }
 }
-.item-icon-cell img { display: block; border-radius: 3px; }
 .mech-abils.mech-grid .mech-abil-row > span + span,
 .mech-abils.mech-levels .mech-abil-row > span + span { border-left: 1px solid var(--line-soft); }
 .mech-old { color: var(--text-dim); }

@@ -1936,6 +1936,17 @@
       ],
       "r": 2600,
       "phrase": "trees"
+    },
+    {
+      "match": "Slightly increased the amount of highground to the north of the Radiant midlane ramp",
+      "spots": [
+        [
+          -1100,
+          -150
+        ]
+      ],
+      "r": 1700,
+      "phrase": "highground"
     }
   ]
 }

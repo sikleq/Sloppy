@@ -55,17 +55,18 @@ def item_page(name):
 
 
 def item_icon(name):
-    """The item's icon in a table cell (a drops table: owner 2026-11-19 "лучше иконки предметов в таблице, а не
-    словами"): its name on hover, a link to its Changes page when it has one."""
+    """The item in a table cell as every table of the site shows one: its small icon chip and its name (owner
+    2026-11-19: "иконки сделаны не по аналогии с другими в таблицах"), the name a link to its Changes page."""
     from .images import item_img
-    img = f'<img src="{item_img(name)}" alt="{html.escape(name)}" width="44" height="32" loading="lazy">'
-    hint = f'<span class="iab-hint abil-ico-hint item-icon-cell" data-tooltip="{html.escape(name, quote=True)}">{img}</span>'
+    from .mech_abilities import ability_chip
+    chip = ability_chip(name, item_img(name))
     slug = item_page(name)
-    if not slug:
-        return hint
-    ver = _State.current_patch_version
-    href = f"../items/{slug}.html" + (f"?from={ver}" if ver else "")
-    return f'<a class="item-mention item-mention-icon" href="{href}">{hint}</a>'
+    label = html.escape(name)
+    if slug:
+        ver = _State.current_patch_version
+        href = f"../items/{slug}.html" + (f"?from={ver}" if ver else "")
+        label = f'<a class="item-mention" href="{href}">{label}</a>'
+    return f'<span class="mech-item">{chip}<span class="mech-abil-name">{label}</span></span>'
 
 
 def item_link(name):

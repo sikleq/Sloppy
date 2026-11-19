@@ -226,8 +226,9 @@
 /* a formula pill in a "?" is a copy, not a button: plain coloured text (owner 2026-11-19: "менее кликабельной") */
 .info-pop .formula-trigger, .info-pop-body .formula-trigger { border: 0; background: none; padding: 0;
   cursor: inherit; pointer-events: none; }
-.pop-li.pop-sub { padding-left: 24px; border-top: 0; padding-top: 0; }
-.pop-li.pop-sub::before { left: 13px; top: 0.62em; opacity: 0.4; }
+/* a sub-row on the same edge as the rows (owner 2026-11-19: "не ровно стоят строки"), only dimmer */
+.pop-li.pop-sub { border-top: 0; padding-top: 0; color: var(--text-dim); }
+.pop-li.pop-sub::before { top: 0.62em; opacity: 0.35; }
 .pop-li.pop-head { color: var(--text-dim); padding-left: 0; }   /* "Compared to Blood Grenade:" over its rows */
 .pop-li.pop-head::before { content: none; }
 /* a % inside a popup's text, in the colour of its direction (owner 2026-11-08, 7.38 Lycan "-20% не окрашено") */

@@ -196,6 +196,41 @@ def _postprocess_from_to_list(lines):
     return out
 
 
+_OBJECTIVES = (("Wisdom Shrine", "Wisdom Shrines"), ("Outpost", "Outposts"), ("Lotus Pool", "Lotus Pools"),
+               ("Watcher", "Watchers"), ("Twin Gate", "Twin Gates"))
+
+
+def _postprocess_objective_subgroups(lines):
+    """A map objective's rows out of "Miscellaneous" into a subgroup of their own, as 7.40 / 7.41 "Wisdom Shrines" (owner
+    2026-11-19: "Wisdom Shrine и Outposts строчки мы разве отдельно не оформляем тоже?"). Rows about two objectives at
+    once stay."""
+    out, i = [], 0
+    while i < len(lines):
+        ln = lines[i]
+        if not (ln.strip() == 'W(subgroup("Miscellaneous"))' and i + 1 < len(lines) and lines[i + 1].strip() == 'W(ul_open())'):
+            out.append(ln)
+            i += 1
+            continue
+        ind = ln[:len(ln) - len(ln.lstrip())]
+        j = i + 2
+        while j < len(lines) and lines[j].strip() != 'W(ul_close())':
+            j += 1
+        rest, moved = [], {}
+        for row in lines[i + 2:j]:
+            text = re.match(r'\s*W\((?:li|li_formula)\("((?:[^"\\]|\\.)*)"', row)
+            hits = [plural for one, plural in _OBJECTIVES if text and re.search(rf"\b{one}s?\b", text.group(1))]
+            if len(hits) == 1:
+                moved.setdefault(hits[0], []).append(row)
+            else:
+                rest.append(row)
+        if rest:
+            out += [ln, lines[i + 1]] + rest + [lines[j]]
+        for plural, rows in moved.items():
+            out += [f'{ind}W(subgroup("{plural}"))', f'{ind}W(ul_open())'] + rows + [f'{ind}W(ul_close())']
+        i = j + 1
+    return out
+
+
 def _postprocess_pip_list(lines):
     """Valve's list of the units with health bar pips (7.42 "All units are now able to damage units with health bar
     pips") → pip_list: each unit's pips as sticks when data/rules/pip_health.json has the patch (owner 2026-11-19)."""
@@ -281,26 +316,40 @@ def _postprocess_new_camps(lines, version=None):
     "не сделал таблицей какие крипы появились новые/лагеря"): the camp, its size and side, its average gold and xp
     from the game files, its creeps with their portraits — as 7.38's flooded camps (camp_table). Valve's rows stay hidden
     for the weights. A row whose creeps the files do not name leaves the run as it is."""
-    out, run = [], []
+    out, run, pending = [], [], []
 
     def flush():
         if len(run) < 2:
             out.extend(r[0] for r in run)
         else:
             ind = run[0][1].group("ind")
-            rows = []
+            rows, said = [], []
             for _ln, m, units in run:
                 where = ", ".join(x for x in (m.group("size"), m.group("side")) if x)
                 gold, xp = _camp_numbers(units, version)
                 creeps = ", ".join(f'({n}, {_py_str(shown)}, NEUTRAL_CDN + "{slug}.png")' for n, slug, shown in units)
                 label = _py_str(m.group("name") + ' camp <span class="camp-where">' + where + '</span>')
                 rows.append(f'({label}, [{creeps}], {_py_str(gold)}, {_py_str(xp)})')
-            out.append(f'{ind}W(li("New neutral camps", t("NEW"), extra="<!--MECHTABLE-->" + camp_table([{", ".join(rows)}]) '
-                       f'+ "<!--/MECHTABLE-->"))')
-            out.extend(ln[:-2] + ", covered=True))" for ln, _m, _u in run)
+                side = f" for {m.group('side')}" if m.group("side") else ""
+                said.append(f"{'an' if m.group('size')[0] in 'AEIOU' else 'a'} {m.group('size')} camp{side} "
+                            f"({m.group('name')})")
+            story = f"Added {len(run)} new neutral camps: " + ", ".join(said[:-1]) + " and " + said[-1]
+            # a block of its own after the list, as 7.38's Flooded Camps (owner 2026-11-19: "New neutral camps сделаны
+            # не так, как мы делали … с новыми нейтралами"): its label, the story, the camps' table; Valve's rows hidden
+            pending.extend([f'{ind}W(plain_header("New Neutral Camps", dynamics=False, new="New camps"))',
+                            f'{ind}W(ul_open())',
+                            f'{ind}W(mech_story({_py_str(story)}, table=camp_table([{", ".join(rows)}])))'])
+            pending.extend(ln[:-2] + ", covered=True))" for ln, _m, _u in run)
+            pending.append(f'{ind}W(ul_close())')
         run.clear()
 
     for ln in lines:
+        if pending and ln.strip() == "W(ul_close())":
+            flush()
+            out.append(ln)
+            out.extend(pending)
+            pending.clear()
+            continue
         m = _NEW_CAMP_RE.match(ln)
         units = []
         if m:

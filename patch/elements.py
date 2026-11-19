@@ -533,7 +533,8 @@ def item_header(name, new=False, changed=False, removed=None, old_title=None, co
                      f'<span class="ability-title-arrow">→</span>{name_html}</span>')
     price = f'<span class="item-icon-cost" aria-label="Cost {cost}">{cost}</span>' if cost else ''
     from .item_marks import item_marks           # Item Potency / Dormant Curio marks on the icon (owner 2026-11-19)
-    price += item_marks(name, _State.current_patch_version)
+    if not removed:                 # an item taken out of the game has nothing to scale (7.42 Javelin)
+        price += item_marks(name, _State.current_patch_version)
     if source:
         type_label += f'<span class="entity-source">{source}</span>'
     # item-block: every framed box of an item hangs out on one common edge (CSS, owner 2026-09-28)

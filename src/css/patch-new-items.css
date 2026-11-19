@@ -10,6 +10,9 @@
 .entity-block.is-new ul.changes li > .row-tag-empty {
   display: none;
 }
+/* … but a new ability's card label ("New ability") keeps its NEW tag, as on every hero's card (owner 2026-11-19,
+   7.42 Radigull's Eggstremism: "New ability неправильно же оформлено?") */
+.entity-block.is-new ul.ability-change-summary-ul > li > .badge:first-child { display: inline-flex; }
 /* Per-row NEW tag was removed: the item is now signalled by the type label
    after the name + the components/provides blocks below the header. The
    block-level filter still works because each <li> inside .is-new carries

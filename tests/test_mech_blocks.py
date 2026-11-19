@@ -295,7 +295,9 @@ def test_a_bosss_drops_by_death_are_a_table():
     assert 'extra=mech_table(["When", "Drops", "Details"], [["Every death", item_icon("Aghanim\'s Shard"), ' \
            '"New thing"], ["From the 2nd death", item_icon("Cheese"), "With the same rules. Gold if everyone has it"]]' in out
     from patch.item_links import item_icon
-    assert 'data-tooltip="Cheese"' in item_icon("Cheese") and "<img " in item_icon("Cheese")
+    # as every table of the site: the small chip and the name (owner 2026-11-19: "не по аналогии с другими")
+    assert item_icon("Cheese").startswith('<span class="mech-item"><span class="ability-chip" data-tooltip="Cheese"')
+    assert '<span class="mech-abil-name"><a class="item-mention"' in item_icon("Cheese")
     other = 'W(li("Now drops gold", t("NEW"), extra=inline_note("Only at night<br>And only once")))'
     assert g._postprocess_drop_table([other]) == [other]
 
@@ -533,12 +535,18 @@ def test_round_five_rules_of_the_742_proofread():
     lines = ['W(li("Added a Radigull camp: New Medium camp for Radiant", t("NEW"), extra=inline_note("Each camp consists '
              'of 2 Radigulls")))',
              'W(li("Added an Odobenus camp: New Medium camp for Dire", t("NEW"), extra=inline_note("Each camp consists of '
-             '1 Odobenus Frostmage and 2 Odobenus Footmen")))', 'W(li("Medium Centaur camp removed", t("DEL")))']
+             '1 Odobenus Frostmage and 2 Odobenus Footmen")))', 'W(li("Medium Centaur camp removed", t("DEL")))',
+             'W(ul_close())']
     out = g._postprocess_new_camps(lines, None)          # no game files: the averages stay empty
-    assert out[0].startswith('W(li("New neutral camps", t("NEW"), extra="<!--MECHTABLE-->" + camp_table([("Radigull camp ')
-    assert '(2, "Radigull", NEUTRAL_CDN + "radigull.png")' in out[0]
-    assert '(1, "Odobenus Frostmage", NEUTRAL_CDN + "odobenus_frostmage.png"), (2, "Odobenus Footman"' in out[0]
-    assert out[1].endswith(', covered=True))') and out[3] == lines[2]
+    # a block of its own after the list, as 7.38's Flooded Camps (owner 2026-11-19)
+    assert out[:2] == [lines[2], 'W(ul_close())']
+    assert out[2] == 'W(plain_header("New Neutral Camps", dynamics=False, new="New camps"))'
+    story = out[4]
+    assert story.startswith('W(mech_story("Added 2 new neutral camps: a Medium camp for Radiant (Radigull) and a Medium '
+                            'camp for Dire (Odobenus)", table=camp_table([("Radigull camp ')
+    assert '(2, "Radigull", NEUTRAL_CDN + "radigull.png")' in story
+    assert '(1, "Odobenus Frostmage", NEUTRAL_CDN + "odobenus_frostmage.png"), (2, "Odobenus Footman"' in story
+    assert out[5].endswith(', covered=True))') and out[-1] == 'W(ul_close())'
     # the runes after Roshan's card are not his abilities: no "Abilities" heading over them
     from patch.state import _State
     from patch import elements
@@ -743,9 +751,23 @@ def test_pip_health_list_is_a_table_of_sticks_from_the_game_data():
     # a talent's extra pips: hidden sticks of their own, shown by the toggle over the table (owner 2026-11-19)
     assert '<i class="pip-x" data-src="talent"></i>' * 4 in html and 'data-pip-src="talent"' in html
     assert 'data-pip-src="scepter"' not in html                               # no toggle no row of the list needs
-    assert "One stick: one hero attack to break" in html
+    # one small panel, icons only, the words in their hovers (owner 2026-11-19)
+    assert 'class="pip-panel"' in html and 'data-tooltip="One stick: one hero attack to break it"' in html
+    assert 'aria-label="Talent"' in html and ">Talent<" not in html
     assert ">Nether Ward<" in html and "Pugna" not in html                     # no hero column
     assert pip_rows("Couriers<br>Some New Unit", "7.42") is None               # a line without data: the list as ever
     assert pip_rows("Couriers", "7.41") is None
     row = 'W(li("All units are now able to damage units with health bar pips", t("REWORK"), extra=inline_list("Couriers")))'
     assert g._postprocess_pip_list([row]) == [row.replace("inline_list(", "pip_list(")]     # the generator marks it
+
+
+def test_map_objectives_leave_miscellaneous_for_subgroups_of_their_own():
+    # owner 2026-11-19: "Wisdom Shrine и Outposts строчки мы разве отдельно не оформляем тоже?" (7.40 / 7.41 form)
+    lines = ['W(subgroup("Miscellaneous"))', 'W(ul_open())',
+             'W(li_formula("Wisdom Shrine experience decreased", "a", "b", f, g))',
+             'W(li("Outposts can now be captured while silenced", t("MISC")))',
+             'W(li("Glyph cooldown decreased", t("BUFF")))', 'W(ul_close())']
+    out = g._postprocess_objective_subgroups(lines)
+    assert out == ['W(subgroup("Miscellaneous"))', 'W(ul_open())', 'W(li("Glyph cooldown decreased", t("BUFF")))',
+                   'W(ul_close())', 'W(subgroup("Wisdom Shrines"))', 'W(ul_open())', lines[2], 'W(ul_close())',
+                   'W(subgroup("Outposts"))', 'W(ul_open())', lines[3], 'W(ul_close())']

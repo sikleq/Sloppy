@@ -243,3 +243,22 @@ def test_abilities_that_set_attack_potency_carry_the_mark_from_742():
     assert ability_marks("pangolier_rolling_thunder", "7.42") == ""
     from patch.item_marks import item_marks
     assert "Illusions: <b>8</b>" in item_marks("Diffusal Blade", "7.42")     # owner 2026-11-19: "просто Illusions: 8"
+
+
+def test_a_new_ability_card_in_a_new_block_keeps_its_new_tile():
+    # owner 2026-11-19, 7.42 Radigull's Eggstremism: "New ability неправильно же оформлено?" — its label had no tile
+    from patch.css_bundle import read_css
+    css = read_css()
+    assert ".entity-block.is-new ul.ability-change-summary-ul > li > .badge:first-child { display: inline-flex; }" in css
+    assert ".tag-marks .entity-block.is-new ul.ability-change-summary-ul > li > .badge[data-tag] { display: flex; }" in css
+
+
+def test_a_removed_item_has_no_potency_mark():
+    # 7.42 Javelin was removed: no Item Potency mark on its icon (owner's screenshot 2026-11-19)
+    from patch.state import _State
+    saved = _State.current_patch_version
+    try:
+        _State.current_patch_version = "7.42"
+        assert "item-marks" not in el.item_header("Javelin", removed="Item removed")
+    finally:
+        _State.current_patch_version = saved

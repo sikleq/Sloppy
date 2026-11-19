@@ -28,6 +28,7 @@
   /* a new unit's or item's row of another tag than NEW has its tile as anywhere else (7.38 Ancient Croaker's MISC
      "Neutrals will cast …": the new block hid its tag and drew a bullet); its NEW rows keep the bullet */
   .tag-marks .entity-block.is-new ul.changes > li:not([data-tag~="new"]) > .badge[data-tag] { display: flex; }
+  .tag-marks .entity-block.is-new ul.ability-change-summary-ul > li > .badge[data-tag] { display: flex; }
   .tag-marks .entity-block.is-new ul.changes > li:not([data-tag~="new"]) > .badge[data-tag] + .row-text::before {
     content: none; }
   /* a row with a bullet and no tile (a section's row, a description): the bullet in the tile's place, its text where
