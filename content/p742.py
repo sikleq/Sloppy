@@ -2511,9 +2511,10 @@ def build():
         new=dict(name="Nihilism", slug="leshrac_greater_lightning_storm", desc=_rw2_new),
         summary="Ability reworked.",
         tag="rework",
-        rows_first=lambda: [li("Ability Reworked", t("REWORK"), covered=True), li("Non-targeted. Affects enemy units. Doesn't pierce Debuff Immunity. Cannot be Dispelled.", t("REWORK"), covered=True), li("Mana Cost: 125. Cooldown: 25s", t("REWORK"), covered=True), li("Disarms nearby enemies, while constantly applying basic dispel to them and Leshrac himself", t("REWORK"), covered=True)]))
+        rows_first=lambda: [li("Ability Reworked", t("REWORK"), covered=True), li("Non-targeted. Affects enemy units. Doesn't pierce Debuff Immunity. Cannot be Dispelled.", t("REWORK"), covered=True), li("Mana Cost: 125. Cooldown: 25s", t("REWORK"), covered=True), li("Disarms nearby enemies, while constantly applying basic dispel to them and Leshrac himself", t("REWORK"), covered=True), li("Radius: 550; Duration: 4s", t("REWORK"), covered=True)]))
     W(ul_open())
-    W(li("Radius: 550; Duration: 4s", t("REWORK"), extra=inline_note("No longer applies Ethereal to Leshrac, so it can be used while Debuff Immune<br>Has no linger duration and doesn't work on invulnerable units")))
+    W(li("No longer applies Ethereal to Leshrac, so it can be used while Debuff Immune", t("REWORK")))
+    W(li("Has no linger duration and doesn't work on invulnerable units", t("REWORK")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

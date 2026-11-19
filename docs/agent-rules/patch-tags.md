@@ -1035,7 +1035,9 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   REWORK; переименование остаётся MISC (`_postprocess_covered_row_tags`).
 - «Ability Reworked» и пересказ новой способности строками → карточка «было → стало» по текстам игры двух патчей
   (`_postprocess_reworked_ability_cards`); видимой остаётся только строка с пояснением, которого нет в карточке
-  («No longer …», «… is unchanged»).
+  («No longer …», «… is unchanged»). Если у Valve такое пояснение висит под строкой одних чисел («Radius: 550;
+  Duration: 4s», Leshrac Nihilism), строка чисел уходит под карточку (числа в ней есть), а каждое пояснение
+  становится своей видимой строкой REWORK, не [?] под числами.
 - «Aghanim's Scepter reworked» / «Now upgraded with Aghanim's Scepter instead of …» и пересказ строками → одна строка,
   пересказ в её [?] (`_postprocess_aghs_rework_rows`). Подстроки Valve у строк про Аганим тоже уходят в [?]
   (`notes.py`), а не стоят отдельными BUFF/MISC (Tinker Deploy Turrets).

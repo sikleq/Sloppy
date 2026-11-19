@@ -85,6 +85,7 @@ _ABIL_HDR_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([a-z0-9_]+)"(, i
 _REWORKED_ROW_RE = re.compile(r'^\s*W\(li\("Ability Reworked", t\("REWORK"\)\)\)\s*$')
 _AGHS_PARENT_RE = re.compile(r"^\s*W\(li\(\"(?:Aghanim's (?:Scepter|Shard) reworked|Now upgraded with Aghanim's "
                              r"(?:Scepter|Shard) instead of Aghanim's (?:Scepter|Shard))\", t\(\"REWORK\"\)")
+_STAT_LINE_RE = re.compile(r"^[A-Z][A-Za-z' ]*: [\d./%sx-]+(?:[;.] [A-Z][A-Za-z' ]*: [\d./%sx-]+)*\.?$")
 _MISC_ROW_RE = re.compile(r'^\s*W\(li\("((?:[^"\\]|\\.)*)", t\("MISC"\)(?:, extra=inline_note\("((?:[^"\\]|\\.)*)"\))?\)\)\s*$')
 
 
@@ -114,8 +115,19 @@ def _postprocess_reworked_ability_cards(lines, version):
         # "Martyrdom is unchanged"); a note of values the card lists anyway goes with its row
         says_more = lambda r: "extra=" in r and re.search(r"\bno longer\b|\bunchanged\b|\bstill\b", r, re.I)
         hidden = [r.strip()[2:-1] for r in rows if not says_more(r)]                    # W(li(..)) -> li(..)
-        hidden = [re.sub(r"\)\s*$", ", covered=True)", r.replace('t("MISC")', 't("REWORK")')) for r in hidden]
         kept = [r for r in rows if says_more(r)]
+        # a kept row that is only values ("Radius: 550; Duration: 4s", owner 2026-11-19 on Nihilism): the card lists
+        # them, so it goes under the card and its notes become rows of their own, not a (?) under a stat line
+        split = []
+        for r in kept:
+            sm = _MISC_ROW_RE.match(r)
+            if sm and sm.group(2) and _STAT_LINE_RE.match(sm.group(1)):
+                hidden.append(f'li("{sm.group(1)}", t("MISC"))')
+                split += [f'{ind}W(li("{note.strip()}", t("REWORK")))' for note in sm.group(2).split("<br>") if note.strip()]
+            else:
+                split.append(r)
+        kept = split
+        hidden = [re.sub(r"\)\s*$", ", covered=True)", r.replace('t("MISC")', 't("REWORK")')) for r in hidden]
         n += 1
         v = f"_rw{n}"
         inn = ", innate=True" if innate else ""
