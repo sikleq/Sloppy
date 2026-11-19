@@ -78,6 +78,9 @@ CANONICAL_TAGS = [
     # an illusion of another kind — how it works, not a number (owner 2026-11-19, 7.42 Riftshadow Prism "Refract now
     # creates a strong illusion": "цвет REWORK, а не MISC")
     (re.compile(r'\bnow creates? an? strong illusions?\b', re.I), 'REWORK'),
+    # what an effect can now reach — NEW, as "no longer affects buildings" is DEL (owner 2026-11-19, 7.42 Parasma Magic
+    # Corruption: "тегом new надо, у тебя misc")
+    (re.compile(r'\bnow (?:also )?affects? buildings\b', re.I), 'NEW'),
     # an Aghanim's upgrade that stops giving its benefit = DEL, wind-up included ("Aghanim's Scepter no longer
     # decreases max wind-up time": the 7.37e tooltip "Decreases wind-up time …", audit 2026-10-03)
     (re.compile(r"^\s*Aghanim's (?:Scepter|Shard) no longer (?:decreases|reduces)\b", re.I), 'DEL'),

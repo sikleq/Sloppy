@@ -383,13 +383,10 @@ h4.subgroup {
 .mech-abil-set { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
 .mech-hero-item > img { object-fit: contain; }    /* an item / Twin Gates in the hero column (owner 2026-10-30) */
 .mech-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-/* 7.42 Artifact Pools (patch/item_links.artifact_pools, owner 2026-11-19): a pool's items one under another, left edge */
-.pool-table .mech-cell .pool-items { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+/* 7.42 Artifact Pools (patch/item_links.artifact_pools, owner 2026-11-19): a pool's items as icon chips in a row,
+   the names in their hovers ("опять имена предметов") */
+.pool-table .mech-cell .pool-items { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
 .mech-abils.mech-cols-5.pool-table { grid-template-columns: fit-content(14%) repeat(4, minmax(0, 1fr)); }
-@media (max-width: 760px) {      /* a phone: icons only, the name in the chip's own hover — names broke into syllables */
-  .pool-table .mech-cell .pool-items { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-  .pool-table .mech-item .mech-abil-name { display: none; }
-}
 /* a facet's chip grows on hover with its name above, as an ability's (owner 2026-10-30) */
 .mech-abils .facet-chip { position: relative; transition: transform 0.12s ease; }
 .mech-abils .facet-chip:hover { z-index: 101; transform: scale(2.6);

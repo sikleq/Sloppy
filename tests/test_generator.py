@@ -761,6 +761,7 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Siege creeps no longer switch aggro to the towers that attack heroes", "REWORK"),
     ("Outposts can now be captured while silenced", "QoL"),                               # owner 2026-11-19
     ("Refract now creates a strong illusion", "REWORK"),                                  # owner 2026-11-19
+    ("Magic Corruption now affects buildings", "NEW"),                                    # owner 2026-11-19
     ("Shine now provides all bonuses on self-cast, but they will be reduced by 50%", "BUFF"),
     ("Aghanim's Scepter now also decreases cooldown by 10s", "BUFF"),
     ("Fire now has Cinder Dash ability", "NEW"),
@@ -994,7 +995,8 @@ def test_artifact_pools_become_one_table_of_tiers_and_pools():
     assert out[0].endswith("extra=artifact_pools([[['A', 'B', 'C'], ['D', 'E', 'F']], [['G', 'H', 'I'], ['J', 'K', 'L']]])))")
     from patch.item_links import artifact_pools
     html = artifact_pools([[["Chipped Vest", "Red Ledger"]]])
-    assert ">Pool 1<" in html and ">Tier 1<" in html and html.count('class="mech-item"') == 2
+    assert ">Pool 1<" in html and ">Tier 1<" in html
+    assert 'class="mech-item"' not in html and ">Red Ledger<" not in html      # icons only (owner 2026-11-19)
 
 
 def test_a_tier_move_goes_into_the_items_header():
@@ -1004,7 +1006,7 @@ def test_a_tier_move_goes_into_the_items_header():
                                         '    W(li("Tier changed from 5 to 4", t("REWORK")))', '    W(ul_close())',
                                         '    W(enchant_header("Audacious"))', '    W(ul_open())',
                                         '    W(li("Tier changed from 5 to 4", t("REWORK")))', '    W(ul_close())'])
-    assert out[0] == '    W(item_header("Witchbane", changed="Now a Tier 4 Artifact"))'
+    assert out[0] == '    W(item_header("Witchbane", changed="Moved from Tier 5 to Tier 4"))'
     assert out[2] == '    W(li("Tier changed from 5 to 4", t("REWORK"), covered=True))'    # hidden, still counted
     assert out[6] == '    W(li("Tier changed from 5 to 4", t("REWORK")))'      # an enchantment: its tier table says it
 

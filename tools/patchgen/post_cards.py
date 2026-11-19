@@ -493,8 +493,8 @@ _PLAIN_ITEM_HDR_RE = re.compile(r'^(\s*)W\(item_header\(("(?:[^"\\]|\\.)*")\)\)\
 
 def _postprocess_tier_move_label(lines):
     """A neutral item moved to another tier says it in its header, as 7.38's "Now a Tier 1 Artifact" (owner 2026-11-19,
-    7.42: "Tier changed from 5 to 4 мы разве не писали где-то в другом патче в шапке"): the label "Now a Tier 4
-    Artifact", the row hidden (covered — still counted by the REWORK filter and the weights)."""
+    7.42: "Tier changed from 5 to 4 мы разве не писали где-то в другом патче в шапке"): the label "Moved from Tier 5
+    to Tier 4", the row hidden (covered — still counted by the REWORK filter and the weights)."""
     out = list(lines)
     for i, ln in enumerate(out):
         m = _PLAIN_ITEM_HDR_RE.match(ln)
@@ -504,7 +504,9 @@ def _postprocess_tier_move_label(lines):
         while j < len(out) and not re.match(r'\s*W\((?:item|hero|unit|plain|enchant)_header\(|\s*W\(section\(', out[j]):
             r = _TIER_MOVE_ROW_RE.match(out[j])
             if r:
-                out[i] = f'{m.group(1)}W(item_header({m.group(2)}, changed="Now a Tier {r.group(3)} Artifact"))'
+                # from which tier to which (owner 2026-11-19: "Now a Tier 4 Artifact надо не так, а показать с какого")
+                out[i] = (f'{m.group(1)}W(item_header({m.group(2)}, '
+                          f'changed="Moved from Tier {r.group(2)} to Tier {r.group(3)}"))')
                 out[j] = f'{r.group(1)}W(li("Tier changed from {r.group(2)} to {r.group(3)}", t("REWORK"), covered=True))'
                 break
             j += 1

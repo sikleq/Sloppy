@@ -92,6 +92,13 @@ def test_a_tier_the_enchantment_lost_is_struck_in_its_header():
         _State.current_patch_version = saved
     assert '<span class="ench-tier-h ench-gone">Tier 5</span>' in html
     assert '<span class="ench-tier-h">Tier 4</span>' in html
+    # every table of the patch: the game has 4 tiers now, Vital never had a tier 5 (owner 2026-11-19)
+    _State.current_patch_version = "7.42"
+    try:
+        vital = _enchant_change("Vital")
+    finally:
+        _State.current_patch_version = saved
+    assert '<span class="ench-tier-h ench-gone">Tier 5</span>' in vital and "ench-col-gone" in vital
 
 
 def test_tables_have_lines_between_cells_and_centred_values():
