@@ -2638,6 +2638,34 @@
 "moved": 2
 }
 }
+},
+{
+"patch": "7.42-1118",
+"date": "2026-11-18",
+"sha8": "0d7217cc",
+"changes": "client update of 2026-11-18 inside 7.42, hours after the patch (no patch notes): one tree removed at the Dire base (x 5824, y 6848); 2 walk-grid cells beside it swapped (one opened, one blocked) and 3 cells there one height level higher; nothing else moved",
+"n": {
+"trees": 2397,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+},
+"moves": {}
 }
 ]
 }
