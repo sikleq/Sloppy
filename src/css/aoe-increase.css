@@ -279,22 +279,37 @@
   font-size: 10.5px;
 }
 
-/* ITEM POTENCY page (builders/item_potency.py, Materials → Mechanics, owner 2026-11-19): items and the values the game
-   scales, the abilities that set attacks' potency */
-.ipot-page { padding: 4px 0 24px; }
+/* ITEM POTENCY page (builders/item_potency.py, Materials → Mechanics, owner 2026-11-19): little text, colour for
+   meaning — rules as cards, a row per scaled value, potency as green / red chips */
+.ipot-page { padding: 4px 14px 28px; text-align: left; }
+.ipot-sec { margin-top: 22px; }
 .ipot-title { font-family: var(--font-ui); color: var(--gold); font-size: 14px; letter-spacing: .4px;
-  text-transform: uppercase; margin: 22px 0 8px 14px; text-align: left; }
-.ipot-table { margin-bottom: 6px; }
-table.mr-table.ipot-table td.ipot-ex { color: var(--text-dim); }
-table.mr-table.ipot-table tr.ipot-gone td { opacity: 0.45; }
-.ipot-nm { display: inline-block; vertical-align: middle; }
-table.mr-table.ipot-table td { text-align: left; vertical-align: middle; padding: 8px 14px; }
+  text-transform: uppercase; margin: 0 0 8px; text-align: left; }
+.ipot-rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.ipot-rule { padding: 10px 12px; border: 1px solid var(--line-soft); border-radius: 6px; background: rgba(255, 255, 255, 0.02); }
+.ipot-rule-h { color: var(--text-main); font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+.ipot-rule .formula-expr { display: block; font-size: 13px; margin-bottom: 6px; }
+.ipot-rule-ex { font-size: 12px; color: var(--text-dim); }
+.ipot-ex-old { color: var(--text-dim); }
+.ipot-ex-new { color: var(--gold); font-weight: 700; }
+.ipot-ex-what { margin-left: 8px; }
+.ipot-table { margin-bottom: 0; }
 table.mr-table.ipot-table { width: 100%; }
-table.mr-table.ipot-table td.ipot-text { white-space: normal; min-width: 0; }
+table.mr-table.ipot-table td { text-align: left; vertical-align: middle; padding: 7px 12px; }
 table.mr-table.ipot-table th { white-space: nowrap; }
-table.mr-table.ipot-table td.ipot-ill { text-align: center; white-space: nowrap; }
+table.mr-table.ipot-table td.ipot-text { white-space: normal; }
+table.mr-table.ipot-table td.ipot-v { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+table.mr-table.ipot-table td.ipot-v-hero { color: var(--gold); font-weight: 700; }
+table.mr-table.ipot-table td.ipot-v-ill { color: var(--text-dim); }
+table.mr-table.ipot-table td.ipot-v-up { color: #6fd08a; font-weight: 700; }
+table.mr-table.ipot-table td.ipot-ab { color: var(--text-dim); white-space: nowrap; }
+table.mr-table.ipot-table tr.ipot-gone td { opacity: 0.45; }
 .ipot-name { white-space: nowrap; font-weight: 600; }
-.ipot-name img { vertical-align: middle; margin-right: 10px; border-radius: 3px; }
+.ipot-nm-wrap { display: inline-flex; align-items: center; gap: 10px; }
+.ipot-name img { border-radius: 3px; }
 .ipot-owner { display: block; color: var(--text-dim); font-weight: 400; font-size: 12px; }
-.ipot-line + .ipot-line { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line-soft); }
-
+.ipot-prop.iab-hint { text-decoration: underline dotted rgba(150, 146, 137, 0.7); text-underline-offset: 3px; cursor: help; }
+.ipot-chip { display: inline-block; min-width: 46px; padding: 1px 8px; border-radius: 3px; font-weight: 700;
+  background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
+.ipot-chip.ipot-buff { background: rgba(85, 205, 115, 0.14); color: #6fd08a; }
+.ipot-chip.ipot-nerf { background: rgba(224, 114, 122, 0.14); color: #e98a91; }

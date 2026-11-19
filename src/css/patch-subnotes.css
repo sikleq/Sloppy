@@ -231,9 +231,11 @@ ul.subnote-items > li::before {
 /* Live formula (formula_change inputs= + chart=, 7.42 Hero kill bounty): a field per variable,
    the result under each formula, a chart of both. The old curve and the old result share the
    muted dashed look, the new ones the gold: the colours tie each curve to its pane. */
-.formula-live .formula-input-row { flex-wrap: wrap; column-gap: 18px; row-gap: 6px; }
-.formula-input-cell { display: flex; align-items: center; gap: 8px; }
-.formula-live .formula-input { width: 120px; }
+/* a variable's field inside the formula itself, right after its name (owner 2026-11-19: "вместо отдельной строки с
+   окнами, можно прям в блоках с формулами сделать поле ввода") */
+.fx-var-in { display: inline-flex; align-items: baseline; gap: 4px; }
+.formula-live .fx-var-in .formula-input { width: 46px; padding: 1px 5px; font-size: 12px; text-align: center;
+  font-family: inherit; color: #e0b87a; }
 .fx-result {
   display: flex;
   align-items: baseline;

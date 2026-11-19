@@ -54,6 +54,20 @@ def item_page(name):
     return engine[len("item_"):].replace("_", "-") if engine else None
 
 
+def item_icon(name):
+    """The item's icon in a table cell (a drops table: owner 2026-11-19 "лучше иконки предметов в таблице, а не
+    словами"): its name on hover, a link to its Changes page when it has one."""
+    from .images import item_img
+    img = f'<img src="{item_img(name)}" alt="{html.escape(name)}" width="44" height="32" loading="lazy">'
+    hint = f'<span class="iab-hint abil-ico-hint item-icon-cell" data-tooltip="{html.escape(name, quote=True)}">{img}</span>'
+    slug = item_page(name)
+    if not slug:
+        return hint
+    ver = _State.current_patch_version
+    href = f"../items/{slug}.html" + (f"?from={ver}" if ver else "")
+    return f'<a class="item-mention item-mention-icon" href="{href}">{hint}</a>'
+
+
 def item_link(name):
     """<a> to the item's Changes page (from this patch, as an item header's link); the name as it was if unknown."""
     slug = item_page(name)

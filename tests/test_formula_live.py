@@ -12,7 +12,7 @@ BOUNTY_ROW = ('W(li("Hero kill bounty rescaled", t("REWORK"), extra=inline_note(
               '"OLD: 125 + (8 * VictimLevel) + KillstreakFactor<br>NEW: 100 + (10 * VictimLevel) + KillstreakFactor")))')
 BOUNTY_BLOCK = ('W(formula_change("Hero kill bounty", "125 + (8 * VictimLevel) + KillstreakFactor", '
                 '"100 + (10 * VictimLevel) + KillstreakFactor", tag="REWORK", '
-                'inputs={"VictimLevel": 15, "KillstreakFactor": 0}, '
+                'inputs={"VictimLevel": 1, "KillstreakFactor": 0}, '      # level 1 by default (2026-11-19)
                 'chart=("VictimLevel", "Victim Level", 1, 30), unit="Gold"))')
 
 
@@ -44,7 +44,9 @@ def test_live_formula_has_a_field_per_variable_results_and_chart():
                           "100 + (10 * VictimLevel) + KillstreakFactor",
                           inputs={"VictimLevel": 15, "KillstreakFactor": 0},
                           chart=("VictimLevel", "Victim Level", 1, 30), unit="Gold")
-    assert re.findall(r'data-var="(\w+)"', html) == ["VictimLevel", "KillstreakFactor"]
+    # the fields inside both formulas, after each variable's name (owner 2026-11-19), the two panes in step
+    assert re.findall(r'data-var="(\w+)"', html) == ["VictimLevel", "KillstreakFactor"] * 2
+    assert 'formula-input-row' not in html and '<label class="fx-var-in"><span class="f-var">VictimLevel</span>' in html
     assert '<span class="fx-val fx-val-old">245</span>' in html
     assert '<span class="fx-val fx-val-new">250</span>' in html
     assert html.count('<polyline class="fx-line') == 2 and 'fx-ruler' in html

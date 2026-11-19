@@ -207,21 +207,26 @@ def _fx_marker(cx, yo, yn, o, n, base):
 def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_better):
     names = list(inputs)
     env = dict(inputs)
-    fields = ''
-    for v in names:
-        d = inputs[v]
-        disp = f'{d:,}' if isinstance(d, int) else f'{d:g}'
-        rng = (f' min="{chart[2]}" max="{chart[3]}" step="1"' if chart and v == chart[0] else ' min="0"')
-        fields += (f'<label class="formula-input-cell">'
-                   f'<span class="formula-input-label">Set <span class="fx-vname">{v}</span>:</span>'
-                   f'<input type="number" class="formula-input" data-var="{v}" data-default="{d}"{rng} '
-                   f'inputmode="decimal" placeholder="By default: {disp}"></label>')
     o, n = _eval_formula(old, env), _eval_formula(new, env)
     unit_html = f' <span class="fx-unit">{unit}</span>' if unit else ''
 
+    def _with_fields(code):
+        """Each variable of the formula gets its field right after its name, in both panes, kept in step by the page
+        (owner 2026-11-19: "вместо отдельной строки с окнами, можно прям в блоках с формулами сделать поле ввода")."""
+        def one(m):
+            v = m.group(1)
+            if v not in inputs:
+                return m.group(0)
+            d = inputs[v]
+            rng = (f' min="{chart[2]}" max="{chart[3]}" step="1"' if chart and v == chart[0] else ' min="0"')
+            return (f'<label class="fx-var-in">{m.group(0)}<input type="number" class="formula-input" '
+                    f'data-var="{v}" data-default="{d}"{rng} inputmode="decimal" value="{d:g}" '
+                    f'aria-label="{v}"></label>')
+        return re.sub(r'<span class="f-var">(\w+)</span>', one, code)
+
     def _pane(expr, cls, val, pct):
         return (f'<div class="formula-pane formula-pane-{cls}">'
-                f'<code class="formula-expr">{_fmt_formula(expr)}</code>'
+                f'<code class="formula-expr">{_with_fields(_fmt_formula(expr))}</code>'
                 f'<div class="fx-result"><span class="fx-val fx-val-{cls}">{_num_fmt(val)}</span>{unit_html}{pct}</div>'
                 f'</div>')
 
@@ -240,7 +245,6 @@ def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_bett
     return (f'<div class="formula-change formula-live" data-tag="{tag_id}"{attrs}>'
             f'<div class="formula-change-title">{badge}'
             f'<span class="formula-change-name">{name}</span></div>'
-            f'<div class="formula-input-row">{fields}</div>'
             f'<div class="formula-change-panes">'
             f'{_pane(old, "old", o, "")}'
             f'<span class="ability-change-arrow">→</span>'

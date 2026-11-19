@@ -1358,15 +1358,31 @@ _POP_FROMTO_RE = re.compile(r'\bfrom (\d+(?:\.\d+)?)(?:%|s|g)? to (\d+(?:\.\d+)?
 _POP_LOWER_RE = re.compile(r'\b(?:cooldown|cost|cast point|delay|respawn|channel time)\b', re.I)
 
 
-def _pop_pct(line):
-    """"… from 90 to 112.5" → the row's % at its end, as on a patch row (owner 2026-11-19: "если там до/после
-    значения, то в конце строки … %разницу"); '' for a line without one."""
-    m = _POP_FROMTO_RE.search(re.sub(r'<[^>]+>', '', line))
-    if not m or 'badge' in line or 'pop-pct' in line:
-        return ''
-    from .badges import b
+def value_hint(value_html, pct, tone):
+    """A changed value as the cards draw one: dotted, its % in the hover (patch/cards_item_abilities._iab_hint)."""
+    import html as _h
+    tip = f'<span class="iab-num iab-{tone}">{pct}</span>'
+    return f'<span class="iab-hint abil-ico-hint" data-tooltip="{_h.escape(tip, quote=True)}">{value_html}</span>'
+
+
+def _pop_hint_value(text):
+    """"Damage increased from 130 to 175" in a "?" row: the 175 dotted, its % on hover (owner 2026-11-19: not a % at
+    the end of the row — "как везде на сайте в карточках")."""
+    m = None
+    for m in _POP_FROMTO_RE.finditer(text):
+        pass
+    if not m or 'badge' in text or 'iab-hint' in text:
+        return text
     a, z = (float(x) if '.' in x else int(x) for x in m.groups())
-    return '' if a == z or a == 0 else f'<span class="pop-end">{b(a, z, l=bool(_POP_LOWER_RE.search(line)))}</span>'
+    if a == z or a == 0:
+        return text
+    lower = bool(_POP_LOWER_RE.search(text))
+    tone = "buff" if (z > a) != lower else "nerf"
+    pct = (z - a) / a * 100
+    s, e = m.span(2)
+    end = re.match(r'(?:%|s|g)?', text[e:]).end() + e
+    shown = f'<span class="iab-hl iab-hl-{tone}">{text[s:end]}</span>'
+    return text[:s] + value_hint(shown, f'{"+" if pct > 0 else "−"}{abs(pct):.0f}%', tone) + text[end:]
 
 
 def _pop_split(line):
@@ -1399,18 +1415,14 @@ def _pop_list(body):
     лаконичной удобной таблицы с разделителями"); an "&nbsp;&nbsp;– x" line is a sub-row of the line above; a row
     with "from A to B" ends with its % — a line with two such changes is two rows. A single plain line stays text."""
     items = [p for x in body.split('<br>') if x.strip() for p in _pop_split(x)]
-    if len(items) < 2 and not (items and _pop_pct(items[0])):
-        return body
+    if len(items) < 2:                    # one line: plain text, its changed value dotted with its % on hover
+        return _pop_hint_value(body) if items else body
     rows = []
     for x in items:
         sub = x.startswith(_POP_SUB)
         text = x[len(_POP_SUB):] if sub else x
         kind = " pop-sub" if sub else " pop-head" if text.endswith(":") and len(items) > 1 else ""
-        pct = _pop_pct(text)
-        dots = '<span class="pop-dots"></span>' if pct else ''      # a dotted ruler to its %, as the site's rows
-        # the % shows under the mouse in a pinned "?" only (owner 2026-11-19: "сделать везде")
-        rows.append(f'<span class="pop-li{kind}{" pop-hint" if pct else ""}"><span class="pop-t'
-                    f'{" pop-t-pct" if pct else ""}">{text}</span>{dots}{pct}</span>')
+        rows.append(f'<span class="pop-li{kind}"><span class="pop-t">{_pop_hint_value(text)}</span></span>')
     return ''.join(rows)
 
 

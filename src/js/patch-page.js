@@ -236,17 +236,6 @@
       requestAnimationFrame(drawBrewlingConnectors);
     });
   });
-  // ... and a pill inside a "?" popup: the popup is a copy (tooltips.js), its pill has no handler — the click goes to
-  // the page's own pill, its table opens under the row (owner 2026-11-19: "formula table внутри [?] не открывается")
-  document.addEventListener('click', e => {
-    const copy = e.target.closest('.info-pop-body .formula-trigger');
-    if (!copy) return;
-    const own = document.querySelector('.formula-trigger[data-formula="' + copy.dataset.formula + '"]');
-    if (!own || own === copy) return;
-    own.click();
-    copy.classList.toggle('active', own.classList.contains('active'));
-  });
-
   // ---- ENTITY SEARCH ----
   // Guard: pages without the search box (e.g. creeps.html) skip this whole
   // block. Without the guard, searchInput.addEventListener below throws on

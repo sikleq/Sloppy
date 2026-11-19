@@ -289,8 +289,11 @@ def test_a_bosss_drops_by_death_are_a_table():
            'Aghanim\'s Shard — New thing<br>Starting with the 2nd death, always drops Cheese with the same rules '
            '<span class=\\"pop-note\\">(Gold if everyone has it)</span>")))')
     out = g._postprocess_drop_table([row])[0]
-    assert 'extra=mech_table(["When", "Drops", "Details"], [["Every death", item_link("Aghanim\'s Shard"), ' \
-           '"New thing"], ["From the 2nd death", item_link("Cheese"), "With the same rules. Gold if everyone has it"]]' in out
+    # icons, not names (owner 2026-11-19: "лучше иконки предметов в таблице, а не словами")
+    assert 'extra=mech_table(["When", "Drops", "Details"], [["Every death", item_icon("Aghanim\'s Shard"), ' \
+           '"New thing"], ["From the 2nd death", item_icon("Cheese"), "With the same rules. Gold if everyone has it"]]' in out
+    from patch.item_links import item_icon
+    assert 'data-tooltip="Cheese"' in item_icon("Cheese") and "<img " in item_icon("Cheese")
     other = 'W(li("Now drops gold", t("NEW"), extra=inline_note("Only at night<br>And only once")))'
     assert g._postprocess_drop_table([other]) == [other]
 
@@ -402,9 +405,17 @@ def test_long_level_tables_lie_across_and_shared_values_pivot():
               'decreased from 130-150 to 125<br>Tier 2 tower gold per player decreased from 110 to 100<br>Barracks last '
               'hit gold rescaled from 90-135 to 100")))')
     out = g._postprocess_from_to_list([bounty])[0]
-    assert 'extra=mech_table(["", "Last hit gold", "Gold per player"], [["Tier 1 tower", mech_change_cell("110-130", ' \
-           '"100"), mech_change_cell("90", "75")], ["Tier 2 tower", ' in out
-    assert '["Barracks", mech_change_cell("90-135", "100"), "–"]' in out and 'cls="mech-grid"' in out
+    # before | after | % per value (owner 2026-11-19: "забыли значения до")
+    assert ('extra=mech_table(["", "Last hit gold: before", "after", "", "Gold per player: before", "after", ""], '
+            '[["Tier 1 tower", *mech_change_cells("110-130", "100"), *mech_change_cells("90", "75")], '
+            '["Tier 2 tower", ') in out
+    assert '["Barracks", *mech_change_cells("90-135", "100"), "–", "", ""]' in out and 'cls="mech-grid mech-change-grid"' in out
+    # the "no longer variable" row: the table's before column shows the ranges — covered
+    rows = g._postprocess_bounty_range_row([out, 'W(li("Buildings no longer have variable last hit bounties", t("MISC")))'])
+    assert rows[1].endswith('t("MISC"), covered=True))')
+    from patch.mech_abilities import mech_change_cells
+    assert mech_change_cells("90", "75") == ['<span class="mech-old">90</span>', '<b class="iab-num iab-nerf">75</b>',
+                                             '<span class="mech-pct-cell iab-nerf">−17%</span>']
 
 
 def test_old_new_values_by_level_under_a_from_to_row_are_a_formula_table():

@@ -22,7 +22,8 @@ _FX_NAME_TAIL_RE = re.compile(r'\s+(?:rescaled|reworked|changed|adjusted|updated
 # The variables we know: (name pattern, default value, chart range or None, axis label or None). A formula with any
 # other variable stays as it was: a default we would have to guess is worse than none.
 _FX_KNOWN_VARS = (
-    (re.compile(r'Level$'), 15, (1, 30), None),                # a hero level: chart 1-30, the default mid-game
+    # a hero level: chart 1-30, the default level 1 (owner 2026-11-19: "по умолчанию 1 уровень и 0 фактор")
+    (re.compile(r'Level$'), 1, (1, 30), None),
     (re.compile(r'^NumHeroes$'), 1, (1, 5), 'Heroes'),         # heroes sharing the gold: 1-5, the team size
     (re.compile(r'Networth$|^NW$'), 10000, None, None),        # networth-style -> 10000 (docs/formula-change.md)
     (re.compile(r'(?:Kill)?[Ss]treak'), 0, None, None),        # no streak by default

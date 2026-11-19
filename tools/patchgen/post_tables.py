@@ -43,7 +43,8 @@ def _postprocess_drop_table(lines):
         if len(parts) < 2 or not all(parts):
             out.append(ln)
             continue
-        rows = ", ".join(f'[{_py_str(w)}, item_link({_py_str(i)}), {_py_str(d)}]' for w, i, d in parts)
+        # the item's icon, its name on hover, a link to its changes (owner 2026-11-19: "лучше иконки предметов")
+        rows = ", ".join(f'[{_py_str(w)}, item_icon({_py_str(i)}), {_py_str(d)}]' for w, i, d in parts)
         out.append(f'{m.group(1)}, extra=mech_table(["When", "Drops", "Details"], [{rows}], wide_last=True)))')
     return out
 
@@ -195,6 +196,20 @@ def _postprocess_from_to_list(lines):
     return out
 
 
+def _postprocess_bounty_range_row(lines):
+    """"Buildings no longer have variable last hit bounties" next to the building bounty table: its "before" column
+    shows the old ranges (110-130 → 100), so the row is covered — hidden, still counted (owner 2026-11-19: "строка не
+    нужна - она уже должна быть в таблице")."""
+    has_table = any("Building bounty" in ln and "mech_change_cell" in ln for ln in lines)
+    out = []
+    for ln in lines:
+        if has_table and re.search(r'W\(li\("Buildings no longer have variable last hit bounties"', ln) \
+                and "covered=True" not in ln:
+            ln = re.sub(r'\)\)\s*$', ', covered=True))', ln)
+        out.append(ln)
+    return out
+
+
 def _pivot(hits):
     """The same few values for several things ("Tier 1 tower last hit gold" / "Tier 1 tower gold per player", …,
     "Melee Barracks gold per player", 7.42) → mech_table with a row per thing and a column per value, each cell
@@ -206,13 +221,17 @@ def _pivot(hits):
         things = list(dict.fromkeys(t for t, _ in split))
         if all(t for t, _ in split) and 2 <= len(kinds) <= 3 and len(things) >= 3 and len(things) < len(hits) \
                 and all(sum(v == kv for _, v in split) >= 2 for kv in kinds):
-            # each change in the colour of what it means, with its % (owner 2026-11-19: "изменения тоже не видны")
-            cell = {(t, v): f'mech_change_cell({_py_str(h.group("a"))}, {_py_str(h.group("b"))})'
+            # each value as before | after | % (owner 2026-11-19: "забыли значения до … один столбец до, другой
+            # после и в конце % разницу"), the after in the colour of what it means
+            cell = {(t, v): f'*mech_change_cells({_py_str(h.group("a"))}, {_py_str(h.group("b"))})'
                     for (t, v), h in zip(split, hits)}
-            rows = ", ".join("[" + ", ".join([_py_str(t)] + [cell.get((t, v), '"–"') for v in kinds]) + "]"
+            rows = ", ".join("[" + ", ".join([_py_str(t)] + [cell.get((t, v), '"–", "", ""') for v in kinds]) + "]"
                              for t in things)
-            head = "[" + ", ".join(_py_str(x) for x in [""] + [v[:1].upper() + v[1:] for v in kinds]) + "]"
-            return f'mech_table({head}, [{rows}], cls="mech-grid")'
+            heads = [""]
+            for v in kinds:
+                heads += [f"{v[:1].upper() + v[1:]}: before", "after", ""]
+            head = "[" + ", ".join(_py_str(x) for x in heads) + "]"
+            return f'mech_table({head}, [{rows}], cls="mech-grid mech-change-grid")'
     return None
 
 

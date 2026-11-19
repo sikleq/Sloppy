@@ -166,12 +166,13 @@ def test_a_moved_talent_is_a_table_row_of_level_and_value_before_and_after():
     from patch.talent_marks import change_cells, moves_table
     buff = '<span class="iab-hl iab-hl-buff">'
     nerf = '<span class="iab-hl iab-hl-nerf">'
-    assert change_cells("+20% Stifling Dagger Damage", "+15% Stifling Dagger Damage", 20, 15) == \
-        ("Stifling Dagger Damage", f"20 → {buff}15</span>",
-         f'<span class="pop-hint">+20% → {nerf}+15%</span><span class="tm-pct">−25%</span></span>')
-    # the % under the mouse in a pinned "?" only (owner 2026-11-19: "+100 можно при наведении … а не писать рядом")
-    assert change_cells("+110 Rolling Boulder Damage", "+160 Rolling Boulder Damage", 15, 20)[1:] == \
-        (f"15 → {nerf}20</span>", f'<span class="pop-hint">+110 → {buff}+160</span><span class="tm-pct">+45%</span></span>')
+    # the % in the new value's own hover, as a card's changed number (owner 2026-11-19: "как везде на сайте в карточках")
+    label, level, value = change_cells("+20% Stifling Dagger Damage", "+15% Stifling Dagger Damage", 20, 15)
+    assert (label, level) == ("Stifling Dagger Damage", f"20 → {buff}15</span>")
+    assert value.startswith('+20% → <span class="iab-hint abil-ico-hint" data-tooltip="')
+    assert "−25%" in value and f'{nerf}+15%</span></span>' in value and 'tm-pct' not in value
+    value = change_cells("+110 Rolling Boulder Damage", "+160 Rolling Boulder Damage", 15, 20)[2]
+    assert "+45%" in value and f'{buff}+160</span></span>' in value
     # unchanged numbers stay in the name; the same level is the other side
     assert change_cells("+4 Armor", "+4 Armor", 10, 10) == ("+4 Armor", "10, other side", '<span class="tm-same">same</span>')
     # another bonus: neither better nor worse

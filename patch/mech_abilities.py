@@ -593,6 +593,22 @@ def mech_change_cell(old, new, l=False):
             f'data-tooltip="{_html.escape(note, quote=True)}">{new}</span></b>')
 
 
+def mech_change_cells(old, new, l=False):
+    """A change as three table cells — before (dim), after (in the colour of what it means), its % (owner 2026-11-19,
+    7.42 building bounty: "забыли значения до … один столбец до, другой после и в конце % разницу"). "110-130" reads
+    as its middle, 120, for the %."""
+    def mid(v):
+        nums = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", str(v))]
+        return sum(nums) / len(nums) if nums else None
+    a, b = mid(old), mid(new)
+    if a is None or b is None or a == b or not a:
+        return [f'<span class="mech-old">{old}</span>', f"<b>{new}</b>", ""]
+    tone = "buff" if (b > a) != l else "nerf"
+    pct = (b - a) / a * 100
+    return [f'<span class="mech-old">{old}</span>', f'<b class="iab-num iab-{tone}">{new}</b>',
+            f'<span class="mech-pct-cell iab-{tone}">{"+" if pct > 0 else "−"}{abs(pct):.0f}%</span>']
+
+
 def mech_formula(expr):
     """A formula for a mech_table's cell, in the look of the site's formula blocks: variables and numbers coloured."""
     from .formula_rows import _fmt_formula

@@ -166,10 +166,15 @@
     function env() {
       const e = {};
       inputs.forEach((i) => {
+        if (i.dataset.var in e) return;            // a variable's field is in both panes: they hold the same value
         const v = parseFloat(i.value);
         e[i.dataset.var] = isFinite(v) ? v : parseFloat(i.dataset.default);
       });
       return e;
+    }
+    // a field typed into: its twin in the other pane follows (owner 2026-11-19: the fields inside the formulas)
+    function sync(src) {
+      inputs.forEach((i) => { if (i !== src && i.dataset.var === src.dataset.var) i.value = src.value; });
     }
     const call = (f, e) => f(...vars.map((v) => e[v]));
     function draw(e) {
@@ -224,7 +229,7 @@
       }
       if (svg && cv) draw(e);
     }
-    inputs.forEach((i) => i.addEventListener('input', () => recalc()));
+    inputs.forEach((i) => i.addEventListener('input', () => { sync(i); recalc(); }));
     if (!svg || !cv) return;
     const cvInput = inputs.find((i) => i.dataset.var === cv);
     function levelAt(ev) {   // the chart's x under the pointer -> a value of the chart variable
@@ -235,7 +240,7 @@
     }
     function pick(ev) {
       const c = levelAt(ev);
-      if (cvInput && String(c) !== cvInput.value) { cvInput.value = c; recalc(); }
+      if (cvInput && String(c) !== cvInput.value) { cvInput.value = c; sync(cvInput); recalc(); }
     }
     let down = false, shown = null;
     svg.addEventListener('pointerdown', (ev) => { down = true; shown = null; svg.setPointerCapture(ev.pointerId); pick(ev); });

@@ -137,6 +137,11 @@ CANONICAL_TAGS = [
     # (7.42, by Poison Attack's decision); an item effect that now also does a new thing to its target — NEW (owner
     # 2026-11-19, Nullify "now also makes the target … less susceptible to forced movement")
     (re.compile(r'\bnow only applies to\b', re.I), 'REWORK'),
+    # owner 2026-11-19 (7.42): a constant instead of a ramp over game time — how it works, REWORK; a passive income
+    # heroes never had — NEW; a creep that no longer switches aggro (you pulled the catapult off the tower) — REWORK
+    (re.compile(r'\bno longer scales over (?:game )?time\b', re.I), 'REWORK'),
+    (re.compile(r'\bnow passively receives?\b', re.I), 'NEW'),
+    (re.compile(r'\bno longer switch(?:es)? aggro\b', re.I), 'REWORK'),
     (re.compile(r'\bnow also makes the target\b', re.I), 'NEW'),
     (re.compile(r'\bnow (?:only|solely) (?:affects?|available|appl(?:ies|ied)|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:affects?|applies|works) only\b', re.I),  'NERF'),

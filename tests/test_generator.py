@@ -618,22 +618,22 @@ def test_multi_line_info_popup_is_a_bulleted_list():
     # owner 2026-11-19: before / after values get the row's % at the end; two changes in one sentence = two rows
     two = info_tip("As a result, for buildings impact damage increased from 90 to 112.5, and burn damage decreased "
                    "from 50 to 45")
-    # a row with a % is a "pop-hint": its % shows under the mouse in a pinned "?" (owner 2026-11-19)
-    assert two.count('class="pop-li pop-hint"') == 2 and "+25%" in two and "-10%" in two
-    assert '<span class="pop-t pop-t-pct">Burn damage decreased from 50 to 45</span><span class="pop-dots"></span>' in two
+    # each changed value dotted, its % in its own hover as on the cards (owner 2026-11-19)
+    assert two.count('class="pop-li"') == 2 and two.count('iab-hint abil-ico-hint') == 2
+    assert '<span class="pop-t">Burn damage decreased from 50 to <span class="iab-hint' in two
     # a sentence per row: the % stands by its own change (owner 2026-11-19, 7.42 Caduceus "+35% не видно, что относится
     # к Damage …")
     cad = info_tip("Compared to Phylactery: — Added allied interaction with a separate cooldown. Damage increased "
                    "from 130 to 175")
     assert '<span class="pop-t">Added allied interaction with a separate cooldown</span></span>' in cad
-    assert '<span class="pop-t pop-t-pct">Damage increased from 130 to 175</span>' in cad
-    assert "+50%" in info_tip("Cooldown increased from 10 to 15") and "nerf" in info_tip("Cooldown increased from 10 to 15")
+    assert '<span class="pop-t">Damage increased from 130 to <span class="iab-hint' in cad
+    assert "+50%" in info_tip("Cooldown increased from 10 to 15") and "iab-nerf" in info_tip("Cooldown increased from 10 to 15")
     # 7.42 Bloodslinger "Compared to Blood Grenade: — Cast range increased from 900 to 1200. Projectile speed …": its
     # lead a row, then a row per sentence, each with its % (owner 2026-11-19: "ты только % … для одного значения")
     cmp = info_tip("Compared to Blood Grenade: — Cast range increased from 900 to 1200. Projectile speed increased "
                    "from 1100 to 1400. Slow increased from 15% to 30% which returns to 15% over the duration")
     assert 'class="pop-li pop-head"><span class="pop-t">Compared to Blood Grenade:</span>' in cmp
-    assert "+33%" in cmp and "+27%" in cmp and "+100%" in cmp
+    assert "+33%" in cmp and "+27%" in cmp and "+100%" in cmp and "pop-end" not in cmp
 
 
 def test_new_item_becomes_card_price_bonuses_then_abilities():
@@ -756,6 +756,9 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Unholy Strength can now be toggled without cancelling invisibility", "QoL"),         # owner 2026-11-19
     ("Regeneration Aura now only applies to player controlled units", "REWORK"),           # as Poison Attack
     ("Force's push now cannot be dispelled", "BUFF"),                     # 11 such rows 7.38-7.42: BUFF
+    ("Passive gold per minute no longer scales over game time", "REWORK"),               # owner 2026-11-19
+    ("All heroes now passively receive 50 experience per minute after the starting horn", "NEW"),
+    ("Siege creeps no longer switch aggro to the towers that attack heroes", "REWORK"),
     ("Shine now provides all bonuses on self-cast, but they will be reduced by 50%", "BUFF"),
     ("Aghanim's Scepter now also decreases cooldown by 10s", "BUFF"),
     ("Fire now has Cinder Dash ability", "NEW"),

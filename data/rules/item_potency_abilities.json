@@ -81,33 +81,57 @@
   "rules": [
     [
       "A scaled value",
-      "value × Item Potency / 100, no cap",
-      "Desolator −6 at 120%: −7.2"
+      "Value * Potency / 100",
+      [
+        "-6",
+        "-7.2",
+        "Desolator at 120%"
+      ]
     ],
     [
-      "Bonuses and penalties of the attacker",
-      "added up: 100 + their sum",
-      "Focus Fire −25 with Evolved +20: 95%"
+      "Bonuses and penalties",
+      "100 + Bonuses",
+      [
+        "100",
+        "95",
+        "Focus Fire -25, Evolved +20"
+      ]
     ],
     [
-      "An attack with its own Item Potency",
-      "multiplied by that sum",
-      "Swashbuckle 60% with Evolved: 72%"
+      "An attack with its own potency",
+      "Own * (100 + Bonuses) / 100",
+      [
+        "60",
+        "72",
+        "Swashbuckle with Evolved"
+      ]
     ],
     [
       "A debuff applied again",
-      "keeps the higher Item Potency",
-      "Desolator of the hero refreshed by its illusion: −6"
+      "max(Old, New)",
+      [
+        "-6",
+        "-6",
+        "the hero's Desolator, refreshed by its illusion"
+      ]
     ],
     [
       "Illusions",
-      "20% unless their creator sets one",
-      "Manta 35%, Illusion Rune 40%"
+      "20",
+      [
+        "20",
+        "35 / 40",
+        "Manta / Illusion Rune"
+      ]
     ],
     [
       "Dormant Curio",
-      "a crafted artifact while holding it: its flagged values × 1.3 (above 0 only)",
-      "40 → 52"
+      "Value * 1.3",
+      [
+        "40",
+        "52",
+        "values above 0 only"
+      ]
     ]
   ]
 }

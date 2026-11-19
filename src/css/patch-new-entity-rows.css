@@ -436,6 +436,12 @@ h4.subgroup {
 .mech-abils.mech-grid { grid-template-columns: fit-content(30%) repeat(calc(var(--mech-cols, 2)), minmax(0, 1fr)); }
 .mech-abils.mech-cols-3.mech-grid { --mech-cols: 2; }
 .mech-abils.mech-cols-4.mech-grid { --mech-cols: 3; }
+/* before | after | % per value (mech_change_cells, owner 2026-11-19): the % column narrow, a stronger line between
+   the values' groups */
+.mech-abils.mech-cols-7.mech-change-grid { grid-template-columns: fit-content(30%) repeat(2, 1fr 1fr 0.8fr); }
+.mech-abils.mech-change-grid .mech-abil-row > span:nth-child(3n + 2) { border-left-color: var(--line-mid, rgba(227, 196, 106, 0.25)); }
+.mech-pct-cell { font-size: 12px; font-weight: 700; }
+.item-icon-cell img { display: block; border-radius: 3px; }
 .mech-abils.mech-grid .mech-abil-row > span + span,
 .mech-abils.mech-levels .mech-abil-row > span + span { border-left: 1px solid var(--line-soft); }
 .mech-old { color: var(--text-dim); }

@@ -79,6 +79,7 @@ from .post_tables import (
     _postprocess_new_creep_abilities,
     _postprocess_renames,
     _postprocess_star_lists,
+    _postprocess_bounty_range_row,
     _postprocess_from_to_list,
     _postprocess_per_death,
     _postprocess_renamed_unit_ability,
@@ -300,6 +301,7 @@ def generate(version):
     out = _postprocess_star_lists(out)                # Valve's "* A<br>* B" "?" -> a list the block opens as a table
     out = _postprocess_dash_table(out)               # Valve's "A -- B -- C" lines in a "?" -> a table (2026-11-19)
     out = _postprocess_from_to_list(out)              # a "?" of "X decreased from A to B" lines -> before / after
+    out = _postprocess_bounty_range_row(out)          # "no longer variable bounties": the table shows it (11-19)
     out = _postprocess_grouped_lists(out)             # "<Group>" + "<Kind>: a; b" lines -> one table (home jungles)
     out = _postprocess_per_death(out)               # "A to B + C per Tormentor's death" -> a table (2026-11-18)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)

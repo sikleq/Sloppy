@@ -121,13 +121,14 @@ def change_cells(before, after, lv_before, lv_after, label=None, percent=True):
             # another bonus, not a bigger or smaller one: neither better nor worse
             value = f"{was} → " + _hl(now, "rework")
         else:
-            value = f"{was} → " + _hl(now, "buff" if b > a else "nerf")
+            tone = "buff" if b > a else "nerf"
+            value = f"{was} → " + _hl(now, tone)
             if percent and a and len(_FIRST_NUM.findall(was)) == 1 and len(_FIRST_NUM.findall(now)) == 1:
                 d = round((b - a) / a * 100)
-                # the % only under the mouse in a pinned "?" (owner 2026-11-19: "+100 можно при наведении, если
-                # включил золотую рамку … а не писать рядом"): the new value dotted, the % hidden till then
-                value = (f'<span class="pop-hint">{value}<span class="tm-pct">'
-                         f'{"+" if d > 0 else "−"}{abs(d)}%</span></span>')
+                # the % in the value's own hover, as a card's changed number (owner 2026-11-19: "как везде на сайте в
+                # карточках - при наведении на значение всплывает"); the value dotted
+                from .elements import value_hint
+                value = f"{was} → " + value_hint(_hl(now, tone), f'{"+" if d > 0 else "−"}{abs(d)}%', tone)
     return (label, level, value)
 
 
