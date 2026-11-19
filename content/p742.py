@@ -3013,7 +3013,7 @@ def build():
     W(ul_close())
     W(ability("False Promise", slug="oracle_false_promise"))
     W(ul_open())
-    W(li("Mana Сost increased from 100/150/200 to 125/175/225", b([100, 150, 200], [125, 175, 225])))
+    W(li("Mana Cost increased from 100/150/200 to 125/175/225", b([100, 150, 200], [125, 175, 225], l=True)))
     W(ul_close())
 
     # Outworld Destroyer
