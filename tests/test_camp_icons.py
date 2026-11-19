@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from patch.camps import camp_icon, camp_table
+from patch.camps import camp_icon, camp_ref, camp_table
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts" / "gen"))
@@ -33,7 +33,7 @@ def test_generated_pictures_are_crisp_and_sized():
         assert set(im.getchannel("A").getdata()) <= {0, 255}        # a hard edge: no blurred fringe
         assert Image.open(ROOT / "icons" / "camps" / f"creepcamp_{t}_22@2x.png").size == (44, 44)
     for s in gen.FACE_CX:
-        assert Image.open(ROOT / "icons" / "camps" / "faces" / f"{s}.png").size == (22, 22)
+        assert Image.open(ROOT / "icons" / "camps" / "faces" / f"{s}.png").size == (34, 22)   # wider: whole faces
     for n in gen.DIGITS:
         assert Image.open(ROOT / "icons" / "camps" / f"count_{n}.png").size == (9, 11)
 
@@ -41,7 +41,8 @@ def test_generated_pictures_are_crisp_and_sized():
 def test_icon_is_type_glyph_then_a_face_per_kind_with_the_count_of_a_repeat():
     html = camp_icon("Medium", [(2, "Boglet", "../icons/units/npc_dota_neutral_froglet.png"),
                                 (1, "Marshmage Apprentice", "../icons/units/npc_dota_neutral_froglet_mage.png")])
-    assert html.index('data-tooltip="Medium camp"') < html.index("faces/froglet.png") < html.index("faces/froglet_mage.png")
+    assert html.index("creepcamp_mid_22.png") < html.index("faces/froglet.png") < html.index("faces/froglet_mage.png")
+    assert "data-tooltip" not in html                     # the size's words hover over the camp's name, not the glyph
     assert html.count('class="camp-face"') == 2
     assert html.count('class="camp-count"') == 1 and "count_2.png" in html and "count_1" not in html          # only the repeated creep shows a count
     assert 'srcset="../icons/camps/faces/froglet.png 1x, ../icons/camps/faces/froglet@2x.png 2x"' in html
@@ -54,7 +55,15 @@ def test_without_faces_only_the_type_glyph_stays():
     assert camp_icon("", [(1, "Unknown", "x.png")]) == ""
 
 
+def test_camp_ref_puts_faces_before_the_name_without_the_type_glyph():
+    html = camp_ref("Wolf camp", [(2, "Giant Wolf", "../icons/units/npc_dota_neutral_tadpole.png")])
+    assert html.index("faces/tadpole.png") < html.index('<span class="camp-ref-name">Wolf camp</span>')
+    assert "creepcamp_" not in html and "count_2.png" in html
+    assert camp_ref("Nowhere camp", [(1, "X", "x.png")]) == "Nowhere camp"   # no face: the name alone
+
+
 def test_old_tables_get_the_type_from_the_camp_name():
     html = camp_table([("Small camp", [(3, "Pollywog", "../icons/units/npc_dota_neutral_tadpole.png")], 54, 90)])
-    assert 'data-tooltip="Small camp"' in html and "faces/tadpole.png" in html and "count_3.png" in html
+    assert '<span class="camp-label iab-hint" data-tooltip="Small camp">Small camp</span>' in html
+    assert "faces/tadpole.png" in html and "count_3.png" in html
     assert "--camp-kinds:1" in html and ">Side<" not in html

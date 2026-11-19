@@ -3,8 +3,8 @@
     icons/camps/creepcamp_<type>_22.png   the game's camp-type glyph (icons/camps/creepcamp_<type>.png, 32 px) as a
                                           crisp 22 px file: the same drawing, empty margins cut, every pixel snapped
                                           to the original's own colours, hard edge (the 32 px file shown at 22 blurs)
-    icons/camps/faces/<creep>.png         each neutral creep's whole face, 22 px in a gold chamfered frame: a
-                                          full-height square of its game portrait (icons/units/npc_dota_neutral_*)
+    icons/camps/faces/<creep>.png         each neutral creep's whole face, 34x22 in a gold chamfered frame: the
+                                          full height and most of the width of its game portrait (icons/units)
     icons/camps/count_<n>.png             the count of a repeated creep: a big 5x7 pixel digit on a dark plate (9x11)
     ...@2x.png                            each of them doubled pixel for pixel, for sharp screens
 
@@ -22,6 +22,7 @@ CAMPS = ROOT / "icons" / "camps"
 FACES = CAMPS / "faces"
 
 S = 22
+FACE_W = 34
 INK = (13, 13, 12)
 GOLD = (227, 196, 106)
 GOLD_LT = (247, 228, 160)
@@ -76,10 +77,10 @@ def type_icon(src):
     return out
 
 
-def _chamfer_mask(s):
-    m = Image.new("L", (s, s), 0)
-    e, c = s - 1, max(2, s // 6)
-    ImageDraw.Draw(m).polygon([(c, 0), (e - c, 0), (e, c), (e, e - c), (e - c, e), (c, e), (0, e - c), (0, c)], fill=255)
+def _chamfer_mask(w, h):
+    m = Image.new("L", (w, h), 0)
+    r, b, c = w - 1, h - 1, max(2, h // 6)
+    ImageDraw.Draw(m).polygon([(c, 0), (r - c, 0), (r, c), (r, b - c), (r - c, b), (c, b), (0, b - c), (0, c)], fill=255)
     return m
 
 
@@ -97,15 +98,17 @@ def _edge(mask):
 
 
 def face(slug):
-    """the creep's whole face (a full-height square of its portrait) in the gold chamfered frame: ink ring outside,
+    """the creep's whole face in the gold chamfered frame, FACE_W x 22: the portrait's full height and most of its width
+    (a square cut the faces, owner 2026-11-19 "у многих обрезаны лица … чуть вытянутее по ширине"); ink ring outside,
     gold ring inside, lit on the top and left"""
     im = Image.open(UNITS / f"npc_dota_neutral_{slug}.png").convert("RGB").resize(PORTRAIT, Image.LANCZOS)
     h = PORTRAIT[1]
-    x0 = max(0, min(PORTRAIT[0] - h, FACE_CX[slug] - h // 2))
-    im = im.crop((x0, 0, x0 + h, h)).resize((S, S), Image.LANCZOS)
+    w = round(h * FACE_W / S)
+    x0 = max(0, min(PORTRAIT[0] - w, FACE_CX[slug] - w // 2))
+    im = im.crop((x0, 0, x0 + w, h)).resize((FACE_W, S), Image.LANCZOS)
     im = ImageEnhance.Sharpness(ImageEnhance.Contrast(im).enhance(1.12)).enhance(1.3)
-    mask = _chamfer_mask(S)
-    out = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    mask = _chamfer_mask(FACE_W, S)
+    out = Image.new("RGBA", (FACE_W, S), (0, 0, 0, 0))
     out.paste(im, (0, 0), mask)
     ring = list(_edge(mask))
     inner = mask.copy()

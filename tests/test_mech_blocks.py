@@ -550,7 +550,8 @@ def test_round_five_rules_of_the_742_proofread():
     html = camp_table([("Radigull camp", [(2, "Radigull", "x.png")], "70", "124", "Medium", "Radiant"),
                        ("Ogre camp", [(1, "Ogre", "y.png")], "90", "150", "Ancient", "")])
     assert ">Side<" in html and 'class="camp-cell camp-side camp-side-radiant">Radiant<' in html and ">Both<" in html
-    assert 'data-tooltip="Medium camp"><img src="../icons/camps/creepcamp_mid_22.png"' in html
+    assert '<span class="camp-type"><img src="../icons/camps/creepcamp_mid_22.png"' in html
+    assert '<span class="camp-label iab-hint" data-tooltip="Medium camp">Radigull camp</span>' in html
     assert ">Side<" not in camp_table([("Small camp", [(3, "Pollywog", "z.png")], 54, 90)])     # 7.38's tables as before
     assert '(2, "Radigull", NEUTRAL_CDN + "radigull.png")' in story
     assert '(1, "Odobenus Frostmage", NEUTRAL_CDN + "odobenus_frostmage.png"), (2, "Odobenus Footman"' in story
