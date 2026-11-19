@@ -90,8 +90,10 @@
     if (table.classList.contains('heroes-dyn-table')) {
       headStickies.forEach(th => { th.style.left = '0px'; });
     } else {
-      if (headStickies[0]) headStickies[0].style.left = '0px';
-      if (headStickies[1]) headStickies[1].style.left = wLvl + 'px';
+      // Neutral Stats: lvl, Copy (icon), Unit. Unit Abilities: lvl, unit, ability.
+      headStickies.forEach((th, i) => {
+        if (i < lefts.length) th.style.left = lefts[i] + 'px';
+      });
     }
   }
 
