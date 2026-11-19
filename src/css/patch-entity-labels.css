@@ -16,6 +16,16 @@ h4.subgroup .subgroup-new-type {
   vertical-align: middle;
 }
 
+/* Where an item no shop sells comes from, under its name (owner 2026-11-19, 7.42 Greater Horn of Battle: "Dropped from
+   Tormentor on every death" was a bulleted row) */
+.entity-name .entity-source {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
 /* An item only taken out of the game / the pool (owner 2026-10-17): "Neutral Item cycled out", "Item removed" in
    the DEL tag's colour where "Returning Tier 2 Artifact" stands; its one DEL row stays in the page, hidden, so the
    tag filters and counts still see it (like ul.changes li.iab-covered) */

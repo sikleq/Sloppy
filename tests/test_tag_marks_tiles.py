@@ -182,3 +182,15 @@ def test_a_covered_row_is_hidden_but_keeps_its_tag():
     from patch.badges import t
     html = el.li("Now also increases Battery Assault radius to 330", t("NEW"), covered=True)
     assert 'class="iab-covered covered-card"' in html and 'data-tag="buff new"' in html
+
+
+def test_an_item_potency_row_has_a_grey_stripe_and_the_games_icon():
+    # owner 2026-11-19: "по аналогии со строками aghanim scepter/shard … чуть подсвеченную (допустим серым) строчку и
+    # эту иконку для строк с item potency"
+    from patch.css_bundle import read_css
+    html = el.li("Bash chance is now modified by Item Potency", el.t("NEW") if hasattr(el, "t") else "")
+    assert 'class="item-potency"' in html or "item-potency" in html.split(">", 1)[0]
+    assert '<span class="aghanim-marker potency"></span>' in html
+    css = read_css()
+    assert ".aghanim-marker.potency" in css and "ul.changes li.item-potency" in css
+    assert (ROOT / "icons" / "stats" / "item_potency.png").exists()

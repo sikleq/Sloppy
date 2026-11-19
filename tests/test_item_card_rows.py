@@ -69,6 +69,8 @@ def test_no_stats_card_without_a_build_change():
             swap = '("NEW", "+' in block and '("DEL", "+' in block
             # an item moved to another neutral tier: a build change of its kind (owner 2026-10-30, 7.37 Vambrace)
             swap = swap or 'new="Now a Tier' in block.split("\n", 1)[0]
+            # a stat split by melee / ranged, old -> new (owner 2026-11-19, 7.42 Phase Boots: "карточками old/new")
+            swap = swap or ' (Melee/Ranged)", ' in block
             if (block.startswith("W(item_header(") and "properties_change(" in block and "components_change(" not in block
                     and "item_abilities_change(" not in block and not swap):
                 bad.append((path.name, re.match(r'W\(item_header\("((?:[^"\\]|\\.)*)"', block).group(1)))

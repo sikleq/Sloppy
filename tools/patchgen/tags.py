@@ -103,6 +103,8 @@ CANONICAL_TAGS = [
     (re.compile(r'^\s*(?:Can )?no longer (?:be )?disabled by Silence\b', re.I), 'NEW'),   # 7.40b Kez's switch: MISC by hand
     (re.compile(r'\bno longer (?:be )?(?:disabled|interrupted|cancell?ed|blocked|prevented|stopped) by\b', re.I), 'BUFF'),
     (re.compile(r'\bno longer (?:interrupts?|cancels?) (?:movement|channel)', re.I), 'BUFF'),
+    # ... but keeping invisibility while toggling is comfort, QoL (owner 2026-11-19, 7.42 Unholy Strength)
+    (re.compile(r'\bwithout (?:cancelling|canceling|breaking) invisibility\b', re.I), 'QoL'),
     (re.compile(r'\b(?:can now|now can) be (?:cast|used|toggled|activated) without\b', re.I), 'BUFF'),
     # a new way to use it, not a bigger number (owner 2026-11-05, 7.38 Death Pact "Now can be cast while rooted or leashed",
     # 7.41e Sniper): NEW. "can now be toggled while" is MISC above
@@ -131,6 +133,11 @@ CANONICAL_TAGS = [
     # … but an item's on-hit effect that now works on heroes only changes when it works — REWORK (owner 2026-11-19,
     # 7.42 Orb of Venom "Poison Attack now only triggers when attacking heroes")
     (re.compile(r'\bnow only triggers when attacking\b', re.I), 'REWORK'),
+    # ... the same for an aura narrowed to some units: "Regeneration Aura now only applies to player controlled units"
+    # (7.42, by Poison Attack's decision); an item effect that now also does a new thing to its target — NEW (owner
+    # 2026-11-19, Nullify "now also makes the target … less susceptible to forced movement")
+    (re.compile(r'\bnow only applies to\b', re.I), 'REWORK'),
+    (re.compile(r'\bnow also makes the target\b', re.I), 'NEW'),
     (re.compile(r'\bnow (?:only|solely) (?:affects?|available|appl(?:ies|ied)|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:affects?|applies|works) only\b', re.I),  'NERF'),
     # a whole cooldown where there was none (7.38 "Poison Attack now has a 9s cooldown") -> REWORK: the
@@ -222,8 +229,6 @@ CANONICAL_TAGS = [
     (re.compile(r'\brespawn timer now (?:decreases|increases|scales|grows)\b|\brespawn time now (?:decreases|increases)\b',
                 re.I), 'REWORK'),
     (re.compile(r'^Timer now (?:visualizes|shows|displays)\b', re.I), 'QoL'),
-    # the item's debuff does more now ("Nullify now also makes the target … 60% less susceptible to forced movement")
-    (re.compile(r'\bnow also makes the target\b', re.I), 'BUFF'),
     # a self-cast that gave nothing now gives half ("Shine now provides all bonuses on self-cast, but they will be
     # reduced by 50%"): a gain, not a new ability
     (re.compile(r'\bnow provides all bonuses on self-cast\b', re.I), 'BUFF'),

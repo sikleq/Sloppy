@@ -950,3 +950,21 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - **Время лишнего лайн крипа** («from 40:00 to 35:00») — `b(40, 35, l=True)`, с %, раньше = BUFF (`tags._extra_creep_badge`).
 - **Плитки тегов и на страницах героев/предметов/юнитов** (`builders/entity_changes.py`: класс `tag-marks`) — раньше
   только на страницах патчей.
+
+### Вычитка 7.42, седьмой круг (владелец 2026-11-19)
+
+- **Откуда берётся предмет** («Dropped from Tormentor on every death») — `item_header(source=…)`, строка под
+  названием, не строка списка с точкой.
+- **Теги:** «toggled without cancelling invisibility» — QoL; «now also makes the target …» — NEW; «now only applies
+  to …» — REWORK (как Poison Attack). «cannot be dispelled» — BUFF: так стоят все 11 таких строк 7.38–7.42.
+- **«Recipe … Total cost … 2400g to 2350g»** — два процента (рецепт / итог); раньше буква g мешала их поставить.
+  Исправлено ещё в 8 строках 7.42.
+- **Строки об Item Potency** — как строки Aghanim: серая полоса и значок самой игры
+  (`panorama/images/status_icons/ability_effectiveness_icon`, `icons/stats/item_potency.png`).
+- **Числа в карточке способностей вместо строки:** «from 25/50% (melee/ranged) to 20/40%» — каждое число
+  подкрашено; «now has a separate … value of 30 …» и «now deals 75% … to buildings» — число, которого не было в
+  старом тексте. Строка прячется, её пояснение всплывает при наведении на число («As a result, for buildings …»
+  переносится к строке про здания).
+- **«(due to …)» у итоговой цены** — под [?], как «Total cost unchanged … (due to …)».
+- **Характеристика с разными значениями для ближнего и дальнего боя** («Damage bonus changed from +18/12 for
+  melee/ranged heroes to +15») — карточка old → new, порядок всегда Melee/Ranged.

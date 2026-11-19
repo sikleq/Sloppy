@@ -394,8 +394,8 @@ _NOW_REQUIRES_RE = re.compile(
 # "Recipe cost X→Y. Total cost decreased/increased X→Y" — both changed.
 # Badge by total cost; recipe % goes inline in the text.
 _RECIPE_COST_BOTH_CHANGED_RE = re.compile(
-    r'^W\(li\("(Recipe cost (?:increased|decreased) from )(\d+)( to )(\d+)'
-    r'(\. Total [Cc]ost (?:increased|decreased) from )(\d+)( to )(\d+)",\s*'
+    r'^W\(li\("(Recipe cost (?:increased|decreased) from )(\d+)g?( to )(\d+)g?'
+    r'(\. Total [Cc]ost (?:increased|decreased) from )(\d+)g?( to )(\d+)g?",\s*'   # 7.42 Blade Mail "2400g"
     r'b\(\d+,\s*\d+,\s*l=True\)\)\)$'
 )
 

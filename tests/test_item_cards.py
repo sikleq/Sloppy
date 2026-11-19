@@ -256,10 +256,60 @@ def test_returning_and_generic_new_item_follow_the_new_item_card(monkeypatch):
                    'W(provides("+10 Damage, +10 Attack Speed"))']
     out = post_items._postprocess_new_item_card([
         'W(item_header("Greater Horn of Battle", new="New Item"))', 'W(ul_open())',
+        'W(li("Dropped from Tormentor on every death", t("NEW")))',
         'W(li("Use: Grand Call to Arms. Summons a wave of mega creeps", t("NEW")))',
         'W(li("Global Cast Range. No Mana Cost. No cooldown", t("NEW")))',
         'W(li("Has 1 charge", t("NEW")))', 'W(ul_close())'], "7.42")
-    assert out[0] == 'W(item_header("Greater Horn of Battle", new="New Consumable Item"))'
+    # where it comes from: a line under the name, not a bulleted row (owner 2026-11-19)
+    assert out[0] == ('W(item_header("Greater Horn of Battle", new="New Consumable Item", '
+                      'source="Dropped from Tormentor on every death"))')
+    assert not any("Dropped from" in ln for ln in out[1:])
+    from patch import elements as el
+    assert '<span class="entity-source">Dropped from Tormentor on every death</span>' in el.item_header(
+        "Greater Horn of Battle", new="New Consumable Item", source="Dropped from Tormentor on every death")
     assert ('W(li("Active: Grand Call to Arms. Summons a wave of mega creeps. Global Cast Range. No Mana Cost. '
             'No cooldown", t("NEW")))') in out
     assert not any(ln.startswith('W(li("Global Cast Range') for ln in out)
+
+
+def test_due_to_goes_under_the_rows_question_mark_and_a_result_note_to_its_row():
+    # owner 2026-11-19, 7.42: "(due to... Kaya and Sange cost decrease. Individually) — под [?] мб надо"; Meteor Hammer
+    # "As a result, for buildings …" — "спрятать под [?] внутри как раз этой строки" (the 75%-to-buildings row)
+    from tools.patchgen import post_items
+    out = post_items._postprocess_due_to_note(
+        ['W(li("Total cost decreased from 4200g to 4000g (due to Kaya cost decrease)", b(4200, 4000, l=True)))'])
+    assert out == ['W(li("Total cost decreased from 4200g to 4000g", b(4200, 4000, l=True), '
+                   'extra=inline_note("Due to Kaya cost decrease")))']
+    out = post_items._postprocess_result_note_to_its_row([
+        'W(item_header("Meteor Hammer"))', 'W(ul_open())',
+        'W(li("Meteor Hammer now deals 75% Impact and Burn Damage to buildings instead of having separate values", '
+        't("REWORK")))',
+        'W(li("Meteor Hammer Burn Damage increased from 50 to 60", b(50, 60), extra=inline_note("As a result, for '
+        'buildings burn damage decreased from 50 to 45")))'])
+    assert out[2].endswith('t("REWORK"), extra=inline_note("As a result, for buildings burn damage decreased from 50 '
+                           'to 45")))')
+    assert out[3] == 'W(li("Meteor Hammer Burn Damage increased from 50 to 60", b(50, 60)))'
+
+
+def test_recipe_and_total_with_a_g_get_both_percents():
+    # owner 2026-11-19, 7.42 Blade Mail "Recipe cost decreased from 450 to 400. Total cost decreased from 2400g to
+    # 2350g": "мы в таких случаях 2 % разницы ставим же"
+    from tools.patchgen import post_cards
+    out = post_cards._postprocess_recipe_cost_zero_net(['W(li("Recipe cost decreased from 450 to 400. Total cost '
+                                                        'decreased from 2400g to 2350g", b(450, 400, l=True)))'])
+    assert out == ['W(li("Recipe cost decreased from 450 to 400. Total cost decreased from 2400 to 2350", '
+                   'b([450, 2400], [400, 2350], l=True, slash=True)))']
+
+
+def test_a_stat_split_by_melee_and_ranged_is_a_stats_card():
+    # owner 2026-11-19, 7.42 Phase Boots: "не лучше ли показать вместо строк карточками old/new?"
+    from tools.patchgen import post_stats
+    out = post_stats._postprocess_properties_change([
+        'W(item_header("Phase Boots"))', 'W(ul_open())',
+        'W(li("Damage bonus changed from +18/12 for melee/ranged heroes to +15 for any wearer", t("REWORK")))',
+        'W(li("Movement Speed bonus changed from +50 to +45/55 for Ranged/Melee Heroes", b(50, [45, 55])))',
+        'W(ul_close())'], version="7.42")
+    assert out[1] == ('W(properties_change(old=[("REWORK", "+18/12 Damage (Melee/Ranged)"), ("REWORK", "+50 Movement '
+                      'Speed")], new=[("", "+15 Damage", b([18, 12], 15)), ("", "+55/45 Movement Speed (Melee/Ranged)", '
+                      'b(50, [55, 45]))]))')
+    assert not any("bonus changed" in ln for ln in out)

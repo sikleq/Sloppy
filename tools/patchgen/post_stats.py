@@ -259,6 +259,39 @@ def _block_lines(lines, i):
     return lines[i:j]
 
 
+_PROP_SPLIT_RE = re.compile(
+    r'^(?P<stat>[A-Z][\w ]+?) bonus changed from \+(?P<old>\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)?)(?: for (?P<oldw>[\w/ ]+?))?'
+    r' to \+(?P<new>\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)?)(?: for (?P<neww>[\w/ ]+?))?$')
+
+
+def _split_side(value, who):
+    """"18/12" for "melee/ranged heroes" -> ("+18/12", " (Melee/Ranged)", [18, 12]); "Ranged/Melee" turned to the
+    Melee/Ranged order; one value -> ("+15", "", 15)."""
+    parts = [float(x) if "." in x else int(x) for x in value.split("/")]
+    if len(parts) == 1:
+        return f"+{value}", "", parts[0]
+    if who and re.match(r'ranged/melee', who, re.I):
+        parts = parts[::-1]
+    return "+" + "/".join(str(p) for p in parts), " (Melee/Ranged)", parts
+
+
+def _row_texts(block):
+    return [m.group(1) for m in (re.match(r'^\s*W\(li\("(.+?)",', ln) for ln in block) if m]
+
+
+def _split_stat_rows(text):
+    """"Damage bonus changed from +18/12 for melee/ranged heroes to +15 for any wearer", "Movement Speed bonus changed
+    from +50 to +45/55 for Ranged/Melee Heroes" (7.42 Phase Boots) -> (old card row, new card row), or None (owner
+    2026-11-19: "не лучше ли показать вместо строк карточками old/new?")."""
+    m = _PROP_SPLIT_RE.match(text)
+    if not m or "/" not in m.group("old") + m.group("new"):
+        return None
+    ov, osuf, on = _split_side(m.group("old"), m.group("oldw"))
+    nv, nsuf, nn = _split_side(m.group("new"), m.group("neww"))
+    stat = m.group("stat").strip()
+    return ("REWORK", f"{ov} {stat}{osuf}"), (None, f"{nv} {stat}{nsuf}", (on, nn))
+
+
 def _swaps_stats(block):
     """The block's rows add a stat the item did not have and take one it had ("Now provides +50/100 Health" + "No
     longer provides +3/6 Damage") — its stats card, though its build did not change."""
@@ -376,8 +409,9 @@ def _postprocess_properties_change(lines, with_abilities=False, version=None):
             if i < len(lines) and lines[i].startswith('W(auto_components_change('):
                 out.append(lines[i])
                 i += 1
-            elif not (_swaps_stats(_block_lines(lines, i)) or tier_move):   # a tier move counts as a build change
-                continue
+            elif not (_swaps_stats(_block_lines(lines, i)) or tier_move   # a tier move counts as a build change
+                      or any(_split_stat_rows(t) for t in _row_texts(_block_lines(lines, i)))):
+                continue                                  # ... and a stat split by melee / ranged (2026-11-19)
             # … or the item's stats themselves change in kind: one added, one gone (owner 2026-10-30, 7.37 Bracer
             # "Now provides +50/100 Health" / "No longer provides +3/6 Damage": "тут разве не карточкой надо?")
 
@@ -402,6 +436,11 @@ def _postprocess_properties_change(lines, with_abilities=False, version=None):
                 kept_lines.append(ln)
                 continue
             txt = m_li.group(1)
+            split = _split_stat_rows(txt)
+            if split:
+                old_rows.append(split[0])
+                new_rows.append(split[1])
+                continue
             # Try add pattern — supports comma-separated multi-stat:
             #   "Now also provides +200 Health, +350 Mana, and +60 Cast Range"
             ma = _PROP_ADD_PREFIX_RE.match(txt)

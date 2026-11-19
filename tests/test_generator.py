@@ -733,7 +733,10 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
      "QoL"),
     ("No longer has a 35% damage penalty against creeps", "BUFF"),          # a penalty gone stays BUFF
     ("Nullify now also makes the target to be 60% less susceptible to forced movement effects applied by their "
-     "allies", "BUFF"),
+     "allies", "NEW"),                                                     # owner 2026-11-19: new, not BUFF
+    ("Unholy Strength can now be toggled without cancelling invisibility", "QoL"),         # owner 2026-11-19
+    ("Regeneration Aura now only applies to player controlled units", "REWORK"),           # as Poison Attack
+    ("Force's push now cannot be dispelled", "BUFF"),                     # 11 such rows 7.38-7.42: BUFF
     ("Shine now provides all bonuses on self-cast, but they will be reduced by 50%", "BUFF"),
     ("Aghanim's Scepter now also decreases cooldown by 10s", "BUFF"),
     ("Fire now has Cinder Dash ability", "NEW"),

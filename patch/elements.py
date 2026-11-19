@@ -498,10 +498,12 @@ def _removed_label(removed):
     return f' <span class="entity-removed-type">{removed}</span>', 'is-removed'
 
 
-def item_header(name, new=False, changed=False, removed=None, old_title=None, cost=None):
+def item_header(name, new=False, changed=False, removed=None, old_title=None, cost=None, source=None):
     """old_title: a renamed item shows "Old → New" like a renamed ability, no "renamed to" row (owner 2026-10-22).
     cost: a new item's price, a tag on its icon instead of a line of its own (owner 2026-11-05, 7.38 Orb of Frost); a later
-    change of the price is a row as ever."""
+    change of the price is a row as ever.
+    source: where an item no shop sells comes from, a line under its name ("Dropped from Tormentor on every death", 7.42
+    Greater Horn of Battle; owner 2026-11-19: not a bulleted row — "мы не делаем вообще markdown через эти точки")."""
     out = _close_ability_block()
     _State.current_hero = None
     _State.current_unit = None
@@ -531,6 +533,8 @@ def item_header(name, new=False, changed=False, removed=None, old_title=None, co
         name_html = (f'<span class="ability-title-rename"><span class="ability-title-old">{old_title}</span>'
                      f'<span class="ability-title-arrow">→</span>{name_html}</span>')
     price = f'<span class="item-icon-cost" aria-label="Cost {cost}">{cost}</span>' if cost else ''
+    if source:
+        type_label += f'<span class="entity-source">{source}</span>'
     # item-block: every framed box of an item hangs out on one common edge (CSS, owner 2026-09-28)
     return out + _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
   <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64"></a>{price}</div>
@@ -1091,6 +1095,11 @@ def _li_classes(text, extra, badge, dyn_tags, covered, major, ability_row):
     elif isinstance(text, str) and "Aghanim's Shard" in text_noclass:
         classes.append("aghanim-shard")
         marker = '<span class="aghanim-marker shard"></span>'
+    elif isinstance(text, str) and re.search(r"\bitem potency\b", text_noclass, re.I):
+        # owner 2026-11-19: a row about Item Potency is drawn as Aghanim's rows are — a grey stripe and the game's own
+        # icon after the text (panorama/images/status_icons/ability_effectiveness_icon, icons/stats/item_potency.png)
+        classes.append("item-potency")
+        marker = '<span class="aghanim-marker potency"></span>'
     elif isinstance(text, str) and _State.current_ability_slug:
         # a row of an ability that Aghanim's Shard / Scepter GRANTS is an Aghanim row even without the
         # words (Medusa 7.38 Cold Blooded; owner 2026-09-26) — KV IsGrantedByShard / IsGrantedByScepter

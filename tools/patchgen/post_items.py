@@ -122,6 +122,10 @@ _ABILITY_COSTS_ROW_RE = re.compile(
 _GENERIC_NEW_LABEL_RE = re.compile(r'new="(New|Returning) Item"')
 
 
+def _py_str_item(s):
+    return json.dumps(s, ensure_ascii=False)
+
+
 def _li_text(row):
     m = re.match(r'^\s*W\(li\("((?:[^"\\]|\\.)*)"', row)
     return m.group(1) if m else ""
@@ -168,6 +172,8 @@ def _new_item_card_parts(text, note):
     m = _NEW_ITEM_COST_RE.match(text)
     if m:
         return [f'cost={m.group(1)}']                      # the header takes it: a tag on the icon
+    if re.match(r'^Dropped (?:from|by) ', text):           # where it comes from: a line under the name (2026-11-19)
+        return [f'source={_py_str_item(text.rstrip("."))}']
     m = _REQ_ROW_RE.match(text)
     if m:
         parts = [(pm.group('name'), pm.group('cost')) for pm in _REQ_PART_RE.finditer(m.group('parts'))]
@@ -357,7 +363,7 @@ def _postprocess_new_item_card(lines, version=None):
         while j < len(lines) and lines[j] != 'W(ul_close())':
             body.append(lines[j])
             j += 1
-        price, bonus, rows, cost = [], [], [], None
+        price, bonus, rows, cost, source = [], [], [], None, None
         for b_ in body:
             raw = re.match(r'^W\(li\("((?:[^"\\]|\\.)*)"', b_)
             note = re.search(r'extra=inline_note\("((?:[^"\\]|\\.)*)"\)', b_)
@@ -381,6 +387,8 @@ def _postprocess_new_item_card(lines, version=None):
                 bonus += piece
             elif piece and piece[0].startswith('cost='):
                 cost = piece[0][len('cost='):]
+            elif piece and piece[0].startswith('source='):
+                source = piece[0][len('source='):]
             else:
                 price += piece
         if not price and not cost and 'Artifact' not in ln and 'Enchantment' not in ln:
@@ -389,6 +397,8 @@ def _postprocess_new_item_card(lines, version=None):
         ln = _with_item_kind(ln, version)
         if cost:
             ln = f'{ln.rstrip()[:-2]}, cost={cost}))'
+        if source:
+            ln = f'{ln.rstrip()[:-2]}, source={source}))'
         out += [ln] + price + bonus
         if rows:
             out += ['W(ul_open())'] + rows + ['W(ul_close())']
@@ -452,4 +462,47 @@ def _postprocess_rework_marker(lines):
         ):
             pending_ability_idx = None
         out.append(line)
+    return out
+
+
+_DUE_TO_ROW_RE = re.compile(r'^(?P<ind>\s*)W\(li\("(?P<text>Total cost (?:increased|decreased) from \d+g? to \d+g?) '
+                            r'\((?P<why>[Dd]ue to[^"]*)\)"(?P<rest>, b\([^)]*\))\)\)\s*$')
+
+
+def _postprocess_due_to_note(lines):
+    """"Total cost decreased from 4200g to 4000g (due to... Kaya and Sange cost decrease. Individually)": the why goes
+    under the row's (?), as "Total cost unchanged at 2575g (due to Pavise cost decrease)" does (owner 2026-11-19, 7.42:
+    "под [?] мб надо")."""
+    out = []
+    for ln in lines:
+        m = _DUE_TO_ROW_RE.match(ln)
+        if m:
+            why = m.group("why")
+            ln = (f'{m.group("ind")}W(li("{m.group("text")}"{m.group("rest")}, '
+                  f'extra=inline_note("{why[:1].upper() + why[1:]}")))')
+        out.append(ln)
+    return out
+
+
+_RESULT_NOTE_RE = re.compile(r', extra=inline_note\("(?P<note>As a result, for (?P<what>\w+)[^"]*)"\)')
+
+
+def _postprocess_result_note_to_its_row(lines):
+    """"As a result, for buildings impact damage increased from 90 to 112.5 …" under a number row goes to the row of the
+    same item that says what changed for buildings ("now deals 75% … to buildings"), under its (?) (owner 2026-11-19,
+    7.42 Meteor Hammer: "спрятать под [?] внутри как раз этой строки")."""
+    out = list(lines)
+    for i, ln in enumerate(out):
+        m = _RESULT_NOTE_RE.search(ln)
+        if not m:
+            continue
+        what = m.group("what").lower()
+        j = i - 1
+        while j >= 0 and not re.match(r'\s*W\((?:item_header|hero_header|section)\(', out[j]):
+            row = re.match(r'\s*W\(li\("((?:[^"\\]|\\.)*)"', out[j])
+            if row and f"to {what}" in row.group(1).lower() and "extra=" not in out[j]:
+                out[j] = re.sub(r'\)\)\s*$', f', extra=inline_note("{m.group("note")}")))', out[j])
+                out[i] = ln.replace(m.group(0), "", 1)
+                break
+            j -= 1
     return out

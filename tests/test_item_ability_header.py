@@ -330,3 +330,40 @@ def test_the_texts_own_kind_and_a_facets_ability_name_go_to_the_header():
     assert '<span class="iab-name">Arcane Aura</span>' in head and "Arcane Aura:" not in rows
     # not in an ability card: "Damage Barrier: 1900" is a value, not a name
     assert "iab-name" not in cards_item_abilities._pane_parts(["Damage Barrier: 1900."])[0]
+
+
+def test_a_melee_ranged_pair_of_values_is_marked_number_by_number():
+    # owner 2026-11-19, 7.42 Cold Attack "slow decreased from 25/50% (melee/ranged) to 20/40%": "должно быть в карточке
+    # в виде измененных значений, а не строкой"
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _State.current_entity_key, _State.current_patch_version = "item|skadi-test", "7.42"
+        cards_item_abilities.item_abilities_change(
+            old=["Passive: Cold Attack. Attacks lower enemy movement by -25% if they are melee and -50% if they are ranged."],
+            new=["Passive: Cold Attack. Attacks lower enemy movement by -20% if they are melee and -40% if they are ranged."])
+        assert cards_item_abilities._iab_covered_change(
+            "Cold Attack slow decreased from 25/50% (melee/ranged) to 20/40% (melee/ranged)", {"nerf"})
+        new = cards_item_abilities.render_iab_card("item|skadi-test|7.42").split("pane-new")[1]
+        assert '<b class="iab-num iab-nerf">-20%</b>' in new and '<b class="iab-num iab-nerf">-40%</b>' in new
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_a_separate_value_only_the_new_text_has_is_marked_in_the_card():
+    # owner 2026-11-19, 7.42 Monkey King Bar "Pierce now has a separate bonus magic damage value of 30 for illusions":
+    # "в карточке уже есть у нас"
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _State.current_entity_key, _State.current_patch_version = "item|mkb-test", "7.42"
+        cards_item_abilities.item_abilities_change(
+            old=["Passive: Pierce. Grants each attack a 80% chance to deal 70 bonus magical damage."],
+            new=["Passive: Pierce. Grants each attack a 80% chance to deal 70 bonus magical damage if the attacker is "
+                 "a hero or 30 if the attacker is an illusion."])
+        assert cards_item_abilities._iab_covered_change(
+            "Pierce now has a separate bonus magic damage value of 30 for illusions", {"misc"})
+        assert not cards_item_abilities._iab_covered_change(
+            "Pierce now has a separate bonus magic damage value of 70 for heroes", {"misc"})     # 70 was there before
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved

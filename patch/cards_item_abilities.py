@@ -594,9 +594,11 @@ _IAB_MARKS = page_cache({})  # "<ek>|<pv>" -> [(target, value, direction)] from 
 _IAB_META_WORDS = {"cooldown": "cooldown", "mana cost": "manacost", "cast range": "castrange", "health cost": "healthcost"}
 
 
-_IAB_FROMTO_RE = re.compile(r"from\s+[+\-]?(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)\S*\s+to\s+[+\-]?(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)", re.I)
+_IAB_FROMTO_RE = re.compile(r"from\s+[+\-]?(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)\S*(?:\s+\([^)]*\))?\s+to\s+[+\-]?(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)", re.I)
 
 
+_IAB_SEPARATE_RE = re.compile(r"\bnow has a separate\b[^.]*?\bvalue of\s+[+\-]?(\d+(?:\.\d+)?)"
+                              r"|\bnow deals\s+(\d+(?:\.\d+)?)%[^.]*?\bto buildings\b", re.I)
 _IAB_NOWHAS_RE = re.compile(r"now has an?\s+(\d+(?:\.\d+)?)s?\s+(cooldown|mana cost)", re.I)
 
 
@@ -654,9 +656,23 @@ def _iab_covered_change(text, tags, extra="", badge=""):
     # which header value: read after the ability's own name — "Reset Cooldowns mana cost decreased" is the mana cost
     # (owner 2026-10-17, Refresher Orb 7.41: the new 325 wasn't marked; "cooldown" was found in the name)
     lead = next((n for n in sorted(card["names"], key=len, reverse=True) if n and low.startswith(n)), "")
-    target = next((v for k, v in _IAB_META_WORDS.items() if k in low[len(lead):]), "num")
+    rest = re.sub(r"\([^)]*\)", "", low[len(lead):])        # "(melee/ranged)" is no cast range (7.42 Cold Attack)
+    target = next((v for k, v in _IAB_META_WORDS.items() if k in rest), "num")
     if m and _iab_has(m.group(2), card["new"]) and _iab_has(m.group(1), card["old"]):
         _IAB_MARKS.setdefault(card["key"], []).append((target, m.group(2), direction, note, "", m.group(1)))
+        return True
+    # "from 25/50% (melee/ranged) to 20/40%": each number marked in the card (owner 2026-11-19, 7.42 Cold Attack)
+    olds, news = (m.group(1).split("/"), m.group(2).split("/")) if m else ([], [])
+    if (target == "num" and len(olds) == len(news) > 1
+            and all(_iab_has(n, card["new"]) for n in news) and all(_iab_has(o, card["old"]) for o in olds)):
+        for o, n in zip(olds, news):
+            if o != n:
+                _IAB_MARKS.setdefault(card["key"], []).append(("num", n, direction, note, "", o))
+        return True
+    m = _IAB_SEPARATE_RE.search(plain)        # a number only the new text has (2026-11-19, MKB 30, Meteor Hammer 75%)
+    probe = (m.group(1) or f"{m.group(2)}%") if m else None    # "75%": not the old "Mana Cost: 75"
+    if probe and _iab_has(probe, card["new"]) and not _iab_has(probe, card["old"]):
+        _IAB_MARKS.setdefault(card["key"], []).append(("num", probe.rstrip("%"), direction, note, "", ""))
         return True
     m = _IAB_NOWHAS_RE.search(plain)
     if m and _iab_has(m.group(1), card["new"]):

@@ -42,6 +42,8 @@
   .tag-marks ul.changes li.li-bg:hover::after { left: 0; }                         /* the hover ruler */
   .tag-marks ul.changes li.aghanim-scepter, .tag-marks ul.changes li.aghanim-shard {
     background: linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%); }
+  .tag-marks ul.changes li.item-potency {
+    background: linear-gradient(90deg, rgba(196, 190, 178, 0.24) 0, rgba(196, 190, 178, 0.11) 60%, transparent 100%); }
   .tag-marks ul.changes li.aghanim-scepter.li-formula, .tag-marks ul.changes li.aghanim-shard.li-formula {
     background: linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%)
       no-repeat 0 3px / 100% 22px; }

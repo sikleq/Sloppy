@@ -294,3 +294,15 @@ ul.changes li.aghanim-shard.li-notag:not([class*="ability-row"]),
 .entity-block.is-new ul.changes li.aghanim-shard:not([class*="ability-row"]) {
   background: linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%);
 }
+/* ITEM POTENCY ROWS — the same stripe in grey (owner 2026-11-19: "чуть подсвеченную (допустим серым) строчку"; more
+   item / hero values will be scaled by it) */
+ul.changes li.item-potency {
+  background:
+    linear-gradient(90deg, transparent 0 70px, rgba(196, 190, 178, 0.24) 70px, rgba(196, 190, 178, 0.11) 60%, transparent 100%) no-repeat 0 3px / 100% 22px,
+    linear-gradient(90deg, rgba(196, 190, 178, 0.24) 0, rgba(196, 190, 178, 0.11) 60%, transparent 100%) no-repeat 0 25px / 100% calc(100% - 28px);
+  border-radius: 3px;
+}
+ul.changes li.item-potency.li-notag:not([class*="ability-row"]),
+.entity-block.is-new ul.changes li.item-potency:not([class*="ability-row"]) {
+  background: linear-gradient(90deg, rgba(196, 190, 178, 0.24) 0, rgba(196, 190, 178, 0.11) 60%, transparent 100%);
+}
