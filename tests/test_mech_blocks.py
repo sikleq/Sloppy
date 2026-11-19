@@ -761,7 +761,7 @@ def test_pip_health_list_is_a_table_of_sticks_from_the_game_data():
     assert 'data-pip-src="scepter"' not in html                               # no toggle no row of the list needs
     # a bar: toggles first (left edge), the keys with a short word after them (right edge) (owner 2026-11-19)
     assert html.index("pip-toggles") < html.index("pip-keys")
-    assert '<span class="pip-key-word">Fragile: 2 per melee hit</span>' in html
+    assert '<span class="pip-key-word">2 per melee hit</span>' in html
     assert 'class="pip-key iab-hint' not in html                                # the keys are plain words, no hover
     assert 'aria-label="Talent"' in html and ">Talent<" not in html
     assert ">Nether Ward<" in html and "Pugna" not in html                     # no hero column

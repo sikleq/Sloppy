@@ -12,7 +12,7 @@ from .elements import (
 )
 from .enchants import (enchant_header, enchant_attr_row, enchant_tier_box, souvenir_chip, enchant_list_head,
                        enchant_row)
-from .formula_rows import li_formula, formula_change, open_formula_table
+from .formula_rows import li_formula, formula_change, open_formula_table, formula_table_pill
 from .level_values import li_level_values
 from .captains_mode import cm_draft
 from .note_boxes import subnote, section_intro, note_box, bug_note

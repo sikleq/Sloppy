@@ -661,7 +661,7 @@ def pip_rows(raw, version):
     def key(sticks, word):
         return f'<span class="pip-key">{sticks}<span class="pip-key-word">{word}</span></span>'
     keys = (key(_pip_sticks(1, False), "1 hit")
-            + key(_pip_sticks(1, True), "Fragile: 2 per melee hit")
+            + key(_pip_sticks(1, True), "2 per melee hit")
             + (key('<span class="pip-sticks"><i class="pip-x pip-x-shown"></i></span>', "Extra") if used else ""))
     toggles = "".join(
         f'<button type="button" class="pip-toggle iab-hint abil-ico-hint" data-pip-src="{k}" aria-pressed="false" '

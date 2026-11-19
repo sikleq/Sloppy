@@ -137,9 +137,10 @@ CANONICAL_TAGS = [
     # (7.42, by Poison Attack's decision); an item effect that now also does a new thing to its target — NEW (owner
     # 2026-11-19, Nullify "now also makes the target … less susceptible to forced movement")
     (re.compile(r'\bnow only applies to\b', re.I), 'REWORK'),
-    # owner 2026-11-19 (7.42): a constant instead of a ramp over game time — how it works, REWORK; a passive income
-    # heroes never had — NEW; a creep that no longer switches aggro (you pulled the catapult off the tower) — REWORK
-    (re.compile(r'\bno longer scales over (?:game )?time\b', re.I), 'REWORK'),
+    # owner 2026-11-19 (7.42): a ramp over game time that is gone — DEL, as Bracer's "No longer doubles its bonuses at
+    # 25 minutes" (first REWORK, the owner asked to weigh DEL); a passive income heroes never had — NEW; a creep that
+    # no longer switches aggro (you pulled the catapult off the tower) — REWORK
+    (re.compile(r'\bno longer scales over (?:game )?time\b', re.I), 'DEL'),
     (re.compile(r'\bnow passively receives?\b', re.I), 'NEW'),
     (re.compile(r'\bno longer switch(?:es)? aggro\b', re.I), 'REWORK'),
     # a map objective that can now be used while silenced (7.42 Outposts): comfort, QoL (owner 2026-11-19)

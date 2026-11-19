@@ -756,7 +756,7 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Unholy Strength can now be toggled without cancelling invisibility", "QoL"),         # owner 2026-11-19
     ("Regeneration Aura now only applies to player controlled units", "REWORK"),           # as Poison Attack
     ("Force's push now cannot be dispelled", "BUFF"),                     # 11 such rows 7.38-7.42: BUFF
-    ("Passive gold per minute no longer scales over game time", "REWORK"),               # owner 2026-11-19
+    ("Passive gold per minute no longer scales over game time", "DEL"),                  # owner 2026-11-19
     ("All heroes now passively receive 50 experience per minute after the starting horn", "NEW"),
     ("Siege creeps no longer switch aggro to the towers that attack heroes", "REWORK"),
     ("Outposts can now be captured while silenced", "QoL"),                               # owner 2026-11-19

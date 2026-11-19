@@ -259,6 +259,15 @@ def open_formula_table(old_fn, new_fn, **bf_kwargs):
     return bf(old_fn, new_fn, "", **bf_kwargs)[2].replace(" hidden>", ">", 1)
 
 
+def formula_table_pill(old_fn, new_fn, label="Formula table", **bf_kwargs):
+    """(pill, table): the site's formula table hidden under a "Formula table" pill in the row's text, for a value that
+    is no formula of the patch notes (owner 2026-11-19, 7.42 passive gold: "поставить Formula table открывашку, по
+    умолчанию таблица скрыта"). The pill goes into li()'s text, the table into its extra."""
+    from .badges import bf
+    trigger, _badge, table = bf(old_fn, new_fn, label, **bf_kwargs)
+    return trigger, table
+
+
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
                rework_badge=True, inline_note_text=None, label=None,
                force_rework=False, extra_html=None, after_html=None, **bf_kwargs):

@@ -119,3 +119,12 @@ def test_an_open_formula_table_has_no_pill_and_shows_by_itself():
                               level_fmt=lambda m: f"{m}:00", value_fmt="{:.1f}", jump_at=None)
     assert html.startswith('<table class="formula-table"') and " hidden" not in html.split(">", 1)[0]
     assert ">60:00<" in html and ">111.3<" in html and ">114.8<" in html
+
+
+def test_a_formula_table_pill_keeps_its_table_hidden_until_clicked():
+    # owner 2026-11-19 (7.42 passive gold): "поставить Formula table открывашку, по умолчанию таблица скрыта"
+    from patch.formula_rows import formula_table_pill
+    pill, table = formula_table_pill(lambda m: (95 + (2 * m + 46) // 5) / 1.15, lambda m: 90, levels=[0, 60],
+                                     level_fmt=lambda m: f"{m}:00", value_fmt="{:.1f}", jump_at=None)
+    assert 'class="formula-trigger"' in pill and ">Formula table<" in pill
+    assert " hidden>" in table
