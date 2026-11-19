@@ -26,3 +26,14 @@ def test_the_page_lists_the_flagged_values_and_the_sources():
     # removed items: grey, hidden till "Show removed", no words (owner 2026-11-19)
     assert 'class="ipot-gone"' in html and "not in the game" not in html and 'class="ipot-show-gone"' in html
     assert "Pangolier" in html and "Illusion Rune" in html
+
+
+def test_a_selected_item_of_several_rows_is_framed_as_one():
+    # owner 2026-11-19, Eye of Skadi's five rows: "при выделении строки выделяет только 1 вариант"
+    from patch.css_bundle import read_css
+    from patch.js_bundle import read_js
+    js = read_js()
+    assert "r.dataset.name === name" in js and "mr-sel-top" in js and "mr-sel-bottom" in js
+    css = read_css()
+    assert ".mr-table tbody tr.mr-row-selected.mr-sel-top > td:first-child" in css
+    assert ".mr-table tbody tr.mr-row-selected.mr-sel-bottom > td:last-child" in css

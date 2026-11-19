@@ -170,7 +170,17 @@
     if (!tr || !table.contains(tr)) return;
     const was = tr.classList.contains('mr-row-selected');
     table.querySelectorAll('tr.mr-row-selected').forEach(r =>
-      r.classList.remove('mr-row-selected'));
-    if (!was) tr.classList.add('mr-row-selected');
+      r.classList.remove('mr-row-selected', 'mr-sel-grp', 'mr-sel-top', 'mr-sel-mid', 'mr-sel-bottom'));
+    if (was) return;
+    // an item of several rows under one name cell (Item Potency's Eye of Skadi, owner 2026-11-19: "выделяет только 1
+    // вариант"): all its rows, one frame round them
+    const name = tr.dataset.name;
+    const group = name ? [...table.querySelectorAll('tbody tr')].filter(r => r.dataset.name === name) : [tr];
+    group.forEach((r, i) => {
+      r.classList.add('mr-row-selected');
+      if (group.length > 1) {
+        r.classList.add('mr-sel-grp', i === 0 ? 'mr-sel-top' : i === group.length - 1 ? 'mr-sel-bottom' : 'mr-sel-mid');
+      }
+    });
   });
 })();
