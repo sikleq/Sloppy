@@ -512,7 +512,7 @@ def _list_title(row_text):
     return _sentence(m.group(1)) if m else "Case"
 
 
-def mech_table(head, rows, labels=True, wide_last=False):
+def mech_table(head, rows, labels=True, wide_last=False, cls=""):
     """A mechanic's rules as a table written in the content (7.38 Lifesteal: Lifesteal / Spell Lifesteal × what each
     applies to × its cut against non-heroes — Valve's three sentences, owner 2026-10-28 "неудобно читается"). head: the
     column titles; rows: lists of cells, or a str for a line across the whole table. The first column reads as a
@@ -536,14 +536,16 @@ def mech_table(head, rows, labels=True, wide_last=False):
                 + '</span>')
     wide = " mech-wide-last" if wide_last else ""
     values = "" if labels else " mech-values"     # no label column: the values are equals, their columns too
-    return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}{wide}{values}">{out}</span><!--/MECHTABLE-->'
+    extra = f" {cls}" if cls else ""   # "mech-grid": a table of values — equal value columns, lines between cells
+    return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}{wide}{values}{extra}">{out}</span><!--/MECHTABLE-->'
 
 
-def mech_level_table(head, rows, notes=(), per=15):
+def mech_level_table(head, rows, notes=(), per=15, l=False):
     """Values by level as the site's level tables read them: the levels a row across, the kinds of value under them
     (owner 2026-11-19, 7.42 experience per level: a 29-row column was "массивная"). head: ["Level", 2, 3, …]; rows:
     [["Old", …], ["New", …], …] in the head's order; per: levels in one block, the rest in the next. A value of the
-    second row that differs from the first is gold (what changed); notes: lines under the tables (a formula)."""
+    second row that differs from the first is coloured by what it means — green better, red worse, as b() — and l=True
+    when less is better (experience needed: more of it is worse, owner 2026-11-19); notes: lines under the tables."""
     levels, out = head[1:], ""
     for k in range(0, len(levels), per):
         part = slice(k, k + per)
@@ -556,13 +558,36 @@ def mech_level_table(head, rows, notes=(), per=15):
         for r, row in enumerate(rows):
             cells = list(row[1:])[part]
             if r == 1 and rows:
-                cells = [f'<span class="mech-lv-changed">{c}</span>' if c != o else c
+                def tone(c, o):
+                    try:
+                        up = float(str(c).replace(",", "")) > float(str(o).replace(",", ""))
+                    except ValueError:
+                        return "mech-lv-changed"
+                    return "iab-lv " + ("iab-nerf" if up == l else "iab-buff") + " mech-lv-changed"
+                cells = [f'<span class="{tone(c, o)}">{c}</span>' if c != o else c
                          for c, o in zip(cells, list(rows[0][1:])[part])]
             body += line(row[0], cells)
         out += f'<span class="mech-abils mech-levels" style="--mech-lv:{cols}">{body}</span>'
     for n in notes:
         out += f'<span class="mech-levels-note">{n}</span>'
     return f'<!--MECHTABLE--><span class="mech-levels-wrap">{out}</span><!--/MECHTABLE-->'
+
+
+def mech_change_cell(old, new, l=False):
+    """A table cell that shows a change as the site's rows do: the old value dim, the new one in the colour of what it
+    means (green better, red worse; l=True when less is better) and its % (owner 2026-11-19, 7.42 building bounty:
+    "изменения тоже не видны"). "110-130" reads as its middle, 120."""
+    def mid(v):
+        nums = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", str(v))]
+        return sum(nums) / len(nums) if nums else None
+    a, b = mid(old), mid(new)
+    if a is None or b is None or a == b:
+        return f'<span class="mech-old">{old}</span> &rarr; <b>{new}</b>'
+    tone = "iab-buff" if (b > a) != l else "iab-nerf"
+    pct = (b - a) / a * 100 if a else 0
+    sign = "+" if pct > 0 else "−"
+    return (f'<span class="mech-old">{old}</span> &rarr; <b class="iab-lv {tone}">{new}</b> '
+            f'<span class="iab-lv {tone} mech-pct">{sign}{abs(pct):.0f}%</span>')
 
 
 def mech_formula(expr):

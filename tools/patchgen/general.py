@@ -123,8 +123,98 @@ def _mechanic_blocks(notes, by_subtitle=False):
         body, _ = _emit_notes([dict(n, indent_level=1) for n in group])     # each Valve row a row: no folding
         tag = "NEW" if label == "New mechanic" else "REWORK"
         out += ['', f'W(plain_header("{name}", new="{label}"))']
-        out += [_as_mech_row(l, tag) if l.startswith('W(li(') else l for l in body]
+        rows = [_as_mech_row(l, tag) if l.startswith('W(li(') else l for l in body]
+        story = _story_of(group, tag) if _SYSTEM_INTRO_RE.search(_strip_html(texts[0])) else None
+        if story:
+            rows = [story] + [r[:-2] + ", covered=True))" if r.startswith('W(li(') and "covered=" not in r else r
+                              for r in rows]
+            rows = ['W(ul_open())'] + [r for r in rows if r not in ('W(ul_open())', 'W(ul_close())')] + ['W(ul_close())']
+        out += rows
     return left, out
+
+
+# a block whose first row brings in a whole system, not one change (7.42 Pip Health "Standardized rules for units that
+# take a fixed number of hits…", Item Potency "… now have an attribute called Item Potency"): told as a paragraph
+_SYSTEM_INTRO_RE = re.compile(r'^(?:Standardized|Unified|Introduced|Reworked the)\b|'
+                              r'\bnow (?:have|has) an? (?:new )?(?:attribute|stat|mechanic|system) called\b', re.I)
+_LIST_INFO_RE = re.compile(r'^\s*\*\s')
+_ASIDE_LEAD = {"For", "Excluding", "Including", "Previously", "Still", "Also", "Only", "Even", "Except", "As", "Used"}
+_HEADING_ROWS = {"Examples": "For example", "Example": "For example"}
+_KEEP_CAPITAL = re.compile(r"^(?:[A-Z]{2,}|[A-Z][\w-]*'s?\b)")
+
+
+def _sentence_case(text, first):
+    """A row as part of a sentence: its first word lower-case, unless it is a name ("Roshan's", "M.A.D.")."""
+    from patch.images import HERO_SLUG
+    word = text.split(" ", 1)[0]
+    if first or _KEEP_CAPITAL.match(text) or word in HERO_SLUG or not word[:1].isupper():
+        return text
+    return word.lower() + text[len(word):]
+
+
+def _with_icons(paragraph):
+    """A story paragraph as a Python expression, the items and abilities it names as their icons (mech_example), as
+    in the mechanic rows (owner 2026-11-19)."""
+    from .names import _py_str
+    from .names import _named_icons
+    found = _named_icons(paragraph)
+    if not found:
+        return _py_str(paragraph)
+    rx = re.compile("|".join(re.escape(w) for w in sorted(found, key=len, reverse=True)))
+    parts, last = [], 0
+    for m in rx.finditer(paragraph):
+        if m.start() > last:
+            parts.append(_py_str(paragraph[last:m.start()]))
+        parts.append(f'mech_example({_py_str(found[m.group(0)])}, label={_py_str(m.group(0))})')
+        last = m.end()
+    if last < len(paragraph):
+        parts.append(_py_str(paragraph[last:]))
+    return " + ".join(parts)
+
+
+def _story_of(group, tag):
+    """The block told as people say it (owner 2026-11-19, Pip Health: "надо придумать, как это человечнее превратить
+    в предложения"): each Valve row a sentence, its sub-rows joined to it after a colon when there are two or more
+    ("… pips: attacks from heroes … deal 1 full pip; attacks from illusions … 1/4 pip"), a lone sub-row a sentence of
+    its own; a row's short "?" in brackets; the first two sentences one paragraph, the rest the next. A "?" that is a
+    starred list of units ("* Couriers<br>* …") is the story's table of icons (mech_list). W(mech_story(...)) or None."""
+    from .names import _py_str
+    from .names import _owner_form
+    items, table = [], None
+    for n in group:
+        text = _strip_html(n.get('note', '')).strip().rstrip('.').replace('’', "'")
+        if n.get('hide_dot') or not text:
+            continue
+        info = (n.get('info') or '').strip()
+        if info and _LIST_INFO_RE.match(info) and table is None:
+            units = [_owner_form(re.sub(r'^\s*\*\s*', '', p).strip()) for p in info.split('<br>') if p.strip()]
+            table = "mech_list(info_tip(" + ", ".join(_py_str(u) for u in units) + "))"
+        elif info and '<br>' not in info and len(info) < 160:
+            aside = _strip_html(info).strip().rstrip('.').replace(' * ', ' × ')
+            word = aside.split(" ", 1)[0]
+            text += f" ({word.lower() + aside[len(word):] if word in _ASIDE_LEAD else aside})"
+        level = n.get('indent_level') or 1
+        if text in _HEADING_ROWS and level >= 2:             # Valve's "Examples" over its own sub-rows: a sentence
+            items.append((_HEADING_ROWS[text], [], level))
+            continue
+        owner = next((it for it in reversed(items) if it[2] < level), None) if level >= 2 else None
+        if owner is not None:
+            owner[1].append(text)
+            continue
+        items.append((text, [], level))
+    if len(items) < 2:
+        return None
+    sentences = []
+    for text, subs, _level in items:
+        if len(subs) >= 2:
+            sentences.append(text + ": " + "; ".join(_sentence_case(s, False) for s in subs) + ".")
+        else:
+            sentences.append(text + ".")
+            sentences += [s + "." for s in subs]
+    paragraphs = [" ".join(sentences[:2]), " ".join(sentences[2:])] if len(sentences) > 2 else [" ".join(sentences)]
+    body = ", ".join(_with_icons(p) for p in paragraphs if p)
+    under = f", table={table}" if table else ""
+    return f'W(mech_story([{body}], tags=("{tag.lower()}",){under}))'
 
 
 def _merge_all_followup(lines):

@@ -2,6 +2,7 @@
 a unit's renamed ability (7.42)."""
 import re
 
+from .names import _named_icons, _owner_form  # noqa: F401  (re-exported)
 from .post_stats import _py_str
 
 
@@ -90,7 +91,15 @@ def _postprocess_dash_table(lines):
             rows = ", ".join("[" + ", ".join(_py_str(c) for c in [cells[0][j]] + [r[j] for r in cells[1:]]) + "]"
                              for j in range(1, len(cells[0])))
             notes = f", notes=[{', '.join(tail)}]" if tail else ""
-            out.append(f'{m.group("head")}, extra=mech_level_table({head}, [{rows}]{notes})))')
+            # the row's own sense: more experience to reach a level is worse — its badge and its cells (2026-11-19)
+            from .tags import _is_lower_better
+            text = re.match(r'\s*W\(li\("((?:[^"\\]|\\.)*)"', ln).group(1)
+            low = _is_lower_better(text)
+            lead = m.group("head")
+            if low:
+                lead = re.sub(r'(b\([^)]*?)\)$', lambda bm: bm.group(1) + (")" if "l=True" in bm.group(1)
+                                                                             else ", l=True)"), lead)
+            out.append(f'{lead}, extra=mech_level_table({head}, [{rows}]{notes}{", l=True" if low else ""})))')
             continue
         rows = ", ".join("[" + ", ".join(_py_str(c) for c in r) + "]" for r in cells[1:])
         head = "[" + ", ".join(_py_str(c) for c in cells[0]) + "]"
@@ -138,11 +147,13 @@ def _pivot(hits):
         things = list(dict.fromkeys(t for t, _ in split))
         if all(t for t, _ in split) and 2 <= len(kinds) <= 3 and len(things) >= 3 and len(things) < len(hits) \
                 and all(sum(v == kv for _, v in split) >= 2 for kv in kinds):
-            cell = {(t, v): f'{h.group("a")} &rarr; <b>{h.group("b")}</b>' for (t, v), h in zip(split, hits)}
-            rows = ", ".join("[" + ", ".join([_py_str(t)] + [_py_str(cell.get((t, v), "–")) for v in kinds]) + "]"
+            # each change in the colour of what it means, with its % (owner 2026-11-19: "изменения тоже не видны")
+            cell = {(t, v): f'mech_change_cell({_py_str(h.group("a"))}, {_py_str(h.group("b"))})'
+                    for (t, v), h in zip(split, hits)}
+            rows = ", ".join("[" + ", ".join([_py_str(t)] + [cell.get((t, v), '"–"') for v in kinds]) + "]"
                              for t in things)
             head = "[" + ", ".join(_py_str(x) for x in [""] + [v[:1].upper() + v[1:] for v in kinds]) + "]"
-            return f"mech_table({head}, [{rows}])"
+            return f'mech_table({head}, [{rows}], cls="mech-grid")'
     return None
 
 
@@ -312,41 +323,8 @@ def _postprocess_renamed_unit_ability(lines, version=None):
     return out
 
 
-_NAME_RUN_RE = re.compile(r"[A-Z][\w'’-]*(?: (?:of|the|[A-Z0-9][\w'’-]*))*")
 _MECH_HEAD_RE = re.compile(r'^\s*W\(plain_header\("[^"]+", new="(?:Reworked|New) mechanic"')
 _ROW_HEAD_RE = re.compile(r'^(?P<head>\s*W\(li\("(?P<text>(?:[^"\\]|\\.)*)",.*?)(?P<tail>\)\))\s*$')
-
-
-def _named_icons(text):
-    """{words of the row: the item / ability they name} for every name with an icon (a plural "Voodoo Masks" as its
-    item; the longest run of capitalised words first, then shorter ones from its start)."""
-    from patch.mech_abilities import mech_example
-    found = {}
-    for run in _NAME_RUN_RE.findall(text):
-        words, start = run.split(), 0
-        while start < len(words):                     # "Tier 4 Evolved Enchantment": the name may start inside
-            hit = None
-            # a name inside a run is two words or more: "Spell Lifesteal" is a stat, not the Lifesteal icon
-            shortest = start + (2 if start else 1)
-            for n in range(len(words), shortest - 1, -1):
-                phrase = " ".join(words[start:n])
-                for name in (phrase, phrase[:-1] if phrase.endswith("s") else None):
-                    if not name or len(name) < 4:
-                        continue
-                    try:
-                        mech_example(name)
-                    except ValueError:
-                        continue
-                    hit = (phrase, name, n)
-                    break
-                if hit:
-                    break
-            if hit:
-                found[hit[0]] = hit[1]
-                start = hit[2]
-            else:
-                start += 1
-    return found
 
 
 def _postprocess_mechanic_name_icons(lines):
@@ -427,22 +405,6 @@ def _postprocess_star_lists(lines):
         parts = [_owner_form(re.sub(r'^\s*\*\s*', '', p).strip()) for p in m.group("body").split("<br>")]
         return 'extra=inline_list("' + "<br>".join(p for p in parts if p) + '")'
     return [_STAR_NOTE_RE.sub(repl, ln) for ln in lines]
-
-
-_POSSESSIVE_RE = re.compile(r"^(?P<owner>[A-Z][\w .'-]*?)(?:'s|’s|'|’) (?P<what>[A-Z].*)$")
-
-
-def _owner_form(line):
-    """"Gyrocopter's Homing Missile" → "Gyrocopter: Homing Missile", the form the lists' table reads as hero | ability
-    with their icons (owner 2026-11-19: the Pip Health list was a column of words, "не как другие — иконками и ряды
-    столбцов"); a creep's too ("Radigull's Eggstremism"). An item's own name ("Roshan's Banner") stays."""
-    from patch.images import HERO_SLUG
-    from patch.mech_abilities import _creep_prefix, _item_icon
-    m = _POSSESSIVE_RE.match(line)
-    if not m or _item_icon(line):
-        return line
-    owner = m.group("owner")
-    return f"{owner}: {m.group('what')}" if owner in HERO_SLUG or _creep_prefix(owner) else line
 
 
 _UNIT_HEAD_RE = re.compile(r'^(?P<ind>\s*)W\(unit_header\("(?P<name>[^"]+)"(?P<rest>.*)\)\)\s*$')

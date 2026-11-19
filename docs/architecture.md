@@ -144,7 +144,7 @@ Key fields:
 | `rows`, `notes` | Одна заметка как строка `W(li(...))`, список заметок: складывание, группировка, порядок |
 | `general`, `entities` | General Updates, герой, предмет, нейтральный крип |
 | `lines` | Общее для проходов: шаблоны блоков, боссы, мелкие помощники |
-| `post_stats`, `post_cards`, `post_facets`, `post_general`, `post_items`, `post_late`, `post_tables`, `post_hero`, `post_shared` | Проходы по готовым строкам (`_postprocess_*`); `post_facets` — удалённые грани и способности (вынесено из `post_cards` 2026-11-06), `post_hero` — General героя, `post_shared` — одна строка нескольких способностей |
+| `post_stats`, `post_cards`, `post_facets`, `post_general`, `post_items`, `post_late`, `post_tables`, `post_terrain`, `post_hero`, `post_shared` | Проходы по готовым строкам (`_postprocess_*`); `post_facets` — удалённые грани и способности (вынесено из `post_cards` 2026-11-06), `post_hero` — General героя, `post_shared` — одна строка нескольких способностей |
 | `normalize` | Datafeed и нормализованный JSON |
 | `pipeline` | `generate(version)`: порядок всех шагов |
 | `facets_auto`, `cli` | Новые грани в `patch/badges.py`, командная строка |

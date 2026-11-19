@@ -398,6 +398,9 @@ def _postprocess_courier_rows(lines):
 
 
 _RUNE_ROW_LINE_RE = re.compile(r'^W\(li\("(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes?: (?P<rest>.*)$')
+_RUNE_NOW_RE = re.compile(r'^W\(li\("(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes? (?P<rest>(?:now|no longer|can|will)\b.*)$')
+_RUNE_INSIDE_RE = re.compile(r'^W\(li\("(?P<rest>[A-Z][^"]*\b(?:by|from|of) (?:an? |the )?(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) '
+                             r'Runes?\b.*)$')
 _RUNE_SUBGROUP_RE = re.compile(r'^W\(subgroup\("(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes?"\)\)$')
 
 
@@ -417,6 +420,10 @@ def _postprocess_rune_rows(lines):
             section = head.group(1)
         row = _RUNE_ROW_LINE_RE.match(raw) if section == "General Updates" else None
         sub = _RUNE_SUBGROUP_RE.match(raw) if section == "General Updates" else None
+        if not (row and row.group("name") in RUNE_ICONS) and section == "General Updates":
+            # "Invisibility Rune now also provides …", "Illusions created by Illusion Rune now have …" (7.42): the rune
+            # is the row's subject without Valve's colon — its block too (owner 2026-11-19: "не сделано иконкой")
+            row = _RUNE_NOW_RE.match(raw) or _RUNE_INSIDE_RE.match(raw)
         if row and row.group("name") in RUNE_ICONS:
             rest = row.group("rest")
             pending.setdefault(row.group("name"), []).append(f'W(li("{rest[0].upper()}{rest[1:]}')
@@ -459,7 +466,20 @@ def _postprocess_team_abilities(lines):
     rows. A list left empty goes, with its header when nothing else is under it."""
     rows, first, anchor = {}, None, None
     keep = []
+    under = None              # Valve's Subtitle "Glyph of Fortification" (7.42): the rows of its list are Glyph's
     for i, raw in enumerate(lines):
+        sub = re.match(r'^\s*W\(subgroup\("(Glyph of Fortification|Scan)"\)\)\s*$', raw)
+        if sub:
+            under = sub.group(1)
+            first = i if first is None else first
+            continue
+        if under and raw.strip() == "W(ul_close())":
+            under = None
+            continue
+        if under:
+            if raw.strip() != "W(ul_open())":
+                rows.setdefault(under, []).append(raw.strip())
+            continue
         m = _TEAM_ABILITY_ROW_RE.match(raw)
         if m:
             name = "Glyph of Fortification" if m.group(1) == "Glyph" else m.group(1)
@@ -478,6 +498,12 @@ def _postprocess_team_abilities(lines):
                   'W(ul_open())', *rows[name], 'W(ul_close())']
     if anchor is None:                                 # no list closes after the row: the block goes last
         anchor = len(keep)
+    # after the whole category the rows stood in, not inside it: the cards after that list (7.42 Courier, the lane
+    # creeps of "Lane Creeps, Towers and Bases") stay under their own header
+    anchor = next((k for k in range(anchor, len(keep))
+                   if re.match(r'^\s*(?:W\((?:plain_header|section)\(|# =====)', keep[k])), len(keep))
+    while anchor > 0 and not keep[anchor - 1].strip():
+        anchor -= 1
     return _drop_empty_lists(keep[:anchor] + block + keep[anchor:])
 
 

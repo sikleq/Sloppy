@@ -892,3 +892,29 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - Чипы Terrain делят ширину ряда (`flex: 1 1 auto`): справа не остаётся пустого места.
 - Flicker вернулся без +35 к скорости — строка с [?] «Not in the patch notes». Earthshaker Fissure (свободный проход с
   Shard) — в docs/todo.md, похоже на заготовку.
+
+### Вычитка 7.42, четвёртый круг (владелец 2026-11-19)
+
+- **Блок, вводящий систему, — абзацем** (`general._story_of`, `mech_story`): первая строка блока — «Standardized rules…» /
+  «… now have an attribute called X» → Valve's строки одной-двумя абзацами человеческим языком: подстроки — после
+  двоеточия через «;», одиночная подстрока — своим предложением, короткий [?] — в скобках, «Examples» — «For example:»,
+  предметы и способности — значками; список юнитов со звёздочками — таблица значков под абзацем. Строки Valve
+  остаются скрытыми (covered) для весов и фильтров. Так Pip Health и Item Potency.
+- **Glyph под подзаголовком Valve — в Team Abilities** (`_postprocess_team_abilities`), блок встаёт после всей категории,
+  не между её карточками.
+- **Руна без двоеточия Valve — тоже блок руны** («Invisibility Rune now also…», «created by Illusion Rune …»,
+  `_RUNE_NOW_RE` / `_RUNE_INSIDE_RE`).
+- **Роshan:** «Base respawn timer now decreases …» — REWORK (как работает возрождение объекта: прежний таймер 8–11 мин
+  теперь меньше с каждой смертью); «Timer now visualizes …» — QoL (интерфейс).
+- **Опыт до уровня — меньше лучше** (`LOWER_IS_BUFF` «experience needed»): строка NERF, в таблице выросшие значения
+  красные (`mech_level_table(l=True)`).
+- **Ячейка изменения в таблице** (`mech_change_cell`): старое значение тусклое, новое — цветом смысла и с %; таблица
+  `cls="mech-grid"` — равные столбцы значений, линии между ячейками.
+- **Таблица строки с тегом — во всю ширину строки, как таблица формул** (`li()` → `.row-table`): одни кромки у всех
+  таблиц. В блоках механик таблица остаётся под текстом.
+- **Изменения файла карты без строки Valve — строками Terrain** (`post_terrain._postprocess_map_file_rows`, по
+  `data/terrain/terrain_diff_<версия>.json`): точки появления героев и курьеров, тайник, участки течений, земля без
+  вардов — если ни одна строка блока их не называет (слова целиком: «ward» ≠ «toward»), с [?] «Not in the patch notes».
+- **Новый тег TEASER** (`t("TEASER")`, своя рамка, `.badge.teaser`): подмигивание Valve к будущему событию («Y'ai 'ng'ngah,
+  Shuggoth h'ee…» 7.42; раньше — шутливое переименование OD, «чутьё» Axe). Не участвует в фильтрах, ячейках изменений и
+  весах (`row_scores._DYN_TAG_WHITELIST`), на Terrain — свой чип вместо номера.

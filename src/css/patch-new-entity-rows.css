@@ -429,7 +429,16 @@ h4.subgroup {
 .mech-abils.mech-levels + .mech-abils.mech-levels { margin-top: 6px; }
 .mech-abils.mech-levels .mech-abil-row > span { padding: 3px 4px; font-variant-numeric: tabular-nums; font-size: 12.5px; }
 .mech-abils.mech-levels .mech-abil-row > .mech-label { padding: 3px 8px; white-space: nowrap; }
-.mech-lv-changed { color: var(--gold-bright, #e3c46a); font-weight: 600; }
+/* a table of changed values (mech_table cls="mech-grid", 7.42 building bounty): the value columns equal, a line
+   between cells as every table of the site, the old value dim, the new in its colour with its % (mech_change_cell) */
+.mech-abils.mech-grid { grid-template-columns: fit-content(30%) repeat(calc(var(--mech-cols, 2)), minmax(0, 1fr)); }
+.mech-abils.mech-cols-3.mech-grid { --mech-cols: 2; }
+.mech-abils.mech-cols-4.mech-grid { --mech-cols: 3; }
+.mech-abils.mech-grid .mech-abil-row > span + span,
+.mech-abils.mech-levels .mech-abil-row > span + span { border-left: 1px solid var(--line-soft); }
+.mech-old { color: var(--text-dim); }
+.mech-pct { font-size: 12px; margin-left: 2px; }
+.mech-lv-changed { font-weight: 600; }      /* its colour: .iab-lv.iab-buff / .iab-nerf, as every changed value */
 .mech-levels-note { display: block; margin-top: 6px; color: var(--text-dim); }
 @media (max-width: 760px) { .mech-abils.mech-levels .mech-abil-row > span { font-size: 11px; padding: 3px 2px; } }
 .mech-cell {

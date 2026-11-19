@@ -187,6 +187,15 @@ ul.changes li > .badge-group {
   color: #87a3bf;
   border: 1px solid rgba(121, 192, 255, 0.20);
 }
+/* TEASER (owner 2026-11-19): Valve's wink at a coming event, no change of the game ("Y'ai 'ng'ngah, Shuggoth h'ee",
+   7.42) — a look of its own, a dashed violet frame and italic; never in the filters, the change cells or the weights */
+.badge.teaser {
+  background: rgba(140, 90, 200, 0.08);
+  color: #b597e0;
+  border: 1px dashed rgba(170, 120, 230, 0.45);
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
 .badge.new {
   border: 1px solid rgba(220, 175, 95, 0.22);
   font-weight: 700;

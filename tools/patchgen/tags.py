@@ -199,6 +199,15 @@ CANONICAL_TAGS = [
     # a flat number traded for one that grows with an attribute ("Damage rescaled from 325 to 300 + 1x Primal
     # Beast's Strength", 7.42): no single %, the row is a change of form
     (re.compile(r"\bfrom \d+(?:\.\d+)? to \d+(?:\.\d+)? \+ [\d.]+x [\w' ]+?(?:Strength|Agility|Intelligence)\b"), 'REWORK'),
+    # Valve's wink at a coming event — a line in the Old Ones' tongue (7.42 "Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth
+    # fhtagn") — TEASER, its own chip, outside filters and cells (owner 2026-11-19)
+    (re.compile(r"\b(?:fhtagn|ftaghu|Shuggoth|ng'ngah|Cthulhu|R'lyeh)\b", re.I), 'TEASER'),
+    # when a boss comes back is how the objective works, not a number of it: "Base respawn timer now decreases by 1
+    # minute every time Roshan is defeated" (7.42) changes the respawn rule — REWORK, as "where and when an object
+    # appears" (owner 2026-11-19); the timer that shows the Aegis and its holder is interface — QoL
+    (re.compile(r'\brespawn timer now (?:decreases|increases|scales|grows)\b|\brespawn time now (?:decreases|increases)\b',
+                re.I), 'REWORK'),
+    (re.compile(r'^Timer now (?:visualizes|shows|displays)\b', re.I), 'QoL'),
     # the item's debuff does more now ("Nullify now also makes the target … 60% less susceptible to forced movement")
     (re.compile(r'\bnow also makes the target\b', re.I), 'BUFF'),
     # a self-cast that gave nothing now gives half ("Shine now provides all bonuses on self-cast, but they will be
@@ -382,6 +391,9 @@ LOWER_IS_BUFF = re.compile(
     r'|initial\s+delay|channel\s+(?:duration|time)|restore\s+duration|bonus\s+lost'
     # … and the waits of 7.42's heroes (Weaver "Thread establishing time", Dazzle "Soul Return Time")
     r'|establishing\s+time|return\s+time'
+    # more experience to reach a level is slower levelling (7.42 "Total amount of experience needed to reach level 30
+    # increased from 64400 to 66600" stood a green +3%; owner 2026-11-19: NERF)
+    r'|experience\s+needed|xp\s+needed'
     r')\b',
     re.I,
 )

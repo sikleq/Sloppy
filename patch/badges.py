@@ -837,6 +837,9 @@ def t(tag):
         "QoL":    ("qol",       "qol"),
         "NEW":    ("new",       "new"),
         "DEL":    ("del",       "del"),
+        # Valve's wink at a coming event (owner 2026-11-19, 7.42 "Y'ai 'ng'ngah, Shuggoth h'ee…"): no gain, no loss —
+        # outside the filters (patch/page.py), the change cells and the weights (row_scores._DYN_TAG_WHITELIST)
+        "TEASER": ("teaser",    "teaser"),
     }
     color_cls, tag_id = cls_map[tag]
     if tag == "NEW":
