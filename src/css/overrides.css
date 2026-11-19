@@ -397,6 +397,8 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .camp-table .camp-type { display: inline-flex; flex: none; margin-right: 1px; }
 .camp-table .camp-ico img { width: 22px; height: 22px; display: block; image-rendering: pixelated; }
 .camp-table .camp-face { position: relative; flex: none; }
+/* with the Side column and the icons 7.42's table was 36 px wider than its block at 1400 px: narrower cell padding */
+.camp-table-sided .camp-cell { padding: 3px 10px; }
 .camp-table .camp-face img.camp-count { position: absolute; right: 0; bottom: 0; width: 9px; height: 11px; }
 .camp-table .camp-side { justify-content: center; font-weight: 600; }
 .camp-table .camp-side-radiant { color: #7fd08c; }
