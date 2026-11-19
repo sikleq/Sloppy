@@ -2666,6 +2666,34 @@
 "tormentors": 2
 },
 "moves": {}
+},
+{
+"patch": "7.42-v3",
+"date": "2026-11-19",
+"sha8": "51dc118a",
+"changes": "client update of 2026-11-19 inside 7.42 (build 6980, 00:50 UTC; no patch notes): the bottom-lane corner — 3 trees removed (x 7744-7872, y -7424 ... -7296), 16 cells one height level higher and 2 lower, 19 walkable cells turned cliff edge and 10 blocked; the top-lane corner (x -8224 ... -7392, y 6880 ... 7840) — 28 walkable cells blocked; nothing else moved",
+"n": {
+"trees": 2394,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+},
+"moves": {}
 }
 ]
 }

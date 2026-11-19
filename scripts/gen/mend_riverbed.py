@@ -41,7 +41,8 @@ STEP = 4                  # px past a sharp side where the water's brightness is
 # slanted tiles), not touched.
 _MID_742 = [(-326, -252, -446, -252, "rt")]        # the pale corner left of x -253, below y -253
 FIXES = {"118cfcea": _MID_742,                     # 7.42
-         "0d7217cc": _MID_742}                     # 7.42-v2: the same riverbed
+         "0d7217cc": _MID_742,                     # 7.42-v2: the same riverbed
+         "51dc118a": _MID_742}                     # 7.42-v3 (build 6980): the same riverbed
 
 
 def _ramp(n, sharp_lo, sharp_hi, fade):

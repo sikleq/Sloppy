@@ -54,4 +54,4 @@ def test_the_pale_corner_goes_away(monkeypatch):
 def test_a_map_without_a_fix_is_left_alone():
     _water, bad = _scene()
     assert mend_riverbed.mend(bad, "deadbeef", rect=RECT) is bad
-    assert "118cfcea" in mend_riverbed.FIXES and "0d7217cc" in mend_riverbed.FIXES
+    assert {"118cfcea", "0d7217cc", "51dc118a"} <= set(mend_riverbed.FIXES)      # 7.42, -v2, -v3
