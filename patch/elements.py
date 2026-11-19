@@ -532,6 +532,8 @@ def item_header(name, new=False, changed=False, removed=None, old_title=None, co
         name_html = (f'<span class="ability-title-rename"><span class="ability-title-old">{old_title}</span>'
                      f'<span class="ability-title-arrow">→</span>{name_html}</span>')
     price = f'<span class="item-icon-cost" aria-label="Cost {cost}">{cost}</span>' if cost else ''
+    from .item_marks import item_marks           # Item Potency / Dormant Curio marks on the icon (owner 2026-11-19)
+    price += item_marks(name, _State.current_patch_version)
     if source:
         type_label += f'<span class="entity-source">{source}</span>'
     # item-block: every framed box of an item hangs out on one common edge (CSS, owner 2026-09-28)
@@ -1099,6 +1101,9 @@ def _li_classes(text, extra, badge, dyn_tags, covered, major, ability_row):
         # icon after the text (panorama/images/status_icons/ability_effectiveness_icon, icons/stats/item_potency.png)
         classes.append("item-potency")
         marker = '<span class="aghanim-marker potency"></span>'
+    elif isinstance(text, str) and re.search(r"\bdormant curio\b", text_noclass, re.I):
+        classes.append("curio-row")                 # ... and a Dormant Curio row: violet-pink (owner 2026-11-19)
+        marker = '<span class="aghanim-marker curio"></span>'
     elif isinstance(text, str) and _State.current_ability_slug:
         # a row of an ability that Aghanim's Shard / Scepter GRANTS is an Aghanim row even without the
         # words (Medusa 7.38 Cold Blooded; owner 2026-09-26) — KV IsGrantedByShard / IsGrantedByScepter
@@ -1346,7 +1351,7 @@ def inline_list(text):
 _POP_SUB = '&nbsp;&nbsp;– '
 
 
-_POP_FROMTO_RE = re.compile(r'\bfrom (\d+(?:\.\d+)?)(?:%|s|g)? to (\d+(?:\.\d+)?)(?:%|s|g)?(?![\d./])')
+_POP_FROMTO_RE = re.compile(r'\bfrom (\d+(?:\.\d+)?)(?:%|s|g)? to (\d+(?:\.\d+)?)(?:%|s|g)?(?![\d/]|\.\d)')
 _POP_LOWER_RE = re.compile(r'\b(?:cooldown|cost|cast point|delay|respawn|channel time)\b', re.I)
 
 
@@ -1362,11 +1367,16 @@ def _pop_pct(line):
 
 
 def _pop_split(line):
-    """"…impact damage increased from 90 to 112.5, and burn damage decreased from 50 to 45": one row per change."""
+    """"…impact damage increased from 90 to 112.5, and burn damage decreased from 50 to 45": one row per change;
+    "Compared to Blood Grenade: — Cast range increased from 900 to 1200. Projectile speed …" (7.42 Bloodslinger): its
+    lead a row of its own, then a row per sentence (owner 2026-11-19: "подобные перечисления изменений в таблице")."""
     hits = list(_POP_FROMTO_RE.finditer(line))
+    lead = re.match(r'^([^:<]{3,60}:)\s*—\s*', line) if len(hits) > 1 else None
+    if lead:
+        return [lead.group(1)] + _pop_split(line[lead.end():])
     out, start = [], 0
     for h, nxt in zip(hits, hits[1:]):
-        cut = re.search(r',\s*(?:and\s+)?', line[h.end():nxt.start()])
+        cut = re.search(r',\s*(?:and\s+)?|\.\s+', line[h.end():nxt.start()])
         if cut:
             out.append(line[start:h.end() + cut.start()])
             start = h.end() + cut.end()
@@ -1385,8 +1395,8 @@ def _pop_list(body):
     for x in items:
         sub = x.startswith(_POP_SUB)
         text = x[len(_POP_SUB):] if sub else x
-        rows.append(f'<span class="pop-li{" pop-sub" if sub else ""}"><span class="pop-t">{text}</span>'
-                    f'{_pop_pct(text)}</span>')
+        kind = " pop-sub" if sub else " pop-head" if text.endswith(":") and len(items) > 1 else ""
+        rows.append(f'<span class="pop-li{kind}"><span class="pop-t">{text}</span>{_pop_pct(text)}</span>')
     return ''.join(rows)
 
 

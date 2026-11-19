@@ -621,6 +621,12 @@ def test_multi_line_info_popup_is_a_bulleted_list():
     assert two.count('class="pop-li"') == 2 and "+25%" in two and "-10%" in two
     assert '<span class="pop-t">Burn damage decreased from 50 to 45</span>' in two
     assert "+50%" in info_tip("Cooldown increased from 10 to 15") and "nerf" in info_tip("Cooldown increased from 10 to 15")
+    # 7.42 Bloodslinger "Compared to Blood Grenade: — Cast range increased from 900 to 1200. Projectile speed …": its
+    # lead a row, then a row per sentence, each with its % (owner 2026-11-19: "ты только % … для одного значения")
+    cmp = info_tip("Compared to Blood Grenade: — Cast range increased from 900 to 1200. Projectile speed increased "
+                   "from 1100 to 1400. Slow increased from 15% to 30% which returns to 15% over the duration")
+    assert 'class="pop-li pop-head"><span class="pop-t">Compared to Blood Grenade:</span>' in cmp
+    assert "+33%" in cmp and "+27%" in cmp and "+100%" in cmp
 
 
 def test_new_item_becomes_card_price_bonuses_then_abilities():

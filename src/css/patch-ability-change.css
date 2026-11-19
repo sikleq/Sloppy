@@ -537,9 +537,9 @@ ul.changes li.unit-sheet::before { content: none; display: none; }
    mechanics, new-entity notes). Drop the 76px phantom tag column the change
    grid reserves and mark each line with a small bullet so it reads as a list,
    not a tag row whose tag was deleted. Ability-rows (Passive:/Active: boxes)
-   keep their own layout. */
-ul.changes li.li-notag:not([class*="ability-row"]) > .row-text::before,
-.entity-block.is-new ul.changes li:not([class*="ability-row"]) > .row-text::before {
+   keep their own layout. The rows of a NEW unit / item / ability card get no bullet (owner 2026-11-19, 7.42 Eggstremism
+   "• New ability": "мы таких не ставим никогда"). */
+ul.changes li.li-notag:not([class*="ability-row"]) > .row-text::before {
   content: "\2022";
   float: none;
   display: inline;

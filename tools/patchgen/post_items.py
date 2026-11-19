@@ -465,6 +465,43 @@ def _postprocess_rework_marker(lines):
     return out
 
 
+_SHORTHAND_ROW_RE = re.compile(
+    r'^(?P<ind>\s*)W\(li\("(?P<kind>Active|Passive|Toggle|Aura|Use): (?P<name>[^."]+)\. '
+    r'(?P<short>(?:Identical to|Same as|Stronger version of|Weaker version of)[^"]*)"(?P<rest>.*)\)\)\s*$')
+
+
+def _postprocess_shorthand_ability(lines, version=None):
+    """"Active: Force. Identical to Force Staff's active" / "Active: Meteor Hammer. Stronger version of basic Meteor
+    Hammer" (7.42 Caduceus, Starforge — Valve's own words): the row gets the ability's full text from the game's
+    tooltip, Valve's short phrase goes first in its (?) (owner 2026-11-19: "не ленись писать всё. Если в игре написано
+    подробно, то и мы пишем так"), as 7.42 Skypiercer's Disarm. No tooltip found: the row stays as it is."""
+    try:
+        from patch.item_ability_text import item_abilities
+    except ImportError:
+        return lines
+    out, item = [], None
+    for ln in lines:
+        h = re.match(r'^\s*W\(item_header\("([^"]+)"', ln)
+        if h:
+            item = h.group(1)
+        m = _SHORTHAND_ROW_RE.match(ln)
+        if m and item and version:
+            slug = _KNOWN_ITEM_SLUGS.get(item, item.lower().replace(' ', '_').replace("'", ''))
+            full = next((t for t in (item_abilities(slug, version) or [])
+                         if t.startswith(f'{m.group("kind")}: {m.group("name")}.')), None)
+            if full:
+                short = m.group("short").rstrip(".")
+                rest = m.group("rest")
+                note = re.search(r'extra=inline_note\("((?:[^"\\]|\\.)*)"\)', rest)
+                if note:
+                    rest = rest.replace(note.group(0), f'extra=inline_note("{short}<br>{note.group(1)}")', 1)
+                else:
+                    rest += f', extra=inline_note("{short}")'
+                ln = f'{m.group("ind")}W(li({_py_str_item(full.rstrip("."))}{rest}))'
+        out.append(ln)
+    return out
+
+
 _DUE_TO_ROW_RE = re.compile(r'^(?P<ind>\s*)W\(li\("(?P<text>Total cost (?:increased|decreased) from \d+g? to \d+g?) '
                             r'\((?P<why>[Dd]ue to[^"]*)\)"(?P<rest>, b\([^)]*\))\)\)\s*$')
 

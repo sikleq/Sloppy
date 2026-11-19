@@ -49,6 +49,7 @@ from .post_items import (
     _postprocess_innate_rows_out_of_stats,
     _postprocess_new_item_card,
     _postprocess_result_note_to_its_row,
+    _postprocess_shorthand_ability,
     _postprocess_rework_marker,
     _postprocess_unstated_total_cost,
 )
@@ -262,6 +263,7 @@ def generate(version):
     out = _postprocess_before_after(out)              # "now … instead of …" rows -> before / after table
     out = _postprocess_mechanic_rules_row(out, after_label=True)   # a reworked mechanic in one list
     out = _postprocess_new_item_card(out, version)
+    out = _postprocess_shorthand_ability(out, version)   # "Identical to …": the game's full text (owner 2026-11-19)
     out = _postprocess_due_to_note(out)               # "(due to …)" of a total cost under the (?) (owner 2026-11-19)
     out = _postprocess_result_note_to_its_row(out)    # "As a result, for buildings …" to its row (owner 2026-11-19)
     out = _postprocess_cost_components(out, version)

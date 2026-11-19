@@ -313,3 +313,17 @@ def test_a_stat_split_by_melee_and_ranged_is_a_stats_card():
                       'Speed")], new=[("", "+15 Damage", b([18, 12], 15)), ("", "+55/45 Movement Speed (Melee/Ranged)", '
                       'b(50, [55, 45]))]))')
     assert not any("bonus changed" in ln for ln in out)
+
+
+def test_a_shorthand_ability_row_gets_the_games_full_text(monkeypatch):
+    # owner 2026-11-19, 7.42 Caduceus "Active: Force. Identical to Force Staff's active": "не ленись писать всё. Если в
+    # игре написано подробно, то и мы пишем так"
+    from tools.patchgen import post_items
+    from patch import item_ability_text
+    monkeypatch.setattr(item_ability_text, "item_abilities",
+                        lambda slug, v: ["Active: Force. Pushes any target unit 600 units. Cooldown: 19s"])
+    out = post_items._postprocess_shorthand_ability([
+        'W(item_header("Caduceus", new="New Item"))', 'W(ul_open())',
+        """W(li("Active: Force. Identical to Force Staff's active", t("NEW")))""", 'W(ul_close())'], "7.42")
+    assert out[2] == ('W(li("Active: Force. Pushes any target unit 600 units. Cooldown: 19s", t("NEW"), '
+                      """extra=inline_note("Identical to Force Staff's active")))""")

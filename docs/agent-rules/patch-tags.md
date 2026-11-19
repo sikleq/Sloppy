@@ -978,3 +978,13 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   строки % (кулдаун, цена, задержка — меньше лучше); две такие перемены в одной фразе — две строки (`elements._pop_list`).
 - Полоса строк Item Potency ещё бледнее. Какие значения меняет Item Potency, игра пишет сама: `apply_effectiveness "1"`
   у значения в `items.txt` (7.42: 22 предмета) — основа будущего значка.
+
+### Вычитка 7.42, девятый круг (владелец 2026-11-19)
+
+- **Значки на иконке предмета** (`patch/item_marks.py`, вариант 2 из макета): серая молния — значения, которые меняет
+  Item Potency (`apply_effectiveness`), под ней значок Dormant Curio (`apply_curio_bonus`). При наведении — фразы из
+  подсказки игры, нужное число жирным. Строки «… Item Potency» — серая полоса, «… Dormant Curio» — фиолетово-розовая.
+- У строк нового юнита / предмета / способности нет точек слева («• New ability» — никогда).
+- «Active: X. Identical to … / Stronger version of …» (так пишет Valve) — полный текст способности из подсказки игры,
+  фраза Valve — первой строкой под [?] (`post_items._postprocess_shorthand_ability`).
+- [?] «Compared to Blood Grenade: — A. B. C.» — шапка и строка на каждое предложение, у каждой свой %.

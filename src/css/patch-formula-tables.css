@@ -27,6 +27,9 @@ ul.changes li.aghanim-shard.li-formula {
 .aghanim-marker.potency {               /* Item Potency rows: the game's own icon (owner 2026-11-19) */
   background-image: url('icons/stats/item_potency.png');
 }
+.aghanim-marker.curio {                 /* Dormant Curio rows: its item icon */
+  background-image: url('icons/items/dormant_curio.png');
+}
 
 /* WRONG-WORD HIGHLIGHT — subtle, neutral marker (no strikethrough) */
 .wrong-word {

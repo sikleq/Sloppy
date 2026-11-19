@@ -306,3 +306,10 @@ ul.changes li.item-potency.li-notag:not([class*="ability-row"]),
 .entity-block.is-new ul.changes li.item-potency:not([class*="ability-row"]) {
   background: linear-gradient(90deg, rgba(196, 190, 178, 0.10) 0, rgba(196, 190, 178, 0.04) 60%, transparent 100%);
 }
+/* DORMANT CURIO ROWS — the same stripe, violet-pink, as light (owner 2026-11-19) */
+ul.changes li.curio-row {
+  background:
+    linear-gradient(90deg, transparent 0 70px, rgba(214, 120, 200, 0.10) 70px, rgba(214, 120, 200, 0.04) 60%, transparent 100%) no-repeat 0 3px / 100% 22px,
+    linear-gradient(90deg, rgba(214, 120, 200, 0.10) 0, rgba(214, 120, 200, 0.04) 60%, transparent 100%) no-repeat 0 25px / 100% calc(100% - 28px);
+  border-radius: 3px;
+}

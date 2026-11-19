@@ -204,3 +204,32 @@ def test_no_all_changes_tip_and_only_the_name_links():
         icon = html.split('class="entity-icon', 1)[1].split("</div>", 1)[0]
         assert "<a " not in icon
         assert 'class="entity-link"' in html.split('class="entity-name"', 1)[1]
+
+
+def test_rows_of_a_new_block_get_no_bullet():
+    # owner 2026-11-19, 7.42 Radigull's Eggstremism "• New ability": "забыл убрать точки … мы таких не ставим никогда"
+    from patch.css_bundle import read_css
+    css = read_css()
+    assert '.entity-block.is-new ul.changes li:not([class*="ability-row"]) > .row-text::before,' not in css
+    assert '.entity-block.is-new ul.changes li:not([class*="ability-row"]) > .row-text::before {' not in css
+
+
+def test_item_icon_marks_come_from_the_games_flags():
+    # owner 2026-11-19: variant 2 — the Item Potency mark on the item's icon, a Dormant Curio one under it; the values
+    # are the items.txt entries flagged apply_effectiveness / apply_curio_bonus, shown as the game's tooltip sentences
+    from patch.item_marks import item_marks
+    skadi = item_marks("Eye of Skadi", "7.42")
+    assert "item-mark-potency" in skadi and "<b>-20%</b>" in skadi and "<b>-40%</b>" in skadi
+    assert "item-mark-curio" not in skadi
+    assert "item-mark-curio" in item_marks("Gunpowder Gauntlets", "7.42")
+    assert item_marks("Blink Dagger", "7.42") == ""
+    from patch.state import _State
+    saved = _State.current_patch_version
+    try:
+        _State.current_patch_version = "7.42"
+        icon = el.item_header("Eye of Skadi").split('class="entity-icon', 1)[1].split('<div class="entity-name"', 1)[0]
+        assert '<span class="item-marks">' in icon
+    finally:
+        _State.current_patch_version = saved
+    html = el.li("Now improved by Dormant Curio", "")
+    assert "curio-row" in html and '<span class="aghanim-marker curio"></span>' in html
