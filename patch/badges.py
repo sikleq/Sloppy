@@ -824,6 +824,22 @@ def facet_badge(facet_slug):
             f'style="background-image:{grad}">{name}</span>')
 
 
+def bt(old, new, tag="REWORK"):
+    """A clock time or a value whose change is neither better nor worse in itself (7.42 Tormentor "Initial spawn time
+    decreased from 20:00 to 15:00"): its tag and the % in the neutral colour (owner 2026-11-19: "нет % разницы").
+    old / new: numbers or "MM:SS"."""
+    def secs(v):
+        if isinstance(v, str) and ":" in v:
+            m, s = v.split(":")
+            return int(m) * 60 + int(s)
+        return float(v)
+    a, z = secs(old), secs(new)
+    if not a or a == z:
+        return t(tag)
+    pct = (z - a) / a * 100
+    return t(tag) + f'<span class="badge-group"><span class="badge neutral">{"+" if pct > 0 else "−"}{abs(pct):.0f}%</span></span>'
+
+
 def t(tag):
     """Text-only tag for non-numeric changes.
     NEW (mechanic/property the entity didn't have before) is treated as a buff

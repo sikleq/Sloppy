@@ -414,3 +414,14 @@ def test_every_rune_fills_its_square_alike_and_stands_in_the_middle():
         left, top, right, bottom = alpha.point(lambda v: 255 if v >= 16 else 0).getbbox()
         assert abs(max(right - left, bottom - top) - 88) <= 2, key
         assert abs((left + right) / 2 - 48) <= 2 and abs((top + bottom) / 2 - 48) <= 2, key
+
+
+def test_a_clock_time_rework_row_gets_a_neutral_percent():
+    # owner 2026-11-19, 7.42 Tormentor "Initial spawn time decreased from 20:00 to 15:00": "нет % разницы, научиться"
+    from tools.patchgen.rows import _emit_li
+    assert _emit_li("Initial spawn time decreased from 20:00 to 15:00", tag_override="REWORK") == \
+        'W(li("Initial spawn time decreased from 20:00 to 15:00", bt("20:00", "15:00")))'
+    from patch.badges import bt
+    html = bt("20:00", "15:00")
+    assert 'data-tag="rework"' in html and '<span class="badge neutral">\u221225%</span>' in html
+    assert "badge-group" not in bt("5:00", "0:00".replace("0:00", "5:00"))     # no change: the tag alone

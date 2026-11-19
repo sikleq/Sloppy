@@ -150,8 +150,8 @@ def _items_rows(version, rules):
     for name, key, slug, vals in _scaled_values(version, "apply_effectiveness"):
         for k, (ab, label, value, sentence) in enumerate(vals):
             cls = ' class="ipot-gone"' if key in gone else ''
-            head = _name_cell(name, f"{ITEM_CDN}{slug}.png", "not in the game" if key in gone else "",
-                              span=len(vals)) if k == 0 else ''
+            # removed from the game: grey, hidden till "Show removed" (owner 2026-11-19: no "not in the game" words)
+            head = _name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals)) if k == 0 else ''
             hint = f' data-tooltip="{_esc(sentence)}"' if sentence else ''
             prop = f'<span class="{"iab-hint abil-ico-hint " if sentence else ""}ipot-prop"{hint}>{_esc(label)}</span>'
             v = _num(value)
@@ -206,7 +206,8 @@ def render_html() -> str:
     head_items = ["Item", "Ability", "Value", "Hero"] + [f"{n} {p}%" for n, p in ILLUSIONS]
     body = (
         _section("How Item Potency adds up", _rules_cards(rules))
-        + _section("Items", _table("ipot-items", head_items, _items_rows(version, rules)))
+        + _section("Items", '<button type="button" class="ipot-show-gone" aria-pressed="false">Show removed</button>'
+                   + _table("ipot-items", head_items, _items_rows(version, rules)))
         + _section("Attacks with their own Item Potency", _table(
             "ipot-sources", ["Ability", "Attacks", "Item Potency"], _sources_rows(version, rules, names, "own")))
         + _section("Bonuses and penalties", _table(

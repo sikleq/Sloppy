@@ -304,6 +304,12 @@ table.mr-table.ipot-table td.ipot-v-ill { color: var(--text-dim); }
 table.mr-table.ipot-table td.ipot-v-up { color: #6fd08a; font-weight: 700; }
 table.mr-table.ipot-table td.ipot-ab { color: var(--text-dim); white-space: nowrap; }
 table.mr-table.ipot-table tr.ipot-gone td { opacity: 0.45; }
+/* items removed from the game: hidden till "Show removed", then grey (owner 2026-11-19) */
+table.mr-table.ipot-table tr.ipot-gone { display: none; }
+.ipot-page.ipot-with-gone table.mr-table.ipot-table tr.ipot-gone { display: table-row; }
+.ipot-show-gone { margin: 0 0 8px; padding: 3px 10px; border-radius: 4px; border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.03); color: var(--text-dim); font-size: 12px; cursor: pointer; }
+.ipot-show-gone[aria-pressed="true"] { border-color: var(--gold); color: var(--text-main); background: rgba(227, 196, 106, 0.10); }
 .ipot-name { white-space: nowrap; font-weight: 600; }
 .ipot-nm-wrap { display: inline-flex; align-items: center; gap: 10px; }
 .ipot-name img { border-radius: 3px; }

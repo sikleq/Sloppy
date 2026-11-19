@@ -23,5 +23,6 @@ def test_the_page_lists_the_flagged_values_and_the_sources():
     assert '<span class="ipot-chip ipot-nerf">60%</span>' in html       # Swashbuckle: below 100% red
     assert '<span class="ipot-chip ipot-buff">125%</span>' in html      # Astral Step: above 100% green
     assert '<span class="ipot-chip ipot-buff">+20%</span>' in html      # Evolved: a bonus green
-    assert 'class="ipot-gone"' in html and "not in the game" in html
+    # removed items: grey, hidden till "Show removed", no words (owner 2026-11-19)
+    assert 'class="ipot-gone"' in html and "not in the game" not in html and 'class="ipot-show-gone"' in html
     assert "Pangolier" in html and "Illusion Rune" in html

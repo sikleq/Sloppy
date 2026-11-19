@@ -759,6 +759,7 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Passive gold per minute no longer scales over game time", "REWORK"),               # owner 2026-11-19
     ("All heroes now passively receive 50 experience per minute after the starting horn", "NEW"),
     ("Siege creeps no longer switch aggro to the towers that attack heroes", "REWORK"),
+    ("Outposts can now be captured while silenced", "QoL"),                               # owner 2026-11-19
     ("Shine now provides all bonuses on self-cast, but they will be reduced by 50%", "BUFF"),
     ("Aghanim's Scepter now also decreases cooldown by 10s", "BUFF"),
     ("Fire now has Cinder Dash ability", "NEW"),

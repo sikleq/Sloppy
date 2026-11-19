@@ -142,6 +142,8 @@ CANONICAL_TAGS = [
     (re.compile(r'\bno longer scales over (?:game )?time\b', re.I), 'REWORK'),
     (re.compile(r'\bnow passively receives?\b', re.I), 'NEW'),
     (re.compile(r'\bno longer switch(?:es)? aggro\b', re.I), 'REWORK'),
+    # a map objective that can now be used while silenced (7.42 Outposts): comfort, QoL (owner 2026-11-19)
+    (re.compile(r'\bcan now be captured while silenced\b', re.I), 'QoL'),
     (re.compile(r'\bnow also makes the target\b', re.I), 'NEW'),
     (re.compile(r'\bnow (?:only|solely) (?:affects?|available|appl(?:ies|ied)|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:affects?|applies|works) only\b', re.I),  'NERF'),

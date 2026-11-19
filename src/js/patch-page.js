@@ -771,6 +771,16 @@
   document.addEventListener('toggle', drawBrewlingConnectors, true);
 })();
 
+// ---- ITEM POTENCY PAGE: "Show removed" shows the items taken out of the game (owner 2026-11-19) ----
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.ipot-show-gone');
+  if (!btn) return;
+  const on = btn.getAttribute('aria-pressed') !== 'true';
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  const page = btn.closest('.ipot-page');
+  if (page) page.classList.toggle('ipot-with-gone', on);
+});
+
 // ---- PIP HEALTH TOGGLES (mech_abilities.pip_rows): a talent's / Aghanim's / Marci's extra pips shown on its toggle
 // (owner 2026-11-19: "чекбоксы в виде таланта/аганима … доп пипы появляются чуть другим цветом") ----
 document.addEventListener('click', (e) => {

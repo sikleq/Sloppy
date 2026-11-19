@@ -325,11 +325,11 @@ def _postprocess_new_camps(lines, version=None):
             ind = run[0][1].group("ind")
             rows, said = [], []
             for _ln, m, units in run:
-                where = ", ".join(x for x in (m.group("size"), m.group("side")) if x)
                 gold, xp = _camp_numbers(units, version)
                 creeps = ", ".join(f'({n}, {_py_str(shown)}, NEUTRAL_CDN + "{slug}.png")' for n, slug, shown in units)
-                label = _py_str(m.group("name") + ' camp <span class="camp-where">' + where + '</span>')
-                rows.append(f'({label}, [{creeps}], {_py_str(gold)}, {_py_str(xp)})')
+                # the size as its icon, the side a column (owner 2026-11-19: "новый столбец side … иконку типа кэмпа")
+                rows.append(f'({_py_str(m.group("name") + " camp")}, [{creeps}], {_py_str(gold)}, {_py_str(xp)}, '
+                            f'{_py_str(m.group("size"))}, {_py_str(m.group("side") or "")})')
                 side = f" for {m.group('side')}" if m.group("side") else ""
                 said.append(f"{'an' if m.group('size')[0] in 'AEIOU' else 'a'} {m.group('size')} camp{side} "
                             f"({m.group('name')})")

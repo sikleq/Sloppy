@@ -1,13 +1,14 @@
 """Public API re-exported for content modules — from patch.api import *"""
 from .output import W
 from .state import _State
-from .badges import b, br, bf, t, gradient_class, facet_badge, scale_pill, rank_step
+from .badges import b, br, bf, bt, t, gradient_class, facet_badge, scale_pill, rank_step
 from .cards_facets import facet_change, new_facet
+from .camps import camp_table
 from .elements import (
     hero_header, item_header, unit_header, ability, facet_header, section, subgroup, li,
     ul_open, ul_close, plain_header,
     components, provides, auto_components_change, inline_note, inline_list, pip_list, pip_story_list, info_tip,
-    show_list, attr_change, creep_ref, camp_table, sub_ability, hl
+    show_list, attr_change, creep_ref, sub_ability, hl
 )
 from .enchants import (enchant_header, enchant_attr_row, enchant_tier_box, souvenir_chip, enchant_list_head,
                        enchant_row)

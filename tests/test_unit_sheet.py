@@ -9,7 +9,7 @@ import pytest
 
 from patch import game_files, unit_numbers as us
 from patch.badges import b, br, t
-from patch.elements import camp_table
+from patch.camps import camp_table
 from patch.static_has import add_static_has_classes
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

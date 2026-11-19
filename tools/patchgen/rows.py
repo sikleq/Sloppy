@@ -7,6 +7,8 @@ from .common import _HERE
 from .data import _strip_html
 from .tags import _FROM_TO_RE, _extra_creep_badge, _guess_tag, _is_lower_better
 
+_CLOCK_FROM_TO_RE = re.compile(r'\bfrom (\d{1,2}:\d{2}) to (\d{1,2}:\d{2})\b')
+
 # the ability's base value stands, the upgrade got a new property: NEW with the numbers in the text, no % (owner 2026-11-05)
 _NEW_UPGRADE_RE = re.compile(r"\bAghanim's (?:Shard|Scepter) now increases\b[^.]*\(from\b", re.I)
 
@@ -311,6 +313,11 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
         badge_str = badge_call
     else:
         badge_str = f't("{tag or "MISC"}")'
+        clock = _CLOCK_FROM_TO_RE.search(_strip_html(txt))
+        if clock and tag == "REWORK":
+            # a clock time moved (7.42 Tormentor "Initial spawn time decreased from 20:00 to 15:00"): its % beside the
+            # REWORK, neutral (owner 2026-11-19: "нет % разницы, научиться")
+            badge_str = f'bt("{clock.group(1)}", "{clock.group(2)}")'
     extras = []
     if info:
         info_esc = info.replace('"', '\\"')

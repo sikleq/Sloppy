@@ -543,7 +543,15 @@ def test_round_five_rules_of_the_742_proofread():
     assert out[2] == 'W(plain_header("New Neutral Camps", dynamics=False, new="New camps"))'
     story = out[4]
     assert story.startswith('W(mech_story("Added 2 new neutral camps: a Medium camp for Radiant (Radigull) and a Medium '
-                            'camp for Dire (Odobenus)", table=camp_table([("Radigull camp ')
+                            'camp for Dire (Odobenus)", table=camp_table([("Radigull camp", ')
+    # the size and the side as fields of their own: its icon, a Side column (owner 2026-11-19)
+    assert '"Medium", "Radiant")' in story and '"Medium", "Dire")' in story
+    from patch.camps import camp_table
+    html = camp_table([("Radigull camp", [(2, "Radigull", "x.png")], "70", "124", "Medium", "Radiant"),
+                       ("Ogre camp", [(1, "Ogre", "y.png")], "90", "150", "Ancient", "")])
+    assert ">Side<" in html and 'class="camp-cell camp-side camp-side-radiant">Radiant<' in html and ">Both<" in html
+    assert 'data-tooltip="Medium camp"><img src="../icons/camps/creepcamp_mid.png"' in html
+    assert ">Side<" not in camp_table([("Small camp", [(3, "Pollywog", "z.png")], 54, 90)])     # 7.38's tables as before
     assert '(2, "Radigull", NEUTRAL_CDN + "radigull.png")' in story
     assert '(1, "Odobenus Frostmage", NEUTRAL_CDN + "odobenus_frostmage.png"), (2, "Odobenus Footman"' in story
     assert out[5].endswith(', covered=True))') and out[-1] == 'W(ul_close())'
