@@ -1027,3 +1027,25 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   `artifact_pools()`).
 - «now creates a strong illusion» — REWORK.
 
+### Вычитка 7.42 по отчёту Fable 5.2 (2026-11-19)
+
+- Русская буква внутри английского слова у Valve («Mana Сost») переводится в латинскую при чтении датафида
+  (`normalize.latin_homoglyphs`), иначе не срабатывает «меньше = лучше».
+- Строка под карточкой (`covered=True`) берёт тег карточки: под новой способностью или новым крипом NEW, под реворком
+  REWORK; переименование остаётся MISC (`_postprocess_covered_row_tags`).
+- «Ability Reworked» и пересказ новой способности строками → карточка «было → стало» по текстам игры двух патчей
+  (`_postprocess_reworked_ability_cards`); видимой остаётся только строка с пояснением, которого нет в карточке
+  («No longer …», «… is unchanged»).
+- «Aghanim's Scepter reworked» / «Now upgraded with Aghanim's Scepter instead of …» и пересказ строками → одна строка,
+  пересказ в её [?] (`_postprocess_aghs_rework_rows`). Подстроки Valve у строк про Аганим тоже уходят в [?]
+  (`notes.py`), а не стоят отдельными BUFF/MISC (Tinker Deploy Turrets).
+- «New … Sub-Ability granted with Aghanim's …» → карточка «New ability» (Dazzle Through the Realm).
+- Призыв: способности вызываемого юнита («Slam: Active …») — свои карточки рядом (`post_summons.py`).
+- Мета-строка карточки («Global Cast Range. Mana Cost: 50 …»), выпавшая под неё отдельным списком, уходит в карточку.
+- Пояснение Valve «Damage spread …» у строк «Max Base Damage …» и «Damage at level 1 …» не теряется.
+- «No Mana Cost» / «No Cooldown» в тексте способности убираются без учёта регистра.
+- Канон: «has N% item potency» и «now has +N% bonus Item Potency» — NEW; голое «Bounty increased» под способностью —
+  награда за юнита героя, меньше = лучше; интерфейс («can now be seen by selecting», «on-screen effect», «for clarity»,
+  «displays a number») — QoL; «is no longer immune to damage from», «fully disarmed during», «internal Ns cooldown» —
+  NERF; «moved into a separate ability», «replaced with a Health Cost», «home jungle» — REWORK; тизеры Ringmaster — TEASER.
+

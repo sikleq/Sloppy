@@ -318,7 +318,9 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
         # consequences (a visible row by rule) and the body of card-type
         # parents (_KIDS_ARE_BODY).
         desc = _descendants(notes, i)
-        if (desc and lines[-1].startswith('W(li(') and not aghs
+        # an Aghanim's row too (Fable audit 2026-11-19, 7.42 Death Prophet / Lifestealer / Tinker / Morphling: the values
+        # of the upgrade stood as rows of their own, MISC or a plain BUFF that read as the base ability's)
+        if (desc and lines[-1].startswith('W(li(')
                 and not _KIDS_ARE_BODY.match(clean)
                 and not any(notes[j].get('hide_dot') for j in desc)):
             folded = [j for j in desc

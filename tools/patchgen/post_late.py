@@ -220,7 +220,10 @@ def _postprocess_facets_first(lines):
 
 _NEW_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("New innate ability\b', re.I)
 # 7.42 "New ability granted with Aghanim's Scepter" (Summon Lone Druid, Summon Ancient Thunderhide): a "New ability." card
-_NEW_BASIC_ROW_RE = re.compile(r'^\s*W\(li\("New (?:basic ability\b|ability granted (?:with|by) Aghanim)', re.I)
+# ... and "New Nothl Projection Sub-Ability granted with Aghanim's Shard" (7.42 Dazzle Through the Realm: 6 MISC rows,
+# Fable audit 2026-11-19)
+_NEW_BASIC_ROW_RE = re.compile(r'^\s*W\(li\("New (?:basic ability\b|(?:[\w\' ]+ )?(?:sub-)?ability granted (?:with|by) '
+                               r'Aghanim)', re.I)
 _ANY_ABILITY_LINE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"(?:, innate=True)?\)\)\s*$')
 _HERO_LINE_RE = re.compile(r'^\s*W\(hero_header\("([^"]+)"')
 
@@ -257,7 +260,8 @@ def _postprocess_new_innate_cards(lines, version):
                 out.append(f'{m.group(1)}W(new_ability("{m.group(2)}", "{m.group(3)}", version="{version}"))')
                 out.append(lines[i + 1])
                 for r in lines[i + 2:end]:
-                    plain = (r.lstrip().startswith("W(li(") and "extra=" not in r
+                    # the "New … granted with Aghanim's" row itself too, its (?) only retells the card (7.42 Dazzle)
+                    plain = (r.lstrip().startswith("W(li(") and ("extra=" not in r or bool(_NEW_BASIC_ROW_RE.match(r)))
                              and ("Aghanim" not in r or bool(_NEW_BASIC_ROW_RE.match(r))))
                     out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if plain else r)
                 out.append(lines[end] if end < len(lines) else "")

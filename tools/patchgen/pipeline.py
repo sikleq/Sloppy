@@ -7,7 +7,8 @@ from .normalize import fetch_datafeed
 from .notes import _postprocess_group_rows_home, _postprocess_same_change_abilities
 from .post_facets import _postprocess_removed_facet_groups, _postprocess_removed_facets, _postprocess_renamed_facets
 from .post_shared import _postprocess_shared_row_group
-from .post_summons import _postprocess_summon_sub_cards
+from .post_summons import (_postprocess_aghs_rework_rows, _postprocess_card_tail_rows, _postprocess_covered_row_tags,
+                           _postprocess_reworked_ability_cards, _postprocess_summon_sub_cards)
 from .post_level_values import _postprocess_level_values
 from .post_hero import _postprocess_attr_change_first, _postprocess_facets_summary_covered
 from .post_cards import (
@@ -294,6 +295,8 @@ def generate(version):
     out = _postprocess_new_innate_cards(out, version)  # "New innate ability" -> the hero's old innate -> new (7.37)
     out = _postprocess_new_facet_rows(out)             # a "New Facet" row -> the new facet card (7.37 Medusa)
     out = _postprocess_summon_sub_cards(out)           # a summon's own abilities: cards (7.42 Thunderhide, 2026-11-19)
+    out = _postprocess_reworked_ability_cards(out, version)   # "Ability Reworked" + retold rows -> a card (2026-11-19)
+    out = _postprocess_aghs_rework_rows(out)           # an Aghanim's rework retold in rows -> its (?) (2026-11-19)
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
     out = _postprocess_stance_blocks(out)              # "Earth Brawler …" rows -> stance blocks, as 7.40 (10-30)
@@ -329,6 +332,8 @@ def generate(version):
     out = _postprocess_rows_first(out)                # a card's plain rows above its caption (owner 2026-11-05)
     out = _postprocess_attr_change_first(out)         # a new main attribute first in General (owner 2026-11-06)
     out = _postprocess_facets_summary_covered(out)    # "Added three … facets" under the facet cards (owner 2026-11-06)
+    out = _postprocess_card_tail_rows(out)            # a card's meta line that fell out of it goes back (2026-11-19)
+    out = _postprocess_covered_row_tags(out)          # a row hidden under a card takes the card's tag (2026-11-19)
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is
