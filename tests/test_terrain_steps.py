@@ -681,3 +681,13 @@ def test_a_changed_tree_outlines_its_own_square_dashed_on_the_old_map():
     ghost = terrain._square_outlines("moved", [(10, 10)], 3.2, "#ffd23f", 1.6, dashed=True, ghost=True)
     assert "tm-hl-ghost" in ghost and 'opacity="0.6"' in ghost
     assert terrain._square_outlines("moved", [], 3.2, "#ffd23f", 1.6, dashed=True) == ""
+
+
+def test_a_teaser_row_shows_the_teaser_icon_not_the_word():
+    # owner 2026-11-19: "почему в terrain слова teaser, а не иконка"
+    # ... and the diamonds as on the patch pages, the tentacle in the teaser's place (owner 2026-11-19)
+    from patch.tag_marks import terrain_rows_tagged
+    li = terrain_rows_tagged(terrain._change_li("Y'ai 'ng'ngah, Shuggoth h'ee", "TEASER", None, "7.42", num=3))
+    assert 'class="tnum-dia tnum-teaser"' in li and ">TEASER<" not in li and ">3<" not in li
+    assert ".tnum-dia.tnum-teaser::before" in read_css()
+    assert "tnum-dia" in terrain_rows_tagged(terrain._change_li("Trees moved", "REWORK", None, "7.42", num=1))

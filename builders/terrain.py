@@ -925,8 +925,9 @@ def _change_li(text, tag, note=None, patch=None, num=None):
         text = terrain_button(text, phrase)
     # the chip is the row's number in its category, as on the patch page — no tag (the owner 2026-10-03)
     chip = terrain_num_chip(num) if num else '<span class="row-tag-empty"></span>'
-    if tag == "TEASER":                     # Valve's wink at a coming event: its own chip, no number (2026-11-19)
-        chip = '<span class="badge teaser" data-tag="teaser">TEASER</span>'
+    if tag == "TEASER":       # Valve's wink at a coming event: the number's box with the TEASER icon, no word, no number
+        # (owner 2026-11-19: "почему в terrain слова teaser, а не иконка")
+        chip = '<span class="badge teaser" data-tag="teaser">TEASER</span>'   # tag_marks: the tentacle in the diamond's place
     return (f'<li class="terrain-row" data-tag="{" ".join(tags)}">{chip}'
             f'<span class="row-text">{text}</span>{shots}</li>')
 
@@ -1537,6 +1538,10 @@ def save_terrain_html():
         # the :has() facts styles.css now reads as classes (patch/static_has.py)
         from patch.static_has import add_static_has_classes
         page = add_static_has_classes(page)
+        # the rows as on the patch pages' Terrain: a diamond in the tag's place, not a number (owner 2026-11-19: "в
+        # terrain старые теги, мы же ромбиками делаем, какой-то рассинхрон получился")
+        from patch.tag_marks import terrain_rows_tagged
+        page = terrain_rows_tagged(page).replace("<body>", '<body class="tag-marks">', 1)
         fname = _terrain_filename(ver, patches)
         out = _os.path.join(_site.DIST_DIR, fname)
         with open(out, "w", encoding="utf-8") as f:

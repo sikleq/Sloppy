@@ -270,9 +270,11 @@ def formula_table_pill(old_fn, new_fn, label="Formula table", **bf_kwargs):
 
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
                rework_badge=True, inline_note_text=None, label=None,
-               force_rework=False, extra_html=None, after_html=None, **bf_kwargs):
+               force_rework=False, extra_html=None, after_html=None, kind=None, **bf_kwargs):
     """extra_html: a box that goes before the table (note_box of a wrongly stated "from", 7.42 Tormentor Reflect);
-    after_html: one under it (formula_approx, Valve's approximation of the 7.42 experience per level)."""
+    after_html: one under it (formula_approx, Valve's approximation of the 7.42 experience per level).
+    kind: "buff" / "nerf" decided by the owner where the mean over levels misleads (7.42 Fowl Play "1 + 1 per 5 levels
+    → 3 at all times": +200% at level 1 outweighs 7 → 3 at level 30; owner 2026-11-19 "nerf")."""
     from .badges import bf
     if label:
         bf_kwargs.setdefault('axis_label', label)
@@ -285,7 +287,8 @@ def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
                  f'to {trigger}')
     overall_match = re.search(r'data-overall="(buff|nerf)"', badge)
     force_match = re.search(r'data-force-left="(buff|nerf)"', badge)
-    kind = (force_match.group(1) if force_match
+    kind = (kind if kind in ("buff", "nerf")
+            else force_match.group(1) if force_match
             else overall_match.group(1) if overall_match
             else None)
     if kind and not force_rework:

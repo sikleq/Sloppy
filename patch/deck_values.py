@@ -29,7 +29,14 @@ def rows_before(html, card_start):
     red by its card)."""
     starts = [m.start() for m in _BLOCK_RE.finditer(html, max(0, card_start - 40000), card_start)]
     nxt = _BLOCK_RE.search(html, card_start + 1)
-    part = html[starts[-1] if starts else card_start:nxt.start() if nxt else card_start + 40000]
+    end = nxt.start() if nxt else card_start + 40000
+    # ... and never past the entity the card belongs to: the last card of a section read the rows of the next one
+    # (owner 2026-11-19, 7.42 Ancient Ogre Seal Pup's new aura: "Radius 1200" lit +269% from Gleipnir's "Eternal Chains
+    # radius increased from 325 to 340" two sections below)
+    ent = html.find('<div class="entity-block', card_start + 1)
+    if 0 < ent < end:
+        end = ent
+    part = html[starts[-1] if starts else card_start:end]
     return [(m.group("tag"), _plain(m.group("text")).lower()) for m in _ROW_RE.finditer(part)]
 
 

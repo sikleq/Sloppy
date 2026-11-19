@@ -121,6 +121,14 @@ def test_an_open_formula_table_has_no_pill_and_shows_by_itself():
     assert ">60:00<" in html and ">111.3<" in html and ">114.8<" in html
 
 
+def test_the_owners_kind_overrides_the_mean_over_levels():
+    # owner 2026-11-19, 7.42 Fowl Play "1 + 1 per 5 levels → 3 at all times": the mean read BUFF, the owner says NERF
+    from patch.formula_rows import li_formula
+    html = li_formula("Total Chickens changed", "1 + 1 per 5 levels", "3 at all times", lambda L: 1 + L // 5,
+                      lambda L: 3, value_fmt="{:g}", kind="nerf")
+    assert 'data-tag="nerf"' in html and ">NERF<" in html and ">BUFF<" not in html
+
+
 def test_a_formula_table_pill_keeps_its_table_hidden_until_clicked():
     # owner 2026-11-19 (7.42 passive gold): "поставить Formula table открывашку, по умолчанию таблица скрыта"
     from patch.formula_rows import formula_table_pill

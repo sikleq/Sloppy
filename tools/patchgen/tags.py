@@ -237,7 +237,8 @@ CANONICAL_TAGS = [
     (re.compile(r"\b(?:fhtagn|ftaghu|Shuggoth|ng'ngah|Cthulhu|R'lyeh)\b", re.I), 'TEASER'),
     # 7.42 Ringmaster (owner 2026-11-19: "это пасхалка, тизер"): a "Resentment" no game file has, daggers "being
     # sharpened", Spotlight "burning brighter" — a wink, no change
-    (re.compile(r"^Resentment (?:increased|decreased) from\b|\bare being sharpened\b|^Now burning brighter\b", re.I),
+    (re.compile(r"^Resentment (?:increased|decreased) from\b|\bare being sharpened\b|^Now burning brighter\b"
+                r"|^Chickens are now more duplicitous\b", re.I),        # Shadow Shaman's Fowl Play (owner 2026-11-19)
      'TEASER'),
     # owner 2026-11-19 (7.42): an effect now scaled by Item Potency is a new property of it, as "now affected by AoE
     # bonuses" — NEW; "now only triggers when attacking heroes" changes when it works — REWORK; using an item from the
