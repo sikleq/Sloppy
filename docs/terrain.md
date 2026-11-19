@@ -301,6 +301,20 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   ground around it — 7.39b painted grass where the portal stood, 7.39 keeps its sand. The unmended render is kept
   as `map_<sha8>_sfm_full_pink.png`; the one-off work script that re-applied it (`stitch_final.py`) is not kept; `scripts/gen/stitch_sfm.py` is the live stitcher. Tests:
   tests/test_mend_map.py.
+- Blue arcs at the map's centre (2026-11-19, the owner: "on mid 7.42 there must be nothing extra"; not in the game).
+  Every render since 7.38 has a light-blue marbled circle at world (0, 0) and ring pieces of radius ~290 around it
+  (7.38-7.41f: a circle on the Dire ground and a slab by the river wall; 7.42 reworked the mid river and two whole
+  arcs showed). It is the Lotus Pools' water effect `particles/world_fountain_of_life/fol_ambient.vpcf`
+  (`ambientfx` of both `npc_dota_lotus_pool`, new in 7.38): its children `fol_ambient_pool_1/2/3_fx` draw water
+  ribbons along points of `fol_pool_N_fx.vsnap` (radius 288-297, angles 85-160, 205-280, 325-40 degrees, z 80) and
+  `fol_ambient_lrg/mid/sml` the centre circle; in SFM the snapshot's control point is not bound to the pool, so
+  the points are taken around (0, 0). Proven by a test render with the 22 `fol_ambient*` particles emptied
+  (`particles/error/null.vpcf_c` copied over them in the dotamapsfm addon): the arcs and the circle are gone, the
+  rest of the map differs only by render noise; the pools lose only the small glow on their fountain top.
+  Ruled out on the way (test renders): the sky (`r_dota_white_skybox 1`, `r_drawskybox 0`, 3D skybox off), the
+  water's reflection / refraction (off: the water turns black, the arcs stay on top), the fish
+  (`ambient_creatures`, models emptied), and all 22 world meshes reaching the spot (emptied in a repacked map vpk).
+  Not fixed yet: the render scripts don't empty `fol_ambient*`; the 7.38-7.42 pictures still carry it (docs/todo.md).
 - Map history: `scripts/gen/map_history.py` — which dota.vpk each patch shipped (SHA-1 from depot 373301's
   manifests, one Steam login per manifest, with pauses: Steam rate-limits logins) and one download per distinct
   file. 7.38-7.41f: 16 map files; 7.08-7.37: 49. Their pictures, objects and counts go to
