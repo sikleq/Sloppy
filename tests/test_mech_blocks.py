@@ -496,6 +496,9 @@ def test_a_teaser_row_has_its_own_chip_and_no_place_in_the_cells():
     assert t("TEASER") == '<span class="badge teaser" data-tag="teaser">TEASER</span>'
     assert "teaser" not in _DYN_TAG_WHITELIST
     assert g._guess_tag("Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu") == "TEASER"
+    import pathlib                                    # its tile on the patch pages has an icon of its own
+    css = (pathlib.Path(__file__).resolve().parents[1] / "src" / "css" / "patch-tag-marks.css").read_text(encoding="utf-8")
+    assert '.tag-marks .badge[data-tag~="teaser"] { --tm: url(' in css
 
 
 def test_valves_starred_list_is_a_list_the_block_opens():
