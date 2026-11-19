@@ -30,11 +30,11 @@ ASSET_VERSION = _site.compute_asset_version()
 # 2026-10-04)
 COLUMNS = (
     ("trees", "Trees", "ui/gothic/tc_trees"),
-    ("camps", "Camps", "camps/creepcamp_mid"),
-    ("tier0", "Small", "camps/creepcamp_small"),
-    ("tier1", "Medium", "camps/creepcamp_mid"),
-    ("tier2", "Large", "camps/creepcamp_big"),
-    ("tier3", "Ancient", "camps/creepcamp_ancient"),
+    ("camps", "Camps", "camps/creepcamp_mid_16"),          # the crisp 16 px glyphs (scripts/gen/gen_camp_icons.py)
+    ("tier0", "Small", "camps/creepcamp_small_16"),
+    ("tier1", "Medium", "camps/creepcamp_mid_16"),
+    ("tier2", "Large", "camps/creepcamp_big_16"),
+    ("tier3", "Ancient", "camps/creepcamp_ancient_16"),
     ("towers", "Towers", "ui/gothic/tc_towers"),
     ("outposts", "Outposts", "ui/gothic/tc_outposts"),
     ("watchers", "Watchers", "ui/gothic/tc_watchers"),
@@ -129,7 +129,7 @@ def tiles_html(files, n_patches):
             + _tile(None, f"{first['patch']} → {last['patch']}", f"{first['date'][:4]} – {last['date'][:4]}")
             + _tile("ui/gothic/tc_trees", last["n"]["trees"], f"trees since {first['patch']}",
                     last["n"]["trees"] - first["n"]["trees"])
-            + _tile("camps/creepcamp_mid", last["n"]["camps"], f"camps since {first['patch']}",
+            + _tile("camps/creepcamp_mid_16", last["n"]["camps"], f"camps since {first['patch']}",
                     last["n"]["camps"] - first["n"]["camps"])
             + '</div>')
 

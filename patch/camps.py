@@ -26,7 +26,12 @@ def camp_table(rows):
     for row in rows:
         camp, creeps, gold, xp = row[:4]
         size, side = (row[4], row[5]) if len(row) > 5 else (row[4] if len(row) > 4 else "", "")
-        cells.append(f'<span class="camp-name">{camp_icon(size or camp.split(" ")[0], creeps)}{camp}</span>')
+        size = size or camp.split(" ")[0]
+        # the size's words on hover over the camp's name, not over its glyph (owner 2026-11-19)
+        # abil-ico-hint: the class src/js/tooltips.js shows a data-tooltip for (iab-hint alone is only the dots)
+        name = (f'<span class="camp-label iab-hint abil-ico-hint" data-tooltip="{size.capitalize()} camp">{camp}</span>'
+                if size.lower() in _CAMP_ICONS else camp)
+        cells.append(f'<span class="camp-name">{camp_icon(size, creeps)}{name}</span>')
         if sided:
             cls = f" camp-side-{side.lower()}" if side else ""
             cells.append(f'<span class="camp-cell camp-side{cls}">{side or "Both"}</span>')
@@ -56,15 +61,31 @@ def _img(path, cls=""):
             f'loading="lazy">')
 
 
+def camp_faces(creeps, gone=False):
+    """a camp's creeps as faces only (a repeat with its count) — a cell of a "before / now" table (7.42 camp changes).
+    gone=True: a camp that left the game, its faces grey like a removed entity's icon (owner 2026-11-19: "просто
+    серые иконки, как мы делаем с удаленными предметами")"""
+    faces = camp_icon("", creeps)
+    return faces.replace('class="camp-ico"', 'class="camp-ico camp-ico-gone"', 1) if gone else faces
+
+
+def camp_ref(name, creeps, new=False):
+    """a camp named in a table whose column already says its size (7.42 "home jungle"): the faces of its creeps (a
+    repeat with its count) before its name, no type glyph — camp_ref("Kobold camp", [(2, "Kobold", icon), ...]).
+    new=True: a camp new in this patch, its name in the site's gold instead of Valve's "(new!)" (owner 2026-11-19)"""
+    faces = camp_icon("", creeps)
+    cls = "camp-ref-name camp-ref-new" if new else "camp-ref-name"
+    return f'<span class="camp-ref">{faces}<span class="{cls}">{name}</span></span>' if faces else name
+
+
 def camp_icon(size, creeps):
-    """the camp's own icon (owner 2026-11-19): the game's camp-type glyph (its words on hover), then each kind of
+    """the camp's own icon (owner 2026-11-19): the game's camp-type glyph, then each kind of
     creep's whole face, a repeated creep with its count in the corner. A creep without a face (not in
     gen_camp_icons.FACE_CX) is left out; with no faces at all the type glyph alone stays."""
     glyph = _CAMP_ICONS.get(size.lower(), "")
     parts = []
     if glyph:
-        parts.append(f'<span class="camp-type iab-hint abil-ico-hint" data-tooltip="{size.capitalize()} camp">'
-                     f'{_img(glyph)}</span>')
+        parts.append(f'<span class="camp-type">{_img(glyph)}</span>')
     for n, _name, icon in creeps:
         slug = Path(icon).stem
         slug = slug[len(_UNIT_PREFIX):] if slug.startswith(_UNIT_PREFIX) else slug

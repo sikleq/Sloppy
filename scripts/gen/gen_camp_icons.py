@@ -3,8 +3,8 @@
     icons/camps/creepcamp_<type>_22.png   the game's camp-type glyph (icons/camps/creepcamp_<type>.png, 32 px) as a
                                           crisp 22 px file: the same drawing, empty margins cut, every pixel snapped
                                           to the original's own colours, hard edge (the 32 px file shown at 22 blurs)
-    icons/camps/faces/<creep>.png         each neutral creep's whole face, 22 px in a gold chamfered frame: a
-                                          full-height square of its game portrait (icons/units/npc_dota_neutral_*)
+    icons/camps/faces/<creep>.png         each neutral creep's whole face, 34x22 in a gold chamfered frame: the
+                                          full height and most of the width of its game portrait (icons/units)
     icons/camps/count_<n>.png             the count of a repeated creep: a big 5x7 pixel digit on a dark plate (9x11)
     ...@2x.png                            each of them doubled pixel for pixel, for sharp screens
 
@@ -22,6 +22,11 @@ CAMPS = ROOT / "icons" / "camps"
 FACES = CAMPS / "faces"
 
 S = 22
+FACE_W = 34
+# the type glyph for each size it is shown at (a 32 px file squeezed by the browser blurs): 16 - Neutral Creeps table,
+# Terrain buttons / chips / tiles; 20 - entity-change cards; 22 - camp_table. The Terrain map markers keep the 32 px
+# file: they scale with the map.
+TYPE_SIZES = (16, 20, 22)
 INK = (13, 13, 12)
 GOLD = (227, 196, 106)
 GOLD_LT = (247, 228, 160)
@@ -33,7 +38,16 @@ PORTRAIT = (512, 288)          # portraits come as 128x72 or 512x288; both are b
 FACE_CX = {"tadpole": 220, "froglet": 230, "froglet_mage": 270, "grown_frog": 260, "grown_frog_mage": 210,
            "ancient_frog": 250, "ancient_frog_mage": 310, "prowler_acolyte": 250, "prowler_shaman": 220,
            "radigull": 170, "odobenus_frostmage": 280, "odobenus_footman": 370, "eimermole_foreman": 220,
-           "eimermole": 190, "ogre_seal": 300, "ogre_seal_pup": 250}
+           "eimermole": 190, "ogre_seal": 300, "ogre_seal_pup": 250,
+           # 7.42 "home jungle" camps (their make-up: server.dll 6984, the camp table at RVA 0x4C2E270)
+           "kobold": 200, "kobold_tunneler": 220, "kobold_taskmaster": 256, "forest_troll_berserker": 256,
+           "forest_troll_high_priest": 256, "gnoll_assassin": 256, "fel_beast": 256, "ghost": 256, "harpy_scout": 240,
+           "harpy_storm": 256, "ogre_mauler": 220, "ogre_magi": 256, "giant_wolf": 220, "alpha_wolf": 200,
+           "satyr_trickster": 280, "satyr_soulstealer": 256, "mud_golem": 256, "centaur_outrunner": 256,
+           "centaur_khan": 240, "wildkin": 170, "enraged_wildkin": 300, "polar_furbolg_champion": 256,
+           "polar_furbolg_ursa_warrior": 280, "satyr_hellcaller": 256, "dark_troll": 256, "dark_troll_warlord": 256,
+           # camps removed in 7.42, their make-up before it (server.dll 6976, camp table RVA 0x4A85D70)
+           "warpine_raider": 256, "big_thunder_lizard": 256, "small_thunder_lizard": 256}
 DIGITS = {"2": ["11110", "00001", "00001", "01110", "10000", "10000", "11111"],
           "3": ["11110", "00001", "00001", "01110", "00001", "00001", "11110"],
           "4": ["10001", "10001", "10001", "11111", "00001", "00001", "00001"],
@@ -58,17 +72,17 @@ def _palette(im, n=10):
     return [tuple(pal[i:i + 3]) for i in range(0, len(pal), 3)]
 
 
-def type_icon(src):
-    """the game glyph at 22 px: margins cut, shrunk, each pixel snapped to the source's colours, no soft edge"""
+def type_icon(src, size=S):
+    """the game glyph at `size` px: margins cut, shrunk, each pixel snapped to the source's colours, no soft edge"""
     pal = _palette(src)
     part = src.crop(src.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox())
     side = max(part.size)
     sq = Image.new("RGBA", (side, side), (0, 0, 0, 0))
     sq.paste(part, ((side - part.width) // 2, (side - part.height) // 2))
-    small = sq.resize((S, S), Image.LANCZOS)
-    out = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    for y in range(S):
-        for x in range(S):
+    small = sq.resize((size, size), Image.LANCZOS)
+    out = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    for y in range(size):
+        for x in range(size):
             r, g, b, a = small.getpixel((x, y))
             if a >= 110:
                 best = min(pal, key=lambda p: (p[0] - r) ** 2 + (p[1] - g) ** 2 + (p[2] - b) ** 2)
@@ -76,10 +90,10 @@ def type_icon(src):
     return out
 
 
-def _chamfer_mask(s):
-    m = Image.new("L", (s, s), 0)
-    e, c = s - 1, max(2, s // 6)
-    ImageDraw.Draw(m).polygon([(c, 0), (e - c, 0), (e, c), (e, e - c), (e - c, e), (c, e), (0, e - c), (0, c)], fill=255)
+def _chamfer_mask(w, h):
+    m = Image.new("L", (w, h), 0)
+    r, b, c = w - 1, h - 1, max(2, h // 6)
+    ImageDraw.Draw(m).polygon([(c, 0), (r - c, 0), (r, c), (r, b - c), (r - c, b), (c, b), (0, b - c), (0, c)], fill=255)
     return m
 
 
@@ -97,15 +111,17 @@ def _edge(mask):
 
 
 def face(slug):
-    """the creep's whole face (a full-height square of its portrait) in the gold chamfered frame: ink ring outside,
+    """the creep's whole face in the gold chamfered frame, FACE_W x 22: the portrait's full height and most of its width
+    (a square cut the faces, owner 2026-11-19 "у многих обрезаны лица … чуть вытянутее по ширине"); ink ring outside,
     gold ring inside, lit on the top and left"""
     im = Image.open(UNITS / f"npc_dota_neutral_{slug}.png").convert("RGB").resize(PORTRAIT, Image.LANCZOS)
     h = PORTRAIT[1]
-    x0 = max(0, min(PORTRAIT[0] - h, FACE_CX[slug] - h // 2))
-    im = im.crop((x0, 0, x0 + h, h)).resize((S, S), Image.LANCZOS)
+    w = round(h * FACE_W / S)
+    x0 = max(0, min(PORTRAIT[0] - w, FACE_CX[slug] - w // 2))
+    im = im.crop((x0, 0, x0 + w, h)).resize((FACE_W, S), Image.LANCZOS)
     im = ImageEnhance.Sharpness(ImageEnhance.Contrast(im).enhance(1.12)).enhance(1.3)
-    mask = _chamfer_mask(S)
-    out = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    mask = _chamfer_mask(FACE_W, S)
+    out = Image.new("RGBA", (FACE_W, S), (0, 0, 0, 0))
     out.paste(im, (0, 0), mask)
     ring = list(_edge(mask))
     inner = mask.copy()
@@ -133,7 +149,9 @@ def count_mark(n):
 
 def main():
     for t in TYPES:
-        save(type_icon(Image.open(CAMPS / f"creepcamp_{t}.png").convert("RGBA")), CAMPS / f"creepcamp_{t}_22.png")
+        src = Image.open(CAMPS / f"creepcamp_{t}.png").convert("RGBA")
+        for size in TYPE_SIZES:
+            save(type_icon(src, size), CAMPS / f"creepcamp_{t}_{size}.png")
     missing = [s for s in FACE_CX if not (UNITS / f"npc_dota_neutral_{s}.png").exists()]
     if missing:
         raise SystemExit(f"no portrait in {UNITS} for: {', '.join(missing)}")

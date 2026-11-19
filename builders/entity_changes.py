@@ -1075,6 +1075,17 @@ def _unit_camp_map() -> dict:
     return out
 
 
+def _removed_creeps() -> set:
+    """npc_dota_neutral_* of the creeps whose camp left the game: builders/creeps.py REMOVED_CREEPS (createhero ->
+    patch), the same list Neutral Stats hides behind its "Removed" button — read as text, as _unit_camp_map does."""
+    src = (_HERE / "builders" / "creeps.py").read_text(encoding="utf-8")
+    createhero = dict(_re.findall(r"'([a-z0-9_]+)':\s*'(npc_dota_neutral_[a-z0-9_]+)'", src))
+    block = _re.search(r"REMOVED_CREEPS\s*=\s*\{(.*?)\}", src, _re.S)
+    if not block:
+        raise ValueError("builders/creeps.py: REMOVED_CREEPS not found")
+    return {createhero[s] for s in _re.findall(r"'([a-z0-9_]+)':", block.group(1)) if s in createhero}
+
+
 def _npc_of(icon: str) -> str:
     m = _re.search(r"(npc_dota_[a-z0-9_]+)\.png", icon or "")
     return m.group(1) if m else ""
@@ -1147,6 +1158,12 @@ def _unit_groups(ents: list[dict]):
                        "name": name, "icon": f"../icons/units/{basename}.png", "patches": [],
                        "_nopage": True, "_current": False, "_npc": _npc_of(f"{basename}.png"),
                        "_bucket": bucket})
+    # creeps whose camp left the game (7.42 Warpine Raider, Thunderhide): removed, behind "Show deleted" like the
+    # Necronomicon (owner 2026-11-19: "крипы должны и тут под удалёнными быть")
+    gone = _removed_creeps()
+    for e in roster:
+        if e["_npc"] in gone:
+            e["_current"] = False
     buckets = {k: [] for k in _UNIT_ORDER}
     for e in roster:
         if e["_npc"] in _UNIT_NOT_LISTED:
@@ -1180,7 +1197,10 @@ def _unit_grid(groups, fill=False) -> str:
             continue
         cards = "".join(_unit_card(e) for e in sorted(lst, key=lambda e: (0 if e.get("_current", True) else 1, e["name"].lower())))
         camp = _CAMP_TITLE_ICON.get(label)
-        badge = (f'<img class="ec-camp-ico" src="icons/camps/creepcamp_{camp}.png" alt="" aria-hidden="true">'
+        # the crisp 20 px glyph (scripts/gen/gen_camp_icons.py), the 32 px one blurred at 20 (owner 2026-11-19)
+        badge = (f'<img class="ec-camp-ico" src="icons/camps/creepcamp_{camp}_20.png" '
+                 f'srcset="icons/camps/creepcamp_{camp}_20.png 1x, icons/camps/creepcamp_{camp}_20@2x.png 2x" '
+                 f'alt="" aria-hidden="true">'
                  if camp else '')
         cols.append(f'<section class="ec-ucol"><h3 class="ec-group-title">{badge}{_esc(label)}</h3>'
                     f'<div class="ec-ucards">{cards}</div></section>')

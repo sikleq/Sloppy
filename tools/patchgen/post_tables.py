@@ -352,17 +352,16 @@ def _postprocess_new_camps(lines, version=None):
             out.extend(r[0] for r in run)
         else:
             ind = run[0][1].group("ind")
-            rows, said = [], []
+            rows = []
             for _ln, m, units in run:
                 gold, xp = _camp_numbers(units, version)
                 creeps = ", ".join(f'({n}, {_py_str(shown)}, NEUTRAL_CDN + "{slug}.png")' for n, slug, shown in units)
                 # the size as its icon, the side a column (owner 2026-11-19: "новый столбец side … иконку типа кэмпа")
                 rows.append(f'({_py_str(m.group("name") + " camp")}, [{creeps}], {_py_str(gold)}, {_py_str(xp)}, '
                             f'{_py_str(m.group("size"))}, {_py_str(m.group("side") or "")})')
-                side = f" for {m.group('side')}" if m.group("side") else ""
-                said.append(f"{'an' if m.group('size')[0] in 'AEIOU' else 'a'} {m.group('size')} camp{side} "
-                            f"({m.group('name')})")
-            story = f"Added {len(run)} new neutral camps: " + ", ".join(said[:-1]) + " and " + said[-1]
+            # the count alone: which camps, their size and side are the table's (owner 2026-11-19: "убрать … потому что
+            # список мы уже перенесли в таблицу")
+            story = f"Added {len(run)} new neutral camps"
             # a block of its own after the list, as 7.38's Flooded Camps (owner 2026-11-19: "New neutral camps сделаны
             # не так, как мы делали … с новыми нейтралами"): its label, the story, the camps' table; Valve's rows hidden
             pending.extend([f'{ind}W(plain_header("New Neutral Camps", dynamics=False, new="New camps"))',
