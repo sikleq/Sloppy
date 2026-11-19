@@ -3,9 +3,11 @@ import re
 import sys
 from pathlib import Path
 
-from PIL import Image
+import pytest
 
-from patch.camps import camp_icon, camp_ref, camp_table
+Image = pytest.importorskip("PIL.Image")    # CI has no Pillow: the icon checks run on the owner's PC only
+
+from patch.camps import camp_icon, camp_ref, camp_table  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts" / "gen"))

@@ -81,6 +81,15 @@ CANONICAL_TAGS = [
     # what an effect can now reach — NEW, as "no longer affects buildings" is DEL (owner 2026-11-19, 7.42 Parasma Magic
     # Corruption: "тегом new надо, у тебя misc")
     (re.compile(r'\bnow (?:also )?affects? buildings\b', re.I), 'NEW'),
+    # Fable audit of 7.42 (2026-11-19): what the interface shows — QoL; a protection a unit lost, a restriction of its
+    # own, a cooldown added to a passive — NERF; an effect moved into another ability, a cost of another kind — REWORK
+    (re.compile(r'\bcan now be seen by selecting\b|\bon-screen effect\b|\bfor clarity\b|\bnow displays a number\b'
+                r'|\bis now reflected on the health regen bar\b', re.I), 'QoL'),
+    (re.compile(r'\bis no longer immune to damage from\b|\bis now fully disarmed during\b'
+                r'|\bnow has an internal \d+(?:\.\d+)?s cooldown\b', re.I), 'NERF'),
+    (re.compile(r'\bmoved into a separate ability\b|\bhas been replaced with a health cost\b'
+                r'|\bmin(?:imum)? health is now set by\b|\bnow has a "home jungle"', re.I), 'REWORK'),
+    (re.compile(r'\bcreated illusions now apply\b|\bmay now target (?:himself|herself|itself)\b', re.I), 'NEW'),
     # an Aghanim's upgrade that stops giving its benefit = DEL, wind-up included ("Aghanim's Scepter no longer
     # decreases max wind-up time": the 7.37e tooltip "Decreases wind-up time …", audit 2026-10-03)
     (re.compile(r"^\s*Aghanim's (?:Scepter|Shard) no longer (?:decreases|reduces)\b", re.I), 'DEL'),
@@ -243,6 +252,9 @@ CANONICAL_TAGS = [
     # ... and without "now": item potency is new in 7.42, so an illusion's or a replica's own value is NEW too (owner
     # 2026-11-19: "Proportion Distortion illusion has 25% item potency - new")
     (re.compile(r'\b(?:have|has) \d+% item potency\b', re.I), 'NEW'),
+    # ... and "Attack now has +20% bonus Item Potency" (Mirana, Sniper, Void Spirit, Weaver, Riki 7.42 — Fable audit
+    # 2026-11-19: BUFF, as the Evolved enchantment's "+20% Item Potency" is NEW)
+    (re.compile(r'\bnow (?:also )?ha(?:s|ve) (?:\+?[\d/]+% )?bonus item potency\b', re.I), 'NEW'),
     (re.compile(r'\bnow move up to \d+% slower if\b', re.I), 'REWORK'),
     # when a boss comes back is how the objective works, not a number of it: "Base respawn timer now decreases by 1
     # minute every time Roshan is defeated" (7.42) changes the respawn rule — REWORK, as "where and when an object
@@ -417,6 +429,9 @@ LOWER_IS_BUFF = re.compile(
     r'|base\s+attack\s+rate'                     # seconds per attack (Kez Sai/Katana) — like BAT
     r'|required\s+to\s+(?:trigger|cast|activate|proc)'
     r'|(?:familiar|summon(?:ed)?|illusion|ward|spirit|eidolon|treant)s?\s+(?:gold\s+)?bounty'   # own summon's bounty
+    # a bare "Bounty increased" sits under the ability whose unit it is (7.42 Tempest Double 70 → 100 + 10 per level:
+    # the enemy's gold; creeps say "Gold Bounty" / "XP Bounty") — Fable audit 2026-11-19
+    r'|^bounty\s+(?:increased|decreased|rescaled|changed)\b'
     # 7.37e proofread: a charge's wait (Demonic Purge Scepter), the caster's own spell damage reflected back (QoP)
     r'|charge\s+restoration\s+time'
     r'|outgoing\s+(?:spell\s+)?damage\s+reflected'

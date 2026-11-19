@@ -264,7 +264,8 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
     if dmg_m:
         old_min, old_max, new_min, new_max = (int(x) for x in dmg_m.groups())
         txt_esc = txt.replace('"', '\\"')
-        return f'W(li("{txt_esc}", br({old_min}, {old_max}, {new_min}, {new_max})))'
+        note = f', extra=inline_note("{info}")' if info else ''        # "Damage spread …" (7.42 Storm Spirit)
+        return f'W(li("{txt_esc}", br({old_min}, {old_max}, {new_min}, {new_max}){note}))'
 
     # "Is now an Agility Hero" → attr_change(old, new): both attributes with icons, old from
     # the stats snapshot before this patch
@@ -289,8 +290,11 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
         txt_esc = txt.replace('"', '\\"')
         h = hero_name.replace('"', '\\"')
         prev_v = _prev_version_in_stats(version)
+        # Valve's own (?) on the row ("Damage spread increased from 4 to 6", 7.42 Leshrac / Primal Beast) — it was lost
+        # here (Fable audit 2026-11-19)
+        note = f' + inline_note("{info}")' if info else ''
         return (f'W(li("{txt_esc}", bstat_h("{h}", "{field}", "{prev_v}", {delta_repr}),'
-                f' extra=note_box(hero="{h}", field="{field}", before_patch="{prev_v}")))')
+                f' extra=note_box(hero="{h}", field="{field}", before_patch="{prev_v}"){note}))')
 
     # Aghs reworked: merge description into main text instead of inline_note
     # (memory rule: sloppy_aghs_reworked_no_hidden_info)

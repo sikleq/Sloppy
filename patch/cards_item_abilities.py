@@ -30,7 +30,7 @@ _IAB_META = (  # (key, icon, pattern of a whole sentence) — header order: radi
 )
 
 
-_IAB_DROP = r"No Mana Cost|No Cooldown"
+_IAB_DROP = r"(?i:No Mana Cost|No Cooldown)"     # any case: Valve's "No cooldown" (7.42 Greater Horn) stayed in the text
 
 
 _IAB_BOLD_LABEL_RE = re.compile(r"<b>\s*((?:Cast )?Range|Radius|Mana Cost|Health Cost|Cooldown)\s*:\s*</b>")

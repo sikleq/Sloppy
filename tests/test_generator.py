@@ -1000,6 +1000,61 @@ def test_a_summons_own_abilities_become_cards_and_the_retold_rows_hide():
     assert 'slug="beastmaster_thunderhide_drum"' in out[7]
 
 
+def test_ability_reworked_rows_become_a_card_of_both_patches_texts():
+    # Fable audit 2026-11-19, 7.42 Chen Zealot / Leshrac Nihilism / Nature's Prophet Curse: rows of MISC under it
+    from tools.patchgen.post_summons import _postprocess_reworked_ability_cards
+    out = _postprocess_reworked_ability_cards([
+        'W(ability("Nihilism", slug="leshrac_greater_lightning_storm"))', 'W(ul_open())',
+        'W(li("Ability Reworked", t("REWORK")))', 'W(li("Mana Cost: 125. Cooldown: 25s", t("MISC")))',
+        'W(li("Radius: 550", t("MISC"), extra=inline_note("No longer applies Ethereal to Leshrac")))', 'W(ul_close())'], "7.42")
+    assert out[0] == '_rw1_old, _rw1_new = game_ability_pair("leshrac_greater_lightning_storm", "7.42")'
+    assert 'summary="Ability reworked."' in "".join(out)
+    assert 'li("Mana Cost: 125. Cooldown: 25s", t("REWORK"), covered=True)' in "".join(out)
+    assert 'W(li("Radius: 550", t("REWORK"), extra=inline_note("No longer applies Ethereal to Leshrac")))' in out
+
+
+def test_an_aghanims_rework_retold_in_rows_goes_into_its_note():
+    # Fable audit 2026-11-19, 7.42 Morphling Morph: "Aghanim's Scepter reworked" + two MISC rows
+    from tools.patchgen.post_summons import _postprocess_aghs_rework_rows
+    out = _postprocess_aghs_rework_rows(['W(li("Aghanim\'s Scepter reworked", t("REWORK")))',
+                                         'W(li("While Morph is active, 2 replicants appear", t("MISC")))',
+                                         'W(li("If no other enemies are found, they cast at the target", t("MISC")))'])
+    assert out == ['W(li("Aghanim\'s Scepter reworked", t("REWORK"), extra=inline_note("While Morph is active, 2 '
+                   'replicants appear<br>If no other enemies are found, they cast at the target")))']
+
+
+def test_a_cards_meta_line_that_fell_out_goes_back_hidden():
+    # Fable audit 2026-11-19, 7.42 Chaos Knight Ahead, Armageddon: "Global Cast Range. Mana Cost: 50 …" under the card
+    from tools.patchgen.post_summons import _postprocess_card_tail_rows
+    out = _postprocess_card_tail_rows(['W(ability_change(', '    rows_first=lambda: [', '        li("New innate ability", t("NEW"), covered=True),',
+                                       '    ]))', 'W(ul_open())', 'W(li("Global Cast Range. Mana Cost: 50", t("NEW")))', 'W(ul_close())'])
+    assert out[3].strip() == 'li("Global Cast Range. Mana Cost: 50", t("NEW"), covered=True),' and out[-1] == '    ]))'
+
+
+def test_valves_note_on_a_base_damage_row_is_kept():
+    # Fable audit 2026-11-19, 7.42 Leshrac / Primal Beast / Storm Spirit: "Damage spread increased …" was lost
+    import tools.generate_patch_code_v2 as g
+    row = g._emit_li("Damage at level 1 increased from 47-57 to 47-60", info="Damage spread increased from 10 to 13")
+    assert 'extra=inline_note("Damage spread increased from 10 to 13")' in row
+
+
+def test_a_row_hidden_under_a_card_takes_the_cards_tag():
+    # Fable audit 2026-11-19: 40 hidden rows of 7.42's new creeps / abilities counted as MISC in filters and weights
+    from tools.patchgen.post_summons import _postprocess_covered_row_tags
+    out = _postprocess_covered_row_tags([
+        'W(unit_header("Radigull", NEUTRAL_CDN + "radigull.png", new="New creep"))',
+        'W(li("New Level 4 Ranged Creep", t("MISC"), covered=True))',
+        'W(ability_change(', '    old=None, new=dict(name="X"),', '    summary="Ability reworked.",', '    tag="rework",',
+        '    rows_first=lambda: [li("Cast Range 500", t("MISC"), covered=True)]))',
+        'W(ability("Steal Weapon", slug="kobold_disarm"))',
+        'W(li("Break renamed to Respite", t("MISC"), covered=True))',
+        'W(li("Buildings no longer have variable last hit bounties", t("MISC"), covered=True))'])
+    assert 't("NEW"), covered=True' in out[1]
+    assert 'li("Cast Range 500", t("REWORK"), covered=True)' in out[6]
+    assert out[8:] == ['W(li("Break renamed to Respite", t("MISC"), covered=True))',
+                       'W(li("Buildings no longer have variable last hit bounties", t("MISC"), covered=True))']
+
+
 def test_valves_cyrillic_letter_in_an_english_word_is_read_as_latin():
     # 7.42 Ringmaster "Mana Сost decreased from 75 to 60/65/70/75": a Cyrillic С hid the lower-is-better rule
     from tools.patchgen.normalize import latin_homoglyphs
