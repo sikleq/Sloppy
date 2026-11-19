@@ -173,7 +173,7 @@ def test_map_file_updates_are_a_sub_list_under_their_patch():
     menu = terrain._picker_html(pages, "7.42-v2")
     names = re.findall(r'<span class="vi-name">([^<]+)</span>', menu)
     assert names == ["7.42", "v3", "v2", "7.41e"]                          # under 7.42, newest first
-    assert menu.count("version-subitem ") == 2 and 'data-rank="1"' in menu   # the arrows keep the time order
+    assert len(re.findall(r"version-subitem\b(?!s)", menu)) == 2 and 'data-rank="1"' in menu   # the arrows keep the time order
     assert 'class="version-item version-subitem current" href="terrain_742-v2.html"' in menu
     # folded under 7.42 behind a "▸ 2" button; open only when the page is one of them (the owner: "picked, not
     # always open")
