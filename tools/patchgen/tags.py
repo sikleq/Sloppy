@@ -226,6 +226,10 @@ CANONICAL_TAGS = [
     # Valve's wink at a coming event — a line in the Old Ones' tongue (7.42 "Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth
     # fhtagn") — TEASER, its own chip, outside filters and cells (owner 2026-11-19)
     (re.compile(r"\b(?:fhtagn|ftaghu|Shuggoth|ng'ngah|Cthulhu|R'lyeh)\b", re.I), 'TEASER'),
+    # 7.42 Ringmaster (owner 2026-11-19: "это пасхалка, тизер"): a "Resentment" no game file has, daggers "being
+    # sharpened", Spotlight "burning brighter" — a wink, no change
+    (re.compile(r"^Resentment (?:increased|decreased) from\b|\bare being sharpened\b|^Now burning brighter\b", re.I),
+     'TEASER'),
     # owner 2026-11-19 (7.42): an effect now scaled by Item Potency is a new property of it, as "now affected by AoE
     # bonuses" — NEW; "now only triggers when attacking heroes" changes when it works — REWORK; using an item from the
     # backpack, a health bar's regen number, a ward's ally damage — interface / comfort — QoL
@@ -236,6 +240,9 @@ CANONICAL_TAGS = [
     # a new property of units: "Illusions created by Illusion Rune now have 40% Item Potency" (7.42, owner 2026-11-19:
     # NEW); a rule lane creeps never had: "Lane creeps now move up to 25% slower if they are pulled out of lane" — REWORK
     (re.compile(r'\bnow (?:have|has) \d+% item potency\b', re.I), 'NEW'),
+    # ... and without "now": item potency is new in 7.42, so an illusion's or a replica's own value is NEW too (owner
+    # 2026-11-19: "Proportion Distortion illusion has 25% item potency - new")
+    (re.compile(r'\b(?:have|has) \d+% item potency\b', re.I), 'NEW'),
     (re.compile(r'\bnow move up to \d+% slower if\b', re.I), 'REWORK'),
     # when a boss comes back is how the objective works, not a number of it: "Base respawn timer now decreases by 1
     # minute every time Roshan is defeated" (7.42) changes the respawn rule — REWORK, as "where and when an object

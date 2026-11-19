@@ -762,6 +762,9 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Outposts can now be captured while silenced", "QoL"),                               # owner 2026-11-19
     ("Refract now creates a strong illusion", "REWORK"),                                  # owner 2026-11-19
     ("Magic Corruption now affects buildings", "NEW"),                                    # owner 2026-11-19
+    ("Proportion Distortion illusion has 25% item potency", "NEW"),                       # owner 2026-11-19
+    ("Resentment increased from 1 to 55", "TEASER"),                                      # owner 2026-11-19
+    ("Daggers are being sharpened", "TEASER"),                                            # owner 2026-11-19
     ("Shine now provides all bonuses on self-cast, but they will be reduced by 50%", "BUFF"),
     ("Aghanim's Scepter now also decreases cooldown by 10s", "BUFF"),
     ("Fire now has Cinder Dash ability", "NEW"),
@@ -982,6 +985,26 @@ def test_an_item_block_ends_at_a_header_line_that_starts_with_a_blank_line():
     out = g._postprocess_properties_change(list(lines))
     assert not any(x.startswith("W(properties_change(") for x in out)
     assert 'W(li("Now provides +0/0/16% Lifesteal", t("NEW")))' in out
+
+
+def test_a_summons_own_abilities_become_cards_and_the_retold_rows_hide():
+    # owner 2026-11-19, 7.42 Beastmaster: "Summon Ancient Thunderhide вообще плохо сделано — куча строк misc тега"
+    from tools.patchgen.post_summons import _postprocess_summon_sub_cards
+    out = _postprocess_summon_sub_cards([
+        'W(new_ability("Summon Ancient Thunderhide", "beastmaster_summon_thunderhide", version="7.42"))', 'W(ul_open())',
+        'W(li("Summons an Ancient Thunderhide to fight along with Beastmaster", t("MISC")))',
+        'W(li("Slam: Active. No Target. Magical Damage", t("MISC"), extra=inline_note("Mana Cost: 50")))',
+        'W(li("Thunderhide Drum: Passive. Aura", t("MISC")))', 'W(ul_close())'])
+    assert all("covered=True" in r for r in out[2:5])
+    assert 'slug="big_thunder_lizard_slam"' in out[6] and 'sub=True' in out[6]
+    assert 'slug="beastmaster_thunderhide_drum"' in out[7]
+
+
+def test_valves_cyrillic_letter_in_an_english_word_is_read_as_latin():
+    # 7.42 Ringmaster "Mana Сost decreased from 75 to 60/65/70/75": a Cyrillic С hid the lower-is-better rule
+    from tools.patchgen.normalize import latin_homoglyphs
+    assert latin_homoglyphs({"n": ["Mana Сost decreased"]}) == {"n": ["Mana Cost decreased"]}
+    assert latin_homoglyphs("Мана") == "Мана"          # a Russian word stays
 
 
 def test_artifact_pools_become_one_table_of_tiers_and_pools():

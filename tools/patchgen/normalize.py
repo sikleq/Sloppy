@@ -10,6 +10,24 @@ from .tags import CANONICAL_TAGS, _FROM_TO_RE, _guess_tag, _is_lower_better
 
 # ---------- TOP-LEVEL ----------
 
+_CYR_TO_LAT = str.maketrans("АВСЕНКМОРТХаеорсухі", "ABCEHKMOPTXaeopcyxi")
+_MIXED_WORD_RE = re.compile(r"\b(?=\w*[A-Za-z])(?=\w*[А-Яа-яі])\w+\b")
+
+
+def latin_homoglyphs(obj):
+    """Valve's notes now and then carry a Cyrillic letter inside an English word (7.42 Ringmaster "Mana Сost decreased
+    from 75 to 60/65/70/75" — a Cyrillic С): the word reads the same but no rule matches it, so the row lost its
+    lower-is-better tag (owner 2026-11-19: "это же бафф? генератор неправильно сделал"). Such letters inside a word
+    that also has Latin ones become Latin; walks dicts and lists."""
+    if isinstance(obj, str):
+        return _MIXED_WORD_RE.sub(lambda m: m.group(0).translate(_CYR_TO_LAT), obj)
+    if isinstance(obj, list):
+        return [latin_homoglyphs(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: latin_homoglyphs(v) for k, v in obj.items()}
+    return obj
+
+
 def fetch_datafeed(version):
     """Download /datafeed/patchnotes?version=X from Valve and cache it under
     data/<version>_datafeed.json. Returns the parsed dict.
@@ -20,7 +38,7 @@ def fetch_datafeed(version):
     p = os.path.join(_HERE, 'data', f'{version}_datafeed.json')
     if os.path.exists(p):
         print(f'Using cached datafeed: {p}')
-        return json.load(open(p, encoding='utf-8'))
+        return latin_homoglyphs(json.load(open(p, encoding='utf-8')))
     url = f'https://www.dota2.com/datafeed/patchnotes?version={version}&language=english'
     print(f'Fetching {url} ...')
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -36,7 +54,7 @@ def fetch_datafeed(version):
     with open(p, 'w', encoding='utf-8') as f:
         json.dump(d, f, ensure_ascii=False, indent=2)
     print(f'Saved -> {p} ({len(raw):,} bytes)')
-    return d
+    return latin_homoglyphs(d)
 
 
 def _numeric_direction(old, new, lower_is_better):

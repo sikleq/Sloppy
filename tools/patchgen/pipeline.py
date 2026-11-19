@@ -7,6 +7,7 @@ from .normalize import fetch_datafeed
 from .notes import _postprocess_group_rows_home, _postprocess_same_change_abilities
 from .post_facets import _postprocess_removed_facet_groups, _postprocess_removed_facets, _postprocess_renamed_facets
 from .post_shared import _postprocess_shared_row_group
+from .post_summons import _postprocess_summon_sub_cards
 from .post_level_values import _postprocess_level_values
 from .post_hero import _postprocess_attr_change_first, _postprocess_facets_summary_covered
 from .post_cards import (
@@ -292,6 +293,7 @@ def generate(version):
     out = _postprocess_innate_cards(out, version)     # innate old -> new from the game's texts (owner 2026-10-27)
     out = _postprocess_new_innate_cards(out, version)  # "New innate ability" -> the hero's old innate -> new (7.37)
     out = _postprocess_new_facet_rows(out)             # a "New Facet" row -> the new facet card (7.37 Medusa)
+    out = _postprocess_summon_sub_cards(out)           # a summon's own abilities: cards (7.42 Thunderhide, 2026-11-19)
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
     out = _postprocess_stance_blocks(out)              # "Earth Brawler …" rows -> stance blocks, as 7.40 (10-30)
