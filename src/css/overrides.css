@@ -388,8 +388,16 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* the camp's size as its icon before the name (its words on hover), its side a column of its own (7.42 new camps,
    owner 2026-11-19: "новый столбец side … иконку этого типа кэмпа") */
 .camp-table .camp-name { gap: 8px; }
-.camp-table .camp-type { display: inline-flex; flex: none; }
-.camp-table .camp-type img { width: 22px; height: 22px; display: block; }
+/* the camp's own icon (owner 2026-11-19, scripts/gen/gen_camp_icons.py): the type glyph, then each kind of creep's face,
+   a repeated one with its count in the corner; as wide as the widest row's so the names line up */
+.camp-table .camp-ico {
+  display: inline-flex; flex: none; align-items: center; gap: 2px;
+  min-width: calc(var(--camp-kinds, 1) * 24px + 22px);
+}
+.camp-table .camp-type { display: inline-flex; flex: none; margin-right: 1px; }
+.camp-table .camp-ico img { width: 22px; height: 22px; display: block; image-rendering: pixelated; }
+.camp-table .camp-face { position: relative; flex: none; }
+.camp-table .camp-face img.camp-count { position: absolute; right: 0; bottom: 0; width: 9px; height: 11px; }
 .camp-table .camp-side { justify-content: center; font-weight: 600; }
 .camp-table .camp-side-radiant { color: #7fd08c; }
 .camp-table .camp-side-dire { color: #cf828d; }
