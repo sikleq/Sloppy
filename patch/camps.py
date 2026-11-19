@@ -28,7 +28,8 @@ def camp_table(rows):
         size, side = (row[4], row[5]) if len(row) > 5 else (row[4] if len(row) > 4 else "", "")
         size = size or camp.split(" ")[0]
         # the size's words on hover over the camp's name, not over its glyph (owner 2026-11-19)
-        name = (f'<span class="camp-label iab-hint" data-tooltip="{size.capitalize()} camp">{camp}</span>'
+        # abil-ico-hint: the class src/js/tooltips.js shows a data-tooltip for (iab-hint alone is only the dots)
+        name = (f'<span class="camp-label iab-hint abil-ico-hint" data-tooltip="{size.capitalize()} camp">{camp}</span>'
                 if size.lower() in _CAMP_ICONS else camp)
         cells.append(f'<span class="camp-name">{camp_icon(size, creeps)}{name}</span>')
         if sided:

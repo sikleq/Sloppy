@@ -75,6 +75,7 @@ def test_742_home_jungle_names_all_18_camps_with_their_faces():
 
 def test_old_tables_get_the_type_from_the_camp_name():
     html = camp_table([("Small camp", [(3, "Pollywog", "../icons/units/npc_dota_neutral_tadpole.png")], 54, 90)])
-    assert '<span class="camp-label iab-hint" data-tooltip="Small camp">Small camp</span>' in html
+    # abil-ico-hint: without it tooltips.js never shows the words (the visual check caught it 2026-11-19)
+    assert '<span class="camp-label iab-hint abil-ico-hint" data-tooltip="Small camp">Small camp</span>' in html
     assert "faces/tadpole.png" in html and "count_3.png" in html
     assert "--camp-kinds:1" in html and ">Side<" not in html
