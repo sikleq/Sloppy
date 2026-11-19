@@ -353,11 +353,6 @@
 /* ... a row with a % lightly in its colour, as the text BUFF / NERF chips (owner 2026-10-27, 7.40 Watcher rows) */
 .badge.tnum.tnum-buff { color: #6da375; background: rgba(85, 205, 115, 0.10); border-color: rgba(85, 205, 115, 0.28); }
 .badge.tnum.tnum-nerf { color: #9a666d; background: rgba(199, 101, 115, 0.10); border-color: rgba(199, 101, 115, 0.28); }
-/* ... a TEASER row (owner 2026-11-19): the box violet and dashed, the TEASER tile's tentacle in it, no word */
-.badge.tnum.tnum-teaser { display: inline-flex; align-items: center; justify-content: center; color: #a98ad8;
-  background: rgba(170, 135, 220, 0.09); border-color: rgba(200, 160, 255, 0.55); border-style: dashed; }
-.badge.tnum.tnum-teaser::before { content: ""; width: 12px; height: 12px; background: currentColor;   /* --tm: the */
-  -webkit-mask: var(--tm) center / contain no-repeat; mask: var(--tm) center / contain no-repeat; }  /* tag's icon */
 /* Pressed filter chip = a neon sign: the letters glow in the chip's own colour and the frame
    lights up with a soft halo of the same colour (no plain outline ring). */
 .legend-tags .badge.filter-btn.active,

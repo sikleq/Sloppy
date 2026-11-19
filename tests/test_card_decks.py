@@ -184,6 +184,11 @@ def test_a_decks_new_values_card_lights_what_changed():
     assert ("buff", "spawn interval improved") in rows_before(under, under.index("CARD"))
     assert rows_before(under + '<div class="ability-block"><li data-tag="nerf"><span class="row-text">Other</span></li>',
                        under.index("CARD"))[-1] == ("buff", "spawn interval improved")      # not the next block's
+    # ... nor the next entity's: the last card of a section read Gleipnir's "radius … from 325" two sections below
+    # (owner 2026-11-19, 7.42 Ancient Ogre Seal Pup's aura "Radius 1200" lit +269%)
+    far = under + ('<div class="entity-block"><ul class="changes"><li data-tag="buff"><span class="row-text">Eternal Chains '
+                   'radius increased from 325 to 340</span></li></ul>')
+    assert all("radius" not in t for _tag, t in rows_before(far, far.index("CARD")))
 
 
 def test_a_deck_pane_with_several_named_tables_moves_them_all_to_the_values_card():

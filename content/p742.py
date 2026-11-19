@@ -3364,7 +3364,7 @@ def build():
     # both rows are old vs new over the hero's levels: tables, not a pill round one side (7.42 proofread; by hand —
     # the generator reads "per level" on both sides only)
     W(li_formula("Total Chickens changed", "1 + 1 per 5 levels", "3 at all times",
-                 lambda L: 1 + L // 5, lambda L: 3, value_fmt="{:g}"))
+                 lambda L: 1 + L // 5, lambda L: 3, value_fmt="{:g}", kind="nerf"))
     W(li_formula("Movespeed bonus rescaled", "5% + 5% per 5 levels", "5% + 1% per level",
                  lambda L: 5 + 5 * (L // 5), lambda L: 5 + 1 * L, value_fmt="{:g}%"))
     W(li("Chickens are now more duplicitous", t("TEASER")))

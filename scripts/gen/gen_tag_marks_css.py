@@ -70,7 +70,7 @@ def data_uri(path, width):
 def block():
     # the same icon on the tag's tile in the filter window (owner 2026-11-07: "использовать иконки-закладки")
     # ... and in a Terrain row's number box (.badge.tnum, a TEASER row: owner 2026-11-19 "почему в terrain слова teaser")
-    tnum = lambda tag: f', .badge.tnum[data-tag~="{tag}"]' if tag == "teaser" else ""
+    tnum = lambda tag: ", .tnum-teaser" if tag == "teaser" else ""
     rows = [f'.tag-marks .badge[data-tag~="{tag}"], .filter-btn[data-filter="{tag}"]{tnum(tag)} '
             f'{{ --tm: url("{data_uri(path, w)}"); }}'
             for tag, path, w in ICONS]

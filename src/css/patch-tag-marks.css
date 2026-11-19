@@ -64,6 +64,10 @@
 .tnum-dia::before { content: "\25C6"; }
 /* a row with a % in its colour, an object taken off the map red (patch/tag_marks.py terrain_tone, owner 2026-11-07:
    "Corner outposts … красим ромбик в красный", "Watcher night vision range decreased … ромбик красный") */
+/* a TEASER row: the TEASER tentacle (--tm, scripts/gen/gen_tag_marks_css.py) where the diamond stands, violet, no frame
+   (owner 2026-11-19) */
+.tnum-dia.tnum-teaser::before { content: ""; display: inline-block; width: 11px; height: 11px; background: #a98ad8;
+  vertical-align: -3px; -webkit-mask: var(--tm) center / contain no-repeat; mask: var(--tm) center / contain no-repeat; }
 .tnum-dia.tnum-buff { color: #55cd73; }
 .tnum-dia.tnum-nerf { color: #c55252; }
 /* a phone's row is a grid with the tag word over the text: the small diamond goes on the text's first line instead */
@@ -78,7 +82,7 @@
   .tag-marks ul.changes > li.terrain-row > .tnum-dia + .row-text::before { width: 0; }
 }
 /* generated icons: begin */
-.tag-marks .badge[data-tag~="teaser"], .filter-btn[data-filter="teaser"], .badge.tnum[data-tag~="teaser"] { --tm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.5C4 9 9.5 9.5 9.5 6S6 2.5 5 4.5S7 7 8 5.5'/%3E%3C/svg%3E"); }
+.tag-marks .badge[data-tag~="teaser"], .filter-btn[data-filter="teaser"], .tnum-teaser { --tm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.5C4 9 9.5 9.5 9.5 6S6 2.5 5 4.5S7 7 8 5.5'/%3E%3C/svg%3E"); }
 .tag-marks .badge[data-tag~="misc"], .filter-btn[data-filter="misc"] { --tm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 7h.01M7 7h.01M10.5 7h.01'/%3E%3C/svg%3E"); }
 .tag-marks .badge[data-tag~="qol"], .filter-btn[data-filter="qol"] { --tm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.6 7.4l3 3L11.4 3.8'/%3E%3C/svg%3E"); }
 .tag-marks .badge[data-tag~="buff"], .filter-btn[data-filter="buff"] { --tm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 12V2.6M3 6.6l4-4 4 4'/%3E%3C/svg%3E"); }

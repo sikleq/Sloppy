@@ -528,7 +528,7 @@ def test_a_teaser_row_has_its_own_chip_and_no_place_in_the_cells():
     import pathlib                                    # its tile on the patch pages has an icon of its own
     css = (pathlib.Path(__file__).resolve().parents[1] / "src" / "css" / "patch-tag-marks.css").read_text(encoding="utf-8")
     # ... the same icon in a Terrain row's number box (owner 2026-11-19)
-    assert ('.tag-marks .badge[data-tag~="teaser"], .filter-btn[data-filter="teaser"], .badge.tnum[data-tag~="teaser"] '
+    assert ('.tag-marks .badge[data-tag~="teaser"], .filter-btn[data-filter="teaser"], .tnum-teaser '
             '{ --tm: url(') in css
 
 

@@ -39,4 +39,12 @@ def terrain_rows_tagged(html):
         tone = terrain_tone(attrs, pct_tone, text)
         cls = f"tnum-dia tnum-{tone}" if tone else "tnum-dia"
         return f'<li{attrs}><span class="{cls}" role="img" aria-label="{n} on the map"></span><span class="row-text">'
-    return _TERRAIN_ROW_RE.sub(one, html)
+    html = _TERRAIN_ROW_RE.sub(one, html)
+    # a TEASER row (Valve's wink, no change): the TEASER tentacle where the diamond stands, no frame (owner 2026-11-19:
+    # "почему в terrain слова teaser, а не иконка", "убери пунктирную обводку у щупальца")
+    return _TERRAIN_TEASER_RE.sub(r'<li\1><span class="tnum-dia tnum-teaser" role="img" aria-label="Teaser"></span>'
+                                  r'<span class="row-text">', html)
+
+
+_TERRAIN_TEASER_RE = re.compile(r'<li\b([^>]*\bterrain-row\b[^>]*)><span class="badge teaser" data-tag="teaser">TEASER</span>'
+                                r'<span class="row-text">')
