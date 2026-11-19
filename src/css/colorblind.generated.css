@@ -55,8 +55,8 @@ html.cb-mode .iab-hl-del { --hl-bg: rgba(154, 51, 90, 0.24); }
 html.cb-mode .iab-hl-num.iab-hl-buff { color: #64baeb; }
 html.cb-mode .iab-hl-num.iab-hl-nerf { color: #f19e60; }
 html.cb-mode .iab-hl-num.iab-hl-del { color: #ce6c91; }
-html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff, html.cb-mode .us-v.iab-buff, html.cb-mode .us-bar .us-v.iab-buff, html.cb-mode .camp-v.iab-buff { color: #64baeb; }
-html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf, html.cb-mode .us-v.iab-nerf, html.cb-mode .us-bar .us-v.iab-nerf, html.cb-mode .camp-v.iab-nerf { color: #f19e60; }
+html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff, html.cb-mode .us-v.iab-buff, html.cb-mode .us-bar .us-v.iab-buff, html.cb-mode .camp-v.iab-buff, html.cb-mode .mech-pct-cell.iab-buff { color: #64baeb; }
+html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf, html.cb-mode .us-v.iab-nerf, html.cb-mode .us-bar .us-v.iab-nerf, html.cb-mode .camp-v.iab-nerf, html.cb-mode .mech-pct-cell.iab-nerf { color: #f19e60; }
 html.cb-mode .components-change .component-price.cost-buff, html.cb-mode .components-change .components-total span.cost-buff { color: #64baeb; }
 html.cb-mode .components-change .component-price.cost-nerf, html.cb-mode .components-change .components-total span.cost-nerf { color: #f19e60; }
 /* === END COLOUR-BLIND MODE (generated) === */

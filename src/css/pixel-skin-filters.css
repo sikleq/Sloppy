@@ -171,8 +171,8 @@ ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8
    hidden, so tag filters and counts still see their tags (owner 2026-09-27) */
 ul.changes li.iab-covered { display: none !important; }
 /* the numbers those rows change, coloured by the row's tag */
-.iab-num.iab-buff, .iab-m.iab-buff, .iab-lv.iab-buff, .us-v.iab-buff, .us-bar .us-v.iab-buff, .camp-v.iab-buff { color: #7fd08c; }
-.iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf, .us-v.iab-nerf, .us-bar .us-v.iab-nerf, .camp-v.iab-nerf { color: #cf828d; }
+.iab-num.iab-buff, .iab-m.iab-buff, .iab-lv.iab-buff, .us-v.iab-buff, .us-bar .us-v.iab-buff, .camp-v.iab-buff, .mech-pct-cell.iab-buff { color: #7fd08c; }
+.iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf, .us-v.iab-nerf, .us-bar .us-v.iab-nerf, .camp-v.iab-nerf, .mech-pct-cell.iab-nerf { color: #cf828d; }
 .iab-num.iab-new, .iab-m.iab-new, .iab-lv.iab-new { color: #e0bd62; }
 .iab-num.iab-misc, .iab-m.iab-misc, .iab-lv.iab-misc { color: var(--text-dimmer); }
 .iab-num.iab-rework, .iab-m.iab-rework, .iab-lv.iab-rework { color: #b99ae6; }   /* Orb of Venom 7.38: a cooldown where there was none */
