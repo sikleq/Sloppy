@@ -455,7 +455,13 @@ h4.subgroup {
 .pip-sep { margin: 0 9px; color: var(--text-dim); font-weight: 700; }
 .pip-legend { display: flex; gap: 22px; margin: 8px 10px 2px; color: var(--text-dim); font-size: 12px; align-items: center; }
 .pip-legend .pip-sticks { margin-right: 6px; }
-@media (max-width: 760px) { .mech-abils.pip-table { grid-template-columns: max-content minmax(0, 1fr); } }
+/* a phone: one pair of columns, a row's levels on one line — the name wraps instead (visual review 2026-11-19: the
+   levels broke apart and left "/" at a line's end) */
+@media (max-width: 760px) {
+  .mech-abils.pip-table { grid-template-columns: minmax(0, 1fr) max-content; }
+  .mech-abils.pip-table .pip-cell { flex-wrap: nowrap; white-space: nowrap; padding-right: 6px; }
+  .mech-abils.pip-table .pip-sep { margin: 0 5px; }
+}
 .item-icon-cell img { display: block; border-radius: 3px; }
 .mech-abils.mech-grid .mech-abil-row > span + span,
 .mech-abils.mech-levels .mech-abil-row > span + span { border-left: 1px solid var(--line-soft); }
