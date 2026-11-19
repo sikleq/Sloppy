@@ -1412,8 +1412,21 @@ def _picker_html(patches, current):
         base, n = _map_update(ver)
         if n is not None and base in rank:
             continue                                  # listed under its patch
-        items.append(item(ver))
-        items += [item(v, sub=True) for v in sorted(subs.get(ver, []), key=lambda v: rank[v])]
+        kids = sorted(subs.get(ver, []), key=lambda v: rank[v])
+        if not kids:
+            items.append(item(ver))
+            continue
+        # the updates fold under their patch and open on a click (the owner 2026-11-19: "so they have to be picked,
+        # not always open"); open already when the page is one of them
+        is_open = current in kids
+        items.append(
+            f'<div class="version-group{" open" if is_open else ""}">'
+            f'<div class="version-group-row">{item(ver)}'
+            f'<button class="vi-sub-toggle" type="button" aria-expanded="{"true" if is_open else "false"}" '
+            f'aria-label="Map file updates inside {_esc(ver)}"><span class="vi-sub-chev">▸</span>{len(kids)}</button>'
+            '</div>'
+            f'<div class="version-subitems">{"".join(item(v, sub=True) for v in kids)}</div>'
+            '</div>')
     label = _site.get_materials_label('terrain') or 'Terrain'
     current_label = _esc(current)
     return (

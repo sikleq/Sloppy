@@ -173,8 +173,13 @@ def test_map_file_updates_are_a_sub_list_under_their_patch():
     menu = terrain._picker_html(pages, "7.42-v2")
     names = re.findall(r'<span class="vi-name">([^<]+)</span>', menu)
     assert names == ["7.42", "v3", "v2", "7.41e"]                          # under 7.42, newest first
-    assert menu.count("version-subitem") == 2 and 'data-rank="1"' in menu   # the arrows keep the time order
+    assert menu.count("version-subitem ") == 2 and 'data-rank="1"' in menu   # the arrows keep the time order
     assert 'class="version-item version-subitem current" href="terrain_742-v2.html"' in menu
+    # folded under 7.42 behind a "▸ 2" button; open only when the page is one of them (the owner: "picked, not
+    # always open")
+    assert '<div class="version-group open">' in menu and 'aria-expanded="true"' in menu
+    closed = terrain._picker_html(pages, "7.42")
+    assert '<div class="version-group">' in closed and '<span class="vi-sub-chev">▸</span>2</button>' in closed
     assert terrain_index.latest_page_file() == "terrain_742.html"
     diff = terrain_index._load_diff("7.42-v3")
     assert (diff["oldVer"], diff["newVer"]) == ("7.42-v2", "7.42-v3") and len(diff["treesNew"]) == 2394
