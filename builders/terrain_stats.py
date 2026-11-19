@@ -53,15 +53,16 @@ _esc = _site.esc
 
 
 def _key(v):
-    """'7.41f' < '7.41f-1007' < '7.42': a map file Valve shipped inside a patch, in a client update with no patch
-    notes, is keyed '<patch>-MMDD' and sorts right after its patch (2026-10-17, a new map file of 2026-10-07)."""
-    m = _re.match(r"(\d+)\.(\d+)([a-z]?)(?:-(\d{4}))?", v)
-    return int(m.group(1)), int(m.group(2)), m.group(3), m.group(4) or ""
+    """'7.41f' < '7.41f-v2' < '7.42': a map file Valve shipped inside a patch, in a client update with no patch
+    notes, is keyed '<patch>-v<N>' (the patch's own file is v1) and sorts right after its patch (2026-10-17, a new
+    map file of 2026-10-07; keyed '<patch>-MMDD' until the owner 2026-11-19: "v2")."""
+    m = _re.match(r"(\d+)\.(\d+)([a-z]?)(?:-v(\d+))?", v)
+    return int(m.group(1)), int(m.group(2)), m.group(3), int(m.group(4) or 1)
 
 
 def is_update(v):
-    """A '<patch>-MMDD' key: a map file of a client update inside a patch, not a patch of its own."""
-    return _re.fullmatch(r"\d+\.\d+[a-z]?-\d{4}", v) is not None
+    """A '<patch>-v<N>' key: a map file of a client update inside a patch, not a patch of its own."""
+    return _re.fullmatch(r"\d+\.\d+[a-z]?-v\d+", v) is not None
 
 
 def count_patches(rows):

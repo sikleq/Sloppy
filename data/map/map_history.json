@@ -2570,7 +2570,7 @@
 "moves": {}
 },
 {
-"patch": "7.41f-1007",
+"patch": "7.41f-v2",
 "date": "2026-10-07",
 "sha8": "0845387f",
 "changes": "client update of 2026-10-07 inside 7.41f (no patch notes): no tree, building or zone moved; 35 walkable cells at the right map edge (x 8384-8576, y -3200 to -2688) one height level lower; world particles: 1 removed, 2 added",
@@ -2640,7 +2640,7 @@
 }
 },
 {
-"patch": "7.42-1118",
+"patch": "7.42-v2",
 "date": "2026-11-18",
 "sha8": "0d7217cc",
 "changes": "client update of 2026-11-18 inside 7.42, hours after the patch (no patch notes): one tree removed at the Dire base (x 5824, y 6848); 2 walk-grid cells beside it swapped (one opened, one blocked) and 3 cells there one height level higher; nothing else moved",
