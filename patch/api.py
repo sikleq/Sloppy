@@ -22,6 +22,7 @@ from .scaling_card import scaling_rework
 from .item_links import artifact_pools, item_icon, item_link
 from .unit_numbers import unit_sheet
 from .mech_abilities import formula_approx, mech_before_after, mech_change_cell, mech_change_cells, mech_example, mech_formula, mech_level_table, mech_list, mech_pair, mech_story, mech_table, mech_text
+from .mech_marked import marked_changes
 from .cards_ability_change import ability_change, new_ability, game_ability_desc, game_ability_pair
 from .cards_aghs import aghs_line, aghs_shard_line
 from .cards_item_abilities import item_abilities_change

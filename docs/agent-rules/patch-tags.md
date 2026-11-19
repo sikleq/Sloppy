@@ -1048,6 +1048,17 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   («No longer …», «… is unchanged»). Если у Valve такое пояснение висит под строкой одних чисел («Radius: 550;
   Duration: 4s», Leshrac Nihilism), строка чисел уходит под карточку (числа в ней есть), а каждое пояснение
   становится своей видимой строкой REWORK, не [?] под числами.
+- Строка Valve «Specifics … can be found in the corresponding ability notes» — пустая отсылка, на странице её нет:
+  вместо неё таблица тех самых правок (`post_mech_lists.py`, владелец 2026-11-20). Breakability of innates — одна
+  строка, под ней таблица «Fully / Partially disabled by Break | значки» из строк «Now … disabled by Break» у врождённых
+  (что Break выключает частично — в [?]). Spell Power Reduction — строка «Changes marked as a part of it in this
+  patch»: все правки с пометкой «As a part of the comprehensive Spell Power Reduction», разложенные по тому, что
+  меняет сама строка (усиление, AoE и дальность, замедления и длительности, урон, прочее), с числом; значок ведёт к
+  герою или предмету (`marked_changes`). Группы Valve («item contributions», «damage», «slows») по строкам не
+  разложить честно, поэтому группы — по словам строки. Чипов-тегов в этих блоках нет, тег скрытый (для фильтров).
+- Item Potency: название в шапке — ссылка на страницу механики (`plain_header(page=…)`); примеры Valve («… would reduce
+  armor by 7.2 (6 × 120%)») уходят из абзаца в таблицу «Attack | Item Potency | Desolator armor reduction», строка
+  иллюзии (20%) досчитана по правилу Valve; хвост «Specific details can be found …» убран.
 - «Aghanim's Scepter reworked» / «Now upgraded with Aghanim's Scepter instead of …» и пересказ строками → одна строка,
   пересказ в её [?] (`_postprocess_aghs_rework_rows`). Подстроки Valve у строк про Аганим тоже уходят в [?]
   (`notes.py`), а не стоят отдельными BUFF/MISC (Tinker Deploy Turrets).
