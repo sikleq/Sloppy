@@ -17,6 +17,7 @@ from .post_cards import (
     _postprocess_rows_first,
     _postprocess_two_selves_cards,
     _postprocess_removed_label,
+    _postprocess_tier_move_label,
     _postprocess_silent_stats,
     _postprocess_stack_note_into_ability,
 )
@@ -81,6 +82,7 @@ from .post_tables import (
     _postprocess_star_lists,
     _postprocess_bounty_range_row,
     _postprocess_objective_subgroups,
+    _postprocess_artifact_pools,
     _postprocess_pip_list,
     _postprocess_from_to_list,
     _postprocess_per_death,
@@ -285,6 +287,7 @@ def generate(version):
     out = _postprocess_recipe_cost_zero_net(out)
     out = _postprocess_rework_marker(out)
     out = _postprocess_removed_label(out)             # "Neutral Item cycled out" label — owner 2026-10-17
+    out = _postprocess_tier_move_label(out)           # "Now a Tier 4 Artifact" in the header — owner 2026-11-19
     out = _postprocess_ability_level_formula(out, version)   # "+X with every level of Y" -> table (owner 2026-10-27)
     out = _postprocess_innate_cards(out, version)     # innate old -> new from the game's texts (owner 2026-10-27)
     out = _postprocess_new_innate_cards(out, version)  # "New innate ability" -> the hero's old innate -> new (7.37)
@@ -306,6 +309,7 @@ def generate(version):
     out = _postprocess_bounty_range_row(out)          # "no longer variable bounties": the table shows it (11-19)
     out = _postprocess_pip_list(out)                  # the pip-health units' pips as sticks (owner 2026-11-19)
     out = _postprocess_objective_subgroups(out)       # Wisdom Shrines / Outposts: a subgroup each (owner 2026-11-19)
+    out = _postprocess_artifact_pools(out)            # 7.42 Artifact Pools: one table, tiers x pools (owner 2026-11-19)
     out = _postprocess_grouped_lists(out)             # "<Group>" + "<Kind>: a; b" lines -> one table (home jungles)
     out = _postprocess_per_death(out)               # "A to B + C per Tormentor's death" -> a table (2026-11-18)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)

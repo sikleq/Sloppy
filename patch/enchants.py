@@ -187,8 +187,14 @@ def _enchant_change(name):
         return ""
     _State.ench_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version,
                         "labels": [s["label"] for s in ent["stats"]]}
+    # a tier the enchantment no longer has (7.42: tier 5 gone, owner 2026-11-19 "удалили тир 5, подсветить это в
+    # таблице"): its header in the DEL colour, struck — a value there before, none now
+    def gone_tier(t):
+        return (not ent["brand_new"] and any(_ench_num(s["old"].get(str(t))) for s in ent["stats"])
+                and not any(s["new"].get(str(t)) is not None for s in ent["stats"]))
     head = ('<span class="ench-row-h"><span class="ench-stat-h">Stats</span>'
-            + "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS) + "</span>")
+            + "".join(f'<span class="ench-tier-h{" ench-gone" if gone_tier(t) else ""}">Tier {t}</span>'
+                      for t in _ENCHANT_TIERS) + "</span>")
     lines = [head]
     for s in ent["stats"]:
         gone = not any(_ench_num(v) for v in s["new"].values())

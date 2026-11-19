@@ -383,6 +383,12 @@ h4.subgroup {
 .mech-abil-set { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
 .mech-hero-item > img { object-fit: contain; }    /* an item / Twin Gates in the hero column (owner 2026-10-30) */
 .mech-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+/* 7.42 Artifact Pools (patch/item_links.artifact_pools, owner 2026-11-19): a pool's items one under another, left edge */
+.pool-table .mech-cell .pool-items { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.mech-abils.mech-cols-5.pool-table { grid-template-columns: fit-content(14%) repeat(4, minmax(0, 1fr)); }
+@media (max-width: 760px) {
+  .pool-table .mech-item { white-space: normal; min-width: 0; overflow-wrap: anywhere; }
+}
 /* a facet's chip grows on hover with its name above, as an ability's (owner 2026-10-30) */
 .mech-abils .facet-chip { position: relative; transition: transform 0.12s ease; }
 .mech-abils .facet-chip:hover { z-index: 101; transform: scale(2.6);

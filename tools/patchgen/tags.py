@@ -75,6 +75,9 @@ CANONICAL_TAGS = [
     (re.compile(r"^Added (?:an? |the )?(?:[\w']+ ){0,4}(?:icon|indicator|marker)\b", re.I), 'QoL'),  # user rule: new icon = QoL
     (re.compile(r'^\s*Now is (?:an? )?innate ability\.?\s*$', re.I), 'REWORK'),   # bare conversion only; "…that improves with X" is judged per case
     (re.compile(r'\bnow levels with\b', re.I), 'REWORK'),
+    # an illusion of another kind — how it works, not a number (owner 2026-11-19, 7.42 Riftshadow Prism "Refract now
+    # creates a strong illusion": "цвет REWORK, а не MISC")
+    (re.compile(r'\bnow creates? an? strong illusions?\b', re.I), 'REWORK'),
     # an Aghanim's upgrade that stops giving its benefit = DEL, wind-up included ("Aghanim's Scepter no longer
     # decreases max wind-up time": the 7.37e tooltip "Decreases wind-up time …", audit 2026-10-03)
     (re.compile(r"^\s*Aghanim's (?:Scepter|Shard) no longer (?:decreases|reduces)\b", re.I), 'DEL'),

@@ -760,6 +760,7 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("All heroes now passively receive 50 experience per minute after the starting horn", "NEW"),
     ("Siege creeps no longer switch aggro to the towers that attack heroes", "REWORK"),
     ("Outposts can now be captured while silenced", "QoL"),                               # owner 2026-11-19
+    ("Refract now creates a strong illusion", "REWORK"),                                  # owner 2026-11-19
     ("Shine now provides all bonuses on self-cast, but they will be reduced by 50%", "BUFF"),
     ("Aghanim's Scepter now also decreases cooldown by 10s", "BUFF"),
     ("Fire now has Cinder Dash ability", "NEW"),
@@ -965,6 +966,47 @@ def test_item_ability_mana_cost_is_a_row_not_a_card_line():
     card = next(x for x in out if x.startswith("W(properties_change("))
     assert "mana cost" not in card and "+450 Health" in card
     assert 'W(li("Eternal Chains mana cost decreased from 200 to 100", b(200, 100, l=True)))' in out
+
+
+def test_an_item_block_ends_at_a_header_line_that_starts_with_a_blank_line():
+    """7.42 Witchbane (owner 2026-11-19: "в игре совсем другое"): the header after it came as "\\nW(plain_header(…" and
+    the block ran on into Enchantment Changes — 20 enchantment stat rows left the page for Witchbane's card."""
+    import tools.generate_patch_code_v2 as g
+    lines = ['W(item_header("Witchbane"))', 'W(ul_open())',
+             'W(li("Cleanse cooldown decreased from 30s to 24s", b(30, 24, l=True)))', 'W(ul_close())',
+             '\nW(plain_header("Enchantment Changes", dynamics=False, sublabel=True))',
+             'W(enchant_header("Brawny"))', 'W(ul_open())',
+             'W(li("Now provides +0/0/16% Lifesteal", t("NEW")))',
+             'W(li("No longer provides +0/0/0/25% Slow Resist", t("DEL")))', 'W(ul_close())']
+    out = g._postprocess_properties_change(list(lines))
+    assert not any(x.startswith("W(properties_change(") for x in out)
+    assert 'W(li("Now provides +0/0/16% Lifesteal", t("NEW")))' in out
+
+
+def test_artifact_pools_become_one_table_of_tiers_and_pools():
+    # owner 2026-11-19, 7.42: "Artifact Pools — сделать таблицей"
+    from tools.patchgen.post_tables import _postprocess_artifact_pools
+    out = _postprocess_artifact_pools([
+        '    W(li("Each tier is now separated into multiple pools of Artifacts, and 1 Artifact is chosen per pool", t("MISC")))',
+        '    W(li("Tier 1", t("MISC"), extra=inline_note("A, B, C<br>D, E, F")))',
+        '    W(li("Tier 2", t("MISC"), extra=inline_note("G, H, I<br>J, K, L")))'])
+    assert len(out) == 1
+    assert out[0].endswith("extra=artifact_pools([[['A', 'B', 'C'], ['D', 'E', 'F']], [['G', 'H', 'I'], ['J', 'K', 'L']]])))")
+    from patch.item_links import artifact_pools
+    html = artifact_pools([[["Chipped Vest", "Red Ledger"]]])
+    assert ">Pool 1<" in html and ">Tier 1<" in html and html.count('class="mech-item"') == 2
+
+
+def test_a_tier_move_goes_into_the_items_header():
+    # owner 2026-11-19, 7.42: "Tier changed from 5 to 4" — in the header as 7.38's "Now a Tier 1 Artifact", not a row
+    from tools.patchgen.post_cards import _postprocess_tier_move_label
+    out = _postprocess_tier_move_label(['    W(item_header("Witchbane"))', '    W(ul_open())',
+                                        '    W(li("Tier changed from 5 to 4", t("REWORK")))', '    W(ul_close())',
+                                        '    W(enchant_header("Audacious"))', '    W(ul_open())',
+                                        '    W(li("Tier changed from 5 to 4", t("REWORK")))', '    W(ul_close())'])
+    assert out[0] == '    W(item_header("Witchbane", changed="Now a Tier 4 Artifact"))'
+    assert out[2] == '    W(li("Tier changed from 5 to 4", t("REWORK"), covered=True))'    # hidden, still counted
+    assert out[6] == '    W(li("Tier changed from 5 to 4", t("REWORK")))'      # an enchantment: its tier table says it
 
 
 def test_does_not_stack_note_goes_into_the_passive_rows_info():
