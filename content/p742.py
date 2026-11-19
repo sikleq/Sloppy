@@ -1265,7 +1265,7 @@ def build():
     W(li("Active: Flicker. Applies basic dispel and blinks you in a random forward direction between 200 and 600 units away. If the wielder took any damage from an enemy player within the last 3 seconds, the blink will not move the caster. No Mana Cost. Cooldown: 8s", t("NEW"), extra=inline_note("Dormant Curio increases min range to 260 and max range to 780")))
     # items.txt: bonus_movement_speed 35 -> 0 and its tooltip line gone (owner 2026-11-19: "можно указать, что раньше
     # было +35"); the item was out of the game in 7.41f, so the row is a note to the returning item, not a cut
-    W(li("No longer provides +35 Movement Speed", t("NERF"), extra=inline_note("It gave +35 Movement Speed before it was cycled out. Not in the patch notes: found in the game files")))
+    W(li("No longer provides +35 Movement Speed", t("DEL"), extra=inline_note("It gave +35 Movement Speed before it was cycled out. Not in the patch notes: found in the game files")))
     W(ul_close())
     W(item_header("Giant's Ring", new="Returning Tier 4 Artifact"))
     W(ul_open())
