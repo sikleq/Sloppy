@@ -250,8 +250,9 @@ def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_bett
 
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
                rework_badge=True, inline_note_text=None, label=None,
-               force_rework=False, extra_html=None, **bf_kwargs):
-    """extra_html: a box that goes before the table (note_box of a wrongly stated "from", 7.42 Tormentor Reflect)."""
+               force_rework=False, extra_html=None, after_html=None, **bf_kwargs):
+    """extra_html: a box that goes before the table (note_box of a wrongly stated "from", 7.42 Tormentor Reflect);
+    after_html: one under it (formula_approx, Valve's approximation of the 7.42 experience per level)."""
     from .badges import bf
     if label:
         bf_kwargs.setdefault('axis_label', label)
@@ -285,4 +286,6 @@ def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
         extra = inline_note(inline_note_text) + extra
     if extra_html:
         extra = extra_html + extra
+    if after_html:
+        extra = extra + after_html
     return li(full_text, full_badge, extra=extra)

@@ -54,6 +54,61 @@ _CLOCK_LINE_RE = re.compile(r'^([A-Z][\w\' ]+?) - (\d{1,2}:\d{2})$')
 _APPROX_RE = re.compile(r'^(?P<pre>.*?\bformula:\s*)(?P<expr>.+?)(?P<post>\s+where\b.*)?$', re.I)
 
 
+_FROM_TO_ROW_RE = re.compile(r'^\s*W\(li\("(?P<prefix>(?:[^"\\]|\\.)*?) from (?P<old>[\d,.]+) to (?P<new>[\d,.]+)"')
+_DEFAULT_GRID = list(range(1, 16)) + [20, 25, 30]          # the full-width formula table's levels (formula-tables.md)
+
+
+_APPROX_LEAD_RE = re.compile(r'\bapproximate (?:the )?(?P<what>.+?) is to use\b', re.I)
+_APPROX_WHERE_RE = re.compile(r'^where (?P<var>\w+) is (?:the )?(?P<what>.+?)\.?$', re.I)
+
+
+def _approx_words(pre, post):
+    """Valve's long words around the formula, short enough for one line with it (owner 2026-11-19: the block
+    "расползается на лишнюю строку"): "An easy way to approximate the xp needed per level is to use this formula:"
+    → "Approximate xp needed per level", "where X is the current level of the hero" → "x — current level of the hero".
+    Other wordings stay as they are."""
+    m = _APPROX_LEAD_RE.search(pre)
+    lead = f"Approximate {m.group('what')}" if m else pre.strip()
+    w = _APPROX_WHERE_RE.match(post.strip())
+    if not w:
+        return lead, post.strip()
+    what = re.sub(r"^current level of the (\w+)$", r"\1's level", w.group("what"))
+    return f"{lead.rstrip(':').rstrip()} ({w.group('var').lower()} — {what})", ""      # x's meaning by the words: one line with the formula
+
+
+def _level_formula_row(ln, cells, prose):
+    """Old / New values by hero level under a row "… from A to B" (7.42 "Total amount of experience needed to reach
+    level 30 increased from 64400 to 66600") → li_formula: the formula table every per-level change has, by its rules —
+    the default grid of levels, the tag from all levels, Δ% (owner 2026-11-19: "таблица сделана не как formula table").
+    Valve's running total column is left out: the row's own "from A to B" is its last value. Valve's approximation
+    sentence goes under the table as formula_approx. None when the table is not that."""
+    m = _FROM_TO_ROW_RE.match(ln)
+    head = [c.lower() for c in cells[0]]
+    if not (m and len(head) >= 3 and head[1] == "old" and head[2] == "new"
+            and all(r[0].isdigit() for r in cells[1:])):
+        return None
+    try:
+        old = {int(r[0]): float(r[1].replace(",", "")) for r in cells[1:]}
+        new = {int(r[0]): float(r[2].replace(",", "")) for r in cells[1:]}
+    except ValueError:
+        return None
+    from .tags import _is_lower_better
+    low = _is_lower_better(re.match(r'\s*W\(li\("((?:[^"\\]|\\.)*)"', ln).group(1))
+    grid = [L for L in _DEFAULT_GRID if L in old]
+    fmt = lambda d: "{" + ", ".join(f"{k}: {v:g}" for k, v in d.items()) + "}"
+    after = ""
+    for p in prose:
+        f = _APPROX_RE.match(p)
+        if f:
+            lead, where = _approx_words(f.group("pre"), f.group("post") or "")
+            after = (f', after_html=formula_approx({_py_str(lead)}, '
+                     f'{_py_str(f.group("expr").strip())}, {_py_str(where)})')
+    ind = ln[:len(ln) - len(ln.lstrip())]
+    return (f'{ind}W(li_formula({_py_str(m.group("prefix"))}, "{m.group("old")}", "{m.group("new")}", '
+            f'lambda L: {fmt(old)}[L], lambda L: {fmt(new)}[L], l={low}, levels={grid}, '
+            f'tag_levels={sorted(old)}, rework_badge=False{after}))')
+
+
 def _postprocess_dash_table(lines):
     """A "?" that is Valve's table typed as text ("Level -- Old -- New -- Total Increase<br>2 -- 240 -- 250 -- 10<br>…",
     7.42 experience per level) → a real table under the row; Valve's sentence after it stays the table's last line,
@@ -84,6 +139,10 @@ def _postprocess_dash_table(lines):
                 tail.append(f'{_py_str(f.group("pre"))} + mech_formula({_py_str(f.group("expr").strip())}) + " " + {post}')
             else:
                 tail.append(_py_str(p))
+        formula_row = _level_formula_row(ln, cells, prose) if len(cells) > _LEVEL_ROWS_MAX else None
+        if formula_row:
+            out.append(formula_row)
+            continue
         if len(cells) > _LEVEL_ROWS_MAX and all(r[0].isdigit() for r in cells[1:]):
             # values by level: the levels across, old / new / … under them (owner 2026-11-19: the 29-row column of
             # the experience table was "массивная")

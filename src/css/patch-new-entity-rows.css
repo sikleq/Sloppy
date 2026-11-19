@@ -441,13 +441,16 @@ h4.subgroup {
 .mech-old { color: var(--text-dim); }
 .mech-pct { font-size: 12px; margin-left: 2px; }
 .mech-lv-changed { font-weight: 600; }      /* its colour: .iab-lv.iab-buff / .iab-nerf, as every changed value */
-/* Valve's sentence under the level tables: a box of its own, the formula on a line of its own (owner 2026-11-19: the
-   7.42 experience approximation "стоит слишком кучно") */
-.mech-levels-note {
+/* Valve's sentence under a table: a box of its own (owner 2026-11-19: the 7.42 experience approximation "стоит слишком
+   кучно"); formula_approx keeps the words, the formula and what x is on one line, wrapping only when narrow (owner
+   2026-11-19: the formula on a line of its own made the text "расползается на лишнюю строку") */
+.mech-levels-note, .formula-approx {
   display: block; margin-top: 8px; padding: 6px 10px; color: var(--text-dim);
   border: 1px solid var(--line-soft); border-radius: 6px; background: rgba(255, 255, 255, 0.02);
 }
 .mech-levels-note > .formula-expr { display: block; margin: 4px 0; white-space: normal; }
+.formula-approx { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
+.formula-approx > .formula-expr { white-space: normal; }
 @media (max-width: 760px) { .mech-abils.mech-levels .mech-abil-row > span { font-size: 11px; padding: 3px 2px; } }
 .mech-cell {
   display: flex;

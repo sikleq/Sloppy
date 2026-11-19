@@ -198,7 +198,7 @@ ul.changes li > .badge-group {
    left, and stretching the note across uses it instead of leaving an
    awkward gap. The note's own padding-left (12px) keeps the text from
    running flush against the entity-block edge. */
-ul.changes li > .formula-table {
+ul.changes li > .formula-table, ul.changes li > .formula-approx {
   grid-column: 1 / -1;
 }
 /* a tagged row's own table (mech_table / mech_level_table / mech_before_after under li()): the formula table's edges

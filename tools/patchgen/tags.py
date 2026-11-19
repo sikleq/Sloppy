@@ -58,9 +58,9 @@ CANONICAL_TAGS = [
     # 7.42: a cooldown reset on an event is a benefit taken away (Glyph); an ENEMY stat debuff taken away (Requiem)
     (re.compile(r'\bno longer resets (?:its |the )?cooldown\b', re.I), 'DEL'),
     (re.compile(r"\bno longer (?:reduces|decreases) (?:enemy|enemies'?) (?:\w+ ){0,3}resistance\b", re.I), 'DEL'),
-    # a protection that is gone, not a penalty: "No longer has reduced damage taken from allies on the first pip of
-    # health" (7.42 wards) read BUFF by the rules below
-    (re.compile(r'\bno longer has reduced damage taken\b', re.I), 'DEL'),
+    # "No longer has reduced damage taken from allies on the first pip of health" (7.42 wards): allies deny a ward with
+    # fewer hits — comfort, QoL (owner 2026-11-19; it read BUFF by the penalty rule below, then DEL)
+    (re.compile(r'\bno longer has reduced damage taken from allies\b', re.I), 'QoL'),
     # "(?:[\w%.]+ )": 7.42 "No longer has a 35% damage penalty", "No longer has 50% reduced proc chance"
     (re.compile(r'\bno longer has (?:an? |the )?(?:[\w%.]+ ){0,5}(?:penalt(?:y|ies)|restrictions?|drawbacks?|downsides?|debuff slow)\b', re.I), 'BUFF'),
     # ── 2026-09-22 generator-vs-proofread diff (7.38): confident direction flips ──
@@ -128,6 +128,9 @@ CANONICAL_TAGS = [
     # a restriction / limit / delay is ADDED → NERF
     (re.compile(r'\bis now dispellable\b', re.I),                   'NERF'),   # own buff can now be removed
     (re.compile(r'\bis now disjointable\b', re.I),                  'NERF'),   # own projectile can now be dodged
+    # … but an item's on-hit effect that now works on heroes only changes when it works — REWORK (owner 2026-11-19,
+    # 7.42 Orb of Venom "Poison Attack now only triggers when attacking heroes")
+    (re.compile(r'\bnow only triggers when attacking\b', re.I), 'REWORK'),
     (re.compile(r'\bnow (?:only|solely) (?:affects?|available|appl(?:ies|ied)|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:affects?|applies|works) only\b', re.I),  'NERF'),
     # a whole cooldown where there was none (7.38 "Poison Attack now has a 9s cooldown") -> REWORK: the
@@ -202,6 +205,13 @@ CANONICAL_TAGS = [
     # Valve's wink at a coming event — a line in the Old Ones' tongue (7.42 "Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth
     # fhtagn") — TEASER, its own chip, outside filters and cells (owner 2026-11-19)
     (re.compile(r"\b(?:fhtagn|ftaghu|Shuggoth|ng'ngah|Cthulhu|R'lyeh)\b", re.I), 'TEASER'),
+    # owner 2026-11-19 (7.42): an effect now scaled by Item Potency is a new property of it, as "now affected by AoE
+    # bonuses" — NEW; "now only triggers when attacking heroes" changes when it works — REWORK; using an item from the
+    # backpack, a health bar's regen number, a ward's ally damage — interface / comfort — QoL
+    (re.compile(r'\b(?:is|are) now (?:modified|affected|scaled) by item potency\b', re.I), 'NEW'),
+    (re.compile(r'\bnow only triggers when attacking\b', re.I), 'REWORK'),
+    (re.compile(r'\bcan now be used (?:out of|from) the backpack\b|\bnow affects the health regen value on the '
+                r'healthbar\b|\bno longer has reduced damage taken from allies\b', re.I), 'QoL'),
     # a new property of units: "Illusions created by Illusion Rune now have 40% Item Potency" (7.42, owner 2026-11-19:
     # NEW); a rule lane creeps never had: "Lane creeps now move up to 25% slower if they are pulled out of lane" — REWORK
     (re.compile(r'\bnow (?:have|has) \d+% item potency\b', re.I), 'NEW'),
@@ -640,6 +650,17 @@ def _extra_creep_timing(clean):
     g = [int(x) for x in m.groups() if x is not None]
     old, new = g[0] * 60 + g[1], g[2] * 60 + g[3]
     return None if old == new else ('BUFF' if new < old else 'NERF')
+
+
+def _extra_creep_badge(text):
+    """The extra lane creep's time as a % badge: b(old, new) in minutes, l=True — earlier is better (owner 2026-11-19,
+    7.42 "Time at which 1 Ranged creep is added changed from 40:00 to 35:00": "% разницы нет"). None for other rows."""
+    m = _EXTRA_CREEP_AT.search(_strip_html(text))
+    if not m:
+        return None
+    g = [int(x) for x in m.groups() if x is not None]
+    old, new = g[0] + g[1] / 60, g[2] + g[3] / 60
+    return None if old == new else f'b({old:g}, {new:g}, l=True)'
 
 
 def _guess_tag(text):

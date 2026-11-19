@@ -116,7 +116,44 @@ def _scaling_cards(todos, abil_icons, version):
     return out
 
 
-_NEW_ITEM_COST_RE = re.compile(r'^Costs? (\d+) gold$', re.I)
+_NEW_ITEM_COST_RE = re.compile(r'^Costs? (\d+)(?: gold|g)\.?$', re.I)   # "Costs 250 gold" / 7.42 Quarterstaff "Costs 900g"
+_ABILITY_COSTS_ROW_RE = re.compile(
+    r'^(?:(?:Global Cast Range|Cast Range: \d+|No Mana Cost|Mana Cost: \d+|No cooldown|Cooldown: [\d.]+s?)\.?\s*)+$', re.I)
+_GENERIC_NEW_LABEL_RE = re.compile(r'new="(New|Returning) Item"')
+
+
+def _li_text(row):
+    m = re.match(r'^\s*W\(li\("((?:[^"\\]|\\.)*)"', row)
+    return m.group(1) if m else ""
+
+
+def _item_kind(name, version):
+    """The shop tab of an item ("Equipment", "Miscellaneous" …), or "Consumable" for an item no shop sells whose
+    ItemQuality says so (7.42 Greater Horn of Battle, a Tormentor drop), else None."""
+    slug = _KNOWN_ITEM_SLUGS.get(name, name.lower().replace(' ', '_').replace("'", ''))
+    try:
+        from patch.rosters import _SHOP_CATEGORIES
+    except ImportError:
+        _SHOP_CATEGORIES = {}
+    if f'item_{slug}' in _SHOP_CATEGORIES:
+        return _SHOP_CATEGORIES[f'item_{slug}']
+    try:
+        with open(os.path.join(_HERE, 'data', 'stats', version or '', 'items.txt'), encoding='utf-8') as f:
+            txt = f.read()
+    except OSError:
+        return None
+    m = re.search(r'"item_' + re.escape(slug) + r'"\s*\{(.*?)\n\t\}', txt, re.S)
+    q = re.search(r'"ItemQuality"\s*"(\w+)"', m.group(1)) if m else None
+    return "Consumable" if q and q.group(1) == 'consumable' else None
+
+
+def _with_item_kind(header, version):
+    """A generic label "New Item" / "Returning Item" (7.42 Quarterstaff, Greater Horn of Battle) says what kind of
+    item it is, as 7.41's "New Equipment Item" (owner 2026-11-19: "не по правилам сделаны")."""
+    m = _GENERIC_NEW_LABEL_RE.search(header)
+    name = re.match(r'^\s*W\(item_header\("([^"]+)"', header)
+    kind = _item_kind(name.group(1), version) if m and name else None
+    return header.replace(m.group(0), f'new="{m.group(1)} {kind} Item"') if kind else header
 _REQ_ROW_RE = re.compile(r'^Requires (?P<parts>.+?)\. Total cost: (?P<total>\d+)g?$', re.I)
 _REQ_PART_RE = re.compile(r"(?:and )?(?:an? )?(?P<name>[A-Za-z][\w' -]+?) \((?P<cost>\d+)\)")
 
@@ -310,7 +347,7 @@ def _postprocess_new_item_card(lines, version=None):
     i = 0
     while i < len(lines):
         ln = lines[i]
-        if not (re.match(r'^W\(item_header\("[^"]+", new="New ', ln) and i + 1 < len(lines)
+        if not (re.match(r'^W\(item_header\("[^"]+", new="(?:New|Returning) ', ln) and i + 1 < len(lines)
                 and lines[i + 1] == 'W(ul_open())'):
             out.append(ln)
             i += 1
@@ -325,7 +362,15 @@ def _postprocess_new_item_card(lines, version=None):
             raw = re.match(r'^W\(li\("((?:[^"\\]|\\.)*)"', b_)
             note = re.search(r'extra=inline_note\("((?:[^"\\]|\\.)*)"\)', b_)
             piece = _new_item_card_parts(raw.group(1), note.group(1) if note else None) if raw else None
+            if piece is None and raw and _ABILITY_COSTS_ROW_RE.match(raw.group(1)) and rows \
+                    and _li_text(rows[-1]).startswith('Active: '):
+                # "Global Cast Range. No Mana Cost. No cooldown" under "Use: …" (7.42 Greater Horn of Battle): the
+                # ability's own numbers go to its card header, so into its row, not a row of their own
+                prev = _li_text(rows[-1])
+                rows[-1] = rows[-1].replace(f'"{prev}"', f'"{prev.rstrip(".")}. {raw.group(1)}"', 1)
+                continue
             if piece is None:
+                b_ = re.sub(r'^(\s*)W\(li\("Use: ', r'\1W(li("Active: ', b_)     # "Use: Grand Call to Arms." = its active
                 row = re.sub(r't\("(?:MISC|BUFF|NERF|REWORK)"\)', 't("NEW")', b_, count=1)
                 if raw and not re.search(r', (?:t|b|bf|br)\(', row):
                     # a row with no tag at all ("Passive: Hallowed. …", extra=…): NEW too (audit 2026-10-16:
@@ -341,6 +386,7 @@ def _postprocess_new_item_card(lines, version=None):
         if not price and not cost and 'Artifact' not in ln and 'Enchantment' not in ln:
             name = re.match(r'^W\(item_header\("([^"]+)"', ln).group(1)
             cost = _kv_item_cost(name, version) if version else None
+        ln = _with_item_kind(ln, version)
         if cost:
             ln = f'{ln.rstrip()[:-2]}, cost={cost}))'
         out += [ln] + price + bonus

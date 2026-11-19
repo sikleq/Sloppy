@@ -99,7 +99,8 @@ def test_new_ability_is_a_card_from_the_game_files(monkeypatch):
     monkeypatch.setattr(at, "ability_text", lambda slug, v, kind="base": "Grants mana.\nBonus mana: 80/160.")
     monkeypatch.setattr(el._State, "current_patch_version", "7.41")
     html = cards_ability_change.new_ability("Objurgation", "obsidian_destroyer_objurgation", note="Barrier can be dispelled.")
-    assert "is-single-new" in html and "New ability." in html and "Grants mana" in html and "80/160" in html
+    # the label without a full stop (owner 2026-11-19)
+    assert "is-single-new" in html and ">New ability<" in html and "Grants mana" in html and "80/160" in html
     monkeypatch.setattr(at, "ability_text", lambda slug, v, kind="base": None)
     import pytest
     with pytest.raises(RuntimeError, match="no description"):

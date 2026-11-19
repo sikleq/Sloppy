@@ -240,3 +240,26 @@ def test_renamed_item_header_shows_old_arrow_new():
     html = el.item_header("Orb of Blight", old_title="Blight Stone")
     assert ('<span class="ability-title-old">Blight Stone</span><span class="ability-title-arrow">→</span>'
             '<a class="entity-link"') in html
+
+
+def test_returning_and_generic_new_item_follow_the_new_item_card(monkeypatch):
+    # owner 2026-11-19, 7.42 Quarterstaff / Greater Horn of Battle: "эти новые/вернувшиеся предметы не по правилам
+    # сделаны" — "Returning Item" and "Costs 900g" were not taken for a new item's card
+    from tools.patchgen import post_items
+    monkeypatch.setattr(post_items, "_item_kind",
+                        lambda name, v: {"Quarterstaff": "Equipment", "Greater Horn of Battle": "Consumable"}[name])
+    out = post_items._postprocess_new_item_card([
+        'W(item_header("Quarterstaff", new="Returning Item"))', 'W(ul_open())',
+        'W(li("Costs 900g", t("NEW")))', 'W(li("Provides +10 Damage and +10 Attack Speed", t("NEW")))',
+        'W(ul_close())'], "7.42")
+    assert out == ['W(item_header("Quarterstaff", new="Returning Equipment Item", cost=900))',
+                   'W(provides("+10 Damage, +10 Attack Speed"))']
+    out = post_items._postprocess_new_item_card([
+        'W(item_header("Greater Horn of Battle", new="New Item"))', 'W(ul_open())',
+        'W(li("Use: Grand Call to Arms. Summons a wave of mega creeps", t("NEW")))',
+        'W(li("Global Cast Range. No Mana Cost. No cooldown", t("NEW")))',
+        'W(li("Has 1 charge", t("NEW")))', 'W(ul_close())'], "7.42")
+    assert out[0] == 'W(item_header("Greater Horn of Battle", new="New Consumable Item"))'
+    assert ('W(li("Active: Grand Call to Arms. Summons a wave of mega creeps. Global Cast Range. No Mana Cost. '
+            'No cooldown", t("NEW")))') in out
+    assert not any(ln.startswith('W(li("Global Cast Range') for ln in out)

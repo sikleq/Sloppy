@@ -407,6 +407,31 @@ def test_long_level_tables_lie_across_and_shared_values_pivot():
     assert '["Barracks", mech_change_cell("90-135", "100"), "–"]' in out and 'cls="mech-grid"' in out
 
 
+def test_old_new_values_by_level_under_a_from_to_row_are_a_formula_table():
+    # owner 2026-11-19: "Total amount of experience … from 64400 to 66600 — таблица сделана не как formula table";
+    # the approximation sentence: one line, not the formula on a line of its own
+    rows = "<br>".join(f"{n} -- {n * 10} -- {n * 11} -- {n}" for n in range(2, 31))
+    xp = (f'W(li("Total amount of experience needed to reach level 30 increased from 64400 to 66600", b(64400, 66600), '
+          f'extra=inline_note("Level -- Old -- New -- Total Increase<br>{rows}<br>An easy way is to use this formula: '
+          f'0.5x^2 + 3 where X is the level")))')
+    out = g._postprocess_dash_table([xp])[0]
+    assert out.startswith('W(li_formula("Total amount of experience needed to reach level 30 increased", "64400", '
+                          '"66600", lambda L: {2: 20, 3: 30,')
+    assert "l=True" in out and "levels=[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30]" in out
+    assert 'after_html=formula_approx("An easy way is to use this formula (x — level)", "0.5x^2 + 3", "")' in out
+    assert g._approx_words("An easy way to approximate the xp needed per level is to use this formula: ",
+                           "where X is the current level of the hero") == \
+        ("Approximate xp needed per level (x — hero's level)", "")
+    assert "Total Increase" not in out
+    from patch import api
+    assert api.li_formula and api.formula_approx                  # the page can call both
+    formula_approx = api.formula_approx
+    html = formula_approx("An easy way is to use this formula:", "0.5x^2 + 3", "where X is the level.")
+    assert html.startswith('<span class="formula-approx"><span class="formula-approx-lead">An easy way is to use this '
+                           'formula:</span><code class="formula-expr">')
+    assert html.endswith('<span class="formula-approx-where">where X is the level</span></span>')
+
+
 def test_a_list_of_summons_is_written_as_hero_and_ability():
     # owner 2026-11-19: the Pip Health list was a column of words, not the icons and pairs of columns of the others
     assert g._owner_form("Gyrocopter's Homing Missile") == "Gyrocopter: Homing Missile"

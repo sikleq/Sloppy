@@ -242,7 +242,8 @@ def test_742_lane_creep_rows_go_to_their_creeps_cards():
     assert 'subgroup("Creep Spawn Intervals")' not in text                 # its rows all left: no empty title
     k = out.index('W(unit_header("Ranged Creep", "../icons/units/npc_dota_creep_goodguys_ranged.png", '
                   'general=False, page="ranged-creep"))')
-    assert 'Ranged creep is added' in out[k + 2] and 't("BUFF")' in out[k + 2]      # comes 5 minutes earlier
+    # comes 5 minutes earlier: BUFF, with its % (owner 2026-11-19: "% разницы нет")
+    assert 'Ranged creep is added' in out[k + 2] and 'b(40, 35, l=True)' in out[k + 2]
     melee = out.index('W(unit_header("Melee Creep", "../icons/units/npc_dota_creep_goodguys_melee.png", '
                       'general=False, page="melee-creep"))')
     assert "melee creeps spawned" in out[melee + 2]

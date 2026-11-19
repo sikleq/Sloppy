@@ -931,3 +931,22 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - **Картинки к строкам Terrain подбираются сами** (`scripts/gen/terrain_spots_auto.py <патч> --write`, затем
   `terrain_shots.py`): по словам строки (объект, сторона, линия, тип лагеря, ярус башни, деревья добавлены / убраны)
   берутся изменения файла карты, группа — точка. Для 7.42: 9 новых точек, 17 картинок.
+
+### Вычитка 7.42, шестой круг (владелец 2026-11-19)
+
+- **Новый и вернувшийся предмет — одной карточкой** (`post_items._postprocess_new_item_card`): метка «Returning …»
+  обрабатывается как «New …»; цена «Costs 900g» уходит в `cost=`; общая метка «New Item» / «Returning Item» получает
+  вкладку магазина (`patch/rosters._SHOP_CATEGORIES`) или «Consumable» по `ItemQuality` (Greater Horn of Battle — дроп
+  Торментора, в магазине его нет); «Use: …» = «Active: …», строка «Global Cast Range. No Mana Cost. No cooldown»
+  присоединяется к ней (числа уходят в шапку карточки). Почему: Quarterstaff и Horn были списком строк, а не как
+  новые предметы 7.41.
+- **Теги:** «now only triggers when attacking …» — REWORK; рюкзак, число регена на полоске, урон союзников по варду
+  на первой пипке — QoL; «is now modified by Item Potency» — NEW (как «now affected by AoE bonuses» в 7.41).
+- **Метка «New ability» без точки** (`cards_ability_change._LABEL_SUMMARY_RE`), так же Ability/Innate reworked, New facet.
+- **Значения по уровням под строкой «… from A to B»** (опыт до 30 уровня) — `li_formula` по правилам formula-tables:
+  сетка по умолчанию, тег по всем уровням, Δ%; столбец Valve «Total Increase» не выводится (итог — в самой строке).
+  Приближённая формула Valve — `formula_approx` под таблицей одной строкой: слова сокращены
+  (`post_tables._approx_words`), смысл x — в скобках, иначе блок переносился на лишнюю строку.
+- **Время лишнего лайн крипа** («from 40:00 to 35:00») — `b(40, 35, l=True)`, с %, раньше = BUFF (`tags._extra_creep_badge`).
+- **Плитки тегов и на страницах героев/предметов/юнитов** (`builders/entity_changes.py`: класс `tag-marks`) — раньше
+  только на страницах патчей.

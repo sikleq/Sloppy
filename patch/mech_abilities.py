@@ -599,6 +599,17 @@ def mech_formula(expr):
     return f'<code class="formula-expr">{_fmt_formula(expr)}</code>'
 
 
+def formula_approx(lead, expr, where=""):
+    """Valve's "an easy way to approximate … is this formula: <expr> where x is …" as one compact line under a table:
+    the words, the formula inline in the site's formula look, the meaning of x after it (owner 2026-11-19, 7.42
+    experience: the formula stood on a line of its own between two lines of text — "текст расползается")."""
+    lead = lead.rstrip().rstrip(":")
+    where = where.strip().rstrip(".")
+    tail = f'<span class="formula-approx-where">{where}</span>' if where else ""
+    return (f'<span class="formula-approx"><span class="formula-approx-lead">{lead}:</span>'
+            f'{mech_formula(expr)}{tail}</span>')
+
+
 def mech_text(*paragraphs):
     """A mechanic's details as plain paragraphs in the row's box, no table (owner 2026-10-30, 7.38 Roshan's pits: "не
     таблицей, а абзацем с удобной информацией"). li() puts it under the row's text."""

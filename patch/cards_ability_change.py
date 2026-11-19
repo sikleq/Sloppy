@@ -114,6 +114,10 @@ def new_ability(name, slug, note=None, innate=False, version=None, icon_url=None
 _ROWS_FIRST = "<!--ROWSFIRST-->"
 
 
+# a summary that is one short label ("New ability.", "New innate ability.", "Ability reworked.", "Innate reworked.")
+_LABEL_SUMMARY_RE = re.compile(r"^(?:New (?:innate |basic )?ability|(?:Ability|Innate) reworked|New facet)\.$")
+
+
 def ability_change(old, new, summary=None, tag=None, sub=False, rows_first=None):
     """rows_first: a function returning the ability's plain li() rows: they stand before the caption, so all its tagged rows
     are in one place above the card (owner 2026-11-05, Arc Warden 7.38). A function, as a row must be made after the card
@@ -332,6 +336,10 @@ def _ability_change(old, new, summary, tag, sub, rows_first):
         aghs_cls = f' class="aghanim-{_aghs}"' if _aghs else ''
         # "Ability reworked (Aghanim's Scepter upgrade)." — in brackets before the full stop (owner 2026-10-21)
         summary_txt = summary or ""
+        if _LABEL_SUMMARY_RE.match(summary_txt):
+            # a card's label is a label, not a sentence: "New ability", "Ability reworked" — no full stop (owner
+            # 2026-11-19, 7.42 Miner's Aura: "New ability с точкой — убери, в других таких же случаях тоже")
+            summary_txt = summary_txt[:-1]
         if _aghs and _aghs in (_granted_by["new"], _granted_by["old"]):
             # the headers say "granted by Aghanim's X": the summary keeps only the stripe (owner 2026-10-26, 7.41
             # Kinetic Fence: "убрать (Aghanim's Shard upgrade) из строки")

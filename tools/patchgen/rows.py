@@ -5,7 +5,7 @@ import re
 
 from .common import _HERE
 from .data import _strip_html
-from .tags import _FROM_TO_RE, _guess_tag, _is_lower_better
+from .tags import _FROM_TO_RE, _extra_creep_badge, _guess_tag, _is_lower_better
 
 # the ability's base value stands, the upgrade got a new property: NEW with the numbers in the text, no % (owner 2026-11-05)
 _NEW_UPGRADE_RE = re.compile(r"\bAghanim's (?:Shard|Scepter) now increases\b[^.]*\(from\b", re.I)
@@ -302,7 +302,10 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
 
     badge_call = _emit_badge(txt, hero_side=bool(hero_name) or _HERO_SIDE[0])
     tag = tag_override or _guess_tag(txt)
-    if badge_call and not _NEW_UPGRADE_RE.search(txt):
+    creep_badge = None if tag_override else _extra_creep_badge(txt)
+    if creep_badge:
+        badge_str = creep_badge                       # "+1 creep at 40:00 → 35:00": its % too (2026-11-19)
+    elif badge_call and not _NEW_UPGRADE_RE.search(txt):
         # Numeric change — let b() drive the tag (BUFF/NERF inferred from
         # value direction + l=True flag). Tag-text only if explicit.
         badge_str = badge_call

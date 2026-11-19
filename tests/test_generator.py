@@ -725,7 +725,12 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Couriers now have fragile pip health", "NEW"),
     ("Now fully disabled by Break", "NERF"),                    # IsBreakable absent in 7.41f, "1" in 7.42
     ("Now partially disabled by Break: disables the gaining of new stacks", "NERF"),
-    ("No longer has reduced damage taken from allies on the first pip of health", "DEL"),
+    ("No longer has reduced damage taken from allies on the first pip of health", "QoL"),     # owner 2026-11-19
+    ("Lesser Corruption armor reduction is now modified by Item Potency", "NEW"),
+    ("Poison Attack now only triggers when attacking heroes", "REWORK"),
+    ("Place Banner can now be used out of the backpack and has a visual effect denoting its radius when active", "QoL"),
+    ("Unholy Strength health drain now affects the health regen value on the healthbar (allowing it to go negative)",
+     "QoL"),
     ("No longer has a 35% damage penalty against creeps", "BUFF"),          # a penalty gone stays BUFF
     ("Nullify now also makes the target to be 60% less susceptible to forced movement effects applied by their "
      "allies", "BUFF"),

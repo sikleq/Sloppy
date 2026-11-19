@@ -24,6 +24,12 @@ def test_tag_marks_run_on_every_patch_page():
     assert page.TAG_MARK_PAGES is None
 
 
+def test_entity_pages_draw_tags_as_tiles_too():
+    # owner 2026-11-19, Melee Creep's page: "тут на страницах юнитов старые теги нарисованы, это норм?"
+    src = (ROOT / "builders" / "entity_changes.py").read_text(encoding="utf-8")
+    assert '"patch-page entity-page tag-marks"' in src
+
+
 def test_a_rows_tag_is_a_small_tile_where_its_tag_stood():
     # owner 2026-11-06, mock "Вариант 1 Плитка 22x18": "закладки в строке вместо ромбика … такое же расположение, как
     # раньше теги стояли, только более компактно" — the diamonds and the rows' bookmarks on the line are gone

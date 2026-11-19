@@ -625,7 +625,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         abilities_html = '<span class="ec-vsep" aria-hidden="true"></span>' + ability_chips
     _from_kind = {"hero": "hero", "item": "item", "enchant": "item"}.get(e["kind"], "unit")
     from_tok = f'{_from_kind}:{_file_slug(e)}'
-    out = [_head(e["name"], asset, "../", "patch-page entity-page"),
+    # tag-marks: the rows' tags as tiles, as on the patch pages (owner 2026-11-19, Melee Creep's page: "тут на
+    # страницах юнитов старые теги нарисованы" — patch/page.py adds the class to the patch pages only)
+    out = [_head(e["name"], asset, "../", "patch-page entity-page tag-marks"),
            f' data-dyn-prefix="../patches/" data-dyn-from="{from_tok}" data-ec-eid="{eid}">\n\n', nav,
            f'\n<a class="nav-back-arrow visible" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
            (_TOOLBAR.format(info=info, scopes=scopes_html, abilities=abilities_html) if e["patches"] else ""),

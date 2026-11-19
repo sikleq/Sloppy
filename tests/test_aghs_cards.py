@@ -292,7 +292,8 @@ def test_aghanim_upgrade_goes_to_the_header_and_the_summary_keeps_the_stripe(mon
     html = cards_ability_change.ability_change(old=dict(name="X", slug="rattletrap_overclocking", desc=["Active (Aghanim's Scepter upgrade). A."]),
                              new=dict(name="X", slug="rattletrap_overclocking", desc=["B."]),
                              summary="Ability reworked.", tag="rework")
-    assert '<span class="row-text">Ability reworked.<span class="aghanim-marker scepter"></span>' in html
+    # the label without its full stop (owner 2026-11-19)
+    assert '<span class="row-text">Ability reworked<span class="aghanim-marker scepter"></span>' in html
     assert "ac-aghs" not in html and "Active (Aghanim" not in html
     # both sides granted by the Scepter (7.40 and 7.41 Overclocking): the summary's glyph says it once, the headers don't
     # (owner 2026-11-06)
