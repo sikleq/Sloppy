@@ -349,6 +349,22 @@ CREEP_CAMP = {
 # "Removed" button shows them (owner 2026-11-18: «убрать, но добавить переключатель»). 7.42: "Large Warpine
 # Raider camp removed", "Ancient Thunderhide camp removed".
 REMOVED_CREEPS = {'pine': '7.42', 'lizard': '7.42', 'small_thunder_lizard': '7.42'}
+# A camp a creep was in until a patch (createhero -> {camp: patch}): the camp tables of server.dll 6976 (the last
+# build before 7.42, RVA 0x4A85D70) against 6984 (7.42, RVA 0x4C2E270). Shown in the camp cell's hover with the
+# creep's first patch (data/rules/creep_since.json, scripts/gen/gen_creep_since.py) — owner 2026-11-19: "при
+# наведении на ячейку camp состояние крипа - в каком лагере был и когда был введен/удален".
+CAMP_UNTIL = {
+    'outrunner': {'mid': '7.42'}, 'khan': {'mid': '7.42'},            # Medium Centaur camp removed
+    'trickster': {'big': '7.42'},                                     # the Large Satyr camp's Banisher -> Mindstealer
+    'pine': {'big': '7.42'}, 'lizard': {'ancient': '7.42'}, 'small_thunder_lizard': {'ancient': '7.42'},
+}
+
+
+@_functools.lru_cache(maxsize=1)
+def _creep_since() -> dict:
+    """npc_dota_neutral_* -> the first patch it is in the game files (only those after 7.08, the store's start)"""
+    with open(_os.path.join(_HERE, 'data', 'rules', 'creep_since.json'), encoding='utf-8') as f:
+        return _json.load(f)
 CAMP_LABEL = {'small': 'Small camp', 'mid': 'Medium camp',
               'big': 'Large camp', 'ancient': 'Ancient camp'}
 
@@ -902,15 +918,26 @@ def _load_unit_page_slugs():
 
 def _name_inner(v, d, unit_page_slugs):
     slug = unit_page_slugs.get(d.get('npc_key'))
-    name = (f'<a class="creep-name-link" href="units/{slug}.html">{esc(v)}</a>' if slug else esc(v))
-    # a creep whose camp left the game: seen only with "Removed" on, it says so after its name (owner 2026-11-19:
-    # "как-то помечаться когда фильтр removed включен")
-    gone = REMOVED_CREEPS.get((d.get("createhero") or "").strip())
-    # the DEL tag's own look (badge del: its colours, the colour-blind mode too)
-    return name + (f' <span class="badge del creep-removed">Removed in {esc(gone)}</span>' if gone else '')
+    # a creep whose camp left the game: its row grey (creeps-cells.css tr[data-removed]), when in its camp's hover
+    # (owner 2026-11-19: "не нравится, сделай просто серым")
+    return f'<a class="creep-name-link" href="units/{slug}.html">{esc(v)}</a>' if slug else esc(v)
 
 
-def _camp_inner(v):
+def camp_history(createhero):
+    """The camp cell's hover lines: its camps now (a removed creep: the camp it was in, until when), a camp it left,
+    its first patch in the game files."""
+    short = (createhero or '').strip()
+    gone = REMOVED_CREEPS.get(short)
+    until = CAMP_UNTIL.get(short, {})
+    lines = [CAMP_LABEL.get(t, t) for t in CREEP_CAMP.get(short, []) if not gone and t not in until]
+    lines += [f'{CAMP_LABEL.get(t, t)} until {p}' for t, p in until.items()]
+    since = _creep_since().get(CREEP_NAME_TO_NPC.get(short) or '')
+    if since:
+        lines.append(f'In the game since {since}')
+    return lines
+
+
+def _camp_inner(v, d=None):
     if not v:
         return DASH
     imgs = []
@@ -920,8 +947,11 @@ def _camp_inner(v):
             # the crisp 16 px glyph (scripts/gen/gen_camp_icons.py), the 32 px one blurred at 16 (owner 2026-11-19)
             f'<img class="camp-ico" src="icons/camps/creepcamp_{t}_16.png" '
             f'srcset="icons/camps/creepcamp_{t}_16.png 1x, icons/camps/creepcamp_{t}_16@2x.png 2x" '
-            f'alt="{esc(label)}" title="{esc(label)}" loading="lazy">')
-    return ''.join(imgs)
+            f'alt="{esc(label)}" loading="lazy">')
+    lines = camp_history((d or {}).get('createhero'))
+    tip = '<br>'.join(esc(s) for s in lines)
+    return (f'<span class="camp-hint abil-ico-hint" data-tooltip="{esc(tip)}">{"".join(imgs)}</span>'
+            if lines else ''.join(imgs))
 
 
 def _attack_range_inner(v, d):
@@ -959,7 +989,7 @@ def _cell_inner(k, v, d, unit_page_slugs):
     if k == 'name':
         return _name_inner(v, d, unit_page_slugs)
     if k == 'camp':
-        return _camp_inner(v)
+        return _camp_inner(v, d)
     if k == 'attack_range' and v:
         return _attack_range_inner(v, d)
     if k in ABILITY_COLS:

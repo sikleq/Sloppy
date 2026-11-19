@@ -23,9 +23,18 @@ def test_removed_creeps_rows_carry_their_patch_and_the_toolbar_has_the_toggle():
 def test_a_removed_creep_says_so_after_its_name_and_unit_changes_files_it_as_removed():
     # owner 2026-11-19: "крипы должны и тут под удалёнными быть unit_changes.html, … как-то помечаться когда фильтр
     # removed включен"
-    name = creeps._name_inner("Warpine Raider", {"createhero": "pine", "npc_key": "x"}, {})
-    assert name == 'Warpine Raider <span class="badge del creep-removed">Removed in 7.42</span>'
-    assert "creep-removed" not in creeps._name_inner("Kobold", {"createhero": "kobold", "npc_key": "y"}, {})
+    # no mark after the name: the row is grey (owner 2026-11-19 "не нравится, сделай просто серым")
+    assert creeps._name_inner("Warpine Raider", {"createhero": "pine", "npc_key": "x"}, {}) == "Warpine Raider"
+    # the camp cell's hover says its camps and when (server.dll 6976 vs 6984; first patch: game files, 7.31 notes
+    # "New Large Camp: 2 Warpine Raiders")
+    assert creeps.camp_history("pine") == ["Large camp until 7.42", "In the game since 7.31"]
+    assert creeps.camp_history("outrunner") == ["Large camp", "Medium camp until 7.42"]
+    assert creeps.camp_history("trickster") == ["Medium camp", "Large camp until 7.42"]
+    assert creeps.camp_history("radigull") == ["Medium camp", "In the game since 7.42"]
+    assert creeps.camp_history("kobold") == ["Small camp"]
+    cell = creeps._camp_inner("big", {"createhero": "pine"})
+    assert 'class="camp-hint abil-ico-hint" data-tooltip="Large camp until 7.42&lt;br&gt;In the game since 7.31"' in cell
+    assert "title=" not in cell                                  # one hover, not the browser's title too
     gone = ec._removed_creeps()
     assert gone == {"npc_dota_neutral_warpine_raider", "npc_dota_neutral_big_thunder_lizard",
                     "npc_dota_neutral_small_thunder_lizard"}
