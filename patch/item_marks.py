@@ -20,7 +20,9 @@ def _flagged(blk, flag):
     av = blk.get("AbilityValues")
     if not isinstance(av, dict):
         return []
-    return [k.lower() for k, v in av.items() if isinstance(v, dict) and str(v.get(flag, "")).strip() == "1"]
+    # "1" or "true" (the game reads both; server.dll 6983, research 2026-11-19); "-1" divides instead — not marked
+    return [k.lower() for k, v in av.items()
+            if isinstance(v, dict) and str(v.get(flag, "")).strip().lower() in ("1", "true")]
 
 
 def _sentences(desc):
