@@ -47,7 +47,8 @@ def test_small_camp_glyphs_use_the_crisp_file_of_their_size():
     for rel in ("builders/creeps.py", "builders/entity_changes.py", "builders/terrain_stats.py", "patch/camps.py"):
         assert not plain.search((ROOT / rel).read_text(encoding="utf-8")), rel
     terrain = (ROOT / "builders" / "terrain.py").read_text(encoding="utf-8")
-    assert '"creepcamp_mid_16", icon_dir="camps"' in terrain and '"camps/creepcamp_big_16"' in terrain
+    # the layer button's img is 22 px by CSS (.tc-btn-icon img): its 22 px file (the visual check caught 16 stretched)
+    assert '"creepcamp_mid_22", icon_dir="camps"' in terrain and '"camps/creepcamp_big_16"' in terrain
     for t in gen.TYPES:
         for size in gen.TYPE_SIZES:
             assert Image.open(ROOT / "icons" / "camps" / f"creepcamp_{t}_{size}.png").size == (size, size)

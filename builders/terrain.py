@@ -999,7 +999,8 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
         # when they're all on already (scripts.js); pressed while every layer is on.
         layer_parts.append(layer_btn("all", "All layers", "tc_all"))
         layer_parts.append(layer_btn("trees", "Trees", "tc_trees"))
-        layer_parts.append(layer_btn("camps", "Neutral Camps", "creepcamp_mid_16", icon_dir="camps"))
+        # .tc-btn-icon img is 22 px (terrain-controls.css): the crisp 22 px glyph, not the 16 one stretched
+        layer_parts.append(layer_btn("camps", "Neutral Camps", "creepcamp_mid_22", icon_dir="camps"))
         layer_parts.append(layer_btn("spawnboxes", "Spawn Boxes", "icon_spawnbox"))
         # every place a ward can't stand (the owner 2026-10-02), from the map's gridnav
         layer_parts.append(layer_btn("nowards", "No-ward ground", "tc_nowards"))
