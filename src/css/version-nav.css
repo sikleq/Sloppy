@@ -206,6 +206,22 @@
 .nav-context-terrain .version-menu {
   min-width: auto;
 }
+/* a map file of a client update inside a patch (Terrain "7.42-v2"): a sub-row under its patch, indented, smaller,
+   with a thin line on the left tying it to the patch above (the owner 2026-11-19: "a sub-list") */
+.version-item.version-subitem {
+  margin-left: 14px;
+  padding: 5px 12px 5px 10px;
+  border-left: 1px solid var(--line);
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+}
+.version-item.version-subitem .vi-name {
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.version-item.version-subitem.current .vi-name {
+  color: var(--gold);
+}
 
 /* NAV BACK ARROW + BACK-TO-TOP — pixel-art chevrons on an index-style gold /
    leather circle (matches the inventory landing page). Arrows are gold (var(--gold))

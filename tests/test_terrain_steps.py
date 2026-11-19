@@ -30,7 +30,7 @@ def test_the_site_has_every_map_file_from_737c_to_741f():
     # and 7.37b ran 7.36's map file (2026-10-29)
     got = [s.patch for s in mv.steps()]
     assert got == ["7.37c", "7.37d", "7.37e", "7.38", "7.38b", "7.38c", "7.39", "7.39b", "7.39c", "7.39d", "7.39e", "7.40", "7.40c",
-                   "7.41", "7.41a", "7.41c", "7.41d", "7.41e", "7.41f", "7.42"]
+                   "7.41", "7.41a", "7.41c", "7.41d", "7.41e", "7.41f", "7.42", "7.42-v2", "7.42-v3"]
     same = mv.same_file_as()
     assert same["7.40b"] == "7.40" and same["7.41b"] == "7.41a"
 
@@ -159,10 +159,25 @@ def test_a_patch_that_changed_nothing_gets_no_page_but_the_newest_does():
     # 7.41c-e changed where wards can stand; 7.41f changed nothing and lost its page once 7.42 became the newest
     assert quiet == {"7.37c", "7.37d", "7.37e", "7.39e", "7.40c", "7.41f"}
     pages = terrain_index._pages([p for p in steps if p not in quiet], notes)
-    assert pages == ["7.42", "7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39",
-                     "7.38c", "7.38b", "7.38"]
+    assert pages == ["7.42-v3", "7.42-v2", "7.42", "7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d",
+                     "7.39c", "7.39b", "7.39", "7.38c", "7.38b", "7.38"]
     html = terrain._build_terrain_page("7.42", pages, notes, steps["7.42"], terrain_index._load_diff("7.42"), "")
     assert '<div class="tf-none">Nothing</div>' not in html and "NEW &nbsp;7.42 →" in html
+
+
+def test_map_file_updates_are_a_sub_list_under_their_patch():
+    """The owner 2026-11-19: 7.42's client-update map files (v2: one tree, v3: the lane corners) are picked on the
+    Terrain page "as a sub-list", not as rows of their own; the Terrain tab still opens on 7.42."""
+    import re
+    pages = ["7.42-v3", "7.42-v2", "7.42", "7.41e"]
+    menu = terrain._picker_html(pages, "7.42-v2")
+    names = re.findall(r'<span class="vi-name">([^<]+)</span>', menu)
+    assert names == ["7.42", "v3", "v2", "7.41e"]                          # under 7.42, newest first
+    assert menu.count("version-subitem") == 2 and 'data-rank="1"' in menu   # the arrows keep the time order
+    assert 'class="version-item version-subitem current" href="terrain_742-v2.html"' in menu
+    assert terrain_index.latest_page_file() == "terrain_742.html"
+    diff = terrain_index._load_diff("7.42-v3")
+    assert (diff["oldVer"], diff["newVer"]) == ("7.42-v2", "7.42-v3") and len(diff["treesNew"]) == 2394
 
 
 def test_7_38_has_its_page_and_its_map_notes():

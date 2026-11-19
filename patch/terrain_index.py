@@ -9,6 +9,7 @@ import json as _json
 import os as _os
 
 from patch import map_versions as _map_versions
+from patch.versions import map_update
 
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 
@@ -313,4 +314,7 @@ def page_patches():
 
 def latest_page_file():
     """terrain_<newest page>.html — where the Terrain tab and the index tile point."""
-    return _terrain_filename(page_patches()[0][0])
+    pages = page_patches()[0]
+    # a patch's own map file, not a client update inside it (7.42, not 7.42-v3): the tab opens on the patch, its
+    # updates are a sub-list of the version menu (the owner 2026-11-19)
+    return _terrain_filename(next((p for p in pages if map_update(p)[1] is None), pages[0]))

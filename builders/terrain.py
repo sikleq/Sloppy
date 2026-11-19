@@ -39,6 +39,7 @@ _sys.path.insert(0, _HERE)
 import patch.site_common as _site
 from patch.html_util import strip_tags      # noqa: E402
 import patch.map_versions as _map_versions
+from patch.versions import map_update as _map_update
 # which patches get a page and what moved on the map: data, in patch/terrain_index.py (the header needs it too)
 from patch.terrain_index import (_MOVED_NAMES, _SAME_CAMP, _box_key, _box_key_xy, _current_shapes,
                                  _moved_items, _retiered_pairs, _terrain_filename, page_patches)
@@ -1389,16 +1390,30 @@ def _picture_attrs(path):
 def _picker_html(patches, current):
     """Version-picker dropdown styled as nav-context-flat nav-context-materials,
     matching the aesthetic of non-patch pages while using href links. One item
-    per page = per patch, newest first (scripts.js's subpatch arrows step
-    through them in this order)."""
+    per page = per patch, newest first. A map file Valve shipped inside a patch in a client update ('7.42-v2',
+    '7.42-v3') is no row of its own but a sub-row under its patch, "v2", "v3" (the owner 2026-11-19: "a sub-list,
+    or too many rows pile up"). data-rank keeps the pages' own order (newest first) for terrain.js's subpatch
+    arrows, which step through them by rank, not by their place in the menu."""
+    rank = {v: i for i, v in enumerate(patches)}
+    subs = {}
+    for ver in patches:
+        base, n = _map_update(ver)
+        if n is not None and base in rank:
+            subs.setdefault(base, []).append(ver)
+
+    def item(ver, sub=False):
+        cls = "version-item" + (" version-subitem" if sub else "") + (" current" if ver == current else "")
+        label = f"v{_map_update(ver)[1]}" if sub else ver
+        return (f'<a class="{cls}" href="{_terrain_filename(ver, patches)}" role="menuitem" data-rank="{rank[ver]}"'
+                f' data-label="{_esc(ver)}"><span class="vi-name">{_esc(label)}</span></a>')
+
     items = []
     for ver in patches:
-        cls = "version-item current" if ver == current else "version-item"
-        href = _terrain_filename(ver, patches)
-        items.append(
-            f'<a class="{cls}" href="{href}" role="menuitem">'
-            f'<span class="vi-name">{_esc(ver)}</span>'
-            f'</a>')
+        base, n = _map_update(ver)
+        if n is not None and base in rank:
+            continue                                  # listed under its patch
+        items.append(item(ver))
+        items += [item(v, sub=True) for v in sorted(subs.get(ver, []), key=lambda v: rank[v])]
     label = _site.get_materials_label('terrain') or 'Terrain'
     current_label = _esc(current)
     return (
