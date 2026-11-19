@@ -655,23 +655,22 @@ def pip_rows(raw, version):
         rows.append(f'<span class="mech-abil-row{dim}"><span class="mech-cell pip-name">{img}{name}</span>'
                     f'<span class="mech-cell pip-cell">{_pip_sticks(e["pips"], e.get("fragile"), e.get("bonus", ()))}'
                     f'</span></span>')
-    # one small panel over the table, icons only, the words in their hovers (owner 2026-11-19: "в мини-панельке
-    # красивой и без текста. Подписи one stick / fragile … тоже"): what the sticks mean, then the toggles
-    def key(sticks, tip):
-        return (f'<span class="pip-key iab-hint abil-ico-hint" data-tooltip="{_html.escape(tip, quote=True)}">'
-                f'{sticks}</span>')
-    keys = (key(_pip_sticks(1, False), "One stick: one hero attack to break it")
-            + key(_pip_sticks(1, True), "Fragile: a melee hero breaks two per attack")
-            + (key('<span class="pip-sticks"><i class="pip-x pip-x-shown"></i></span>',
-                   "Extra pips: switch them on with the buttons") if used else ""))
+    # a bar over the table: the toggles at its left edge (icons, the source in the hover), what the sticks mean at its
+    # right edge with a short word each (owner 2026-11-19: "панель кнопок по левому краю таблицы, панель подсказок по
+    # правому и с коротким текстом"; the icon-only keys with a dotted hover line read as broken)
+    def key(sticks, word):
+        return f'<span class="pip-key">{sticks}<span class="pip-key-word">{word}</span></span>'
+    keys = (key(_pip_sticks(1, False), "1 hit")
+            + key(_pip_sticks(1, True), "Fragile: 2 per melee hit")
+            + (key('<span class="pip-sticks"><i class="pip-x pip-x-shown"></i></span>', "Extra") if used else ""))
     toggles = "".join(
         f'<button type="button" class="pip-toggle iab-hint abil-ico-hint" data-pip-src="{k}" aria-pressed="false" '
         f'aria-label="{_html.escape(lab, quote=True)}" data-tooltip="{_html.escape(lab, quote=True)}">'
         f'<img src="{ic}" alt="" width="20" height="20"></button>'
         for k, lab, ic in _PIP_SOURCES if k in used)
-    panel = (f'<span class="pip-panel">{keys}' + (f'<span class="pip-panel-sep"></span>{toggles}' if toggles else "")
-             + '</span>')
-    return (f'<!--MECHTABLE--><span class="pip-block">{panel}<span class="mech-abils pip-table">{"".join(rows)}</span>'
+    bar = ('<span class="pip-bar">' + (f'<span class="pip-panel pip-toggles">{toggles}</span>' if toggles else "<span></span>")
+           + f'<span class="pip-panel pip-keys">{keys}</span></span>')
+    return (f'<!--MECHTABLE--><span class="pip-block">{bar}<span class="mech-abils pip-table">{"".join(rows)}</span>'
             f'</span><!--/MECHTABLE-->')
 
 

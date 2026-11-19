@@ -469,14 +469,16 @@ h4.subgroup {
 .pip-sticks > i { display: block; width: 3px; height: 14px; border-radius: 99px; background: #6fbf73; }
 .pip-sticks.pip-fragile > i { background: #e0a96a; }
 .pip-sep { margin: 0 9px; color: var(--text-dim); font-weight: 700; }
-/* one small panel over the table, icons only, the words in their hovers (owner 2026-11-19: "в мини-панельке красивой
-   и без текста"): the sticks' meaning, a line, then the toggles — a talent's / Aghanim's / Marci's extra pips */
+/* a bar over the table (owner 2026-11-19): the toggles at the table's left edge — a talent's / Aghanim's / Marci's
+   extra pips — and what the sticks mean at its right edge, a short word each */
 .pip-block { display: block; }
-.pip-panel { display: inline-flex; align-items: center; gap: 6px; margin: 2px 10px 8px; padding: 4px 6px;
+.pip-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin: 2px 0 8px; }
+.pip-panel { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px;
   border: 1px solid var(--line-soft); border-radius: 6px; background: rgba(0, 0, 0, 0.25); }
-.pip-key { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
-  border-radius: 4px; background: rgba(255, 255, 255, 0.03); }
-.pip-panel-sep { width: 1px; align-self: stretch; margin: 2px 4px; background: var(--line-soft); }
+.pip-panel.pip-keys { margin-left: auto; gap: 14px;   /* wrapped on a phone it still keeps the right edge */ padding: 4px 10px; min-height: 28px; box-sizing: border-box; }
+.pip-key { display: inline-flex; align-items: center; gap: 6px; }
+.pip-key-word { font-size: 12px; color: var(--text-dim); white-space: nowrap; }
 .pip-toggle { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0;
   border-radius: 5px; border: 1px solid transparent; background: rgba(255, 255, 255, 0.03); cursor: pointer; }
 .pip-toggle img { width: 20px; height: 20px; border-radius: 3px; opacity: 0.45; filter: grayscale(0.6); }
