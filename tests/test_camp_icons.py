@@ -40,6 +40,19 @@ def test_generated_pictures_are_crisp_and_sized():
         assert Image.open(ROOT / "icons" / "camps" / f"count_{n}.png").size == (9, 11)
 
 
+def test_small_camp_glyphs_use_the_crisp_file_of_their_size():
+    """a 32 px creepcamp_*.png squeezed to 16-22 px blurs (owner 2026-11-19): every place that shows the glyph at a
+    fixed small size takes creepcamp_<type>_<size>.png; only the Terrain map markers (they zoom) keep the 32 px file"""
+    plain = re.compile(r'creepcamp_(?:small|mid|big|ancient)(?:\.png|"|\')')
+    for rel in ("builders/creeps.py", "builders/entity_changes.py", "builders/terrain_stats.py", "patch/camps.py"):
+        assert not plain.search((ROOT / rel).read_text(encoding="utf-8")), rel
+    terrain = (ROOT / "builders" / "terrain.py").read_text(encoding="utf-8")
+    assert '"creepcamp_mid_16", icon_dir="camps"' in terrain and '"camps/creepcamp_big_16"' in terrain
+    for t in gen.TYPES:
+        for size in gen.TYPE_SIZES:
+            assert Image.open(ROOT / "icons" / "camps" / f"creepcamp_{t}_{size}.png").size == (size, size)
+
+
 def test_icon_is_type_glyph_then_a_face_per_kind_with_the_count_of_a_repeat():
     html = camp_icon("Medium", [(2, "Boglet", "../icons/units/npc_dota_neutral_froglet.png"),
                                 (1, "Marshmage Apprentice", "../icons/units/npc_dota_neutral_froglet_mage.png")])

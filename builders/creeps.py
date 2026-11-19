@@ -915,7 +915,9 @@ def _camp_inner(v):
     for t in v.split(','):
         label = CAMP_LABEL.get(t, t)
         imgs.append(
-            f'<img class="camp-ico" src="icons/camps/creepcamp_{t}.png" '
+            # the crisp 16 px glyph (scripts/gen/gen_camp_icons.py), the 32 px one blurred at 16 (owner 2026-11-19)
+            f'<img class="camp-ico" src="icons/camps/creepcamp_{t}_16.png" '
+            f'srcset="icons/camps/creepcamp_{t}_16.png 1x, icons/camps/creepcamp_{t}_16@2x.png 2x" '
             f'alt="{esc(label)}" title="{esc(label)}" loading="lazy">')
     return ''.join(imgs)
 

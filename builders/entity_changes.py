@@ -1180,7 +1180,10 @@ def _unit_grid(groups, fill=False) -> str:
             continue
         cards = "".join(_unit_card(e) for e in sorted(lst, key=lambda e: (0 if e.get("_current", True) else 1, e["name"].lower())))
         camp = _CAMP_TITLE_ICON.get(label)
-        badge = (f'<img class="ec-camp-ico" src="icons/camps/creepcamp_{camp}.png" alt="" aria-hidden="true">'
+        # the crisp 20 px glyph (scripts/gen/gen_camp_icons.py), the 32 px one blurred at 20 (owner 2026-11-19)
+        badge = (f'<img class="ec-camp-ico" src="icons/camps/creepcamp_{camp}_20.png" '
+                 f'srcset="icons/camps/creepcamp_{camp}_20.png 1x, icons/camps/creepcamp_{camp}_20@2x.png 2x" '
+                 f'alt="" aria-hidden="true">'
                  if camp else '')
         cols.append(f'<section class="ec-ucol"><h3 class="ec-group-title">{badge}{_esc(label)}</h3>'
                     f'<div class="ec-ucards">{cards}</div></section>')

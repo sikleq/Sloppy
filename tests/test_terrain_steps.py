@@ -216,7 +216,7 @@ def test_the_facts_read_like_the_list():
     # On the map, Changed in the map file, and (since 2026-10-05) Heights — the height switches
     assert "<table" not in html and html.count('<div class="tf-head">') == 3
     first = html.split('<div class="tf-tiles tf-tiles-more">')[0]
-    assert first.count('<div class="tf-tile">') == 5 and 'icons/camps/creepcamp_ancient.png' in first
+    assert first.count('<div class="tf-tile">') == 5 and 'icons/camps/creepcamp_ancient_16.png' in first
     names = [n.split(" ")[0].split("<")[0] for n in first.split('<div class="tf-name">')[1:]]
     assert names == ["trees", "small", "medium", "large", "ancient"]
     assert '<div class="tf-name">large <span class="tm-rem-text">−4</span></div>' in html

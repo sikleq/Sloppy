@@ -23,6 +23,10 @@ FACES = CAMPS / "faces"
 
 S = 22
 FACE_W = 34
+# the type glyph for each size it is shown at (a 32 px file squeezed by the browser blurs): 16 - Neutral Creeps table,
+# Terrain buttons / chips / tiles; 20 - entity-change cards; 22 - camp_table. The Terrain map markers keep the 32 px
+# file: they scale with the map.
+TYPE_SIZES = (16, 20, 22)
 INK = (13, 13, 12)
 GOLD = (227, 196, 106)
 GOLD_LT = (247, 228, 160)
@@ -66,17 +70,17 @@ def _palette(im, n=10):
     return [tuple(pal[i:i + 3]) for i in range(0, len(pal), 3)]
 
 
-def type_icon(src):
-    """the game glyph at 22 px: margins cut, shrunk, each pixel snapped to the source's colours, no soft edge"""
+def type_icon(src, size=S):
+    """the game glyph at `size` px: margins cut, shrunk, each pixel snapped to the source's colours, no soft edge"""
     pal = _palette(src)
     part = src.crop(src.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox())
     side = max(part.size)
     sq = Image.new("RGBA", (side, side), (0, 0, 0, 0))
     sq.paste(part, ((side - part.width) // 2, (side - part.height) // 2))
-    small = sq.resize((S, S), Image.LANCZOS)
-    out = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    for y in range(S):
-        for x in range(S):
+    small = sq.resize((size, size), Image.LANCZOS)
+    out = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    for y in range(size):
+        for x in range(size):
             r, g, b, a = small.getpixel((x, y))
             if a >= 110:
                 best = min(pal, key=lambda p: (p[0] - r) ** 2 + (p[1] - g) ** 2 + (p[2] - b) ** 2)
@@ -143,7 +147,9 @@ def count_mark(n):
 
 def main():
     for t in TYPES:
-        save(type_icon(Image.open(CAMPS / f"creepcamp_{t}.png").convert("RGBA")), CAMPS / f"creepcamp_{t}_22.png")
+        src = Image.open(CAMPS / f"creepcamp_{t}.png").convert("RGBA")
+        for size in TYPE_SIZES:
+            save(type_icon(src, size), CAMPS / f"creepcamp_{t}_{size}.png")
     missing = [s for s in FACE_CX if not (UNITS / f"npc_dota_neutral_{s}.png").exists()]
     if missing:
         raise SystemExit(f"no portrait in {UNITS} for: {', '.join(missing)}")

@@ -999,7 +999,7 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
         # when they're all on already (scripts.js); pressed while every layer is on.
         layer_parts.append(layer_btn("all", "All layers", "tc_all"))
         layer_parts.append(layer_btn("trees", "Trees", "tc_trees"))
-        layer_parts.append(layer_btn("camps", "Neutral Camps", "creepcamp_mid", icon_dir="camps"))
+        layer_parts.append(layer_btn("camps", "Neutral Camps", "creepcamp_mid_16", icon_dir="camps"))
         layer_parts.append(layer_btn("spawnboxes", "Spawn Boxes", "icon_spawnbox"))
         # every place a ward can't stand (the owner 2026-10-02), from the map's gridnav
         layer_parts.append(layer_btn("nowards", "No-ward ground", "tc_nowards"))
@@ -1193,7 +1193,8 @@ def _signed(n):
 _CAMP_TIERS = ((0, "small"), (1, "medium"), (2, "large"), (3, "ancient"))
 
 # The icon of each kind of object in the "Changed in the map file" chips (its map layer's icon).
-_ITEM_ICON = {"trees": "ui/gothic/tc_trees", "camps": "camps/creepcamp_mid", "camp tiers": "camps/creepcamp_big",
+# the camp glyphs at 16 px: the crisp files of scripts/gen/gen_camp_icons.py (owner 2026-11-19)
+_ITEM_ICON = {"trees": "ui/gothic/tc_trees", "camps": "camps/creepcamp_mid_16", "camp tiers": "camps/creepcamp_big_16",
               "camp spawn boxes": "ui/gothic/icon_spawnbox", "towers": "ui/gothic/tc_towers",
               "lotus pools": "ui/gothic/tc_lotus", "twin gates": "ui/gothic/tc_twingates",
               "Tormentors": "ui/gothic/tc_tormentors", "bounty runes": "ui/gothic/tc_bounty",
@@ -1327,7 +1328,7 @@ def _facts_html(counts, step, diff):
         tiles = [tile("ui/gothic/tc_trees", trees, "trees", trees - counts.get("treesOld", 0))]
         for t, label in _CAMP_TIERS:
             cur = new_t.get(t, new_t.get(str(t), 0))
-            tiles.append(tile(f"camps/{_CAMP_ICON[t]}", cur, label, cur - old_t.get(t, old_t.get(str(t), 0))))
+            tiles.append(tile(f"camps/{_CAMP_ICON[t]}_16", cur, label, cur - old_t.get(t, old_t.get(str(t), 0))))
         # every other kind of object under them, a gap apart (the owner 2026-10-03: "trees and camps on one row,
         # everything else on the others")
         more = []

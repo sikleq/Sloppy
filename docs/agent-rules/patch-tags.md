@@ -934,7 +934,9 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   значке. В другой таблице, где столбец уже называет размер, лагерь пишется `camp_ref("Wolf camp", [(2, "Giant
   Wolf", NEUTRAL_CDN + "giant_wolf.png"), …])` — лица без значка типа (7.42 home jungle, `mech_table(...,
   cls="camp-jungle")`). Картинки — `python scripts/gen/gen_camp_icons.py`; крипа нового лагеря добавить в его
-  `FACE_CX` (иначе `tests/test_camp_icons.py` красный). Состав обычных лагерей — из server.dll (таблица лагерей,
+  `FACE_CX` (иначе `tests/test_camp_icons.py` красный). Значок типа там же в размерах `TYPE_SIZES` (16 — таблица
+  нейтралов и Terrain, 20 — карточки изменений юнитов, 22 — лагеря): мелкое место берёт файл своего размера
+  `creepcamp_<тип>_<размер>.png`, 32 px — только метки на карте Terrain (они масштабируются). Состав обычных лагерей — из server.dll (таблица лагерей,
   7.42 сборка 6984: RVA 0x4C2E270), не по памяти.
 - **Картинки к строкам Terrain подбираются сами** (`scripts/gen/terrain_spots_auto.py <патч> --write`, затем
   `terrain_shots.py`): по словам строки (объект, сторона, линия, тип лагеря, ярус башни, деревья добавлены / убраны)
