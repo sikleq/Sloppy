@@ -32,6 +32,10 @@
   color: var(--text-bright);
   white-space: nowrap;
 }
+/* a creep whose camp left the game, shown with "Removed" on: the DEL badge after its name, its numbers dimmed
+   (owner 2026-11-19) */
+.creeps-table .creep-removed { margin-left: 6px; font-size: 10px; padding: 1px 5px; vertical-align: 1px; }
+.creeps-table tr[data-removed] td:not(.col-name) { opacity: 0.55; }
 /* Type — plain coloured fills (no glass effect). */
 .unit-abilities-table td.ua-type-active  { background: rgba(80, 155, 230, 0.22); color: #d2e6ff; }
 .unit-abilities-table td.ua-type-passive { background: rgba(170, 110, 215, 0.22); color: #e8d3f5; }

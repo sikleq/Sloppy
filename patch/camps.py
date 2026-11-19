@@ -61,11 +61,18 @@ def _img(path, cls=""):
             f'loading="lazy">')
 
 
-def camp_ref(name, creeps):
+def camp_faces(creeps):
+    """a camp's creeps as faces only (a repeat with its count) — a cell of a "before / now" table (7.42 camp changes)"""
+    return camp_icon("", creeps)
+
+
+def camp_ref(name, creeps, new=False):
     """a camp named in a table whose column already says its size (7.42 "home jungle"): the faces of its creeps (a
-    repeat with its count) before its name, no type glyph — camp_ref("Kobold camp", [(2, "Kobold", icon), ...])"""
+    repeat with its count) before its name, no type glyph — camp_ref("Kobold camp", [(2, "Kobold", icon), ...]).
+    new=True: a camp new in this patch, its name in the site's gold instead of Valve's "(new!)" (owner 2026-11-19)"""
     faces = camp_icon("", creeps)
-    return f'<span class="camp-ref">{faces}<span class="camp-ref-name">{name}</span></span>' if faces else name
+    cls = "camp-ref-name camp-ref-new" if new else "camp-ref-name"
+    return f'<span class="camp-ref">{faces}<span class="{cls}">{name}</span></span>' if faces else name
 
 
 def camp_icon(size, creeps):

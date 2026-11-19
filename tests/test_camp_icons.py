@@ -76,6 +76,8 @@ def test_camp_ref_puts_faces_before_the_name_without_the_type_glyph():
     assert html.index("faces/tadpole.png") < html.index('<span class="camp-ref-name">Wolf camp</span>')
     assert "creepcamp_" not in html and "count_2.png" in html
     assert camp_ref("Nowhere camp", [(1, "X", "x.png")]) == "Nowhere camp"   # no face: the name alone
+    new = camp_ref("Wolf camp", [(2, "Giant Wolf", "../icons/units/npc_dota_neutral_tadpole.png")], new=True)
+    assert '<span class="camp-ref-name camp-ref-new">Wolf camp</span>' in new
 
 
 def test_742_home_jungle_names_all_18_camps_with_their_faces():
@@ -83,8 +85,22 @@ def test_742_home_jungle_names_all_18_camps_with_their_faces():
     line = next(s for s in src.splitlines() if "home jungle" in s)
     assert line.count("camp_ref(") == 18 and 'cls="camp-jungle"' in line
     assert "<br>" not in line                          # one camp a line comes from the cell's column, not a <br>
+    # new camps in gold, not Valve's "(new!)"; the first column says the side (owner 2026-11-19)
+    assert "(new!)" not in line and line.count("new=True") == 3 and 'mech_table(["Side", ' in line
     # make-up read from server.dll 6984: Kobold camp lost a Kobold (3 -> 2, Valve's note), Vhoul is 3 Assassins
     assert 'camp_ref("Kobold camp", [(2, "Kobold"' in line and 'camp_ref("Vhoul camp", [(3, "Vhoul Assassin"' in line
+
+
+def test_742_camp_changes_are_one_table_valves_rows_covered():
+    # owner 2026-11-19 "оформить таблицей": Camp / Before / Now; Valve's rows stay for their tags and weights
+    src = (ROOT / "content" / "p742.py").read_text(encoding="utf-8")
+    line = next(s for s in src.splitlines() if 'mech_story("Neutral camps changed"' in s)
+    assert 'mech_table(["Camp", "Before", "Now"]' in line and 'cls="camp-changes"' in line
+    assert line.count('"badge del camp-gone">Removed') == 3 and line.count("camp_faces(") == 4
+    for row in ("Satyr Banisher in Large Satyr camp replaced", "Amount of Kobolds in Kobold camp",
+                "Medium Centaur camp removed", "Large Warpine Raider camp removed", "Ancient Thunderhide camp removed"):
+        valve = next(s for s in src.splitlines() if row in s)
+        assert "covered=True" in valve, row
 
 
 def test_old_tables_get_the_type_from_the_camp_name():

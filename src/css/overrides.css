@@ -403,7 +403,22 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .camp-ref .camp-ico { display: inline-flex; flex: none; gap: 2px; }       /* the faces never squeeze under the name */
 .camp-ref .camp-ref-name { text-align: left; }
 .mech-abils.camp-jungle { grid-template-columns: auto auto auto auto; }   /* columns by their camps, not 1fr for one */
-.camp-jungle .mech-cell { flex-direction: column; gap: 4px; }     /* one camp a line (no <br>: in a flex row it does not break) */
+/* one camp a line (no <br>: in a flex row it does not break), the camps flush left, the side's word in the middle of
+   its row's height (owner 2026-11-19: "нет выравнивания по левому краю … radiant/dire по центру") */
+.camp-jungle .mech-cell { flex-direction: column; gap: 4px; justify-content: center; }
+.camp-jungle .mech-abil-row:not(.mech-head) .mech-cell:not(.mech-label) { align-items: flex-start; }
+/* 7.42 camps changed / removed (mech_table cls="camp-changes"): Camp / Before / Now, faces flush left, a removed camp
+   with the DEL tag */
+.mech-abils.camp-changes { grid-template-columns: max-content max-content max-content; width: max-content; max-width: 100%; }
+.camp-changes .mech-abil-row:not(.mech-head) .mech-cell:not(.mech-label) { justify-content: flex-start; }
+.camp-changes .camp-ico { display: inline-flex; flex: none; gap: 2px; }
+.camp-changes .camp-ico img { width: 22px; height: 22px; display: block; image-rendering: pixelated; }
+.camp-changes .camp-face { position: relative; flex: none; }
+.camp-changes .camp-face img { width: 34px; }
+.camp-changes .camp-face img.camp-count { position: absolute; right: 0; bottom: 0; width: 9px; height: 11px; }
+.camp-changes .camp-gone { font-size: 11px; padding: 1px 6px; }      /* the DEL tag's own look (badge del) */
+/* a camp new in this patch: its name in gold, not Valve's "(new!)" */
+.camp-ref .camp-ref-new { color: var(--gold, #e3c46a); }
 /* with the Side column and the icons 7.42's table was 36 px wider than its block at 1400 px: narrower cell padding */
 .camp-table-sided .camp-cell { padding: 3px 8px; }
 .camp-table .camp-face img.camp-count, .camp-ref .camp-face img.camp-count { position: absolute; right: 0; bottom: 0; width: 9px; height: 11px; }

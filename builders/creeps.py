@@ -902,10 +902,12 @@ def _load_unit_page_slugs():
 
 def _name_inner(v, d, unit_page_slugs):
     slug = unit_page_slugs.get(d.get('npc_key'))
-    if slug:
-        return (f'<a class="creep-name-link" href="units/{slug}.html">'
-                f'{esc(v)}</a>')
-    return esc(v)
+    name = (f'<a class="creep-name-link" href="units/{slug}.html">{esc(v)}</a>' if slug else esc(v))
+    # a creep whose camp left the game: seen only with "Removed" on, it says so after its name (owner 2026-11-19:
+    # "как-то помечаться когда фильтр removed включен")
+    gone = REMOVED_CREEPS.get((d.get("createhero") or "").strip())
+    # the DEL tag's own look (badge del: its colours, the colour-blind mode too)
+    return name + (f' <span class="badge del creep-removed">Removed in {esc(gone)}</span>' if gone else '')
 
 
 def _camp_inner(v):

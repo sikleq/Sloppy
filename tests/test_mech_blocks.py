@@ -544,8 +544,8 @@ def test_round_five_rules_of_the_742_proofread():
     assert out[:2] == [lines[2], 'W(ul_close())']
     assert out[2] == 'W(plain_header("New Neutral Camps", dynamics=False, new="New camps"))'
     story = out[4]
-    assert story.startswith('W(mech_story("Added 2 new neutral camps: a Medium camp for Radiant (Radigull) and a Medium '
-                            'camp for Dire (Odobenus)", table=camp_table([("Radigull camp", ')
+    # the count alone, the camps are the table's (owner 2026-11-19: "убрать … список мы уже перенесли в таблицу")
+    assert story.startswith('W(mech_story("Added 2 new neutral camps", table=camp_table([("Radigull camp", ')
     # the size and the side as fields of their own: its icon, a Side column (owner 2026-11-19)
     assert '"Medium", "Radiant")' in story and '"Medium", "Dire")' in story
     from patch.camps import camp_table
