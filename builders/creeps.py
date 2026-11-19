@@ -918,23 +918,25 @@ def _load_unit_page_slugs():
 
 def _name_inner(v, d, unit_page_slugs):
     slug = unit_page_slugs.get(d.get('npc_key'))
-    # a creep whose camp left the game: its row grey (creeps-cells.css tr[data-removed]), when in its camp's hover
+    # a creep whose camp left the game: its row grey (creeps-cells.css tr[data-removed]), when in its camp cell's history
     # (owner 2026-11-19: "не нравится, сделай просто серым")
     return f'<a class="creep-name-link" href="units/{slug}.html">{esc(v)}</a>' if slug else esc(v)
 
 
-def camp_history(createhero):
-    """The camp cell's hover lines: its camps now (a removed creep: the camp it was in, until when), a camp it left,
-    its first patch in the game files."""
+def camp_changelog(createhero, dates=None):
+    """The camp cell's history in the stat cells' format (patch, date, kind, camp), oldest first: the patch the creep
+    came into the game (game files, only after 7.08) with its first camps, and a camp it left. Owner 2026-11-20:
+    "наподобии как в других ячейках, только без % разницы"."""
+    dates = dates or {}
     short = (createhero or '').strip()
-    gone = REMOVED_CREEPS.get(short)
     until = CAMP_UNTIL.get(short, {})
-    lines = [CAMP_LABEL.get(t, t) for t in CREEP_CAMP.get(short, []) if not gone and t not in until]
-    lines += [f'{CAMP_LABEL.get(t, t)} until {p}' for t, p in until.items()]
+    camps = list(dict.fromkeys(list(until) + CREEP_CAMP.get(short, [])))
+    out = []
     since = _creep_since().get(CREEP_NAME_TO_NPC.get(short) or '')
     if since:
-        lines.append(f'In the game since {since}')
-    return lines
+        out += [(since, dates.get(since, ''), 'A', CAMP_LABEL.get(t, t)) for t in camps]
+    out += [(p, dates.get(p, ''), 'R', CAMP_LABEL.get(t, t)) for t, p in until.items()]
+    return out
 
 
 def _camp_inner(v, d=None):
@@ -948,10 +950,7 @@ def _camp_inner(v, d=None):
             f'<img class="camp-ico" src="icons/camps/creepcamp_{t}_16.png" '
             f'srcset="icons/camps/creepcamp_{t}_16.png 1x, icons/camps/creepcamp_{t}_16@2x.png 2x" '
             f'alt="{esc(label)}" loading="lazy">')
-    lines = camp_history((d or {}).get('createhero'))
-    tip = '<br>'.join(esc(s) for s in lines)
-    return (f'<span class="camp-hint abil-ico-hint" data-tooltip="{esc(tip)}">{"".join(imgs)}</span>'
-            if lines else ''.join(imgs))
+    return ''.join(imgs)
 
 
 def _attack_range_inner(v, d):
@@ -1051,6 +1050,13 @@ def _stats_cell(k, row, src, unit_page_slugs):
                 f'title="{esc(cmd)}" '
                 f'onerror="this.style.visibility=\'hidden\'"></td>')
     inner = _cell_inner(k, v, d, unit_page_slugs)
+    if k == 'camp':
+        # the stat cells' history popup (creeps-changelog.js): ADDED / REMOVED rows, no %
+        hist = camp_changelog(d.get('createhero'), src.hist.patch_dates)
+        payload = ';'.join('|'.join(e) for e in hist)
+        extra = f' data-hist="{esc(payload)}"' if hist else ''
+        cls = _col_cls(k, v) + (' has-history' if hist else '')
+        return f'<td class="{cls}"{_sort_attr(k, v)}{extra}>{inner}</td>'
     if k in COL_HIST or k in COL_CHANGELOG:
         extra, has_hist = _history_attrs(k, v, row.get('npc_key'), src)
         cls = _col_cls(k, v) + (' has-history' if has_hist else '')
