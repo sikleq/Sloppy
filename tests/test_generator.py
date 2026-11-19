@@ -619,7 +619,13 @@ def test_multi_line_info_popup_is_a_bulleted_list():
     two = info_tip("As a result, for buildings impact damage increased from 90 to 112.5, and burn damage decreased "
                    "from 50 to 45")
     assert two.count('class="pop-li"') == 2 and "+25%" in two and "-10%" in two
-    assert '<span class="pop-t">Burn damage decreased from 50 to 45</span>' in two
+    assert '<span class="pop-t pop-t-pct">Burn damage decreased from 50 to 45</span><span class="pop-dots"></span>' in two
+    # a sentence per row: the % stands by its own change (owner 2026-11-19, 7.42 Caduceus "+35% не видно, что относится
+    # к Damage …")
+    cad = info_tip("Compared to Phylactery: — Added allied interaction with a separate cooldown. Damage increased "
+                   "from 130 to 175")
+    assert '<span class="pop-t">Added allied interaction with a separate cooldown</span></span>' in cad
+    assert '<span class="pop-t pop-t-pct">Damage increased from 130 to 175</span>' in cad
     assert "+50%" in info_tip("Cooldown increased from 10 to 15") and "nerf" in info_tip("Cooldown increased from 10 to 15")
     # 7.42 Bloodslinger "Compared to Blood Grenade: — Cast range increased from 900 to 1200. Projectile speed …": its
     # lead a row, then a row per sentence, each with its % (owner 2026-11-19: "ты только % … для одного значения")

@@ -233,3 +233,13 @@ def test_item_icon_marks_come_from_the_games_flags():
         _State.current_patch_version = saved
     html = el.li("Now improved by Dormant Curio", "")
     assert "curio-row" in html and '<span class="aghanim-marker curio"></span>' in html
+
+
+def test_abilities_that_set_attack_potency_carry_the_mark_from_742():
+    # owner 2026-11-19: "Ставить такой значок на иконки этих способностей — да"; data from the code of 7.42
+    from patch.item_marks import ability_marks
+    assert "Slashes: 60% Item Potency" in ability_marks("pangolier_swashbuckle", "7.42")
+    assert ability_marks("pangolier_swashbuckle", "7.41f") == ""          # values known for 7.42 on
+    assert ability_marks("pangolier_rolling_thunder", "7.42") == ""
+    from patch.item_marks import item_marks
+    assert "Illusions (20% Item Potency): <b>8</b>" in item_marks("Diffusal Blade", "7.42")

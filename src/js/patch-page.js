@@ -313,9 +313,15 @@
   });
   // An ability named only by its small icon in a row (a facet's "Exorcism: …"): once per name, unless a block has it.
   const indexed = new Set(entities.map(e => e.name.toLowerCase()));
+  // "Pangolier’s Swashbuckle" (a mechanic row's chip) is the block's "Swashbuckle": one result, not two (owner
+  // 2026-11-19: "в поиске 2 строки swashbuckle, это дубль")
+  const known = (name) => {
+    const low = name.toLowerCase().replace(/’/g, "'");
+    return indexed.has(low) || indexed.has(low.replace(/^[^']+'s?\s+/, ''));
+  };
   document.querySelectorAll('.ability-chip[aria-label], .facet-chip[aria-label]').forEach(chip => {
     const name = chip.getAttribute('aria-label');
-    if (indexed.has(name.toLowerCase()) || chip.closest('[hidden], details:not([open])')) return;
+    if (known(name) || chip.closest('[hidden], details:not([open])')) return;
     indexed.add(name.toLowerCase());
     const isFacet = chip.classList.contains('facet-chip');
     const img = chip.querySelector('img');
@@ -331,7 +337,7 @@
   // head's own icon or its block's (owner 2026-11-06: "Tree dance … перестал искаться через поиск")
   document.querySelectorAll('.ability-change-pane .iab-head .iab-name').forEach(nameEl => {
     const name = nameEl.textContent.trim();
-    if (!name || /^Aghanim's /.test(name) || indexed.has(name.toLowerCase())) return;
+    if (!name || /^Aghanim's /.test(name) || known(name)) return;
     indexed.add(name.toLowerCase());
     const head = nameEl.closest('.iab-head');
     const block = head.closest('.ability-block');

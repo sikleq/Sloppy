@@ -216,7 +216,12 @@
 .pop-li { display: flex; align-items: baseline; gap: 12px; position: relative; padding: 3px 0; }
 .pop-li + .pop-li { border-top: 1px solid var(--line-soft); }
 .pop-li > .pop-t { flex: 1 1 auto; text-align: left; }
-.pop-li > .pop-end { flex: none; margin-left: auto; }
+.pop-li > .pop-t.pop-t-pct { flex: 0 1 auto; }
+/* the ruler from the text's last line to its %, as the rows' hover ruler (owner 2026-11-19: "+35% не видно, что
+   относится к Damage …") */
+.pop-li > .pop-dots { flex: 1 1 12px; min-width: 12px; align-self: flex-end; margin-bottom: 0.4em;
+  border-bottom: 1px dashed rgba(150, 146, 137, 0.45); }
+.pop-li > .pop-end { flex: none; margin-left: 0; }
 .pop-li > .pop-end .badge-group { display: inline-flex; gap: 3px; }
 .pop-li.pop-sub { padding-left: 13px; border-top: 0; padding-top: 0; }
 .pop-li.pop-head { color: var(--text-dim); }                 /* "Compared to Blood Grenade:" over its rows */
@@ -312,6 +317,7 @@ html.cb-mode .pop-pct-nerf { color: #eb7115; }
 .entity-icon > .item-icon-cost { position: absolute; right: -5px; bottom: -5px; }
 /* Item Potency / Dormant Curio marks on an item's icon, one under the other at its top right; the hover lists the
    values the game scales (patch/item_marks.py; owner 2026-11-19: variant 2 "значок на иконке") */
+.ability-icon-wrap > .item-marks { position: absolute; right: -6px; top: -6px; display: flex; flex-direction: column; }
 .entity-icon > .item-marks { position: absolute; right: -6px; top: -6px; display: flex; flex-direction: column; gap: 3px; }
 .item-marks > .info-tip.item-mark { width: 19px; height: 19px; margin: 0; padding: 0; border-radius: 3px;
   background: var(--bg-deep-97); box-shadow: 0 0 0 1px rgba(200, 196, 186, 0.5); border: 0; }

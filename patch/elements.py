@@ -742,6 +742,9 @@ def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=N
     if is_innate and not skip_marker:
         icon_inner += (f'<img src="{INNATE_ICON_URL}" alt="" '
                        f'class="innate-marker">')
+    if icon_inner:
+        from .item_marks import ability_marks        # an ability that sets attacks' Item Potency (owner 2026-11-19)
+        icon_inner += ability_marks(slug, _State.current_patch_version)
     icon_html = f'<div class="ability-icon-wrap">{icon_inner}</div>' if icon_inner else ''
     if not sub and _State.current_block_is_facet and not _State.facet_block_had_ul:
         import sys
@@ -1371,9 +1374,16 @@ def _pop_split(line):
     "Compared to Blood Grenade: — Cast range increased from 900 to 1200. Projectile speed …" (7.42 Bloodslinger): its
     lead a row of its own, then a row per sentence (owner 2026-11-19: "подобные перечисления изменений в таблице")."""
     hits = list(_POP_FROMTO_RE.finditer(line))
-    lead = re.match(r'^([^:<]{3,60}:)\s*—\s*', line) if len(hits) > 1 else None
+    if not hits:
+        return [line]
+    lead = re.match(r'^([^:<]{3,60}:)\s*—\s*', line)
     if lead:
         return [lead.group(1)] + _pop_split(line[lead.end():])
+    # a sentence per row once one of them has a change: "Added allied interaction … cooldown. Damage increased from
+    # 130 to 175" (7.42 Caduceus) — its % stood at the end of both sentences (owner 2026-11-19)
+    sentences = re.split(r'(?<=[a-z0-9%)])\.\s+(?=[A-Z])', line)
+    if len(sentences) > 1:
+        return [p for s in sentences for p in _pop_split(s)]
     out, start = [], 0
     for h, nxt in zip(hits, hits[1:]):
         cut = re.search(r',\s*(?:and\s+)?|\.\s+', line[h.end():nxt.start()])
@@ -1396,7 +1406,10 @@ def _pop_list(body):
         sub = x.startswith(_POP_SUB)
         text = x[len(_POP_SUB):] if sub else x
         kind = " pop-sub" if sub else " pop-head" if text.endswith(":") and len(items) > 1 else ""
-        rows.append(f'<span class="pop-li{kind}"><span class="pop-t">{text}</span>{_pop_pct(text)}</span>')
+        pct = _pop_pct(text)
+        dots = '<span class="pop-dots"></span>' if pct else ''      # a dotted ruler to its %, as the site's rows
+        rows.append(f'<span class="pop-li{kind}"><span class="pop-t{" pop-t-pct" if pct else ""}">{text}</span>'
+                    f'{dots}{pct}</span>')
     return ''.join(rows)
 
 

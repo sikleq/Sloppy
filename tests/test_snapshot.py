@@ -20,8 +20,8 @@ EXPECTED = {
     # -4 / -12: 5+ level badges show "first … last" only (2026-10-16, Dagon 7.41); +6 / +2: the Spider Legs / Witchbane
     # abilities cards repeat their rows' % in the values' hover (2026-10-17); +8 / +12: Alert, Timeless, Titanic, Vital
     # got their tier tables, a changed cell's % on hover (2026-10-26); +3 / +1: a "from A to B" line in a (?) ends with
-    # its % (owner 2026-11-19)
-    "badge_buff": 399,
+    # its % (owner 2026-11-19); +1: a sentence per row in a (?) (Caduceus, 2026-11-19)
+    "badge_buff": 400,
     "badge_nerf": 204,
     "badge_new": 1,
     "badge_del": 5,

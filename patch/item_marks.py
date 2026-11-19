@@ -56,6 +56,48 @@ def _rows(slug, version, blk, keys):
     return rows
 
 
+_ABIL_RULES = None
+
+
+def _version_key(v):
+    m = re.match(r"7\.(\d+)([a-z]?)", v or "")
+    return (int(m.group(1)), m.group(2)) if m else (0, "")
+
+
+def ability_marks(slug, version):
+    """The Item Potency mark on an ability's icon: an ability that sets the potency of attacks (Swashbuckle 60%) —
+    data/rules/item_potency_abilities.json, from the code of 7.42; '' before 7.42 or for any other ability (owner
+    2026-11-19: "Ставить такой значок на иконки этих способностей — да")."""
+    global _ABIL_RULES
+    if _ABIL_RULES is None:
+        import json
+        import os
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "rules",
+                            "item_potency_abilities.json")
+        with open(path, encoding="utf-8") as f:
+            _ABIL_RULES = json.load(f)
+    text = _ABIL_RULES["abilities"].get(slug or "")
+    if not text or _version_key(version) < _version_key(_ABIL_RULES["since"]):
+        return ""
+    return (f'<span class="item-marks"><span class="info-tip item-mark item-mark-potency" tabindex="0">'
+            f'<img src="{_FLAGS[0][3]}" alt=""><span class="info-pop"><span class="info-pop-h">Item Potency</span>'
+            f'<span class="pop-li"><span class="pop-t">{text}</span></span></span></span></span>')
+
+
+ILLUSION_POTENCY = 20     # an illusion's Item Potency unless its creator sets one (server.dll 6983, research 2026-11-19)
+
+
+def _illusion_row(text):
+    """The same numbers on a default illusion: value × 20 / 100 (owner 2026-11-19, Diffusal Blade's Manabreak: "нет
+    строчки про то, как это работает на иллюзиях")."""
+    nums = re.findall(r"<b>([-+]?\d+(?:\.\d+)?)(%?)</b>", text)
+    if not nums:
+        return ""
+    vals = " / ".join(f"<b>{round(float(v) * ILLUSION_POTENCY / 100, 2):g}{pct}</b>" for v, pct in nums)
+    return (f'<span class="pop-li pop-sub"><span class="pop-t">Illusions ({ILLUSION_POTENCY}% Item Potency): '
+            f'{vals}</span></span>')
+
+
 def item_marks(name, version):
     if not version:
         return ""
@@ -69,6 +111,7 @@ def item_marks(name, version):
         if not keys:
             continue
         rows = "".join(f'<span class="pop-li"><span class="pop-t">{f"{n}: " if n else ""}{t}</span></span>'
+                       + (_illusion_row(t) if kind == "potency" else "")
                        for n, t in _rows(slug, version, blk, keys))
         src = icon or item_img("Dormant Curio")
         out += (f'<span class="info-tip item-mark item-mark-{kind}" tabindex="0"><img src="{src}" alt="">'
