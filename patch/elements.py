@@ -609,6 +609,10 @@ def subgroup(title, new=None, one_box=False):
         _State.new_mech_tag = _mech_tag(new)
     if title.lower() == "abilities":
         _State.seen_abilities_subgroup = True
+    elif _State.current_unit and not _State.current_hero and title.lower() not in ("facets", "talents"):
+        # a category of its own after a unit's card (7.42 "Runes" after Roshan): its abilities are not the unit's — no
+        # "Abilities" heading over the runes (owner 2026-11-19)
+        _State.current_unit = None
     if title.lower() == "facets":
         _State.seen_facets_subgroup = True   # the facet blocks after it don't repeat the heading (7.38 removed facets)
     if title.lower() == "talents":

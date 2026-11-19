@@ -736,6 +736,8 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Base respawn timer now decreases by 1 minute every time Roshan is defeated, to a minimum of 5 minutes", "REWORK"),
     ("Timer now visualizes the timer for the Aegis and who is carrying it", "QoL"),
     ("Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu", "TEASER"),
+    ("Illusions created by Illusion Rune now have 40% Item Potency", "NEW"),
+    ("Lane creeps now move up to 25% slower if they are pulled out of lane", "REWORK"),
     # 7.42 proofread 2026-11-18: the canon in Valve's new words
     ("Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be", "REWORK"),
     ("Radiant Tier 1 tower moved ever so slightly to the south", "REWORK"),

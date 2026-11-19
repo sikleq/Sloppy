@@ -66,13 +66,13 @@ from .post_late import (
     _postprocess_row_notes,
     _postprocess_stance_blocks,
 )
-from .post_terrain import _postprocess_map_file_rows
 from .post_tables import (
     _postprocess_drop_table,
     _postprocess_old_new_table,
     _postprocess_dash_table,
     _postprocess_grouped_lists,
     _postprocess_mechanic_name_icons,
+    _postprocess_new_camps,
     _postprocess_new_creep_abilities,
     _postprocess_renames,
     _postprocess_star_lists,
@@ -289,7 +289,7 @@ def generate(version):
     out = _postprocess_old_new_table(out)              # Valve's OLD: / NEW: lists over the same keys -> before / after
     out = _postprocess_renamed_unit_ability(out, version)   # a unit's ability reworked and renamed -> old -> new card
     out = _postprocess_new_creep_abilities(out, version)   # a new creep's abilities -> New ability cards (11-19)
-    out = _postprocess_map_file_rows(out, version)    # the map file's changes no Terrain row names (11-19)
+    out = _postprocess_new_camps(out, version)        # "Added a X camp: New Medium camp …" rows -> one camp table
     out = _postprocess_renames(out)                   # a unit / item ability rename -> "Old → New" header (11-19)
     out = _postprocess_star_lists(out)                # Valve's "* A<br>* B" "?" -> a list the block opens as a table
     out = _postprocess_dash_table(out)               # Valve's "A -- B -- C" lines in a "?" -> a table (2026-11-19)

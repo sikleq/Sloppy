@@ -586,8 +586,11 @@ def mech_change_cell(old, new, l=False):
     tone = "iab-buff" if (b > a) != l else "iab-nerf"
     pct = (b - a) / a * 100 if a else 0
     sign = "+" if pct > 0 else "−"
-    return (f'<span class="mech-old">{old}</span> &rarr; <b class="iab-lv {tone}">{new}</b> '
-            f'<span class="iab-lv {tone} mech-pct">{sign}{abs(pct):.0f}%</span>')
+    # as the cards show a changed number (owner 2026-11-19): the new value alone, coloured and dotted; "old → new"
+    # and the % on hover (unit_numbers.changed_value)
+    note = f'{old} → {new} <span class="iab-num iab-{tone[4:]}">({sign}{abs(pct):.0f}%)</span>'
+    return (f'<b class="iab-num {tone}"><span class="iab-hint abil-ico-hint" '
+            f'data-tooltip="{_html.escape(note, quote=True)}">{new}</span></b>')
 
 
 def mech_formula(expr):

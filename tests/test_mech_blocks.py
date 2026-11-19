@@ -451,7 +451,9 @@ def test_round_three_rules_of_the_742_proofread():
     # a changed value in a table: dim old, coloured new with its %
     from patch.mech_abilities import mech_change_cell, mech_level_table
     cell = mech_change_cell("110-130", "100")
-    assert '<span class="mech-old">110-130</span>' in cell and 'iab-nerf' in cell and '−17%' in cell
+    # as the cards: the new value coloured and dotted, "old → new (%)" on hover (owner 2026-11-19)
+    assert cell.startswith('<b class="iab-num iab-nerf"><span class="iab-hint abil-ico-hint" data-tooltip="110-130 → 100 ')
+    assert '−17%' in cell and cell.endswith('>100</span></b>')
     assert 'iab-buff' in mech_change_cell("90", "100")
     # more experience to a level is worse: red with l=True
     html = mech_level_table(["Level", "2"], [["Old", "240"], ["New", "250"]], l=True)
@@ -475,21 +477,6 @@ def test_a_system_block_is_told_as_a_paragraph():
     assert 'table=mech_list(info_tip("Couriers", "Gyrocopter: Homing Missile"))' in story
 
 
-def test_map_file_changes_no_note_names_get_rows():
-    from tools.patchgen.post_terrain import map_file_rows, _postprocess_map_file_rows
-    diff = {"entities": {"heroSpawns": {"old": [[-6700, -6700], [6836, 6554]], "new": [[-6568, -6552], [6312, 6088]]},
-                         "couriers": {"old": [[7010, 6387]], "new": [[6600, 5992]]}},
-            "currentAreas": {"old": [1, 2], "new": [1, 2, 3]}, "wards": {"lost": "10", "gained": "4"}}
-    rows = dict((t.split()[0], t) for _k, t in map_file_rows(diff))
-    assert rows["Hero"] == "Hero spawn points moved: Dire 701 units, Radiant 198 units"
-    assert rows["Streams"] == "Streams have 1 more sections with a current (3 instead of 2)"
-    assert rows["No-ward"] == "No-ward ground changed: 10 cells became no-ward, 4 became wardable"
-    page = ['W(plain_header("Terrain Changes", terrain_link="7.42"))', 'W(subgroup("Miscellaneous"))', 'W(ul_open())',
-            'W(li("Dire fountain moved toward the Ancient", t("REWORK")))', 'W(ul_close())']
-    out = _postprocess_map_file_rows(page, "7.42")          # the real 7.42 diff: "toward" is not a word about wards
-    assert any(l.startswith('W(li("No-ward ground changed:') for l in out) and out[-1] == 'W(ul_close())'
-
-
 def test_a_teaser_row_has_its_own_chip_and_no_place_in_the_cells():
     from patch.badges import t
     from patch.row_scores import _DYN_TAG_WHITELIST
@@ -499,6 +486,34 @@ def test_a_teaser_row_has_its_own_chip_and_no_place_in_the_cells():
     import pathlib                                    # its tile on the patch pages has an icon of its own
     css = (pathlib.Path(__file__).resolve().parents[1] / "src" / "css" / "patch-tag-marks.css").read_text(encoding="utf-8")
     assert '.tag-marks .badge[data-tag~="teaser"], .filter-btn[data-filter="teaser"] { --tm: url(' in css
+
+
+def test_round_five_rules_of_the_742_proofread():
+    # owner 2026-11-19, fifth round on 7.42
+    lines = ['W(li("Added a Radigull camp: New Medium camp for Radiant", t("NEW"), extra=inline_note("Each camp consists '
+             'of 2 Radigulls")))',
+             'W(li("Added an Odobenus camp: New Medium camp for Dire", t("NEW"), extra=inline_note("Each camp consists of '
+             '1 Odobenus Frostmage and 2 Odobenus Footmen")))', 'W(li("Medium Centaur camp removed", t("DEL")))']
+    out = g._postprocess_new_camps(lines, None)          # no game files: the averages stay empty
+    assert out[0].startswith('W(li("New neutral camps", t("NEW"), extra="<!--MECHTABLE-->" + camp_table([("Radigull camp ')
+    assert '(2, "Radigull", NEUTRAL_CDN + "radigull.png")' in out[0]
+    assert '(1, "Odobenus Frostmage", NEUTRAL_CDN + "odobenus_frostmage.png"), (2, "Odobenus Footman"' in out[0]
+    assert out[1].endswith(', covered=True))') and out[3] == lines[2]
+    # the runes after Roshan's card are not his abilities: no "Abilities" heading over them
+    from patch.state import _State
+    from patch import elements
+    _State.current_unit, _State.current_hero, _State.seen_abilities_subgroup = "Roshan", None, False
+    elements.subgroup("Runes")
+    assert _State.current_unit is None
+    import importlib.util, pathlib
+    spec = importlib.util.spec_from_file_location(
+        "tsa", pathlib.Path(__file__).resolve().parents[1] / "scripts" / "gen" / "terrain_spots_auto.py")
+    tsa = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tsa)
+    want = tsa.wanted("Moved small flooded camps at the top/bottom rims closer to stream ends")
+    assert want["camp"] == {"small"} and {"top", "bot"} <= want["lanes"]
+    assert tsa.wanted("Added more trees to the north of Radiant Tier 1 tower")["trees"] == "added"
+    assert tsa._lane(6606, 5867) != "mid" and tsa._lane(-600, -600) == "mid"          # the bases are not mid
 
 
 def test_valves_starred_list_is_a_list_the_block_opens():

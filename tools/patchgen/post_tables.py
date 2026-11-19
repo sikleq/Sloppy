@@ -157,6 +157,83 @@ def _pivot(hits):
     return None
 
 
+_NEW_CAMP_RE = re.compile(r'^(?P<ind>\s*)W\(li\("Added an? (?P<name>[A-Z][\w\' ]+?) camp: New (?P<size>Small|Medium|Large|'
+                          r'Ancient) camp(?: for (?P<side>Radiant|Dire))?", t\("\w+"\), extra=inline_note\("\s*Each camp '
+                          r'consists of (?P<units>[^"]+)"\)\)\)\s*$')
+_CAMP_UNIT_RE = re.compile(r'(\d+) ([A-Z][\w\' ]+?)(?= and |, |$)')
+
+
+def _creep_slug(name, version):
+    """"Odobenus Footmen" → "odobenus_footman" (npc_dota_neutral_<slug>), by the game's own names, or None."""
+    from builders.creeps import CREEP_DISPLAY_NAMES as _NPC_DISPLAY_NAME
+    singular = re.sub(r"men$", "man", name)
+    singular = re.sub(r"s$", "", singular) if singular == name else singular
+    for npc, shown in _NPC_DISPLAY_NAME.items():
+        if shown in (name, singular) and npc.startswith("npc_dota_neutral_"):
+            return npc[len("npc_dota_neutral_"):], shown
+    return None
+
+
+def _camp_numbers(units, version):
+    """(average gold, average xp) of a camp from its units' bounties in the game files of `version`, or ("", "")."""
+    from patch import game_files
+    from patch.unit_numbers import _UNITS_FILE, numbers
+    text = game_files.read(version, _UNITS_FILE) if version else None
+    if not text:
+        return "", ""
+    gold = xp = 0.0
+    for n, slug, _shown in units:
+        nums = numbers(text, f"npc_dota_neutral_{slug}")
+        lo, hi = (float(x) for x in nums["Gold"].split("-"))
+        gold += n * (lo + hi) / 2
+        xp += n * float(nums["XP"])
+    return f"{gold:g}", f"{xp:g}"
+
+
+def _postprocess_new_camps(lines, version=None):
+    """Valve's "Added a Radigull camp: New Medium camp for Radiant" rows, one after another, each with "Each camp consists
+    of …" behind a "?" (7.42: four of them) → one row "New neutral camps" with a table of the camps (owner 2026-11-19:
+    "не сделал таблицей какие крипы появились новые/лагеря"): the camp, its size and side, its average gold and xp
+    from the game files, its creeps with their portraits — as 7.38's flooded camps (camp_table). Valve's rows stay hidden
+    for the weights. A row whose creeps the files do not name leaves the run as it is."""
+    out, run = [], []
+
+    def flush():
+        if len(run) < 2:
+            out.extend(r[0] for r in run)
+        else:
+            ind = run[0][1].group("ind")
+            rows = []
+            for _ln, m, units in run:
+                where = ", ".join(x for x in (m.group("size"), m.group("side")) if x)
+                gold, xp = _camp_numbers(units, version)
+                creeps = ", ".join(f'({n}, {_py_str(shown)}, NEUTRAL_CDN + "{slug}.png")' for n, slug, shown in units)
+                label = _py_str(m.group("name") + ' camp <span class="camp-where">' + where + '</span>')
+                rows.append(f'({label}, [{creeps}], {_py_str(gold)}, {_py_str(xp)})')
+            out.append(f'{ind}W(li("New neutral camps", t("NEW"), extra="<!--MECHTABLE-->" + camp_table([{", ".join(rows)}]) '
+                       f'+ "<!--/MECHTABLE-->"))')
+            out.extend(ln[:-2] + ", covered=True))" for ln, _m, _u in run)
+        run.clear()
+
+    for ln in lines:
+        m = _NEW_CAMP_RE.match(ln)
+        units = []
+        if m:
+            for n, name in _CAMP_UNIT_RE.findall(m.group("units")):
+                found = _creep_slug(name.strip(), version)
+                if not found:
+                    units = []
+                    break
+                units.append((int(n), *found))
+        if m and units:
+            run.append((ln, m, units))
+            continue
+        flush()
+        out.append(ln)
+    flush()
+    return out
+
+
 _PER_DEATH_ROW_RE = re.compile(
     r'^(?P<ind>\s*)W\(li\("(?P<pre>[^"]+?) (?P<verb>changed|decreased|increased|rescaled) from (?P<a>\d+(?:\.\d+)?)'
     r'(?P<pct>%?) to (?P<b>\d+(?:\.\d+)?)%? \+ (?P<c>\d+(?:\.\d+)?)%? per (?P<who>[A-Z]\w+)(?:\'s)? death'

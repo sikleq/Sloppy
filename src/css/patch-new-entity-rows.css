@@ -407,6 +407,8 @@ h4.subgroup {
 .mech-abils.mech-cols-3 { grid-template-columns: fit-content(28%) minmax(0, 1fr) fit-content(28%); }
 /* before / after the patch (mech_before_after): the two columns one width (7.41 Health Restoration) */
 .mech-abils.mech-cols-3.mech-wide-last { grid-template-columns: fit-content(28%) fit-content(20%) minmax(0, 1fr); }
+/* the phrases of a wide last column read from the left (owner 2026-11-19, 7.42 Tormentor drops "Details") */
+.mech-abils.mech-wide-last > .mech-abil-row:not(.mech-head) > .mech-cell:last-child { justify-content: flex-start; text-align: left; }
 .mech-abils.mech-cols-3.mech-ba { grid-template-columns: fit-content(30%) minmax(0, 1fr) minmax(0, 1fr); }
 /* two tables side by side, their rows level (subgrid): 7.38 Lifesteal damage types | Against non-heroes */
 .mech-pair {
@@ -439,7 +441,13 @@ h4.subgroup {
 .mech-old { color: var(--text-dim); }
 .mech-pct { font-size: 12px; margin-left: 2px; }
 .mech-lv-changed { font-weight: 600; }      /* its colour: .iab-lv.iab-buff / .iab-nerf, as every changed value */
-.mech-levels-note { display: block; margin-top: 6px; color: var(--text-dim); }
+/* Valve's sentence under the level tables: a box of its own, the formula on a line of its own (owner 2026-11-19: the
+   7.42 experience approximation "стоит слишком кучно") */
+.mech-levels-note {
+  display: block; margin-top: 8px; padding: 6px 10px; color: var(--text-dim);
+  border: 1px solid var(--line-soft); border-radius: 6px; background: rgba(255, 255, 255, 0.02);
+}
+.mech-levels-note > .formula-expr { display: block; margin: 4px 0; white-space: normal; }
 @media (max-width: 760px) { .mech-abils.mech-levels .mech-abil-row > span { font-size: 11px; padding: 3px 2px; } }
 .mech-cell {
   display: flex;

@@ -77,7 +77,7 @@ def build():
     W(ul_close())
     W(subgroup("Lane Creeps"))
     W(ul_open())
-    W(li("Lane creeps now move up to 25% slower if they are pulled out of lane", t("MISC"), extra=inline_note("Slow builds up over 10s<br>Pulls near Tier 1 safelane towers don't count and apply no slow"), also_dyn=['unit|melee-creep', 'unit|ranged-creep', 'unit|flagbearer-creep', 'unit|siege-creep']))
+    W(li("Lane creeps now move up to 25% slower if they are pulled out of lane", t("REWORK"), extra=inline_note("Slow builds up over 10s<br>Pulls near Tier 1 safelane towers don't count and apply no slow"), also_dyn=['unit|melee-creep', 'unit|ranged-creep', 'unit|flagbearer-creep', 'unit|siege-creep']))
     W(ul_close())
     W(unit_header("Melee Creep", "../icons/units/npc_dota_creep_goodguys_melee.png", general=False, page="melee-creep"))
     W(ul_open())
@@ -110,7 +110,7 @@ def build():
     W(li("Initial spawn time decreased from 20:00 to 15:00", t("REWORK")))
     # server.dll of build 6978: one deaths counter for the match, raised before the payout — the N-th kill pays
     # 125 + 50 × (N − 1), no cap (dota2-ida-researcher 2026-11-19, CONFIRMED_DLL)
-    W(li_formula("Gold reward per player changed", "175", "125 + 50 per Tormentor's death", lambda N: 175, lambda N: 125 + 50 * (N - 1), levels=[1, 2, 3, 4, 5, 6], level_fmt=lambda N: f"#{N}", jump_at=None, rework_badge=False, inline_note_text="Columns: the Tormentor's number in the match. No upper limit"))
+    W(li_formula("Gold reward per player changed", "175", "125 + 50 per Tormentor's death", lambda N: 175, lambda N: 125 + 50 * (N - 1), levels=[1, 2, 3, 4, 5, 6], level_fmt=lambda N: f"#{N}", jump_at=None, rework_badge=False))
     W(ul_close())
     W(ability("Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png"))
     W(ul_open())
@@ -120,7 +120,7 @@ def build():
     W(ul_open())
     # Valve's "from 35%" is wrong: miniboss_reflect passive_reflection_pct is 30 in the files of 7.41c–7.41f (7.41:
     # "decreased from 50% to 30%"); the old column is the real 30%
-    W(li_formula("Base damage reflection decreased", '<span class="wrong-word">35%</span>', "15% + 5% per Tormentor death, up to 30%", lambda N: 30, lambda N: min(30, 15 + 5 * (N - 1)), levels=[1, 2, 3, 4, 5, 6], level_fmt=lambda N: f"#{N}", jump_at=None, rework_badge=False, value_fmt="{:g}%", inline_note_text="Still grows over time: +1.5% per minute of the game, on top of the 30% limit. Columns: the Tormentor's number in the match",
+    W(li_formula("Base damage reflection decreased", '<span class="wrong-word">35%</span>', "15% + 5% per Tormentor death, up to 30%", lambda N: 30, lambda N: min(30, 15 + 5 * (N - 1)), levels=[1, 2, 3, 4, 5, 6], level_fmt=lambda N: f"#{N}", jump_at=None, rework_badge=False, value_fmt="{:g}%", inline_note_text="Still grows over time",
                  extra_html=note_box('This change is wrongly stated. It was 30% since 7.41; the real change is 30% &rarr; 15% + 5% per Tormentor death, up to 30%')))
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
@@ -141,7 +141,7 @@ def build():
     W(ul_close())
     W(ability("Illusion Rune", icon_url="../icons/runes/illusion.png", innate=False))
     W(ul_open())
-    W(li("Illusions created by Illusion Rune now have 40% Item Potency", t("MISC")))
+    W(li("Illusions created by Illusion Rune now have 40% Item Potency", t("NEW")))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.42"))
@@ -167,11 +167,6 @@ def build():
     W(li("Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu", t("TEASER")))
     W(li("Slightly rearranged the trees around Radiant Safelane Tier 1 small camp", t("REWORK")))
     W(li("Dire base shop moved 256 units west", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
-    W(li("Hero spawn points moved: Dire 650–720 units, Radiant 62–198 units", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
-    W(li("Courier spawn points moved: Dire 569–685 units, Radiant 128–537 units", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
-    W(li("Dire stash moved 362 units", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
-    W(li("Streams have 3 more sections with a current (8 instead of 5)", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
-    W(li("No-ward ground changed: 869 cells became no-ward, 356 became wardable", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====
@@ -185,10 +180,11 @@ def build():
     W(li("Gold bounty no longer increases by 1 per cycle", t("DEL")))
     W(li("Neutral creeps can now walk through both Radiant and Dire defender's gates", t("MISC")))
     W(li("Each non-amphibian and non-ancient Neutral camp unit now has a \"home jungle\", meaning it will spawn only on its own side of the map", t("MISC"), extra=mech_table(["Jungle", "Small camps", "Medium camps", "Large camps"], [["Radiant", "Kobold camp<br>Hill Troll Berserker and Kobold camp<br>Hill Troll camp", "Wolf camp<br>Ogre camp<br>Radigull camp (new!)", "Centaur camp<br>Wildwing camp<br>Eimermole camp (new!)"], ["Dire", "Vhoul camp<br>Ghost camp<br>Harpy camp", "Satyr camp<br>Golem camp<br>Odobenus camp (new!)", "Large Satyr camp<br>Hellbear camp<br>Dark Troll camp"]])))
-    W(li("Added a Radigull camp: New Medium camp for Radiant", t("NEW"), extra=inline_note("Each camp consists of 2 Radigulls")))
-    W(li("Added an Odobenus camp: New Medium camp for Dire", t("NEW"), extra=inline_note("Each camp consists of 1 Odobenus Frostmage and 2 Odobenus Footmen")))
-    W(li("Added an Eimermole camp: New Large camp for Radiant", t("NEW"), extra=inline_note("Each camp consists of 1 Eimermole Foreman and 1 Eimermole")))
-    W(li("Added an Ancient Ogre Seal camp: New Ancient camp", t("NEW"), extra=inline_note(" Each camp consists of 1 Ancient Ogre Seal and 2 Ancient Ogre Seal Pups")))
+    W(li("New neutral camps", t("NEW"), extra="<!--MECHTABLE-->" + camp_table([("Radigull camp <span class=\"camp-where\">Medium, Radiant</span>", [(2, "Radigull", NEUTRAL_CDN + "radigull.png")], "70", "124"), ("Odobenus camp <span class=\"camp-where\">Medium, Dire</span>", [(1, "Odobenus Frostmage", NEUTRAL_CDN + "odobenus_frostmage.png"), (2, "Odobenus Footman", NEUTRAL_CDN + "odobenus_footman.png")], "73", "140"), ("Eimermole camp <span class=\"camp-where\">Large, Radiant</span>", [(1, "Eimermole Foreman", NEUTRAL_CDN + "eimermole_foreman.png"), (1, "Eimermole", NEUTRAL_CDN + "eimermole.png")], "98", "156"), ("Ancient Ogre Seal camp <span class=\"camp-where\">Ancient</span>", [(1, "Ancient Ogre Seal", NEUTRAL_CDN + "ogre_seal.png"), (2, "Ancient Ogre Seal Pup", NEUTRAL_CDN + "ogre_seal_pup.png")], "152", "314")]) + "<!--/MECHTABLE-->"))
+    W(li("Added a Radigull camp: New Medium camp for Radiant", t("NEW"), extra=inline_note("Each camp consists of 2 Radigulls"), covered=True))
+    W(li("Added an Odobenus camp: New Medium camp for Dire", t("NEW"), extra=inline_note("Each camp consists of 1 Odobenus Frostmage and 2 Odobenus Footmen"), covered=True))
+    W(li("Added an Eimermole camp: New Large camp for Radiant", t("NEW"), extra=inline_note("Each camp consists of 1 Eimermole Foreman and 1 Eimermole"), covered=True))
+    W(li("Added an Ancient Ogre Seal camp: New Ancient camp", t("NEW"), extra=inline_note(" Each camp consists of 1 Ancient Ogre Seal and 2 Ancient Ogre Seal Pups"), covered=True))
     W(li("Satyr Banisher in Large Satyr camp replaced with the second Satyr Mindstealer", t("REWORK")))
     W(li("Amount of Kobolds in Kobold camp decreased from 3 to 2", b(3, 2)))
     W(li("Medium Centaur camp removed", t("DEL")))
@@ -997,7 +993,7 @@ def build():
     W(properties_change(old=[("NERF", "+10% Movement Speed")], new=[("", "+6% Movement Speed", b(10, 6))]))
     W(ul_open())
     W(li("Total cost decreased from 4650g to 4550g (due to Yasha cost decrease)", b(4650, 4550, l=True)))
-    W(li("Mirror Image illusions now have 35% item potency", t("MISC")))
+    W(li("Mirror Image illusions now have 35% item potency", t("NEW")))
     W(ul_close())
 
     # ===== NEUTRAL ITEM UPDATES =====
@@ -1328,7 +1324,7 @@ def build():
     W(li("Tier changed from 5 to 4", t("REWORK")))
     W(li("Refract health cost decreased from 8% to 4%", b(8, 4, l=True)))
     W(li("Refract now creates a strong illusion", t("MISC")))
-    W(li("Refract illusion now has 100% item potency", t("MISC")))
+    W(li("Refract illusion now has 100% item potency", t("NEW")))
     W(ul_close())
     W(item_header("Witchbane"))
     W(properties_change(old=[("REWORK", "+7/15/23/31 Attack Speed"), ("REWORK", "+110/150/190/230 Health"), ("REWORK", "+0/3/6/9 Health Regen"), ("REWORK", "+0.8/1.6/2.4/3.2 Mana Regen"), ("REWORK", "+0/10/13/16% Magic Resistance"), ("REWORK", "+15/20/25/30 Movement Speed"), ("REWORK", "+0/100/160/220 Mana"), ("REWORK", "+0/0/0/15% Evasion"), ("REWORK", "+6/9/12/15 Damage"), ("REWORK", "+0/4/6/8 Armor"), ("REWORK", "+9/12/15% Health Restoration"), ("REWORK", "+0/100/160/220 Mana"), ("REWORK", "+0.8/1.6/2.4/3.2 Mana Regen"), ("REWORK", "+15/20/25/30 Movement Speed"), ("REWORK", "+6/9/12/15 Damage"), ("REWORK", "+10/12/14% Status Resistance"), ("REWORK", "+5/12% Spell Amplification"), ("DEL", "+0/0/0/25% Slow Resist")], new=[("", "+8/18/28 Attack Speed", b([7, 15, 23, 31], [8, 18, 28])), ("", "+110/170/230 Health", b([110, 150, 190, 230], [110, 170, 230])), ("", "+0/4/8 Health Regen", b([0, 3, 6, 9], [0, 4, 8])), ("", "+0.8/2/3.2 Mana Regen", b([0.8, 1.6, 2.4, 3.2], [0.8, 2, 3.2])), ("", "+0/12/15% Magic Resistance", b([0, 10, 13, 16], [0, 12, 15])), ("", "+14/22/30 Movement Speed", b([15, 20, 25, 30], [14, 22, 30])), ("", "+0/130/200 Mana", b([0, 100, 160, 220], [0, 130, 200])), ("", "+0/0/15% Evasion", b([0, 0, 0, 15], [0, 0, 15])), ("", "+6/11/16 Damage", b([6, 9, 12, 15], [6, 11, 16])), ("", "+0/5/7 Armor", b([0, 4, 6, 8], [0, 5, 7])), ("", "+10/15% Health Restoration", b([9, 12, 15], [10, 15])), ("", "+0/130/200 Mana", b([0, 100, 160, 220], [0, 130, 200])), ("", "+0.8/2/3.2 Mana Regen", b([0.8, 1.6, 2.4, 3.2], [0.8, 2, 3.2])), ("", "+14/22/30 Movement Speed", b([15, 20, 25, 30], [14, 22, 30])), ("", "+6/11/16 Damage", b([6, 9, 12, 15], [6, 11, 16])), ("", "+11/13% Status Resistance", b([10, 12, 14], [11, 13])), ("", "+10% Spell Amplification", b([5, 12], 10)), ("NEW", "+0/0/16% Lifesteal"), ("NEW", "+20% Item Potency")]))
@@ -3032,7 +3028,7 @@ def build():
     W(ul_open())
     W(li("Number of Slashes increased from 3 to 4", b(3, 4)))
     W(li("Damage per slash decreased from 35/65/95/125 to 25/50/75/100", b([35, 65, 95, 125], [25, 50, 75, 100])))
-    W(li("Slashes now have 60% item potency", t("MISC")))
+    W(li("Slashes now have 60% item potency", t("NEW")))
     W(ul_close())
 
     # Phantom Assassin
