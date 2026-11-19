@@ -110,3 +110,12 @@ def test_740_assist_gold_is_the_live_block():
 def test_742_bounty_is_the_live_block():
     src = (ROOT / "content" / "p742.py").read_text(encoding="utf-8")
     assert BOUNTY_BLOCK in src and "OLD: 125 + (8 * VictimLevel)" not in src
+
+
+def test_an_open_formula_table_has_no_pill_and_shows_by_itself():
+    # owner 2026-11-19, 7.42 passive gold: "просил же formula table" — open under the row, by minute
+    from patch.formula_rows import open_formula_table
+    html = open_formula_table(lambda m: (95 + (2 * m + 46) // 5) / 1.15, lambda m: 90, levels=[0, 60, 70],
+                              level_fmt=lambda m: f"{m}:00", value_fmt="{:.1f}", jump_at=None)
+    assert html.startswith('<table class="formula-table"') and " hidden" not in html.split(">", 1)[0]
+    assert ">60:00<" in html and ">111.3<" in html and ">114.8<" in html

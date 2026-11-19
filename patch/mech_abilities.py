@@ -607,12 +607,28 @@ def _pip_entries(version):
     return _PIP_DATA.get(version or "")
 
 
-def _pip_sticks(pips, fragile):
-    """Health pips as thin rounded sticks, levels split by "/" (owner 2026-11-19: variant A, "чуть ближе палочки")."""
+_PIP_SOURCES = (   # the toggles over the pip table: (key, label, icon)
+    ("talent", "Talent", "../icons/misc/talents_gold.svg"),
+    ("scepter", "Aghanim's Scepter", "../icons/stats/aghs_scepter_icon.png"),
+    ("shard", "Aghanim's Shard", "../icons/stats/aghs_shard_icon.png"),
+    ("marci", "Allied Marci (Special Delivery)", "../icons/heroes/marci.png"),
+)
+
+
+def _pip_sticks(pips, fragile, bonus=()):
+    """Health pips as thin rounded sticks, levels split by "/" (owner 2026-11-19: variant A, "чуть ближе палочки");
+    a talent's / Aghanim's / Marci's extra pips after them, hidden until its toggle is on (owner 2026-11-19: "чекбоксы
+    … доп пипы появляются чуть другим цветом")."""
     levels = pips if isinstance(pips, list) else [pips]
     cls = " pip-fragile" if fragile else ""
-    return '<span class="pip-sep">/</span>'.join(
-        f'<span class="pip-sticks{cls}" aria-label="{n} pips">' + "<i></i>" * n + "</span>" for n in levels)
+    groups = []
+    for k, n in enumerate(levels):
+        extra = ""
+        for b in bonus:
+            x = b["extra"][k] if isinstance(b["extra"], list) else b["extra"]
+            extra += f'<i class="pip-x" data-src="{b["src"]}"></i>' * x
+        groups.append(f'<span class="pip-sticks{cls}" aria-label="{n} pips">' + "<i></i>" * n + extra + "</span>")
+    return '<span class="pip-sep">/</span>'.join(groups)
 
 
 def pip_rows(raw, version):
@@ -627,40 +643,48 @@ def pip_rows(raw, version):
     by_line = {e["line"]: e for e in data}
     if any(line not in by_line for line in lines):
         return None
-    rows = []
+    rows, used = [], set()
     for line in lines:
         e = by_line[line]
         parsed = _parse_line(line)
         label, icon = (_ABILITY_ONLY.get(parsed[0], parsed[0]), parsed[1]) if parsed else (line, None)
-        tip = "<br>".join(x for x in (e.get("note"), "" if e.get("sure", True) else
-                                      "From the game files, not checked in the game's code") if x)
         name = _html.escape(label)
-        if tip:
-            name = (f'<span class="iab-hint abil-ico-hint" data-tooltip="{_html.escape(tip, quote=True)}">'
-                    f'{name}</span>')
         img = f'<img src="{icon}" alt="" loading="lazy" width="22" height="22">' if icon and not icon.startswith("facet:") else ""
         dim = "" if e.get("sure", True) else " pip-unsure"
+        used |= {b["src"] for b in e.get("bonus", ())}
         rows.append(f'<span class="mech-abil-row{dim}"><span class="mech-cell pip-name">{img}{name}</span>'
-                    f'<span class="mech-cell pip-cell">{_pip_sticks(e["pips"], e.get("fragile"))}</span></span>')
-    legend = (f'<span class="pip-legend"><span>{_pip_sticks(2, False)} 1 hero hit each</span>'
-              f'<span>{_pip_sticks(2, True)} Fragile: a melee hero hits 2</span></span>')
-    return f'<!--MECHTABLE--><span class="mech-abils pip-table">{"".join(rows)}</span>{legend}<!--/MECHTABLE-->'
+                    f'<span class="mech-cell pip-cell">{_pip_sticks(e["pips"], e.get("fragile"), e.get("bonus", ()))}'
+                    f'</span></span>')
+    toggles = "".join(
+        f'<button type="button" class="pip-toggle" data-pip-src="{k}" aria-pressed="false" data-tooltip="{_html.escape(lab, quote=True)}">'
+        f'<img src="{ic}" alt="" width="18" height="18">{_html.escape(lab)}</button>'
+        for k, lab, ic in _PIP_SOURCES if k in used)
+    bar = f'<span class="pip-toggles">{toggles}</span>' if toggles else ""
+    # what a stick means, said plainly (owner 2026-11-19: "подсказку как-то лучше записать")
+    legend = (f'<span class="pip-legend"><span>{_pip_sticks(1, False)} One stick: one hero attack to break</span>'
+              f'<span>{_pip_sticks(1, True)} Fragile: a melee hero breaks two per attack</span>'
+              + ('<span><span class="pip-sticks"><i class="pip-x pip-x-shown"></i></span> Extra from a toggle above</span>'
+                 if toggles else "") + '</span>')
+    return (f'<!--MECHTABLE--><span class="pip-block">{bar}<span class="mech-abils pip-table">{"".join(rows)}</span>'
+            f'{legend}</span><!--/MECHTABLE-->')
 
 
 def mech_change_cells(old, new, l=False):
-    """A change as three table cells — before (dim), after (in the colour of what it means), its % (owner 2026-11-19,
+    """A change as two table cells — "before → after", its % coloured (owner 2026-11-19,
     7.42 building bounty: "забыли значения до … один столбец до, другой после и в конце % разницу"). "110-130" reads
     as its middle, 120, for the %."""
     def mid(v):
         nums = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", str(v))]
         return sum(nums) / len(nums) if nums else None
     a, b = mid(old), mid(new)
+    # before → after in one cell, the % beside it in the colour of what it means (owner 2026-11-19: "цветом надо
+    # выделить -17%, а не after … before/after в один столбец")
+    both = f'<span class="mech-old">{old}</span> → <b>{new}</b>'
     if a is None or b is None or a == b or not a:
-        return [f'<span class="mech-old">{old}</span>', f"<b>{new}</b>", ""]
+        return [both, ""]
     tone = "buff" if (b > a) != l else "nerf"
     pct = (b - a) / a * 100
-    return [f'<span class="mech-old">{old}</span>', f'<b class="iab-num iab-{tone}">{new}</b>',
-            f'<span class="mech-pct-cell iab-{tone}">{"+" if pct > 0 else "−"}{abs(pct):.0f}%</span>']
+    return [both, f'<span class="mech-pct-cell iab-{tone}">{"+" if pct > 0 else "−"}{abs(pct):.0f}%</span>']
 
 
 def mech_formula(expr):
@@ -790,6 +814,9 @@ _HERO_LINE_RE = re.compile(r"^([A-Z][\w'.\- ]+?): (\S.*)$")
 TWO_PAIRS_FROM = 12           # a list this long reads in two pairs of columns (hero | ability, hero | ability)
 
 
+_re_tags = re.compile(r"<[^>]+>")
+
+
 def hero_ability_rows(raw, least=1, row_text=""):
     """Valve's 7.37 lists "Hero: Ability (how)" as a table (owner 2026-10-30): the row's own text is its first line
     ("The following are considered a Teleport:" — "встроить внутри таблицы … как начало предложения"); the items and
@@ -884,6 +911,24 @@ def hero_ability_rows(raw, least=1, row_text=""):
     def said(abils):                            # the details cell: each ability's words, named when there are two
         named = sum(1 for _n, _a, d in abils if d) > 1
         return "<br>".join(f"{n}: {d}" if named and n else d for n, _a, d in abils if d)
+    if not with_details:
+        # no hero column: the ability says whose it is, its owner in the name's hover; the freed room is a third
+        # column (owner 2026-11-19: "тоже убрать иконки героев, но освободившийся слот …")
+        flat = []
+        for hero, abils in pairs:
+            owner = _html.unescape(_re_tags.sub("", hero)).strip()
+            for _n, a, d in abils:
+                a = a.replace('<span class="mech-abil-name">',
+                              f'<span class="mech-abil-name iab-hint abil-ico-hint" data-tooltip="{_html.escape(owner, quote=True)}">', 1)
+                flat.append(tipped(a, d))
+        per = 3 if len(flat) >= 6 else 2 if len(flat) >= 2 else 1
+        for k in range(0, len(flat), per):
+            chunk = flat[k:k + per] + [""] * (per - len(flat[k:k + per]))
+            html += f'<span class="mech-abil-row">{cells(chunk)}</span>'
+        for note in notes:
+            html += line(note, "mech-table-note")
+        lead = " mech-captioned" if row_text else ""
+        return f'<span class="mech-abils mech-cols-flat mech-cols-flat{per}{lead}">{html}</span>', []
     if with_details:
         pairs = [(hero, f'<span class="mech-abil-set">{"".join(tipped(a, "") for _n, a, _d in abils)}</span>', said(abils))
                  for hero, abils in pairs]

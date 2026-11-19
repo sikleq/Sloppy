@@ -1,30 +1,239 @@
 {
-  "_about": "Health pips of the units Valve lists under Pip Health, by patch (owner 2026-11-19: show the pips of each). From the static research of server.dll 6983 (7.42, 2026-11-19): 1 pip = 4 HP; a hero hits 1 pip, a melee hero 2 on a Fragile unit, illusions / creeps / other units 1/4. 'line' is Valve's line as on the page; 'pips' an int or one per level; 'sure': false = read from the game files, not traced in the code; 'note': talents / upgrades. patch/mech_abilities.pip_rows().",
+  "_about": "Health pips of the units Valve lists under Pip Health, by patch (owner 2026-11-19: show the pips of each). From the static research of server.dll 6983 (7.42, 2026-11-19): 1 pip = 4 HP; a hero hits 1 pip, a melee hero 2 on a Fragile unit, illusions / creeps / other units 1/4. 'line' is Valve's line as on the page; 'pips' an int or one per level; every count and bonus proven in the code (follow-up 2026-11-19); 'sure': false would dim a row; 'bonus': extra pips from a talent / Aghanim's Scepter / Shard / an allied Marci (Special Delivery), an int or one per level — the page's toggles show them. patch/mech_abilities.pip_rows().",
   "7.42": [
-    {"line": "Couriers", "pips": 2, "fragile": true, "sure": true, "note": "+1 next to Marci (Special Delivery)"},
-    {"line": "Observer Wards", "pips": 2, "fragile": false, "sure": true},
-    {"line": "Sentry Wards", "pips": 2, "fragile": false, "sure": true},
-    {"line": "Clinkz: Skeleton Archers", "pips": 2, "fragile": false, "sure": true},
-    {"line": "Clockwerk: Power Cogs", "pips": 2, "fragile": false, "sure": true},
-    {"line": "Grimstroke: Phantom's Embrace", "pips": [2, 2, 3, 3], "fragile": false, "sure": true, "note": "+1 with its talent"},
-    {"line": "Gyrocopter: Homing Missile", "pips": 3, "fragile": false, "sure": true},
-    {"line": "Juggernaut: Healing Ward", "pips": 1, "fragile": false, "sure": true, "note": "2 with Aghanim's Shard"},
-    {"line": "Keeper of the Light: Will-O-Wisp", "pips": 8, "fragile": false, "sure": true},
-    {"line": "Lich: Ice Spire", "pips": 4, "fragile": false, "sure": true},
-    {"line": "Phoenix: Supernova", "pips": [6, 8, 10], "fragile": false, "sure": true, "note": "7/10/13 with Aghanim's Scepter; +2 with its talent"},
-    {"line": "Pugna: Nether Ward", "pips": [3, 4, 5, 6], "fragile": false, "sure": true},
-    {"line": "Radigull: Eggstremism", "pips": 1, "fragile": false, "sure": true},
-    {"line": "Roshan's Banner", "pips": [6, 8, 10], "fragile": true, "sure": true},
-    {"line": "Shadow Shaman: Mass Serpent Wards", "pips": 2, "fragile": false, "sure": true, "note": "3 with its talent"},
-    {"line": "Shadow Shaman: Urnaconda", "pips": 8, "fragile": false, "sure": false, "note": "12 with its talent"},
-    {"line": "Techies: M.A.D.", "pips": 3, "fragile": false, "sure": false},
-    {"line": "Techies: Proximity Mines", "pips": 1, "fragile": false, "sure": true},
-    {"line": "Templar Assassin: Psionic Trap", "pips": 2, "fragile": true, "sure": true},
-    {"line": "Tidehunter: Dead in the Water", "pips": 4, "fragile": false, "sure": true},
-    {"line": "Treant Protector: Eyes in the Forest", "pips": 2, "fragile": false, "sure": true},
-    {"line": "Undying: Tombstone", "pips": [5, 6, 7, 8], "fragile": false, "sure": true, "note": "+4 with its talent"},
-    {"line": "Undying: Tombstone Zombies", "pips": 1, "fragile": false, "sure": true},
-    {"line": "Weaver: The Swarm", "pips": [3, 4, 4, 5], "fragile": false, "sure": true, "note": "+1 with its talent"},
-    {"line": "Zeus: Nimbus", "pips": 8, "fragile": true, "sure": true}
+    {
+      "line": "Couriers",
+      "pips": 2,
+      "fragile": true,
+      "sure": true,
+      "bonus": [
+        {
+          "src": "marci",
+          "extra": 1
+        }
+      ]
+    },
+    {
+      "line": "Observer Wards",
+      "pips": 2,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Sentry Wards",
+      "pips": 2,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Clinkz: Skeleton Archers",
+      "pips": 2,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Clockwerk: Power Cogs",
+      "pips": 2,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Grimstroke: Phantom's Embrace",
+      "pips": [
+        2,
+        2,
+        3,
+        3
+      ],
+      "fragile": false,
+      "sure": true,
+      "bonus": [
+        {
+          "src": "talent",
+          "extra": 1
+        }
+      ]
+    },
+    {
+      "line": "Gyrocopter: Homing Missile",
+      "pips": 3,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Juggernaut: Healing Ward",
+      "pips": 1,
+      "fragile": false,
+      "sure": true,
+      "bonus": [
+        {
+          "src": "shard",
+          "extra": 1
+        }
+      ]
+    },
+    {
+      "line": "Keeper of the Light: Will-O-Wisp",
+      "pips": 8,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Lich: Ice Spire",
+      "pips": 4,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Phoenix: Supernova",
+      "pips": [
+        6,
+        8,
+        10
+      ],
+      "fragile": false,
+      "sure": true,
+      "bonus": [
+        {
+          "src": "scepter",
+          "extra": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "src": "talent",
+          "extra": 2
+        }
+      ]
+    },
+    {
+      "line": "Pugna: Nether Ward",
+      "pips": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Radigull: Eggstremism",
+      "pips": 1,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Roshan's Banner",
+      "pips": [
+        6,
+        8,
+        10
+      ],
+      "fragile": true,
+      "sure": true
+    },
+    {
+      "line": "Shadow Shaman: Mass Serpent Wards",
+      "pips": 2,
+      "fragile": false,
+      "sure": true,
+      "bonus": [
+        {
+          "src": "talent",
+          "extra": 1
+        }
+      ]
+    },
+    {
+      "line": "Shadow Shaman: Urnaconda",
+      "pips": 8,
+      "fragile": false,
+      "sure": true,
+      "bonus": [
+        {
+          "src": "talent",
+          "extra": 4
+        }
+      ]
+    },
+    {
+      "line": "Techies: M.A.D.",
+      "pips": 3,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Techies: Proximity Mines",
+      "pips": 1,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Templar Assassin: Psionic Trap",
+      "pips": 2,
+      "fragile": true,
+      "sure": true
+    },
+    {
+      "line": "Tidehunter: Dead in the Water",
+      "pips": 4,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Treant Protector: Eyes in the Forest",
+      "pips": 2,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Undying: Tombstone",
+      "pips": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "fragile": false,
+      "sure": true,
+      "bonus": [
+        {
+          "src": "talent",
+          "extra": 4
+        }
+      ]
+    },
+    {
+      "line": "Undying: Tombstone Zombies",
+      "pips": 1,
+      "fragile": false,
+      "sure": true
+    },
+    {
+      "line": "Weaver: The Swarm",
+      "pips": [
+        3,
+        4,
+        4,
+        5
+      ],
+      "fragile": false,
+      "sure": true,
+      "bonus": [
+        {
+          "src": "talent",
+          "extra": 1
+        }
+      ]
+    },
+    {
+      "line": "Zeus: Nimbus",
+      "pips": 8,
+      "fragile": true,
+      "sure": true
+    }
   ]
 }

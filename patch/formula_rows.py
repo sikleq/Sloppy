@@ -252,6 +252,13 @@ def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_bett
             f'</div>{chart_html}</div>')
 
 
+def open_formula_table(old_fn, new_fn, **bf_kwargs):
+    """The site's formula table (old / new / Δ% by level or minute) open under a row, no pill to click — a value that
+    is no formula of the patch notes (owner 2026-11-19, 7.42 passive gold: "просил же formula table")."""
+    from .badges import bf
+    return bf(old_fn, new_fn, "", **bf_kwargs)[2].replace(" hidden>", ">", 1)
+
+
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
                rework_badge=True, inline_note_text=None, label=None,
                force_rework=False, extra_html=None, after_html=None, **bf_kwargs):

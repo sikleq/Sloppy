@@ -232,11 +232,11 @@ def _pivot(hits):
             # после и в конце % разницу"), the after in the colour of what it means
             cell = {(t, v): f'*mech_change_cells({_py_str(h.group("a"))}, {_py_str(h.group("b"))})'
                     for (t, v), h in zip(split, hits)}
-            rows = ", ".join("[" + ", ".join([_py_str(t)] + [cell.get((t, v), '"–", "", ""') for v in kinds]) + "]"
+            rows = ", ".join("[" + ", ".join([_py_str(t)] + [cell.get((t, v), '"–", ""') for v in kinds]) + "]"
                              for t in things)
             heads = [""]
-            for v in kinds:
-                heads += [f"{v[:1].upper() + v[1:]}: before", "after", ""]
+            for v in kinds:                   # "before → after" and its % (owner 2026-11-19: in one column)
+                heads += [v[:1].upper() + v[1:], ""]
             head = "[" + ", ".join(_py_str(x) for x in heads) + "]"
             return f'mech_table({head}, [{rows}], cls="mech-grid mech-change-grid")'
     return None

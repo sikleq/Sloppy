@@ -190,8 +190,10 @@ def test_a_hero_ability_list_is_a_table_led_by_its_row_with_items_on_a_line_of_t
     # pairs keeps it behind a "?"
     assert ">How<" not in html and ">Details<" in html and "mech-cols-hero3" in html
     assert ">Details<" not in long_html
-    assert "mech-cols-hero4" in long_html
-    assert oracle.count('class="mech-hero"') == 1 and "Clairvoyant Curse" in oracle and "Clairvoyant Cure" in oracle
+    # no hero column: the abilities in three columns, the hero in the name's hover (owner 2026-11-19)
+    assert "mech-cols-flat3" in long_html and 'class="mech-hero"' not in long_html
+    assert 'data-tooltip="Faceless Void">Distortion Field<' in long_html
+    assert "Clairvoyant Curse" in oracle and "Clairvoyant Cure" in oracle and oracle.count('data-tooltip="Oracle"') == 2
     # an item's own active from the game's tooltip (owner 2026-10-30: "у предметов тоже есть способности")
     assert '>Teleport</span>' in html
 
@@ -406,15 +408,16 @@ def test_long_level_tables_lie_across_and_shared_values_pivot():
               'hit gold rescaled from 90-135 to 100")))')
     out = g._postprocess_from_to_list([bounty])[0]
     # before | after | % per value (owner 2026-11-19: "забыли значения до")
-    assert ('extra=mech_table(["", "Last hit gold: before", "after", "", "Gold per player: before", "after", ""], '
+    # "before → after" in one column, its % coloured (owner 2026-11-19)
+    assert ('extra=mech_table(["", "Last hit gold", "", "Gold per player", ""], '
             '[["Tier 1 tower", *mech_change_cells("110-130", "100"), *mech_change_cells("90", "75")], '
             '["Tier 2 tower", ') in out
-    assert '["Barracks", *mech_change_cells("90-135", "100"), "–", "", ""]' in out and 'cls="mech-grid mech-change-grid"' in out
+    assert '["Barracks", *mech_change_cells("90-135", "100"), "–", ""]' in out and 'cls="mech-grid mech-change-grid"' in out
     # the "no longer variable" row: the table's before column shows the ranges — covered
     rows = g._postprocess_bounty_range_row([out, 'W(li("Buildings no longer have variable last hit bounties", t("MISC")))'])
     assert rows[1].endswith('t("MISC"), covered=True))')
     from patch.mech_abilities import mech_change_cells
-    assert mech_change_cells("90", "75") == ['<span class="mech-old">90</span>', '<b class="iab-num iab-nerf">75</b>',
+    assert mech_change_cells("90", "75") == ['<span class="mech-old">90</span> → <b>75</b>',
                                              '<span class="mech-pct-cell iab-nerf">−17%</span>']
 
 
@@ -733,10 +736,14 @@ def test_pip_health_list_is_a_table_of_sticks_from_the_game_data():
     from patch.mech_abilities import pip_rows
     html = pip_rows("Couriers<br>Pugna: Nether Ward<br>Shadow Shaman: Urnaconda", "7.42")
     assert html.count('class="mech-abil-row') == 3
-    assert html.count("<i></i>") >= 2 + 3 + 4 + 5 + 6 + 8 + 4                 # sticks + the legend's
+    assert html.count("<i></i>") == 2 + 3 + 4 + 5 + 6 + 8 + 2                 # sticks + one in each of 2 legend keys
     assert '<span class="pip-sticks pip-fragile" aria-label="2 pips">' in html  # the courier is Fragile
     assert '<span class="pip-sep">/</span>' in html                            # Nether Ward 3/4/5/6
-    assert "pip-unsure" in html and "not checked in the game&#x27;s code" in html   # Urnaconda: files only
+    assert "pip-unsure" not in html                                            # every count proven in the code
+    # a talent's extra pips: hidden sticks of their own, shown by the toggle over the table (owner 2026-11-19)
+    assert '<i class="pip-x" data-src="talent"></i>' * 4 in html and 'data-pip-src="talent"' in html
+    assert 'data-pip-src="scepter"' not in html                               # no toggle no row of the list needs
+    assert "One stick: one hero attack to break" in html
     assert ">Nether Ward<" in html and "Pugna" not in html                     # no hero column
     assert pip_rows("Couriers<br>Some New Unit", "7.42") is None               # a line without data: the list as ever
     assert pip_rows("Couriers", "7.41") is None

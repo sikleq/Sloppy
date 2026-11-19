@@ -770,3 +770,14 @@
   });
   document.addEventListener('toggle', drawBrewlingConnectors, true);
 })();
+
+// ---- PIP HEALTH TOGGLES (mech_abilities.pip_rows): a talent's / Aghanim's / Marci's extra pips shown on its toggle
+// (owner 2026-11-19: "чекбоксы в виде таланта/аганима … доп пипы появляются чуть другим цветом") ----
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.pip-toggle');
+  if (!btn) return;
+  const block = btn.closest('.pip-block');
+  const on = btn.getAttribute('aria-pressed') !== 'true';
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  if (block) block.classList.toggle('pip-on-' + btn.dataset.pipSrc, on);
+});
