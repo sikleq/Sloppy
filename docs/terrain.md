@@ -314,7 +314,20 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   Ruled out on the way (test renders): the sky (`r_dota_white_skybox 1`, `r_drawskybox 0`, 3D skybox off), the
   water's reflection / refraction (off: the water turns black, the arcs stay on top), the fish
   (`ambient_creatures`, models emptied), and all 22 world meshes reaching the spot (emptied in a repacked map vpk).
-  Not fixed yet: the render scripts don't empty `fol_ambient*`; the 7.38-7.42 pictures still carry it (docs/todo.md).
+  Fixed 2026-11-19: `render_versions.py` (maprender/sfm, used by the stumps renders too) empties the 22 files
+  before Dota starts and removes them after (`hide_particles` / `unhide_particles`; it stops when the pak has no
+  `fol_ambient*`, so a renamed effect is not missed silently). Every map file 7.38-7.42 is re-rendered, normal and
+  with stumps (`rerender_nofol.py`). Checked: no picture before 7.38 has the arcs (no Lotus Pools there).
+- Riverbed corner at mid (2026-11-19, the owner: "a strange extra corner", not in the game). By the Radiant stairs
+  the 7.42 water shows a pale area with dead-straight edges along x -253 and y -253. It is map geometry: the Dire
+  riverbed (`agg_merge_mod_dire_riverbed_path`, dark 64-unit tiles at z 0) leaves out the corner x < -256,
+  y < -256, and the lighter Radiant riverbed under it shows through the water in SFM's straight-down light (the
+  render puts the edge 3 units off the mesh). Ruled out first: particles (`r_drawparticles 0`: still there), a seam
+  of our stitching (cell borders at x -393 / y -793). No console variable or override hides geometry, so the
+  stitched picture is mended: `scripts/gen/mend_riverbed.py` brings the patch's smoothed brightness onto a line
+  from its soft side to the water past the sharp edge, keeping the ripples; boxes per map file (7.42, 7.42-v2).
+  Tests: tests/test_mend_riverbed.py. The small bluish slab with a bright rim at (-440, -186) is a stone of the
+  Radiant riverbed under the water and stays.
 - Map history: `scripts/gen/map_history.py` — which dota.vpk each patch shipped (SHA-1 from depot 373301's
   manifests, one Steam login per manifest, with pauses: Steam rate-limits logins) and one download per distinct
   file. 7.38-7.41f: 16 map files; 7.08-7.37: 49. Their pictures, objects and counts go to
