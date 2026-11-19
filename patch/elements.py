@@ -1408,8 +1408,9 @@ def _pop_list(body):
         kind = " pop-sub" if sub else " pop-head" if text.endswith(":") and len(items) > 1 else ""
         pct = _pop_pct(text)
         dots = '<span class="pop-dots"></span>' if pct else ''      # a dotted ruler to its %, as the site's rows
-        rows.append(f'<span class="pop-li{kind}"><span class="pop-t{" pop-t-pct" if pct else ""}">{text}</span>'
-                    f'{dots}{pct}</span>')
+        # the % shows under the mouse in a pinned "?" only (owner 2026-11-19: "сделать везде")
+        rows.append(f'<span class="pop-li{kind}{" pop-hint" if pct else ""}"><span class="pop-t'
+                    f'{" pop-t-pct" if pct else ""}">{text}</span>{dots}{pct}</span>')
     return ''.join(rows)
 
 

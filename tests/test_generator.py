@@ -618,7 +618,8 @@ def test_multi_line_info_popup_is_a_bulleted_list():
     # owner 2026-11-19: before / after values get the row's % at the end; two changes in one sentence = two rows
     two = info_tip("As a result, for buildings impact damage increased from 90 to 112.5, and burn damage decreased "
                    "from 50 to 45")
-    assert two.count('class="pop-li"') == 2 and "+25%" in two and "-10%" in two
+    # a row with a % is a "pop-hint": its % shows under the mouse in a pinned "?" (owner 2026-11-19)
+    assert two.count('class="pop-li pop-hint"') == 2 and "+25%" in two and "-10%" in two
     assert '<span class="pop-t pop-t-pct">Burn damage decreased from 50 to 45</span><span class="pop-dots"></span>' in two
     # a sentence per row: the % stands by its own change (owner 2026-11-19, 7.42 Caduceus "+35% не видно, что относится
     # к Damage …")

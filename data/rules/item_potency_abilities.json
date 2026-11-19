@@ -36,5 +36,78 @@
   "other": {
     "Illusion Rune": "Illusions: 40%",
     "Any other illusion": "20%"
-  }
+  },
+  "groups": {
+    "own": [
+      "pangolier_swashbuckle",
+      "gyrocopter_flak_cannon",
+      "gyrocopter_side_gunner",
+      "ember_spirit_sleight_of_fist",
+      "kez_falcon_rush",
+      "abaddon_death_coil",
+      "sniper_assassinate",
+      "void_spirit_astral_step",
+      "luna_moon_glaive"
+    ],
+    "added": [
+      "mirana_celestial_quiver",
+      "riki_innate_backstab",
+      "weaver_geminate_attack",
+      "sandking_scorpion_strike",
+      "windrunner_focusfire",
+      "juggernaut_blade_fury",
+      "item_enhancement_evolved"
+    ],
+    "illusions": [
+      "chaos_knight_phantasm",
+      "chaos_knight_chaos_bolt",
+      "spectre_haunt",
+      "spectre_shadow_step",
+      "terrorblade_reflection",
+      "grimstroke_dark_portrait",
+      "ringmaster_funhouse_mirror",
+      "vengefulspirit_command_aura",
+      "dark_seer_wall_of_replica",
+      "dark_seer_normal_punch",
+      "item_manta",
+      "item_riftshadow_prism"
+    ]
+  },
+  "not_in_game": [
+    "item_javelin",
+    "item_stygian_desolator",
+    "item_misericorde"
+  ],
+  "rules": [
+    [
+      "A scaled value",
+      "value × Item Potency / 100, no cap",
+      "Desolator −6 at 120%: −7.2"
+    ],
+    [
+      "Bonuses and penalties of the attacker",
+      "added up: 100 + their sum",
+      "Focus Fire −25 with Evolved +20: 95%"
+    ],
+    [
+      "An attack with its own Item Potency",
+      "multiplied by that sum",
+      "Swashbuckle 60% with Evolved: 72%"
+    ],
+    [
+      "A debuff applied again",
+      "keeps the higher Item Potency",
+      "Desolator of the hero refreshed by its illusion: −6"
+    ],
+    [
+      "Illusions",
+      "20% unless their creator sets one",
+      "Manta 35%, Illusion Rune 40%"
+    ],
+    [
+      "Dormant Curio",
+      "a crafted artifact while holding it: its flagged values × 1.3 (above 0 only)",
+      "40 → 52"
+    ]
+  ]
 }

@@ -15,3 +15,9 @@ def test_the_page_lists_the_flagged_items_and_the_sources():
     assert "Swashbuckle" in html and "Slashes: 60%" in html and "Pangolier" in html
     assert "Illusion Rune" in html and "Manta Style" in html
     assert 'subtabs_active' not in html and "Item Potency" in html
+    # owner 2026-11-19 "item potency улучшить намного": the rules, the usual illusion potencies, the gone items, Curio
+    for title in ("How Item Potency adds up", "Attacks with their own Item Potency", "Bonuses and penalties",
+                  "Illusions", "Dormant Curio"):
+        assert f'<h3 class="ipot-title">{title}</h3>' in html
+    assert ">-2.1<" in html and ">-2.4<" in html                      # Desolator −6 at Manta 35% and Rune 40%
+    assert 'class="ipot-gone"' in html and "(not in the game)" in html

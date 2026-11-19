@@ -124,7 +124,10 @@ def change_cells(before, after, lv_before, lv_after, label=None, percent=True):
             value = f"{was} → " + _hl(now, "buff" if b > a else "nerf")
             if percent and a and len(_FIRST_NUM.findall(was)) == 1 and len(_FIRST_NUM.findall(now)) == 1:
                 d = round((b - a) / a * 100)
-                value += f' <span class="tm-pct">{"+" if d > 0 else "−"}{abs(d)}%</span>'
+                # the % only under the mouse in a pinned "?" (owner 2026-11-19: "+100 можно при наведении, если
+                # включил золотую рамку … а не писать рядом"): the new value dotted, the % hidden till then
+                value = (f'<span class="pop-hint">{value}<span class="tm-pct">'
+                         f'{"+" if d > 0 else "−"}{abs(d)}%</span></span>')
     return (label, level, value)
 
 

@@ -226,6 +226,12 @@
 .pop-li > .pop-dots { flex: 1 1 12px; min-width: 12px; align-self: flex-end; margin-bottom: 0.4em;
   border-bottom: 1px dashed transparent; }
 .pop-li:hover > .pop-dots { border-bottom-color: rgba(150, 146, 137, 0.45); }   /* only under the mouse, as the rows' */
+/* a value's % in a "?": hidden, shown under the mouse once the "?" is pinned (its gold frame) — the value dotted as
+   the site's other values with a % on hover (owner 2026-11-19: "+100 можно при наведении … сделать везде") */
+.pop-hint > .pop-end, .pop-hint > .tm-pct { display: none; }
+.info-pop-body.is-pinned .pop-hint:hover > .pop-end { display: inline; }
+.info-pop-body.is-pinned .pop-hint:hover > .tm-pct { display: inline; margin-left: 6px; }
+.pop-hint .iab-hl { text-decoration: underline dotted currentColor; text-underline-offset: 3px; }
 .pop-li > .pop-end { flex: none; margin-left: 0; }
 .pop-li > .pop-end .badge-group { display: inline-flex; gap: 3px; }
 .pop-li.pop-sub { padding-left: 24px; border-top: 0; padding-top: 0; }

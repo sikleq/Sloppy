@@ -281,13 +281,20 @@
 
 /* ITEM POTENCY page (builders/item_potency.py, Materials → Mechanics, owner 2026-11-19): items and the values the game
    scales, the abilities that set attacks' potency */
-.ipot-table { margin-bottom: 28px; }
+.ipot-page { padding: 4px 0 24px; }
+.ipot-title { font-family: var(--font-ui); color: var(--gold); font-size: 14px; letter-spacing: .4px;
+  text-transform: uppercase; margin: 22px 0 8px 14px; text-align: left; }
+.ipot-table { margin-bottom: 6px; }
+table.mr-table.ipot-table td.ipot-ex { color: var(--text-dim); }
+table.mr-table.ipot-table tr.ipot-gone td { opacity: 0.45; }
+.ipot-nm { display: inline-block; vertical-align: middle; }
 table.mr-table.ipot-table td { text-align: left; vertical-align: middle; padding: 8px 14px; }
-table.mr-table.ipot-table td.ipot-text { white-space: normal; min-width: 360px; max-width: 760px; }
+table.mr-table.ipot-table { width: 100%; }
+table.mr-table.ipot-table td.ipot-text { white-space: normal; min-width: 0; }
+table.mr-table.ipot-table th { white-space: nowrap; }
 table.mr-table.ipot-table td.ipot-ill { text-align: center; white-space: nowrap; }
 .ipot-name { white-space: nowrap; font-weight: 600; }
 .ipot-name img { vertical-align: middle; margin-right: 10px; border-radius: 3px; }
-.ipot-owner { display: block; margin-left: 54px; color: var(--text-dim); font-weight: 400; font-size: 12px; }
-.ipot-sources .ipot-owner { margin-left: 42px; }
+.ipot-owner { display: block; color: var(--text-dim); font-weight: 400; font-size: 12px; }
 .ipot-line + .ipot-line { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line-soft); }
 
