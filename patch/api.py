@@ -3,7 +3,7 @@ from .output import W
 from .state import _State
 from .badges import b, br, bf, bt, t, gradient_class, facet_badge, scale_pill, rank_step
 from .cards_facets import facet_change, new_facet
-from .camps import camp_table
+from .camps import camp_ref, camp_table
 from .elements import (
     hero_header, item_header, unit_header, ability, facet_header, section, subgroup, li,
     ul_open, ul_close, plain_header,

@@ -34,7 +34,14 @@ PORTRAIT = (512, 288)          # portraits come as 128x72 or 512x288; both are b
 FACE_CX = {"tadpole": 220, "froglet": 230, "froglet_mage": 270, "grown_frog": 260, "grown_frog_mage": 210,
            "ancient_frog": 250, "ancient_frog_mage": 310, "prowler_acolyte": 250, "prowler_shaman": 220,
            "radigull": 170, "odobenus_frostmage": 280, "odobenus_footman": 370, "eimermole_foreman": 220,
-           "eimermole": 190, "ogre_seal": 300, "ogre_seal_pup": 250}
+           "eimermole": 190, "ogre_seal": 300, "ogre_seal_pup": 250,
+           # 7.42 "home jungle" camps (their make-up: server.dll 6984, the camp table at RVA 0x4C2E270)
+           "kobold": 200, "kobold_tunneler": 220, "kobold_taskmaster": 256, "forest_troll_berserker": 256,
+           "forest_troll_high_priest": 256, "gnoll_assassin": 256, "fel_beast": 256, "ghost": 256, "harpy_scout": 240,
+           "harpy_storm": 256, "ogre_mauler": 220, "ogre_magi": 256, "giant_wolf": 220, "alpha_wolf": 200,
+           "satyr_trickster": 280, "satyr_soulstealer": 256, "mud_golem": 256, "centaur_outrunner": 256,
+           "centaur_khan": 240, "wildkin": 170, "enraged_wildkin": 300, "polar_furbolg_champion": 256,
+           "polar_furbolg_ursa_warrior": 280, "satyr_hellcaller": 256, "dark_troll": 256, "dark_troll_warlord": 256}
 DIGITS = {"2": ["11110", "00001", "00001", "01110", "10000", "10000", "11111"],
           "3": ["11110", "00001", "00001", "01110", "00001", "00001", "11110"],
           "4": ["10001", "10001", "10001", "11111", "00001", "00001", "00001"],

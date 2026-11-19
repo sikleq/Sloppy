@@ -399,8 +399,11 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .camp-table .camp-face, .camp-ref .camp-face { position: relative; flex: none; }
 .camp-table .camp-face img, .camp-ref .camp-face img { width: 34px; }     /* a creep's face is 34x22, wider than its glyph */
 /* a camp named in another table (7.42 "home jungle", camp_ref): its faces before the name, one camp a line */
-.camp-ref { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; margin: 1px 0; }
-.camp-ref .camp-ico { display: inline-flex; gap: 2px; }
+.camp-ref { display: inline-flex; max-width: 100%; align-items: center; gap: 6px; vertical-align: middle; margin: 1px 0; }
+.camp-ref .camp-ico { display: inline-flex; flex: none; gap: 2px; }       /* the faces never squeeze under the name */
+.camp-ref .camp-ref-name { text-align: left; }
+.mech-abils.camp-jungle { grid-template-columns: auto auto auto auto; }   /* columns by their camps, not 1fr for one */
+.camp-jungle .mech-cell { flex-direction: column; gap: 4px; }     /* one camp a line (no <br>: in a flex row it does not break) */
 /* with the Side column and the icons 7.42's table was 36 px wider than its block at 1400 px: narrower cell padding */
 .camp-table-sided .camp-cell { padding: 3px 8px; }
 .camp-table .camp-face img.camp-count, .camp-ref .camp-face img.camp-count { position: absolute; right: 0; bottom: 0; width: 9px; height: 11px; }

@@ -64,6 +64,15 @@ def test_camp_ref_puts_faces_before_the_name_without_the_type_glyph():
     assert camp_ref("Nowhere camp", [(1, "X", "x.png")]) == "Nowhere camp"   # no face: the name alone
 
 
+def test_742_home_jungle_names_all_18_camps_with_their_faces():
+    src = (ROOT / "content" / "p742.py").read_text(encoding="utf-8")
+    line = next(s for s in src.splitlines() if "home jungle" in s)
+    assert line.count("camp_ref(") == 18 and 'cls="camp-jungle"' in line
+    assert "<br>" not in line                          # one camp a line comes from the cell's column, not a <br>
+    # make-up read from server.dll 6984: Kobold camp lost a Kobold (3 -> 2, Valve's note), Vhoul is 3 Assassins
+    assert 'camp_ref("Kobold camp", [(2, "Kobold"' in line and 'camp_ref("Vhoul camp", [(3, "Vhoul Assassin"' in line
+
+
 def test_old_tables_get_the_type_from_the_camp_name():
     html = camp_table([("Small camp", [(3, "Pollywog", "../icons/units/npc_dota_neutral_tadpole.png")], 54, 90)])
     assert '<span class="camp-label iab-hint" data-tooltip="Small camp">Small camp</span>' in html
