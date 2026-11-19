@@ -925,8 +925,9 @@ def _change_li(text, tag, note=None, patch=None, num=None):
         text = terrain_button(text, phrase)
     # the chip is the row's number in its category, as on the patch page — no tag (the owner 2026-10-03)
     chip = terrain_num_chip(num) if num else '<span class="row-tag-empty"></span>'
-    if tag == "TEASER":                     # Valve's wink at a coming event: its own chip, no number (2026-11-19)
-        chip = '<span class="badge teaser" data-tag="teaser">TEASER</span>'
+    if tag == "TEASER":       # Valve's wink at a coming event: the number's box with the TEASER icon, no word, no number
+        # (owner 2026-11-19: "почему в terrain слова teaser, а не иконка")
+        chip = '<span class="badge tnum tnum-teaser" data-tag="teaser" role="img" aria-label="Teaser" data-tooltip="Teaser"></span>'
     return (f'<li class="terrain-row" data-tag="{" ".join(tags)}">{chip}'
             f'<span class="row-text">{text}</span>{shots}</li>')
 

@@ -527,7 +527,9 @@ def test_a_teaser_row_has_its_own_chip_and_no_place_in_the_cells():
     assert g._guess_tag("Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu") == "TEASER"
     import pathlib                                    # its tile on the patch pages has an icon of its own
     css = (pathlib.Path(__file__).resolve().parents[1] / "src" / "css" / "patch-tag-marks.css").read_text(encoding="utf-8")
-    assert '.tag-marks .badge[data-tag~="teaser"], .filter-btn[data-filter="teaser"] { --tm: url(' in css
+    # ... the same icon in a Terrain row's number box (owner 2026-11-19)
+    assert ('.tag-marks .badge[data-tag~="teaser"], .filter-btn[data-filter="teaser"], .badge.tnum[data-tag~="teaser"] '
+            '{ --tm: url(') in css
 
 
 def test_round_five_rules_of_the_742_proofread():

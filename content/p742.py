@@ -3367,7 +3367,7 @@ def build():
                  lambda L: 1 + L // 5, lambda L: 3, value_fmt="{:g}"))
     W(li_formula("Movespeed bonus rescaled", "5% + 5% per 5 levels", "5% + 1% per level",
                  lambda L: 5 + 5 * (L // 5), lambda L: 5 + 1 * L, value_fmt="{:g}%"))
-    W(li("Chickens are now more duplicitous", t("MISC")))
+    W(li("Chickens are now more duplicitous", t("TEASER")))
     W(ul_close())
     W(ability("Hex", slug="shadow_shaman_voodoo"))
     W(ul_open())
