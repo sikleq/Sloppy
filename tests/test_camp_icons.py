@@ -7,7 +7,7 @@ import pytest
 
 Image = pytest.importorskip("PIL.Image")    # CI has no Pillow: the icon checks run on the owner's PC only
 
-from patch.camps import camp_icon, camp_ref, camp_table  # noqa: E402
+from patch.camps import camp_faces, camp_icon, camp_ref, camp_table  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts" / "gen"))
@@ -96,11 +96,20 @@ def test_742_camp_changes_are_one_table_valves_rows_covered():
     src = (ROOT / "content" / "p742.py").read_text(encoding="utf-8")
     line = next(s for s in src.splitlines() if 'mech_story("Neutral camps changed"' in s)
     assert 'mech_table(["Camp", "Before", "Now"]' in line and 'cls="camp-changes"' in line
-    assert line.count('"badge del camp-gone">Removed') == 3 and line.count("camp_faces(") == 4
+    # the removed camps: their old make-up (server.dll 6976) in Before, the same faces grey in Now, no red mark
+    assert "camp-gone" not in line and line.count("camp_faces(") == 10 and line.count("gone=True") == 3
+    assert "'—'" not in line
     for row in ("Satyr Banisher in Large Satyr camp replaced", "Amount of Kobolds in Kobold camp",
                 "Medium Centaur camp removed", "Large Warpine Raider camp removed", "Ancient Thunderhide camp removed"):
         valve = next(s for s in src.splitlines() if row in s)
         assert "covered=True" in valve, row
+
+
+def test_a_removed_camps_faces_are_grey_not_a_red_mark():
+    # owner 2026-11-19: "removed выделяет от сайта, может просто серые иконки, как мы делаем с удаленными предметами"
+    creeps = [(2, "Kobold", "../icons/units/npc_dota_neutral_kobold.png")]
+    assert 'class="camp-ico camp-ico-gone"' in camp_faces(creeps, gone=True)
+    assert "camp-ico-gone" not in camp_faces(creeps)
 
 
 def test_old_tables_get_the_type_from_the_camp_name():

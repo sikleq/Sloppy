@@ -45,7 +45,9 @@ FACE_CX = {"tadpole": 220, "froglet": 230, "froglet_mage": 270, "grown_frog": 26
            "harpy_storm": 256, "ogre_mauler": 220, "ogre_magi": 256, "giant_wolf": 220, "alpha_wolf": 200,
            "satyr_trickster": 280, "satyr_soulstealer": 256, "mud_golem": 256, "centaur_outrunner": 256,
            "centaur_khan": 240, "wildkin": 170, "enraged_wildkin": 300, "polar_furbolg_champion": 256,
-           "polar_furbolg_ursa_warrior": 280, "satyr_hellcaller": 256, "dark_troll": 256, "dark_troll_warlord": 256}
+           "polar_furbolg_ursa_warrior": 280, "satyr_hellcaller": 256, "dark_troll": 256, "dark_troll_warlord": 256,
+           # camps removed in 7.42, their make-up before it (server.dll 6976, camp table RVA 0x4A85D70)
+           "warpine_raider": 256, "big_thunder_lizard": 256, "small_thunder_lizard": 256}
 DIGITS = {"2": ["11110", "00001", "00001", "01110", "10000", "10000", "11111"],
           "3": ["11110", "00001", "00001", "01110", "00001", "00001", "11110"],
           "4": ["10001", "10001", "10001", "11111", "00001", "00001", "00001"],

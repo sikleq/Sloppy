@@ -202,7 +202,8 @@
   /* 7.42 "home jungle": the camps' faces don't fit four columns of a phone, the table scrolls inside itself */
   .mech-abils.camp-jungle { max-width: 100%; overflow-x: auto; grid-template-columns: repeat(4, max-content); }
   .camp-jungle .camp-ref-name { white-space: nowrap; }
-  .mech-abils.camp-changes { overflow-x: auto; }       /* 7.42 camps changed: three faces a cell, scrolls inside itself */
+  /* 7.42 camps changed: three faces a cell, scrolls inside itself */
+  .mech-abils.camp-changes { overflow-x: auto; grid-template-columns: repeat(3, max-content); }
   /* 7.38 "List of Neutral Enchantments" table: icon + name, then the tier values, then the squares */
   body.patch-page .entity-block.enchant-list-head,
   body.patch-page .entity-block.enchant-list-row { margin-left: -6px; margin-right: 0; padding-left: 8px; padding-right: 8px; }

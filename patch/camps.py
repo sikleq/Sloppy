@@ -61,9 +61,12 @@ def _img(path, cls=""):
             f'loading="lazy">')
 
 
-def camp_faces(creeps):
-    """a camp's creeps as faces only (a repeat with its count) — a cell of a "before / now" table (7.42 camp changes)"""
-    return camp_icon("", creeps)
+def camp_faces(creeps, gone=False):
+    """a camp's creeps as faces only (a repeat with its count) — a cell of a "before / now" table (7.42 camp changes).
+    gone=True: a camp that left the game, its faces grey like a removed entity's icon (owner 2026-11-19: "просто
+    серые иконки, как мы делаем с удаленными предметами")"""
+    faces = camp_icon("", creeps)
+    return faces.replace('class="camp-ico"', 'class="camp-ico camp-ico-gone"', 1) if gone else faces
 
 
 def camp_ref(name, creeps, new=False):
