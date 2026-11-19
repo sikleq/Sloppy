@@ -175,6 +175,12 @@ def test_can_now_be_dispelled_adds_dispellable_at_the_end_of_the_description():
         # owner 2026-11-19, 7.42 Pipe "Barrier is now dispellable": "мы разве не внутри карточек пишем вместо строки?"
         _card_for("item|pipe-test", ["Active: Barrier. Absorbs 425 damage."], ["Active: Barrier. Absorbs 425 damage."])
         assert cards_item_abilities._iab_text_change("Barrier is now dispellable", {"nerf"})
+        # owner 2026-11-19, Parasma 7.42 "Magic Corruption now affects buildings": not in the tooltip — the card says it
+        _card_for("item|parasma-test", ["Passive: Magic Corruption. Your attacks reduce the enemy's Magic resistance by 20% for 4 seconds."],
+                  ["Passive: Magic Corruption. Your attacks reduce the enemy's Magic resistance by 15% for 4 seconds."])
+        assert cards_item_abilities._iab_text_change("Magic Corruption now affects buildings", {"misc"})
+        new = cards_item_abilities.render_iab_card("item|parasma-test|7.38").split("pane-new")[1]
+        assert 'data-tag="misc">Affects buildings</span>.' in new
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 

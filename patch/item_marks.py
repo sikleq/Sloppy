@@ -97,6 +97,30 @@ def _illusion_row(text):
     return f'<span class="pop-li pop-sub"><span class="pop-t">Illusions: {vals}</span></span>'     # owner 2026-11-19
 
 
+def _curio_pct(version):
+    """Dormant Curio's own bonus, its "item_potency" in that patch's items.txt (30 in 7.42); None when it has none."""
+    av = (_items(version).get("item_dormant_curio") or {}).get("AbilityValues")
+    if not isinstance(av, dict):
+        return None
+    v = av.get("item_potency")
+    v = v.get("value") if isinstance(v, dict) else v
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def _curio_text(text, pct):
+    """Each scaled number as "50 → 65" — what Dormant Curio makes of it, only a value above 0 grows (server.dll 6983);
+    owner 2026-11-19, Red Ledger's Most Wanted: the mark repeated the description instead of showing the bonus."""
+    def one(m):
+        v = float(m.group(1))
+        if v <= 0:
+            return m.group(0)
+        return f'<span class="mech-old">{m.group(1)}{m.group(2)}</span> → <b>{round(v * (100 + pct) / 100, 2):g}{m.group(2)}</b>'
+    return re.sub(r"<b>(\d+(?:\.\d+)?)(%?)</b>", one, text)
+
+
 def item_marks(name, version):
     if not version:
         return ""
@@ -105,13 +129,18 @@ def item_marks(name, version):
     if not isinstance(blk, dict):
         return ""
     out = ""
+    curio = _curio_pct(version)
     for kind, flag, head, icon in _FLAGS:
         keys = _flagged(blk, flag)
-        if not keys:
+        if not keys or (kind == "curio" and not curio):
             continue
+        found = _rows(slug, version, blk, keys)
+        if kind == "curio":
+            head = f"With Dormant Curio (+{curio:g}%)"
+            found = [(n, _curio_text(t, curio)) for n, t in found]
         rows = "".join(f'<span class="pop-li"><span class="pop-t">{f"{n}: " if n else ""}{t}</span></span>'
                        + (_illusion_row(t) if kind == "potency" else "")
-                       for n, t in _rows(slug, version, blk, keys))
+                       for n, t in found)
         src = icon or item_img("Dormant Curio")
         out += (f'<span class="info-tip item-mark item-mark-{kind}" tabindex="0"><img src="{src}" alt="">'
                 f'<span class="info-pop"><span class="info-pop-h">{head}</span>{rows}</span></span>')

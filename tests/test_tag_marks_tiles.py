@@ -222,6 +222,10 @@ def test_item_icon_marks_come_from_the_games_flags():
     assert "item-mark-potency" in skadi and "<b>-20%</b>" in skadi and "<b>-40%</b>" in skadi
     assert "item-mark-curio" not in skadi
     assert "item-mark-curio" in item_marks("Gunpowder Gauntlets", "7.42")
+    # the Curio mark shows what the bonus makes of each number, not the description again (owner 2026-11-19, Red Ledger)
+    ledger = item_marks("Red Ledger", "7.42")
+    assert "With Dormant Curio (+30%)" in ledger
+    assert '<span class="mech-old">50</span> → <b>65</b>' in ledger and '<span class="mech-old">12</span> → <b>15.6</b>' in ledger
     assert item_marks("Blink Dagger", "7.42") == ""
     from patch.state import _State
     saved = _State.current_patch_version
