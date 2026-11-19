@@ -613,8 +613,14 @@ def test_nested_child_keeps_its_own_valve_info():
 def test_multi_line_info_popup_is_a_bulleted_list():
     from patch.elements import info_tip
     html = info_tip("first<br>second<br>&nbsp;&nbsp;– deeper")
-    assert html.count('class="pop-li"') == 2 and 'class="pop-li pop-sub">deeper' in html
+    assert html.count('class="pop-li"') == 2 and 'class="pop-li pop-sub"><span class="pop-t">deeper' in html
     assert 'pop-li' not in info_tip("just one line")
+    # owner 2026-11-19: before / after values get the row's % at the end; two changes in one sentence = two rows
+    two = info_tip("As a result, for buildings impact damage increased from 90 to 112.5, and burn damage decreased "
+                   "from 50 to 45")
+    assert two.count('class="pop-li"') == 2 and "+25%" in two and "-10%" in two
+    assert '<span class="pop-t">Burn damage decreased from 50 to 45</span>' in two
+    assert "+50%" in info_tip("Cooldown increased from 10 to 15") and "nerf" in info_tip("Cooldown increased from 10 to 15")
 
 
 def test_new_item_becomes_card_price_bonuses_then_abilities():

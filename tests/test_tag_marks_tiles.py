@@ -194,3 +194,13 @@ def test_an_item_potency_row_has_a_grey_stripe_and_the_games_icon():
     css = read_css()
     assert ".aghanim-marker.potency" in css and "ul.changes li.item-potency" in css
     assert (ROOT / "icons" / "stats" / "item_potency.png").exists()
+
+
+def test_no_all_changes_tip_and_only_the_name_links():
+    # owner 2026-11-19: "All changes of X убрать из подсказок отовсюду … переходить только если кликнуть по названию,
+    # а не иконке" (the icon is kept for the Item Potency mark)
+    for html in (el.item_header("Desolator"), el.hero_header("Axe")):
+        assert "All changes of" not in html
+        icon = html.split('class="entity-icon', 1)[1].split("</div>", 1)[0]
+        assert "<a " not in icon
+        assert 'class="entity-link"' in html.split('class="entity-name"', 1)[1]

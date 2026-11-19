@@ -437,8 +437,8 @@ def hero_header(name):
     eid = _register_entity("hero", name)
     href = _entity_link("heroes", name)
     return _open_block() + f'''<div class="entity hero-entity"{eid}>
-  <div class="entity-icon hero-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{hero_img(name)}" alt="{name}" loading="lazy" width="256" height="144"></a></div>
-  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a></div>
+  <div class="entity-icon hero-icon"><img src="{hero_img(name)}" alt="{name}" loading="lazy" width="256" height="144"></div>
+  <div class="entity-name"><a class="entity-link" href="{href}">{name}</a></div>
 </div>'''
 
 
@@ -478,7 +478,6 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
     img = f'<img src="{icon_url}" alt="{name}" loading="lazy" width="128" height="72">'
     if eid:          # a tracked unit has a Changes page (units/<slug>.html; a creep-hero lives with the heroes)
         href = _entity_link("heroes" if entity_kind == "creep-hero" else "units", page or name)
-        img = f'<a class="entity-link" href="{href}">{img}</a>'
         name_html = f'<a class="entity-link" href="{href}">{name}</a>'
     else:            # General Updates (Roshan, Tormentor…): no dynamics id, no page
         name_html = name
@@ -528,7 +527,7 @@ def item_header(name, new=False, changed=False, removed=None, old_title=None, co
         block_data_attr = ''
     eid = _register_entity("item", name)
     href = _entity_link("items", name)
-    name_html = f'<a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>'
+    name_html = f'<a class="entity-link" href="{href}">{name}</a>'
     if old_title and old_title != name:
         name_html = (f'<span class="ability-title-rename"><span class="ability-title-old">{old_title}</span>'
                      f'<span class="ability-title-arrow">→</span>{name_html}</span>')
@@ -537,7 +536,7 @@ def item_header(name, new=False, changed=False, removed=None, old_title=None, co
         type_label += f'<span class="entity-source">{source}</span>'
     # item-block: every framed box of an item hangs out on one common edge (CSS, owner 2026-09-28)
     return out + _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
-  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64"></a>{price}</div>
+  <div class="entity-icon item-icon"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64">{price}</div>
   <div class="entity-name">{name_html}{type_label}</div>
 </div>'''
 
@@ -1347,15 +1346,48 @@ def inline_list(text):
 _POP_SUB = '&nbsp;&nbsp;– '
 
 
+_POP_FROMTO_RE = re.compile(r'\bfrom (\d+(?:\.\d+)?)(?:%|s|g)? to (\d+(?:\.\d+)?)(?:%|s|g)?(?![\d./])')
+_POP_LOWER_RE = re.compile(r'\b(?:cooldown|cost|cast point|delay|respawn|channel time)\b', re.I)
+
+
+def _pop_pct(line):
+    """"… from 90 to 112.5" → the row's % at its end, as on a patch row (owner 2026-11-19: "если там до/после
+    значения, то в конце строки … %разницу"); '' for a line without one."""
+    m = _POP_FROMTO_RE.search(re.sub(r'<[^>]+>', '', line))
+    if not m or 'badge' in line or 'pop-pct' in line:
+        return ''
+    from .badges import b
+    a, z = (float(x) if '.' in x else int(x) for x in m.groups())
+    return '' if a == z or a == 0 else f'<span class="pop-end">{b(a, z, l=bool(_POP_LOWER_RE.search(line)))}</span>'
+
+
+def _pop_split(line):
+    """"…impact damage increased from 90 to 112.5, and burn damage decreased from 50 to 45": one row per change."""
+    hits = list(_POP_FROMTO_RE.finditer(line))
+    out, start = [], 0
+    for h, nxt in zip(hits, hits[1:]):
+        cut = re.search(r',\s*(?:and\s+)?', line[h.end():nxt.start()])
+        if cut:
+            out.append(line[start:h.end() + cut.start()])
+            start = h.end() + cut.end()
+    rest = line[start:]
+    return out + [rest[:1].upper() + rest[1:] if out else rest]
+
+
 def _pop_list(body):
-    """A popup of several lines is an enumeration: one bullet per line (an "&nbsp;&nbsp;– x"
-    line is a sub-item of the line above). A single line stays plain text."""
-    items = [x for x in body.split('<br>') if x.strip()]
-    if len(items) < 2:
+    """A popup is a small table: one row per line, thin lines between them (owner 2026-11-19: "внутри всех [?] …
+    лаконичной удобной таблицы с разделителями"); an "&nbsp;&nbsp;– x" line is a sub-row of the line above; a row
+    with "from A to B" ends with its % — a line with two such changes is two rows. A single plain line stays text."""
+    items = [p for x in body.split('<br>') if x.strip() for p in _pop_split(x)]
+    if len(items) < 2 and not (items and _pop_pct(items[0])):
         return body
-    return ''.join(
-        f'<span class="pop-li pop-sub">{x[len(_POP_SUB):]}</span>' if x.startswith(_POP_SUB)
-        else f'<span class="pop-li">{x}</span>' for x in items)
+    rows = []
+    for x in items:
+        sub = x.startswith(_POP_SUB)
+        text = x[len(_POP_SUB):] if sub else x
+        rows.append(f'<span class="pop-li{" pop-sub" if sub else ""}"><span class="pop-t">{text}</span>'
+                    f'{_pop_pct(text)}</span>')
+    return ''.join(rows)
 
 
 def info_tip(*lines, header=None):

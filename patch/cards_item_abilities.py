@@ -866,8 +866,8 @@ _IAB_VERBS = {"deal", "deals", "apply", "applies", "gives", "grants", "provides"
 
 
 _IAB_TAILS = (   # (the row after the ability's name, the sentence the new description gets)
-    (r"can now be dispelled", "Dispellable."),
-    (r"can no longer be dispelled", "Not dispellable."),
+    (r"(?:can now be dispelled|is now dispellable)", "Dispellable."),        # 7.42 Pipe "Barrier is now dispellable"
+    (r"(?:can no longer be dispelled|is no longer dispellable)", "Not dispellable."),
     (r"now pierces debuff immunity", "Pierces Debuff Immunity."),
     (r"no longer pierces debuff immunity", "Does not pierce Debuff Immunity."),
     # a value the tooltip keeps for one kind of unit only (owner 2026-10-16, Crimson Guard 7.41: "Guard base damage

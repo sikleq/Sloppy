@@ -97,8 +97,8 @@ def enchant_row(name, stats, tiers, slug=None, new=True):
     lines.insert(0, own_head)
     return (_open_block(("is-new " if new else "") + "item-block enchant-list-row", ' data-new-tag="NEW"' if new else "")
             + f'''<div class="entity item-entity"{eid}>
-  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{icon}" alt="{name}" loading="lazy"></a></div>
-  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a></div>
+  <div class="entity-icon item-icon"><img src="{icon}" alt="{name}" loading="lazy"></div>
+  <div class="entity-name"><a class="entity-link" href="{href}">{name}</a></div>
 </div><div class="ench-tiers"{tag}>{"".join(lines)}</div>''')
 
 
@@ -123,8 +123,8 @@ def enchant_header(name, slug=None, new=False, removed=None):
     href = _entity_link("items", "enchantment " + name)
     table = "" if removed else _enchant_change(name)
     return _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
-  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{icon}" alt="{name}" loading="lazy"></a></div>
-  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>{type_label}</div>
+  <div class="entity-icon item-icon"><img src="{icon}" alt="{name}" loading="lazy"></div>
+  <div class="entity-name"><a class="entity-link" href="{href}">{name}</a>{type_label}</div>
 </div>''' + table
 
 

@@ -61,4 +61,4 @@ def item_link(name):
         return html.escape(name)
     ver = _State.current_patch_version
     href = f"../items/{slug}.html" + (f"?from={ver}" if ver else "")
-    return f'<a class="item-mention" href="{href}" title="All changes of {html.escape(name)}">{html.escape(name)}</a>'
+    return f'<a class="item-mention" href="{href}">{html.escape(name)}</a>'

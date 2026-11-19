@@ -272,7 +272,9 @@ class TestInfoTip:
     def test_multiple_lines_become_bullets(self):
         from patch.elements import info_tip
         result = info_tip("Line 1", "Line 2")
-        assert '<span class="pop-li">Line 1</span><span class="pop-li">Line 2</span>' in result
+        # rows of a small table, not bullets (owner 2026-11-19)
+        assert ('<span class="pop-li"><span class="pop-t">Line 1</span></span>'
+                '<span class="pop-li"><span class="pop-t">Line 2</span></span>') in result
 
     def test_returns_span_with_info_tip_class(self):
         from patch.elements import info_tip
