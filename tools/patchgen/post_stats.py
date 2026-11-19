@@ -254,7 +254,8 @@ def _parse_number_or_list(s):
 def _block_lines(lines, i):
     """The lines of the item block that starts after lines[i - 1] (its header), up to the next entity header."""
     j = i
-    while j < len(lines) and not re.match(r'W\((?:item_header|hero_header|section|plain_header|unit_header)\(', lines[j]):
+    while j < len(lines) and not re.match(r'\s*W\((?:item_header|hero_header|section|plain_header|unit_header|enchant_header)\(',
+                                          lines[j]):
         j += 1
     return lines[i:j]
 
@@ -423,10 +424,12 @@ def _postprocess_properties_change(lines, with_abilities=False, version=None):
         needs_old = False
         block_end = i
         while block_end < len(lines):
-            ln = lines[block_end]
-            if (ln.startswith('W(item_header(') or ln.startswith('W(hero_header(')
-                or ln.startswith('W(section(') or ln.startswith('W(plain_header(')
-                or ln.startswith('W(unit_header(')):
+            # a header line may come with a leading blank line in it ("\nW(plain_header(\"Artifact Pools\"…") — read
+            # without it, or the block runs on into the enchantments and their stats land in the item's card (owner
+            # 2026-11-19, 7.42 Witchbane: "в игре совсем другое" — 18 enchantment stats in a neutral item's card)
+            ln = lines[block_end].lstrip()
+            if ln.startswith(('W(item_header(', 'W(hero_header(', 'W(section(', 'W(plain_header(', 'W(unit_header(',
+                              'W(enchant_header(')):
                 break
             block_end += 1
 

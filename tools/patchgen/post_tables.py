@@ -196,6 +196,35 @@ def _postprocess_from_to_list(lines):
     return out
 
 
+_POOL_TIER_RE = re.compile(r'^\s*W\(li\("Tier (\d)", t\("MISC"\), extra=inline_note\("([^"]+)"\)\)\)\s*$')
+_POOLS_ROW_RE = re.compile(r'^(\s*W\(li\("Each tier is now separated into multiple pools of Artifacts[^"]*", t\("\w+"\))\)\)\s*$')
+
+
+def _postprocess_artifact_pools(lines):
+    """7.42 Artifact Pools: the "Tier N" rows, each with its pools in a (?) — "a, b, c<br>d, e, f" — become one table
+    under the row that says there are pools (owner 2026-11-19: "Artifact Pools — сделать таблицей"), artifact_pools():
+    a row per tier, a column per pool, the items with their icons."""
+    at = next((k for k, ln in enumerate(lines) if _POOLS_ROW_RE.match(ln)), None)
+    if at is None:
+        return lines
+    tiers, drop = {}, set()
+    for k, ln in enumerate(lines):
+        m = _POOL_TIER_RE.match(ln)
+        if m:
+            tiers[int(m.group(1))] = [[x.strip() for x in pool.split(",")] for pool in m.group(2).split("<br>")]
+            drop.add(k)
+    if sorted(tiers) != list(range(1, len(tiers) + 1)) or not tiers:
+        return lines
+    out = []
+    for k, ln in enumerate(lines):
+        if k in drop:
+            continue
+        if k == at:
+            ln = f'{_POOLS_ROW_RE.match(ln).group(1)}, extra=artifact_pools({[tiers[n] for n in sorted(tiers)]!r})))'
+        out.append(ln)
+    return out
+
+
 _OBJECTIVES = (("Wisdom Shrine", "Wisdom Shrines"), ("Outpost", "Outposts"), ("Lotus Pool", "Lotus Pools"),
                ("Watcher", "Watchers"), ("Twin Gate", "Twin Gates"))
 

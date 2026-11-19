@@ -302,8 +302,10 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
         merged_esc = merged.replace('"', '\\"')
         return f'W(li("{merged_esc}", t("REWORK")))'
 
-    badge_call = _emit_badge(txt, hero_side=bool(hero_name) or _HERO_SIDE[0])
     tag = tag_override or _guess_tag(txt)
+    if tag == "TEASER":        # a wink with numbers in it is no change (7.42 "Resentment increased from 1 to 55")
+        return f'W(li("{txt}", t("TEASER")))'
+    badge_call = _emit_badge(txt, hero_side=bool(hero_name) or _HERO_SIDE[0])
     creep_badge = None if tag_override else _extra_creep_badge(txt)
     if creep_badge:
         badge_str = creep_badge                       # "+1 creep at 40:00 → 35:00": its % too (2026-11-19)

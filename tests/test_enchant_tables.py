@@ -80,6 +80,27 @@ def test_7_41_enchantments_show_tables_and_keep_only_word_rows():
     assert 'class="ench-stat ench-gone">Cast Range' in mystical and "None" not in mystical
 
 
+def test_a_tier_the_enchantment_lost_is_struck_in_its_header():
+    # owner 2026-11-19, 7.42: "удалили тир 5, подсветить это в таблице"
+    from patch.enchants import _enchant_change
+    from patch.state import _State
+    saved = _State.current_patch_version
+    try:
+        _State.current_patch_version = "7.42"
+        html = _enchant_change("Audacious")
+    finally:
+        _State.current_patch_version = saved
+    assert '<span class="ench-tier-h ench-gone">Tier 5</span>' in html
+    assert '<span class="ench-tier-h">Tier 4</span>' in html
+    # every table of the patch: the game has 4 tiers now, Vital never had a tier 5 (owner 2026-11-19)
+    _State.current_patch_version = "7.42"
+    try:
+        vital = _enchant_change("Vital")
+    finally:
+        _State.current_patch_version = saved
+    assert '<span class="ench-tier-h ench-gone">Tier 5</span>' in vital and "ench-col-gone" in vital
+
+
 def test_tables_have_lines_between_cells_and_centred_values():
     # owner 2026-10-17: "все таблицы оформляются с вертикальными линиями-разделителями между ячейками, а значения
     # стоят центрировано"

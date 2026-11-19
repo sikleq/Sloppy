@@ -69,6 +69,21 @@ def item_icon(name):
     return f'<span class="mech-item">{chip}<span class="mech-abil-name">{label}</span></span>'
 
 
+def artifact_pools(tiers):
+    """Valve's neutral item pools (7.42 "Each tier is now separated into multiple pools of Artifacts, and 1 Artifact is
+    chosen per pool") as one table: a row per tier, a column per pool, its items as icon chips, the name in the chip's
+    hover (owner 2026-11-19: "Artifact Pools — сделать таблицей", then "плохо сделано, опять имена предметов").
+    tiers: [[pool items, …] per tier], tier 1 first."""
+    from .images import item_img
+    from .mech_abilities import ability_chip, mech_table
+    pools = max(len(t) for t in tiers)
+    head = ["Tier"] + [f"Pool {k + 1}" for k in range(pools)]
+    rows = [[f"Tier {n}"] + ['<span class="pool-items">' + "".join(ability_chip(x, item_img(x)) for x in pool) + "</span>"
+                            for pool in tier]
+            for n, tier in enumerate(tiers, 1)]
+    return mech_table(head, rows, cls="mech-grid pool-table")
+
+
 def item_link(name):
     """<a> to the item's Changes page (from this patch, as an item header's link); the name as it was if unknown."""
     slug = item_page(name)

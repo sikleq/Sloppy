@@ -328,7 +328,9 @@ def _postprocess_silent_stats(lines, version):
             i += 1
             continue
         end = i + 1
-        while end < len(lines) and not re.match(r'W\((?:item|hero|unit|plain)_header\(|W\(section\(', lines[end]):
+        # a header line may start with a blank line in it (7.42 Witchbane: the block ran on into the enchantments)
+        while end < len(lines) and not re.match(r'\s*(?:W\((?:item|hero|unit|plain|enchant)_header\(|W\(section\()',
+                                                lines[end]):
             end += 1
         block = lines[i:end]
         card_at = next((k for k, ln in enumerate(block) if _CARD_LINE_RE.match(ln)), None)
@@ -482,6 +484,32 @@ def _postprocess_removed_label(lines):
             label = (("Neutral Item " if neutral else "Item ")
                      + ("cycled out" if "cycled out" in r.group(1).lower() else "removed"))
         out[i] = f'{m.group(1)}W({m.group(2)}({m.group(3)}, removed="{label}"))'
+    return out
+
+
+_TIER_MOVE_ROW_RE = re.compile(r'^(\s*)W\(li\("Tier changed from (\d) to (\d)", (?:t\("REWORK"\)|b\(\d, \d\))\)\)\s*$')
+_PLAIN_ITEM_HDR_RE = re.compile(r'^(\s*)W\(item_header\(("(?:[^"\\]|\\.)*")\)\)\s*$')
+
+
+def _postprocess_tier_move_label(lines):
+    """A neutral item moved to another tier says it in its header, as 7.38's "Now a Tier 1 Artifact" (owner 2026-11-19,
+    7.42: "Tier changed from 5 to 4 мы разве не писали где-то в другом патче в шапке"): the label "Moved from Tier 5
+    to Tier 4", the row hidden (covered — still counted by the REWORK filter and the weights)."""
+    out = list(lines)
+    for i, ln in enumerate(out):
+        m = _PLAIN_ITEM_HDR_RE.match(ln)
+        if not m:
+            continue
+        j = i + 1
+        while j < len(out) and not re.match(r'\s*W\((?:item|hero|unit|plain|enchant)_header\(|\s*W\(section\(', out[j]):
+            r = _TIER_MOVE_ROW_RE.match(out[j])
+            if r:
+                # from which tier to which (owner 2026-11-19: "Now a Tier 4 Artifact надо не так, а показать с какого")
+                out[i] = (f'{m.group(1)}W(item_header({m.group(2)}, '
+                          f'changed="Moved from Tier {r.group(2)} to Tier {r.group(3)}"))')
+                out[j] = f'{r.group(1)}W(li("Tier changed from {r.group(2)} to {r.group(3)}", t("REWORK"), covered=True))'
+                break
+            j += 1
     return out
 
 

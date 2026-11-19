@@ -206,6 +206,35 @@
 .nav-context-terrain .version-menu {
   min-width: auto;
 }
+/* a patch with map-file updates: its row plus a small "▸ 2" button that opens them underneath (closed unless the
+   page is one of them — the owner 2026-11-19: "so they have to be picked, not always open") */
+.version-group-row { display: flex; align-items: center; gap: 2px; }
+.version-group-row > .version-item { flex: 1 1 auto; }
+.vi-sub-toggle {
+  display: inline-flex; align-items: center; gap: 3px; padding: 4px 7px; border: 0; border-radius: 4px;
+  background: none; color: var(--text-dimmer); font: inherit; font-size: 12px; cursor: pointer;
+}
+.vi-sub-toggle:hover { background: var(--bg-panel-4); color: var(--text-main); }
+.vi-sub-chev { display: inline-block; transition: transform 0.12s ease; }
+.version-group.open .vi-sub-chev { transform: rotate(90deg); }
+.version-subitems { display: none; }
+.version-group.open .version-subitems { display: block; }
+/* a map file of a client update inside a patch (Terrain "7.42-v2"): a sub-row under its patch, indented, smaller,
+   with a thin line on the left tying it to the patch above (the owner 2026-11-19: "a sub-list") */
+.version-item.version-subitem {
+  margin-left: 14px;
+  padding: 5px 12px 5px 10px;
+  border-left: 1px solid var(--line);
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+}
+.version-item.version-subitem .vi-name {
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.version-item.version-subitem.current .vi-name {
+  color: var(--gold);
+}
 
 /* NAV BACK ARROW + BACK-TO-TOP — pixel-art chevrons on an index-style gold /
    leather circle (matches the inventory landing page). Arrows are gold (var(--gold))

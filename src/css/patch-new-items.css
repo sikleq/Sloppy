@@ -282,6 +282,12 @@ body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0 
   color: var(--text-dimmer);
   text-decoration: line-through; text-decoration-color: rgba(197, 82, 82, 0.85); text-decoration-thickness: 1.5px;
 }
+/* a tier it no longer has (7.42 tier 5, owner 2026-11-19: "удалили тир 5, подсветить это в таблице") */
+.ench-change .ench-row-h .ench-tier-h.ench-gone {
+  text-decoration: line-through; text-decoration-color: rgba(197, 82, 82, 0.85); text-decoration-thickness: 1.5px;
+  background: rgba(197, 82, 82, 0.10);
+}
+.ench-change .ench-v.ench-col-gone { background: rgba(197, 82, 82, 0.06); }   /* that tier's column, shaded */
 .ench-tiers.ench-change .iab-lv.iab-del {      /* beats the colour-blind DEL rule */
   color: var(--text-dimmer); font-weight: 400;
   text-decoration: line-through; text-decoration-color: rgba(197, 82, 82, 0.85); text-decoration-thickness: 1.5px;

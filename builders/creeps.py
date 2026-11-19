@@ -740,8 +740,9 @@ def build_rows(csv_rows, src):
 CATEGORIES = [
     ('Basic', [
         ('lvl',          'Lvl',              'std'),
-        ('icon',         '',                 'std'),
+        ('icon',         'Copy',             'std'),
         ('name',         'Unit',             'std'),
+        ('camp',         'Camp',             'std'),   # owner 2026-11-19: right after Unit
     ]),
     ('Vitality', [
         ('hp',           'HP',               'std'),
@@ -773,8 +774,7 @@ CATEGORIES = [
         ('xp',           'XP',               'std'),
     ]),
     ('Other', [
-        ('camp',         'Camp',             'std'),
-        ('ms',           'Movespeed',        'std'),
+        ('ms',          'Movespeed',        'std'),
         ('vision',       'Vision',           'std'),
         ('aggro',        'Acquisition Range', 'exp'),
         ('turn_rate',    'Turn Rate',        'exp'),
@@ -800,7 +800,7 @@ COL_CAT = {k: _CAT_SLUG[cat] for cat, cols in CATEGORIES for (k, _l, _m) in cols
 # group the table into logical sections (identity | survivability |
 # offense | economy | utility | abilities).
 # Left-border on the first (always-visible) column of each super-category.
-SEP_AFTER = {'hp', 'dmg_avg', 'gold', 'camp', 'ability1'}
+SEP_AFTER = {'hp', 'dmg_avg', 'gold', 'ms', 'ability1'}
 # Identity columns pinned to the left edge during horizontal scroll
 # (scripts.js computes their cumulative left offsets after layout).
 STICKY_COLS = {'lvl', 'icon', 'name'}
@@ -854,23 +854,16 @@ def _label_html(label):
 
 def _stats_thead():
     # Header: each sortable th carries data-col (key) and data-idx (its
-    # body-cell index, so the sort logic survives the colspan on Юнит).
-    # The "Юнит" header spans the icon + name columns (colspan=2) so it
-    # reads as centered over the whole unit-identity block; the separate
-    # icon <th> is dropped.
-    name_idx = [k for k, _ in COLUMNS].index('name')
+    # body-cell index). One <th> per column: lvl, Copy (icon), Unit, Camp…
     thead_list = []
     for i, (k, label) in enumerate(COLUMNS):
-        if k == 'icon':
-            continue  # folded into the colspan=2 Юнит header
         cat = COL_CAT.get(k, '')
-        if k == 'name':
+        if k == 'icon':
+            # owner 2026-11-19: the icon column has its own "Copy" header
+            # (clicking an icon copies the spawn command); not sortable.
             thead_list.append(
-                f'<th class="{_col_cls(k)} sortable" colspan="2" '
-                f'data-col="{k}" data-idx="{name_idx}" data-cat="{cat}">'
-                f'<span class="th-label">{_label_html(label)}</span>'
-                f'<span class="sort-ind"></span></th>'
-            )
+                f'<th class="{_col_cls(k)}" data-cat="{cat}">'
+                f'<span class="th-label">{_label_html(label)}</span></th>')
         elif not label:
             thead_list.append(f'<th class="{_col_cls(k)}" data-cat="{cat}"></th>')
         else:

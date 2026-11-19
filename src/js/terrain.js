@@ -513,12 +513,14 @@
         btnL.title = (i === 0 && newerPage) ? 'Go to ' + newerPage.label : '';
         btnR.title = (i === groups.length - 1 && olderPage) ? 'Go to ' + olderPage.label : '';
       }
-      // Terrain pages, newest first, as listed in the header version menu.
+      // Terrain pages, newest first, by their data-rank: the header menu lists a patch's map-file updates
+      // ("v2", "v3") under the patch, out of time order.
       var pages = [].slice.call(document.querySelectorAll('.version-dropdown .version-menu a.version-item'));
+      pages.sort(function(a, b) { return (+a.dataset.rank || 0) - (+b.dataset.rank || 0); });
       var curPage = pages.findIndex(function(a) { return a.classList.contains('current'); });
       function pageAt(k) {
         var a = (curPage >= 0 && k >= 0 && k < pages.length) ? pages[k] : null;
-        return a ? { href: a.getAttribute('href'), label: a.textContent.trim() } : null;
+        return a ? { href: a.getAttribute('href'), label: a.dataset.label || a.textContent.trim() } : null;
       }
       var newerPage = pageAt(curPage - 1);
       var olderPage = pageAt(curPage + 1);

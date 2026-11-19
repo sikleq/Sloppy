@@ -870,12 +870,9 @@ _IAB_TAILS = (   # (the row after the ability's name, the sentence the new descr
     (r"(?:can no longer be dispelled|is no longer dispellable)", "Not dispellable."),
     (r"now pierces debuff immunity", "Pierces Debuff Immunity."),
     (r"no longer pierces debuff immunity", "Does not pierce Debuff Immunity."),
-    # owner 2026-11-19, Parasma 7.42 "Magic Corruption now affects buildings": the tooltip never says it — the row
-    # goes, the card says it ("убрать из строки и подсветить в карточке")
-    (r"now (?:also )?affects buildings", "Affects buildings."),
-    # a value the tooltip keeps for one kind of unit only (owner 2026-10-16, Crimson Guard 7.41: "Guard base damage
-    # block rescaled from 70 for all units to 70 on melee heroes and buildings and 45 on ranged heroes" — the new
-    # tooltip still says "70"); {0} = the row's number
+    (r"now (?:also )?affects buildings", "Affects buildings."),     # Parasma 7.42 Magic Corruption (owner 2026-11-19)
+    # a value the tooltip keeps for one kind of unit only (owner 2026-10-16, Crimson Guard 7.41 "Guard base damage block
+    # rescaled from 70 for all units to 70 on melee heroes … and 45 on ranged heroes"); {0} = the row's number
     (r"base damage block rescaled from \d+ for all units to \d+ on melee heroes(?: and buildings)? and (\d+) on "
      r"ranged heroes", "{0} base damage block on ranged heroes."),
     # the game's own wording for a shared cooldown (Refresher Orb: "Shares a cooldown with Refresher Shard."); owner

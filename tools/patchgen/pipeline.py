@@ -7,6 +7,7 @@ from .normalize import fetch_datafeed
 from .notes import _postprocess_group_rows_home, _postprocess_same_change_abilities
 from .post_facets import _postprocess_removed_facet_groups, _postprocess_removed_facets, _postprocess_renamed_facets
 from .post_shared import _postprocess_shared_row_group
+from .post_summons import _postprocess_summon_sub_cards
 from .post_level_values import _postprocess_level_values
 from .post_hero import _postprocess_attr_change_first, _postprocess_facets_summary_covered
 from .post_cards import (
@@ -17,6 +18,7 @@ from .post_cards import (
     _postprocess_rows_first,
     _postprocess_two_selves_cards,
     _postprocess_removed_label,
+    _postprocess_tier_move_label,
     _postprocess_silent_stats,
     _postprocess_stack_note_into_ability,
 )
@@ -81,6 +83,7 @@ from .post_tables import (
     _postprocess_star_lists,
     _postprocess_bounty_range_row,
     _postprocess_objective_subgroups,
+    _postprocess_artifact_pools,
     _postprocess_pip_list,
     _postprocess_from_to_list,
     _postprocess_per_death,
@@ -285,10 +288,12 @@ def generate(version):
     out = _postprocess_recipe_cost_zero_net(out)
     out = _postprocess_rework_marker(out)
     out = _postprocess_removed_label(out)             # "Neutral Item cycled out" label — owner 2026-10-17
+    out = _postprocess_tier_move_label(out)           # "Now a Tier 4 Artifact" in the header — owner 2026-11-19
     out = _postprocess_ability_level_formula(out, version)   # "+X with every level of Y" -> table (owner 2026-10-27)
     out = _postprocess_innate_cards(out, version)     # innate old -> new from the game's texts (owner 2026-10-27)
     out = _postprocess_new_innate_cards(out, version)  # "New innate ability" -> the hero's old innate -> new (7.37)
     out = _postprocess_new_facet_rows(out)             # a "New Facet" row -> the new facet card (7.37 Medusa)
+    out = _postprocess_summon_sub_cards(out)           # a summon's own abilities: cards (7.42 Thunderhide, 2026-11-19)
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
     out = _postprocess_stance_blocks(out)              # "Earth Brawler …" rows -> stance blocks, as 7.40 (10-30)
@@ -306,6 +311,7 @@ def generate(version):
     out = _postprocess_bounty_range_row(out)          # "no longer variable bounties": the table shows it (11-19)
     out = _postprocess_pip_list(out)                  # the pip-health units' pips as sticks (owner 2026-11-19)
     out = _postprocess_objective_subgroups(out)       # Wisdom Shrines / Outposts: a subgroup each (owner 2026-11-19)
+    out = _postprocess_artifact_pools(out)            # 7.42 Artifact Pools: one table, tiers x pools (owner 2026-11-19)
     out = _postprocess_grouped_lists(out)             # "<Group>" + "<Kind>: a; b" lines -> one table (home jungles)
     out = _postprocess_per_death(out)               # "A to B + C per Tormentor's death" -> a table (2026-11-18)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)

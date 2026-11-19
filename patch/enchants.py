@@ -176,6 +176,15 @@ def _ench_cell(old, new, penalty, brand_new, added_line=False):
             f'<span class="iab-lv iab-{d}{" " + tone if tone else ""}">{value}</span></span>')
 
 
+def _gone_tiers(version):
+    """The tiers no enchantment of the patch has any more but some had before (7.42: {5})."""
+    ents = [e for e in _enchant_tables().get(version, {}).values() if not e.get("brand_new")]
+    had = {t for e in ents for s in e["stats"] for t in _ENCHANT_TIERS if _ench_num(s["old"].get(str(t)))}
+    has = {t for e in _enchant_tables().get(version, {}).values() for s in e["stats"] for t in _ENCHANT_TIERS
+           if s["new"].get(str(t)) is not None}
+    return had - has
+
+
 def _enchant_change(name):
     """An enchantment's bonuses by tier, before → after (owner 2026-10-17, 7.41: "Vital is written as a bare row… a
     table? a card?" — variant A: the 7.38 table, a changed cell "was → now" in colour). Data:
@@ -187,13 +196,18 @@ def _enchant_change(name):
         return ""
     _State.ench_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version,
                         "labels": [s["label"] for s in ent["stats"]]}
+    # a tier the game no longer has (7.42: 4 tiers, owner 2026-11-19 "Tier-5 по-прежнему никак не выделен, его же
+    # больше нет"): struck in every enchantment's table of that patch, its column shaded
+    lost_tiers = _gone_tiers(_State.current_patch_version or "")
     head = ('<span class="ench-row-h"><span class="ench-stat-h">Stats</span>'
-            + "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS) + "</span>")
+            + "".join(f'<span class="ench-tier-h{" ench-gone" if t in lost_tiers else ""}">Tier {t}</span>'
+                      for t in _ENCHANT_TIERS) + "</span>")
     lines = [head]
     for s in ent["stats"]:
         gone = not any(_ench_num(v) for v in s["new"].values())
         added = not ent["brand_new"] and not any(_ench_num(v) for v in s["old"].values())
         cells = "".join(_ench_cell(s["old"].get(str(t)), s["new"].get(str(t)), s["penalty"], ent["brand_new"], added)
+                        .replace('class="ench-v', 'class="ench-v ench-col-gone' if t in lost_tiers else 'class="ench-v', 1)
                         for t in _ENCHANT_TIERS)
         cls = (" ench-neg" if s["penalty"] else "") + (" ench-gone" if gone else " ench-added" if added else "")
         lines.append(f'<span class="ench-stat{cls}">{s["label"]}</span>{cells}')

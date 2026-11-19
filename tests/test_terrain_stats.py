@@ -19,10 +19,12 @@ import builders.terrain_stats as ts  # noqa: E402
 def test_every_map_file_is_one_row_with_the_patches_that_shipped_it():
     files = ts.load()
     # 66 since 2026-10-20: 7.41f-v2, the map file of the 2026-10-07 client update inside 7.41f; 67 with 7.42;
-    # 68 with 7.42-v2, the client update of the same evening (one tree fewer at the Dire base)
-    assert len(files) == 68 and files[0]["patch"] == "7.08" and files[-1]["patch"] == "7.42-v2"
+    # 68 with 7.42-v2, the client update of the same evening (one tree fewer at the Dire base); 69 with 7.42-v3,
+    # build 6980 of the next night (3 trees fewer in the bottom-lane corner)
+    assert len(files) == 69 and files[0]["patch"] == "7.08" and files[-1]["patch"] == "7.42-v3"
     by = {f["patch"]: f for f in files}
     assert by["7.42-v2"]["n"]["trees"] == by["7.42"]["n"]["trees"] - 1 and ts.is_update("7.42-v2")
+    assert by["7.42-v3"]["n"]["trees"] == by["7.42-v2"]["n"]["trees"] - 3 and ts.is_update("7.42-v3")
     assert by["7.22"]["also"][:2] == ["7.22b", "7.22c"]
     assert by["7.41"]["n"]["watchers"] == 10 and by["7.41"]["n"]["outposts"] == 2      # lanterns, not outposts
     assert [by["7.41"]["n"][f"tier{t}"] for t in range(4)] == [6, 14, 6, 2]
@@ -34,7 +36,7 @@ def test_cells_show_added_removed_and_moved():
     files = ts.load()
     table = ts.table_html(files, {"7.41", "7.40"})
     rows = ts.group(files)                                             # identical files glued (7.41a … 7.41f)
-    assert table.count("<tr>") == len(rows) + 1 and len(rows) < 68
+    assert table.count("<tr>") == len(rows) + 1 and len(rows) < 69
     assert table.index(">7.41a<") < table.index(">7.08<")              # newest first
     glued = next(r for r in rows if r["patch"] == "7.41a")
     assert glued["also"] == ["7.41b", "7.41c", "7.41d", "7.41e", "7.41f", "7.41f-v2"]   # nothing counted moved
@@ -64,7 +66,7 @@ def test_tiles_chart_and_the_terrain_menu():
     assert 'class="ts-mark"' not in chart and chart.count('class="ts-trend"') == 1
     majors = sum(1 for f in files if re.fullmatch(r"\d+\.\d+", f["patch"]))        # not "7.41f-v2"
     assert chart.count('class="ts-dot ts-dot-major"') == majors and majors > 10
-    assert chart.count('class="ts-pt"') == 68 and '">7.38 · 2496</text>' in chart       # version + count on hover
+    assert chart.count('class="ts-pt"') == 69 and '">7.38 · 2496</text>' in chart       # version + count on hover
     assert 'class="ts-grid ts-grid-major" x1=' in chart and 'class="ts-axis"' in chart
     groups = {g[0]: g for g in site.MATERIALS_GROUPS}
     assert [c[0] for c in groups["terrain_grp"][3]] == ["terrain", "terrain_stats"]

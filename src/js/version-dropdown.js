@@ -25,6 +25,15 @@
         dropdownBtn.setAttribute('aria-expanded', 'false');
       }
     });
+    // A patch's map-file updates (Terrain "v2", "v3") fold under it: its "▸ 2" button opens and closes them.
+    dropdownMenu.querySelectorAll('.vi-sub-toggle').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const open = btn.closest('.version-group').classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
     // Prevent scroll propagation to the page on Safari (overscroll-behavior
     // alone isn't enough on older WebKit builds).
     dropdownMenu.addEventListener('touchmove', (e) => { e.stopPropagation(); }, { passive: true });

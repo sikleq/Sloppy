@@ -20,6 +20,18 @@ def test_removed_creeps_rows_carry_their_patch_and_the_toolbar_has_the_toggle():
     assert 'data-attack-filter' not in creeps._STATS_TOOLBAR.split('id="removed-toggle"')[1]
 
 
+def test_camp_sits_in_basic_after_unit_and_the_icon_column_is_headed_copy():
+    # owner 2026-11-19
+    basic = dict(creeps.CATEGORIES)['Basic']
+    assert [k for k, _l, _m in basic] == ['lvl', 'icon', 'name', 'camp']
+    assert creeps.COL_CAT['camp'] == 'basic'
+    head = creeps._stats_thead()
+    assert 'colspan' not in head
+    icon_th = head.split('col-icon')[1].split('</th>')[0]
+    assert 'Copy' in icon_th
+    assert head.index('col-icon') < head.index('col-name') < head.index('col-camp')
+
+
 def test_numbers_use_a_decimal_comma():
     assert cc.fmt_num(0.9) == '0,9'
     assert cc.fmt_num('12') == '12'

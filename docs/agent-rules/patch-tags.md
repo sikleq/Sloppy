@@ -998,3 +998,32 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - Значок Item Potency на иконках способностей, которые задают потенцию атак (Swashbuckle 60% и др.) —
   `data/rules/item_potency_abilities.json`, только подтверждённое кодом 7.42, с 7.42.
 - Поиск: значок способности в строке («Pangolier’s Swashbuckle») больше не даёт второй результат рядом с её блоком.
+
+### Вычитка 7.42, круги 11–17 (владелец 2026-11-19)
+
+- Страница `item_potency.html` (Materials → Mechanics, `builders/item_potency.py`): карточки правил, таблица
+  предметов (значение, иллюзии 20% / Manta 35% / руна 40%), свои / добавленные / иллюзорные источники; удалённые из
+  игры предметы спрятаны за кнопкой «Show removed», слов «not in the game» нет.
+- Pip Health (`mech_abilities.pip_rows`): палочки по данным кода (`data/rules/pip_health.json`); над таблицей полоса —
+  кнопки талант / Аганим / Шард / Марси у левого края, пояснения коротким текстом у правого («1 hit», «2 per melee
+  hit», «Extra»).
+- Новые лагеря — отдельным блоком «New Neutral Camps» (`patch/camps.py`): столбец Side и значок типа лагеря.
+- Время «20:00 → 15:00» у строки REWORK получает нейтральный % (`bt()`).
+- Пассивное золото 7.42: старая формула строкой под строкой (как приближение опыта, `formula_approx`), таблица —
+  за кнопкой «Formula table», скрыта (`formula_table_pill`); «no longer scales over game time» — DEL, как у Bracer
+  «No longer doubles its bonuses at 25 minutes».
+- Свойство, которого нет в подсказке игры, но есть в патчноуте, дописывается в карточку способности в цвет тега,
+  строка прячется (`_IAB_TAILS`): «Magic Corruption now affects buildings» → «Affects buildings.».
+- Значок Dormant Curio показывает каждое число с бонусом Curio («50 → 65», бонус берётся из `item_potency` самого
+  Dormant Curio в items.txt; растут только значения больше 0). Значок стоит только у предметов с флагом
+  `apply_curio_bonus` в файлах игры: у нейтралок без флага его нет — так и в игре.
+- Граница блока предмета в генераторе (`_postprocess_properties_change`, `_block_lines`, `_postprocess_silent_stats`):
+  заголовок читается без начальных пробелов и пустой строки, `enchant_header` тоже конец блока. Иначе блок
+  предмета перед «Enchantment Changes» забирал строки чар: в 7.42 у Witchbane была карточка из 18 характеристик чар,
+  а 20 строк чар пропали со страницы. Тест `test_an_item_block_ends_at_a_header_line_that_starts_with_a_blank_line`.
+- «Tier changed from 5 to 4» у нейтрального предмета — в шапке «Now a Tier 4 Artifact» (как 7.38), строка скрыта
+  (`_postprocess_tier_move_label`); у чар это показывает таблица тиров, где пропавший тир зачёркнут в шапке.
+- Artifact Pools — одна таблица: строка на тир, столбец на пул, предметы со значками (`_postprocess_artifact_pools`,
+  `artifact_pools()`).
+- «now creates a strong illusion» — REWORK.
+
