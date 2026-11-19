@@ -386,6 +386,48 @@ def test_valves_text_tables_in_a_note_become_tables():
            '("Tier 2 tower gold", "90", "75"), ("Barracks gold", "90-135", "100")])' in g._postprocess_from_to_list([bounty])[0]
 
 
+def test_long_level_tables_lie_across_and_shared_values_pivot():
+    # owner 2026-11-19: the 29-row experience column and the ten building lines were still "массивные"
+    rows = "<br>".join(f"{n} -- {n * 10} -- {n * 10 + (5 if n % 2 else 0)} -- {n}" for n in range(2, 14))
+    xp = f'W(li("Experience increased", b(1, 2), extra=inline_note("Level -- Old -- New -- Total Increase<br>{rows}")))'
+    out = g._postprocess_dash_table([xp])[0]
+    assert 'extra=mech_level_table(["Level", "2", "3",' in out and '["Old", "20", "30",' in out
+    assert '["Total Increase", "2", "3",' in out
+    from patch.mech_abilities import mech_level_table
+    html = mech_level_table(["Level", "2", "3"], [["Old", "20", "30"], ["New", "20", "35"]])
+    assert 'style="--mech-lv:2"' in html and '<span class="mech-lv-changed">35</span>' in html and \
+        '<span class="mech-lv-changed">20</span>' not in html
+    bounty = ('W(li("Building bounty decreased", t("NERF"), extra=inline_note("Tier 1 tower last hit gold decreased from '
+              '110-130 to 100<br>Tier 1 tower gold per player decreased from 90 to 75<br>Tier 2 tower last hit gold '
+              'decreased from 130-150 to 125<br>Tier 2 tower gold per player decreased from 110 to 100<br>Barracks last '
+              'hit gold rescaled from 90-135 to 100")))')
+    out = g._postprocess_from_to_list([bounty])[0]
+    assert 'extra=mech_table(["", "Last hit gold", "Gold per player"], [["Tier 1 tower", "110-130 &rarr; <b>100</b>", ' \
+           '"90 &rarr; <b>75</b>"], ["Tier 2 tower", ' in out and '["Barracks", "90-135 &rarr; <b>100</b>", "–"]' in out
+
+
+def test_a_list_of_summons_is_written_as_hero_and_ability():
+    # owner 2026-11-19: the Pip Health list was a column of words, not the icons and pairs of columns of the others
+    assert g._owner_form("Gyrocopter's Homing Missile") == "Gyrocopter: Homing Missile"
+    assert g._owner_form("Clinkz' Skeleton Archers") == "Clinkz: Skeleton Archers"
+    assert g._owner_form("Roshan's Banner") == "Roshan's Banner"                 # an item's own name
+    assert g._owner_form("Couriers") == "Couriers"
+    from patch.mech_abilities import _item_icon, _parse_line
+    assert _item_icon("Observer Wards") and _parse_line("Techies: M.A.D.") and _parse_line("Tidehunter: Dead in the Water")
+
+
+def test_every_item_a_mechanic_row_names_is_an_icon():
+    # owner 2026-11-19: "Slark's Pounce — тоже должно быть иконкой. Voodoo Masks …, a Tier 4 Evolved Enchantment, a Desolator"
+    lines = ['W(plain_header("Item Potency", new="Reworked mechanic"))', 'W(ul_open())',
+             'W(li("Any hero attacking with a Tier 4 Evolved Enchantment, so if they have a Desolator", t("REWORK")))',
+             'W(li("Spell Lifesteal from two Voodoo Masks will provide +30%", t("REWORK")))', 'W(ul_close())',
+             'W(plain_header("Global Mechanics"))', 'W(li("A Desolator elsewhere", t("MISC")))']
+    out = g._postprocess_mechanic_name_icons(lines)
+    assert out[2].endswith(", examples={'Evolved Enchantment': 'Evolved Enchantment', 'Desolator': 'Desolator'}))")
+    assert ", examples={'Voodoo Masks': 'Voodoo Mask" in out[3] and "'Lifesteal'" not in out[3]   # a stat, no icon
+    assert out[6] == lines[6]                                                          # not a mechanic block
+
+
 def test_valves_starred_list_is_a_list_the_block_opens():
     row = 'W(li("Abilities that pierce", t("REWORK"), extra=inline_note("* Batrider: Flaming Lasso <br> * Pudge: Dismember")))'
     assert g._postprocess_star_lists([row])[0] == \

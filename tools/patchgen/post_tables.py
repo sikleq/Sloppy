@@ -83,11 +83,23 @@ def _postprocess_dash_table(lines):
                 tail.append(f'{_py_str(f.group("pre"))} + mech_formula({_py_str(f.group("expr").strip())}) + " " + {post}')
             else:
                 tail.append(_py_str(p))
+        if len(cells) > _LEVEL_ROWS_MAX and all(r[0].isdigit() for r in cells[1:]):
+            # values by level: the levels across, old / new / … under them (owner 2026-11-19: the 29-row column of
+            # the experience table was "массивная")
+            head = "[" + ", ".join(_py_str(c) for c in [cells[0][0]] + [r[0] for r in cells[1:]]) + "]"
+            rows = ", ".join("[" + ", ".join(_py_str(c) for c in [cells[0][j]] + [r[j] for r in cells[1:]]) + "]"
+                             for j in range(1, len(cells[0])))
+            notes = f", notes=[{', '.join(tail)}]" if tail else ""
+            out.append(f'{m.group("head")}, extra=mech_level_table({head}, [{rows}]{notes})))')
+            continue
         rows = ", ".join("[" + ", ".join(_py_str(c) for c in r) + "]" for r in cells[1:])
         head = "[" + ", ".join(_py_str(c) for c in cells[0]) + "]"
         rows = rows + "".join(", " + t for t in tail)
         out.append(f'{m.group("head")}, extra=mech_table({head}, [{rows}], labels=False)))')
     return out
+
+
+_LEVEL_ROWS_MAX = 10          # a longer list of levels is laid across (mech_level_table)
 
 
 _FROM_TO_LINE_RE = re.compile(r'^(?P<what>[A-Z][^<>]*?) (?:increased|decreased|rescaled|changed) from (?P<a>[^<>]+?) '
@@ -106,9 +118,32 @@ def _postprocess_from_to_list(lines):
         if len(parts) < 3 or not all(hits):
             out.append(ln)
             continue
+        pivot = _pivot(hits)
+        if pivot:
+            out.append(f'{m.group("head")}, extra={pivot}))')
+            continue
         rows = ", ".join(f'({_py_str(h.group("what"))}, {_py_str(h.group("a"))}, {_py_str(h.group("b"))})' for h in hits)
         out.append(f'{m.group("head")}, extra=mech_before_after("Change", [{rows}])))')
     return out
+
+
+def _pivot(hits):
+    """The same few values for several things ("Tier 1 tower last hit gold" / "Tier 1 tower gold per player", …,
+    "Melee Barracks gold per player", 7.42) → mech_table with a row per thing and a column per value, each cell
+    "old → <b>new</b>" (owner 2026-11-19: ten lines of before / after were still massive). None when the lines do
+    not split so (fewer than 2 things, a value named once)."""
+    for k in (4, 3, 2):
+        split = [(" ".join(h.group("what").split()[:-k]), " ".join(h.group("what").split()[-k:])) for h in hits]
+        kinds = list(dict.fromkeys(v for _, v in split))
+        things = list(dict.fromkeys(t for t, _ in split))
+        if all(t for t, _ in split) and 2 <= len(kinds) <= 3 and len(things) >= 3 and len(things) < len(hits) \
+                and all(sum(v == kv for _, v in split) >= 2 for kv in kinds):
+            cell = {(t, v): f'{h.group("a")} &rarr; <b>{h.group("b")}</b>' for (t, v), h in zip(split, hits)}
+            rows = ", ".join("[" + ", ".join([_py_str(t)] + [_py_str(cell.get((t, v), "–")) for v in kinds]) + "]"
+                             for t in things)
+            head = "[" + ", ".join(_py_str(x) for x in [""] + [v[:1].upper() + v[1:] for v in kinds]) + "]"
+            return f"mech_table({head}, [{rows}])"
+    return None
 
 
 _PER_DEATH_ROW_RE = re.compile(
@@ -277,6 +312,70 @@ def _postprocess_renamed_unit_ability(lines, version=None):
     return out
 
 
+_NAME_RUN_RE = re.compile(r"[A-Z][\w'’-]*(?: (?:of|the|[A-Z0-9][\w'’-]*))*")
+_MECH_HEAD_RE = re.compile(r'^\s*W\(plain_header\("[^"]+", new="(?:Reworked|New) mechanic"')
+_ROW_HEAD_RE = re.compile(r'^(?P<head>\s*W\(li\("(?P<text>(?:[^"\\]|\\.)*)",.*?)(?P<tail>\)\))\s*$')
+
+
+def _named_icons(text):
+    """{words of the row: the item / ability they name} for every name with an icon (a plural "Voodoo Masks" as its
+    item; the longest run of capitalised words first, then shorter ones from its start)."""
+    from patch.mech_abilities import mech_example
+    found = {}
+    for run in _NAME_RUN_RE.findall(text):
+        words, start = run.split(), 0
+        while start < len(words):                     # "Tier 4 Evolved Enchantment": the name may start inside
+            hit = None
+            # a name inside a run is two words or more: "Spell Lifesteal" is a stat, not the Lifesteal icon
+            shortest = start + (2 if start else 1)
+            for n in range(len(words), shortest - 1, -1):
+                phrase = " ".join(words[start:n])
+                for name in (phrase, phrase[:-1] if phrase.endswith("s") else None):
+                    if not name or len(name) < 4:
+                        continue
+                    try:
+                        mech_example(name)
+                    except ValueError:
+                        continue
+                    hit = (phrase, name, n)
+                    break
+                if hit:
+                    break
+            if hit:
+                found[hit[0]] = hit[1]
+                start = hit[2]
+            else:
+                start += 1
+    return found
+
+
+def _postprocess_mechanic_name_icons(lines):
+    """In a mechanic block every item and hero ability the rows name is its icon, not only the ones after "such as"
+    (owner 2026-11-19, 7.42: "Slark's Pounce — тоже должно быть иконкой", "two Voodoo Masks", "a Tier 4 Evolved
+    Enchantment", "if he has a Desolator"); merged into the row's examples= (_postprocess_example_icons)."""
+    import ast
+    out, in_mech = [], False
+    for ln in lines:
+        if re.match(r'^\s*W\((?:plain_header|section|unit_header|subgroup)\(', ln):
+            in_mech = bool(_MECH_HEAD_RE.match(ln))
+        row = _ROW_HEAD_RE.match(ln) if in_mech else None
+        if not row:
+            out.append(ln)
+            continue
+        found = _named_icons(row.group("text").replace("\\'", "'"))
+        if not found:
+            out.append(ln)
+            continue
+        ex = re.search(r", examples=(\{.*?\})(?=[,)])", ln)
+        have = ast.literal_eval(ex.group(1)) if ex else {}
+        merged = {**found, **have}
+        if ex:
+            out.append(ln[:ex.start()] + f", examples={merged!r}" + ln[ex.end():])
+        else:
+            out.append(f'{row.group("head")}, examples={merged!r}{row.group("tail")}')
+    return out
+
+
 _GROUP_HEAD_RE = re.compile(r"^([A-Z][\w' ]+)$")
 _GROUP_ITEM_RE = re.compile(r"^(?:&nbsp;)*(?:–|-)?\s*([A-Z][\w' ]+): (.+)$")
 
@@ -325,9 +424,25 @@ def _postprocess_star_lists(lines):
     icons (hero_ability_rows) or of lines (text_list_rows) under the row instead of a 25-line "?" (owner 2026-11-19:
     "под [?] слишком массивно и не читаемо"). Lines after the list that are not starred stay its last lines."""
     def repl(m):
-        parts = [re.sub(r'^\s*\*\s*', '', p).strip() for p in m.group("body").split("<br>")]
+        parts = [_owner_form(re.sub(r'^\s*\*\s*', '', p).strip()) for p in m.group("body").split("<br>")]
         return 'extra=inline_list("' + "<br>".join(p for p in parts if p) + '")'
     return [_STAR_NOTE_RE.sub(repl, ln) for ln in lines]
+
+
+_POSSESSIVE_RE = re.compile(r"^(?P<owner>[A-Z][\w .'-]*?)(?:'s|’s|'|’) (?P<what>[A-Z].*)$")
+
+
+def _owner_form(line):
+    """"Gyrocopter's Homing Missile" → "Gyrocopter: Homing Missile", the form the lists' table reads as hero | ability
+    with their icons (owner 2026-11-19: the Pip Health list was a column of words, "не как другие — иконками и ряды
+    столбцов"); a creep's too ("Radigull's Eggstremism"). An item's own name ("Roshan's Banner") stays."""
+    from patch.images import HERO_SLUG
+    from patch.mech_abilities import _creep_prefix, _item_icon
+    m = _POSSESSIVE_RE.match(line)
+    if not m or _item_icon(line):
+        return line
+    owner = m.group("owner")
+    return f"{owner}: {m.group('what')}" if owner in HERO_SLUG or _creep_prefix(owner) else line
 
 
 _UNIT_HEAD_RE = re.compile(r'^(?P<ind>\s*)W\(unit_header\("(?P<name>[^"]+)"(?P<rest>.*)\)\)\s*$')

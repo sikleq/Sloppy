@@ -71,6 +71,7 @@ from .post_tables import (
     _postprocess_old_new_table,
     _postprocess_dash_table,
     _postprocess_grouped_lists,
+    _postprocess_mechanic_name_icons,
     _postprocess_new_creep_abilities,
     _postprocess_renames,
     _postprocess_star_lists,
@@ -246,6 +247,7 @@ def generate(version):
     out = _postprocess_level_values(out, version)     # a [?] list of new level values -> one table (owner 11-08)
     out = _postprocess_rune_rows(out)                 # a rune reads as an ability: icon, name, rows (owner 2026-11-04)
     out = _postprocess_example_icons(out)             # an example named in a row carries its icon (owner 2026-11-04)
+    out = _postprocess_mechanic_name_icons(out)       # every item / ability a mechanic row names: its icon (11-19)
     out = _postprocess_courier_rows(out)              # Courier rows -> the unit's own category (owner 2026-11-04)
     out = _postprocess_team_abilities(out)            # Glyph, Scan rows -> an ability's header (owner 2026-11-04)
     out = _postprocess_minute_formula(out)

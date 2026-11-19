@@ -117,6 +117,9 @@
   display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 6px;
   white-space: nowrap; color: var(--text-dim); line-height: 1.35;
 }
+/* the chips of a row share its width: no free space at the right end (the owner 2026-11-19: "по ширине тоже
+   выровняй, есть место свободное") */
+.tf-chips > .tf-chip { flex: 1 1 auto; justify-content: center; }
 .tf-chip b { color: var(--text-bright); font-weight: 600; }
 .tf-chip .tf-chip-zero { color: var(--text-main); font-weight: 600; }    /* as many added as removed */
 /* one object, several kinds of change: side by side in the same chip, a thin line between them (the owner

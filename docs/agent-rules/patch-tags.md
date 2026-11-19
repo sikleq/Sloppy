@@ -874,3 +874,21 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   +200» — NERF (была вся карта), канон читает REWORK.
 - Чипы Terrain с несколькими видами изменений — виды в одну строку через тонкую черту (`terrain-controls.css`):
   столбиком такие чипы были в 2–3 раза выше остальных.
+
+### Вычитка 7.42, третий круг (владелец 2026-11-19)
+
+- **Таблица по уровням — поперёк** (`mech_level_table`, `_postprocess_dash_table`): больше 10 строк с номерами уровней →
+  уровни столбцами, «Old / New / Total Increase» строками, по 15 уровней в блоке; новое значение, что отличается от
+  старого, золотом. Столбец из 29 строк был «массивным».
+- **Одинаковые величины у нескольких объектов — одна таблица** (`_pivot` в `_postprocess_from_to_list`): «Tier 1 tower
+  last hit gold / gold per player …» → строка на здание, столбец на величину, «было &rarr; <b>стало</b>».
+- **Список призванных юнитов — «Герой: способность»** (`_owner_form` в `_postprocess_star_lists`): тогда список Pip Health
+  — таблица значков в две пары столбцов, как остальные. Значкам помогли: множественное число (Observer Wards, Mass
+  Serpent Wards), акроним «M.A.D.», «in the» в имени (Dead in the Water), юнит вместо способности (`_ICON_ALIASES`:
+  Skeleton Archers, Tombstone Zombies).
+- **Каждый предмет и способность в строке механики — значком** (`_postprocess_mechanic_name_icons`), не только после
+  «such as»: Slark's Pounce, Voodoo Masks, Evolved Enchantment, Desolator, Pangolier's Swashbuckle. Имя внутри ряда
+  заглавных слов — от двух слов («Spell Lifesteal» — характеристика, не значок Lifesteal).
+- Чипы Terrain делят ширину ряда (`flex: 1 1 auto`): справа не остаётся пустого места.
+- Flicker вернулся без +35 к скорости — строка с [?] «Not in the patch notes». Earthshaker Fissure (свободный проход с
+  Shard) — в docs/todo.md, похоже на заготовку.

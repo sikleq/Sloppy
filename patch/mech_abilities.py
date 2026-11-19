@@ -35,7 +35,9 @@ _TRAIL_BRACKET_RE = re.compile(r"\s+\(([^()<>]+)\)\s*$")
 _TRAIL_ABILITY_RE = re.compile(r" ability$")
 # an ability's name: capitalised words ("Fortune's End", "Storm Hammer"); the sentence starts at the first lower-case one
 # ("Scream of Pain", "Echo of the Wild": a small "of" / "the" between capitalised words is still the name)
-_ABIL_RE = re.compile(r"((?:[A-Z][\w'\-!]*)(?: (?:of |the |of the |and )?[A-Z][\w'\-!]*)*)(?: (?=[a-z])|[.,]|$)")
+# "Dead in the Water", "Eyes in the Forest" (7.42 Pip Health), "M.A.D." (Techies' Mutually Assured Destruction)
+_ABIL_RE = re.compile(r"((?:(?:[A-Z]\.){2,}|[A-Z][\w'\-!]*)(?: (?:of |the |of the |and |in |in the )?[A-Z][\w'\-!]*)*)"
+                      r"(?: (?=[a-z])|[.,]|$)")
 # "Oracle's Fortune's End", "Mars' Bulwark", and 7.37's lists "Chen: Divine Favor"
 _OWNER_END_RE = re.compile(r"'s |(?<=s)' |: ")
 
@@ -72,7 +74,11 @@ def _innate_marker(src):
 _ENCHANT_RE = re.compile(r"^(?:Item bonus from )?(\w+) [Ee]nchantment$")   # "Audacious Enchantment"
 # a unit named like an ability: the icon of the ability that summons it (7.41 "Warlock's Golem with talent")
 _ICON_ALIASES = {("warlock", "Golem"): "warlock_rain_of_chaos",
-                 ("lone_druid", "Spirit Bear's Return"): "lone_druid_spirit_bear_return"}   # the game's name: "Return"
+                 ("lone_druid", "Spirit Bear's Return"): "lone_druid_spirit_bear_return",   # the game's name: "Return"
+                 # a summon named by its unit, not its ability (7.42 Pip Health list)
+                 ("clinkz", "Skeleton Archers"): "clinkz_burning_army",
+                 ("techies", "M.A.D."): "techies_mutually_assured_destruction",
+                 ("undying", "Tombstone Zombies"): "undying_tombstone"}
 # a map unit that is neither a hero nor a neutral creep: its abilities' prefix (7.41 "Tormentor's Reflect")
 _UNIT_PREFIXES = {"Tormentor": "miniboss"}
 
@@ -183,6 +189,8 @@ def _item_icon(name):
     item = _item_slug(name)
     if _os.path.exists(_os.path.join(_ITEM_ICON_DIR, f"{item}.png")):
         return f"{ITEM_CDN}{item}.png"
+    if name.endswith("s") and len(name) > 4:          # Valve's plural: "Observer Wards", "Couriers" (7.42 Pip Health)
+        return _item_icon(name[:-1])
     return None
 
 
@@ -235,7 +243,10 @@ def _icon(owner, abil):
         # an innate without an icon of its own gets the innate mark, as its ability header does
         if (hero, abil) in INNATE_ABILITIES:
             return INNATE_ICON_URL
-        return _icon_of_patch(hero, abil)
+        found = _icon_of_patch(hero, abil)
+        if not found and abil.endswith("s") and len(abil) > 4:    # Valve's plural: "Mass Serpent Wards" (7.42)
+            return _icon(owner, abil[:-1])
+        return found
     icon = _item_icon(owner)                         # an item's ability: the item's own icon
     if icon:
         return icon
@@ -526,6 +537,32 @@ def mech_table(head, rows, labels=True, wide_last=False):
     wide = " mech-wide-last" if wide_last else ""
     values = "" if labels else " mech-values"     # no label column: the values are equals, their columns too
     return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}{wide}{values}">{out}</span><!--/MECHTABLE-->'
+
+
+def mech_level_table(head, rows, notes=(), per=15):
+    """Values by level as the site's level tables read them: the levels a row across, the kinds of value under them
+    (owner 2026-11-19, 7.42 experience per level: a 29-row column was "массивная"). head: ["Level", 2, 3, …]; rows:
+    [["Old", …], ["New", …], …] in the head's order; per: levels in one block, the rest in the next. A value of the
+    second row that differs from the first is gold (what changed); notes: lines under the tables (a formula)."""
+    levels, out = head[1:], ""
+    for k in range(0, len(levels), per):
+        part = slice(k, k + per)
+        cols = len(levels[part])
+
+        def line(label, cells, cls=""):
+            return (f'<span class="mech-abil-row{cls}"><span class="mech-cell mech-label">{label}</span>'
+                    + "".join(f'<span class="mech-cell">{c}</span>' for c in cells) + '</span>')
+        body = line(head[0], levels[part], " mech-head")
+        for r, row in enumerate(rows):
+            cells = list(row[1:])[part]
+            if r == 1 and rows:
+                cells = [f'<span class="mech-lv-changed">{c}</span>' if c != o else c
+                         for c, o in zip(cells, list(rows[0][1:])[part])]
+            body += line(row[0], cells)
+        out += f'<span class="mech-abils mech-levels" style="--mech-lv:{cols}">{body}</span>'
+    for n in notes:
+        out += f'<span class="mech-levels-note">{n}</span>'
+    return f'<!--MECHTABLE--><span class="mech-levels-wrap">{out}</span><!--/MECHTABLE-->'
 
 
 def mech_formula(expr):

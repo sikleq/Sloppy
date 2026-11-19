@@ -423,6 +423,15 @@ h4.subgroup {
 .mech-abils.mech-cols-2.mech-values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .mech-abils.mech-cols-3.mech-values { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .mech-abils.mech-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }   /* a line of values (7.38 Lotus Pools) */
+/* values by level (mech_level_table, 7.42 experience): levels across, a block of them per line; tight cells, the
+   changed values gold (the owner 2026-11-19: the 29-row column was "массивная") */
+.mech-abils.mech-levels { grid-template-columns: fit-content(18%) repeat(var(--mech-lv), minmax(0, 1fr)); margin: 6px 0 0; }
+.mech-abils.mech-levels + .mech-abils.mech-levels { margin-top: 6px; }
+.mech-abils.mech-levels .mech-abil-row > span { padding: 3px 4px; font-variant-numeric: tabular-nums; font-size: 12.5px; }
+.mech-abils.mech-levels .mech-abil-row > .mech-label { padding: 3px 8px; white-space: nowrap; }
+.mech-lv-changed { color: var(--gold-bright, #e3c46a); font-weight: 600; }
+.mech-levels-note { display: block; margin-top: 6px; color: var(--text-dim); }
+@media (max-width: 760px) { .mech-abils.mech-levels .mech-abil-row > span { font-size: 11px; padding: 3px 2px; } }
 .mech-cell {
   display: flex;
   flex-wrap: wrap;
