@@ -89,6 +89,14 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     ("Ringmaster", "ringmaster_crystal_ball"),   # Sideshow Secrets sub-ability, not surfaced in live API
     ("Ringmaster", "ringmaster_weighted_pie"),   # Sideshow Secrets sub-ability, not surfaced in live API
     ("Tinker", "tinker_defense_matrix"),    # not surfaced in live herodata API
+    # Dropped from Valve's live herodata on 2026-11-19 (datafeed update); all six are
+    # in abilities_slim.json, so the older patch pages that name them stay correct.
+    ("Beastmaster", "beastmaster_drums_of_slom"),
+    ("Lycan", "lycan_apex_predator"),
+    ("Juggernaut", "juggernaut_swift_slash"),
+    ("Meepo", "meepo_megameepo"),
+    ("Chaos Knight", "chaos_knight_fundamental_forging"),
+    ("Nyx Assassin", "nyx_assassin_neuro_sting"),
     # Familiar's self-cast Stone Form (7.41e). Exists in abilities_slim.json as
     # "Stone Form"; live herodata only lists the Familiars' own entry.
     ("Visage", "visage_stone_form_self_cast"),
