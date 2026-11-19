@@ -301,6 +301,33 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   ground around it — 7.39b painted grass where the portal stood, 7.39 keeps its sand. The unmended render is kept
   as `map_<sha8>_sfm_full_pink.png`; the one-off work script that re-applied it (`stitch_final.py`) is not kept; `scripts/gen/stitch_sfm.py` is the live stitcher. Tests:
   tests/test_mend_map.py.
+- Blue arcs at the map's centre (2026-11-19, the owner: "on mid 7.42 there must be nothing extra"; not in the game).
+  Every render since 7.38 has a light-blue marbled circle at world (0, 0) and ring pieces of radius ~290 around it
+  (7.38-7.41f: a circle on the Dire ground and a slab by the river wall; 7.42 reworked the mid river and two whole
+  arcs showed). It is the Lotus Pools' water effect `particles/world_fountain_of_life/fol_ambient.vpcf`
+  (`ambientfx` of both `npc_dota_lotus_pool`, new in 7.38): its children `fol_ambient_pool_1/2/3_fx` draw water
+  ribbons along points of `fol_pool_N_fx.vsnap` (radius 288-297, angles 85-160, 205-280, 325-40 degrees, z 80) and
+  `fol_ambient_lrg/mid/sml` the centre circle; in SFM the snapshot's control point is not bound to the pool, so
+  the points are taken around (0, 0). Proven by a test render with the 22 `fol_ambient*` particles emptied
+  (`particles/error/null.vpcf_c` copied over them in the dotamapsfm addon): the arcs and the circle are gone, the
+  rest of the map differs only by render noise; the pools lose only the small glow on their fountain top.
+  Ruled out on the way (test renders): the sky (`r_dota_white_skybox 1`, `r_drawskybox 0`, 3D skybox off), the
+  water's reflection / refraction (off: the water turns black, the arcs stay on top), the fish
+  (`ambient_creatures`, models emptied), and all 22 world meshes reaching the spot (emptied in a repacked map vpk).
+  Fixed 2026-11-19: `render_versions.py` (maprender/sfm, used by the stumps renders too) empties the 22 files
+  before Dota starts and removes them after (`hide_particles` / `unhide_particles`; it stops when the pak has no
+  `fol_ambient*`, so a renamed effect is not missed silently). Every map file 7.38-7.42 is re-rendered, normal and
+  with stumps (`rerender_nofol.py`). Checked: no picture before 7.38 has the arcs (no Lotus Pools there).
+- Riverbed corner at mid (2026-11-19, the owner: "a strange extra corner", not in the game). By the Radiant stairs
+  the 7.42 water shows a pale area with dead-straight edges along x -253 and y -253. It is map geometry: the Dire
+  riverbed (`agg_merge_mod_dire_riverbed_path`, dark 64-unit tiles at z 0) leaves out the corner x < -256,
+  y < -256, and the lighter Radiant riverbed under it shows through the water in SFM's straight-down light (the
+  render puts the edge 3 units off the mesh). Ruled out first: particles (`r_drawparticles 0`: still there), a seam
+  of our stitching (cell borders at x -393 / y -793). No console variable or override hides geometry, so the
+  stitched picture is mended: `scripts/gen/mend_riverbed.py` brings the patch's smoothed brightness onto a line
+  from its soft side to the water past the sharp edge, keeping the ripples; boxes per map file (7.42, 7.42-v2).
+  Tests: tests/test_mend_riverbed.py. The small bluish slab with a bright rim at (-440, -186) is a stone of the
+  Radiant riverbed under the water and stays.
 - Map history: `scripts/gen/map_history.py` — which dota.vpk each patch shipped (SHA-1 from depot 373301's
   manifests, one Steam login per manifest, with pauses: Steam rate-limits logins) and one download per distinct
   file. 7.38-7.41f: 16 map files; 7.08-7.37: 49. Their pictures, objects and counts go to

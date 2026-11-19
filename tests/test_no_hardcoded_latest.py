@@ -16,7 +16,8 @@ from patch import terrain_index
 
 
 def test_terrain_link_is_the_newest_terrain_page():
-    newest = terrain_index.page_patches()[0][0]
+    # the newest patch's own page, not a client-update map file inside it (7.42, not 7.42-v3)
+    newest = next(p for p in terrain_index.page_patches()[0] if "-v" not in p)
     assert site.latest_terrain_href() == f"terrain_{newest.replace('.', '')}.html"
     html = site.render_materials_subnav("terrain_stats")
     assert f'href="{site.latest_terrain_href()}">Terrain</a>' in html and site.TERRAIN_LATEST not in html
