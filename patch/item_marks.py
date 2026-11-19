@@ -94,8 +94,7 @@ def _illusion_row(text):
     if not nums:
         return ""
     vals = " / ".join(f"<b>{round(float(v) * ILLUSION_POTENCY / 100, 2):g}{pct}</b>" for v, pct in nums)
-    return (f'<span class="pop-li pop-sub"><span class="pop-t">Illusions ({ILLUSION_POTENCY}% Item Potency): '
-            f'{vals}</span></span>')
+    return f'<span class="pop-li pop-sub"><span class="pop-t">Illusions: {vals}</span></span>'     # owner 2026-11-19
 
 
 def item_marks(name, version):

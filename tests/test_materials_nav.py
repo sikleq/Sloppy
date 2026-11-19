@@ -19,9 +19,13 @@ def test_each_group_opens_its_changes_page_and_lists_it_first():
 def test_materials_tab_opens_hero_changes():
     # Owner 2026-11-16: Materials opens Hero Changes, groups Heroes, Creeps, Items, Terrain, Structures.
     assert dict((k, h) for k, _l, h in site.NAV_TABS)["materials"] == "hero_changes.html"
-    assert [g[1] for g in site.MATERIALS_GROUPS] == ["Heroes", "Creeps", "Items", "Terrain", "Structures"]
+    # Owner 2026-11-19: AoE Increase and Item Potency under a Mechanics tab; Structures marked beta
+    assert [g[1] for g in site.MATERIALS_GROUPS] == ["Heroes", "Creeps", "Items", "Terrain", "Mechanics", "Structures"]
     html = site.render_materials_subnav("hero_changes")
     assert html.index('href="hero_changes.html">Hero Changes') < html.index('href="heroes_stats.html">Hero Stats')
+    mech = dict((g[0], g) for g in site.MATERIALS_GROUPS)["mechanics_grp"][3]
+    assert [c[0] for c in mech] == ["aoe_increase", "item_potency"]
+    assert '>Structures<span class="nav-soon-tag nav-beta-tag">beta</span>' in html
 
 
 def test_index_creeps_panel_links_unit_changes():

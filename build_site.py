@@ -71,6 +71,7 @@ STEPS = [
     ("mana",    "builders/mana_items.py",   "Mana Items table"),
     ("stats",   "builders/heroes_stats.py", "Hero Stats table"),
     ("aoe",     "builders/aoe_increase.py", "AoE Increase table"),
+    ("ipot",    "builders/item_potency.py", "Item Potency table"),
     ("lab",     "builders/hero_lab.py",     "Hero Lab calculator"),
     ("hdyn",    "builders/heroes_dyn.py",   "Hero Dynamics matrix"),
     ("idyn",    "builders/items_dyn.py",    "Item Dynamics matrix"),

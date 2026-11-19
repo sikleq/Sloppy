@@ -86,7 +86,6 @@ MATERIALS_GROUPS = [
         ("hero_changes", "Hero Changes",  "hero_changes.html"),
         ("heroes_stats", "Hero Stats",    "heroes_stats.html"),
         ("hero_lab",     "Hero Lab",      "hero_lab.html"),
-        ("aoe_increase", "AoE Increase",  "aoe_increase.html"),
         ("heroes_dyn",   "Hero Dynamics", "heroes_dyn.html"),
     ]),
     ("creeps_grp", "Creeps", "unit_changes.html", [
@@ -108,9 +107,18 @@ MATERIALS_GROUPS = [
         ("terrain",       "Terrain",       TERRAIN_LATEST),
         ("terrain_stats", "Terrain Stats", "terrain_stats.html"),
     ]),
+    # game mechanics that cut across heroes and items (owner 2026-11-19: "Aoe Increase и … под новой вкладкой
+    # Mechanics, а не в Heroes или Items")
+    ("mechanics_grp", "Mechanics", "aoe_increase.html", [
+        ("aoe_increase", "AoE Increase",  "aoe_increase.html"),
+        ("item_potency", "Item Potency",  "item_potency.html"),
+    ]),
     # Buildings / map objectives — towers, barracks, tormentors.
     ("structures", "Structures", "structures.html", None),
 ]
+
+# a tab still being built: a small "beta" tag after its name (owner 2026-11-19: "Structures пометить BETA … ещё сырая")
+BETA_TABS = {"structures"}
 
 
 @_functools.lru_cache(maxsize=None)
@@ -286,7 +294,8 @@ def render_materials_subnav(active, prefix=""):
                 continue
             # Plain link (Terrain — no children).
             cls = "nav-subtab" + (" active" if active == gkey else "")
-            parts.append(f'<a class="{cls}" href="{prefix}{resolve_href(ghref)}">{glabel}</a>')
+            beta = '<span class="nav-soon-tag nav-beta-tag">beta</span>' if gkey in BETA_TABS else ''
+            parts.append(f'<a class="{cls}" href="{prefix}{resolve_href(ghref)}">{glabel}{beta}</a>')
             continue
         # Flatten child + grandchild keys so the group highlights when any
         # descendant page is active.

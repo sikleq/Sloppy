@@ -213,19 +213,25 @@
 .info-pop-body.is-pinned, .qhint-tip.is-pinned { position: absolute; pointer-events: auto; user-select: text; border-color: var(--gold); }
 /* a "?" popup = a small table (owner 2026-11-19: "лаконичной удобной таблицы с разделителями"): a row per line, thin
    lines between them, "–" for a sub-row; a row with "from A to B" ends with its % (.pop-end), as a patch row does */
-.pop-li { display: flex; align-items: baseline; gap: 12px; position: relative; padding: 3px 0; }
+.pop-li { display: flex; align-items: baseline; gap: 12px; position: relative; padding: 3px 0 3px 12px; }
+/* a small diamond at the start of a row, a sub-row one step in (owner 2026-11-19: "в начале строки короткую черту или
+   ромбик"; "без длинной черточки") */
+.pop-li::before { content: ""; position: absolute; left: 1px; top: calc(3px + 0.62em); width: 4px; height: 4px;
+  background: var(--gold); opacity: 0.6; transform: rotate(45deg); }
 .pop-li + .pop-li { border-top: 1px solid var(--line-soft); }
 .pop-li > .pop-t { flex: 1 1 auto; text-align: left; }
 .pop-li > .pop-t.pop-t-pct { flex: 0 1 auto; }
 /* the ruler from the text's last line to its %, as the rows' hover ruler (owner 2026-11-19: "+35% не видно, что
    относится к Damage …") */
 .pop-li > .pop-dots { flex: 1 1 12px; min-width: 12px; align-self: flex-end; margin-bottom: 0.4em;
-  border-bottom: 1px dashed rgba(150, 146, 137, 0.45); }
+  border-bottom: 1px dashed transparent; }
+.pop-li:hover > .pop-dots { border-bottom-color: rgba(150, 146, 137, 0.45); }   /* only under the mouse, as the rows' */
 .pop-li > .pop-end { flex: none; margin-left: 0; }
 .pop-li > .pop-end .badge-group { display: inline-flex; gap: 3px; }
-.pop-li.pop-sub { padding-left: 13px; border-top: 0; padding-top: 0; }
-.pop-li.pop-head { color: var(--text-dim); }                 /* "Compared to Blood Grenade:" over its rows */
-.pop-li.pop-sub::before { content: "–"; position: absolute; left: 1px; color: var(--text-dim, #969289); }
+.pop-li.pop-sub { padding-left: 24px; border-top: 0; padding-top: 0; }
+.pop-li.pop-sub::before { left: 13px; top: 0.62em; opacity: 0.4; }
+.pop-li.pop-head { color: var(--text-dim); padding-left: 0; }   /* "Compared to Blood Grenade:" over its rows */
+.pop-li.pop-head::before { content: none; }
 /* a % inside a popup's text, in the colour of its direction (owner 2026-11-08, 7.38 Lycan "-20% не окрашено") */
 .pop-pct { font-weight: 700; }
 .pop-pct-buff { color: #55cd73; }
