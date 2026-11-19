@@ -7,15 +7,15 @@
  "checks": {
   "247040": {
    "version": 7505,
-   "checked": "2026-11-19T04:23:24Z"
+   "checked": "2026-11-19T12:08:49Z"
   },
   "2305270": {
    "version": 3370,
-   "checked": "2026-11-19T04:23:24Z"
+   "checked": "2026-11-19T12:08:49Z"
   },
   "570": {
-   "version": 6980,
-   "checked": "2026-11-19T04:23:24Z"
+   "version": 6983,
+   "checked": "2026-11-19T12:08:49Z"
   }
  },
  "builds": [
@@ -2557,7 +2557,7 @@
   {"branch": "public", "from": 6972, "version": 6973, "time": "2026-11-09T22:30:10Z", "source": "muk-as/DOTA2_WEB", "timed": true},
   {"branch": "experimental", "from": 7504, "version": 7505, "time": "2026-11-10T00:10:11Z", "source": "muk-as/DOTA2_WEB", "timed": true},
   {"branch": "staging", "from": 3332, "version": 3338, "time": "2026-11-10T01:55:35Z", "source": "muk-as/DOTA2_WEB", "timed": true},
-  {"branch": "staging", "from": 3338, "version": 3341, "time": "2026-11-10T19:23:55Z", "after": "2026-11-10T17:50:32Z", "source": "valve-api", "timed": true},
+  {"branch": "staging", "from": 3338, "version": 3341, "time": "2026-11-10T18:06:59Z", "source": "muk-as/DOTA2_WEB", "timed": true},
   {"branch": "staging", "from": 3341, "version": 3344, "time": "2026-11-10T22:56:11Z", "source": "muk-as/DOTA2_WEB", "timed": true},
   {"branch": "staging", "from": 3344, "version": 3346, "time": "2026-11-11T01:47:36Z", "source": "muk-as/DOTA2_WEB", "timed": true},
   {"branch": "staging", "from": 3346, "version": 3348, "time": "2026-11-11T18:32:25Z", "source": "muk-as/DOTA2_WEB", "timed": true},
@@ -2569,19 +2569,22 @@
   {"branch": "staging", "from": 3350, "version": 3352, "time": "2026-11-12T22:35:41Z", "after": "2026-11-12T16:48:19Z", "source": "valve-api", "timed": false},
   {"branch": "staging", "from": 3352, "version": 3353, "time": "2026-11-13T01:24:11Z", "source": "muk-as/DOTA2_WEB", "timed": true},
   {"branch": "public", "from": 6974, "version": 6975, "time": "2026-11-13T01:39:23Z", "source": "muk-as/DOTA2_WEB", "timed": true},
-  {"branch": "staging", "from": 3353, "version": 3354, "time": "2026-11-13T18:06:06Z", "after": "2026-11-13T11:32:42Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3354, "version": 3357, "time": "2026-11-13T23:33:35Z", "after": "2026-11-13T18:06:06Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3357, "version": 3359, "time": "2026-11-14T03:35:57Z", "after": "2026-11-13T23:33:35Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3359, "version": 3360, "time": "2026-11-14T21:07:22Z", "after": "2026-11-14T16:54:57Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3360, "version": 3361, "time": "2026-11-15T20:28:59Z", "after": "2026-11-15T15:23:00Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3361, "version": 3363, "time": "2026-11-16T07:02:35Z", "after": "2026-11-16T00:17:10Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3363, "version": 3364, "time": "2026-11-17T00:45:17Z", "after": "2026-11-16T17:00:21Z", "source": "valve-api", "timed": false},
-  {"branch": "public", "from": 6975, "version": 6976, "time": "2026-11-17T08:33:22Z", "after": "2026-11-17T00:45:17Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3364, "version": 3365, "time": "2026-11-17T08:33:22Z", "after": "2026-11-17T00:45:17Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3365, "version": 3366, "time": "2026-11-17T17:54:15Z", "after": "2026-11-17T12:27:45Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3366, "version": 3368, "time": "2026-11-18T00:33:50Z", "after": "2026-11-17T17:54:15Z", "source": "valve-api", "timed": false},
-  {"branch": "staging", "from": 3368, "version": 3370, "time": "2026-11-18T17:05:09Z", "after": "2026-11-18T13:05:00Z", "source": "valve-api", "timed": false},
+  {"branch": "staging", "from": 3353, "version": 3354, "time": "2026-11-13T18:01:57Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3354, "version": 3357, "time": "2026-11-13T22:27:00Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3357, "version": 3359, "time": "2026-11-14T01:33:39Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3359, "version": 3360, "time": "2026-11-14T20:48:55Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3360, "version": 3361, "time": "2026-11-15T16:26:50Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3361, "version": 3363, "time": "2026-11-16T01:04:33Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3363, "version": 3364, "time": "2026-11-16T21:21:08Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "public", "from": 6975, "version": 6976, "time": "2026-11-17T01:24:01Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3364, "version": 3365, "time": "2026-11-17T03:18:42Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3365, "version": 3366, "time": "2026-11-17T17:41:05Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3366, "version": 3368, "time": "2026-11-18T00:20:19Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "staging", "from": 3368, "version": 3370, "time": "2026-11-18T15:10:34Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "public", "from": 6976, "version": 6978, "time": "2026-11-18T19:54:39Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "public", "from": 6978, "version": 6979, "time": "2026-11-18T21:47:42Z", "source": "muk-as/DOTA2_WEB", "timed": true},
   {"branch": "public", "from": 6976, "version": 6979, "time": "2026-11-18T23:24:14Z", "after": "2026-11-18T17:05:09Z", "source": "valve-api", "timed": false},
-  {"branch": "public", "from": 6979, "version": 6980, "time": "2026-11-19T04:23:24Z", "after": "2026-11-18T23:24:14Z", "source": "valve-api", "timed": false}
+  {"branch": "public", "from": 6979, "version": 6980, "time": "2026-11-19T01:10:15Z", "source": "muk-as/DOTA2_WEB", "timed": true},
+  {"branch": "public", "from": 6980, "version": 6983, "time": "2026-11-19T05:48:32Z", "source": "muk-as/DOTA2_WEB", "timed": true}
  ]
 }
