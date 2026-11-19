@@ -6,7 +6,7 @@ from .cards_facets import facet_change, new_facet
 from .elements import (
     hero_header, item_header, unit_header, ability, facet_header, section, subgroup, li,
     ul_open, ul_close, plain_header,
-    components, provides, auto_components_change, inline_note, inline_list, info_tip,
+    components, provides, auto_components_change, inline_note, inline_list, pip_list, pip_story_list, info_tip,
     show_list, attr_change, creep_ref, camp_table, sub_ability, hl
 )
 from .enchants import (enchant_header, enchant_attr_row, enchant_tier_box, souvenir_chip, enchant_list_head,

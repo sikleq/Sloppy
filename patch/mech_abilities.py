@@ -593,6 +593,60 @@ def mech_change_cell(old, new, l=False):
             f'data-tooltip="{_html.escape(note, quote=True)}">{new}</span></b>')
 
 
+_PIP_DATA = None
+
+
+def _pip_entries(version):
+    global _PIP_DATA
+    if _PIP_DATA is None:
+        import json as _json
+        path = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "data", "rules",
+                             "pip_health.json")
+        with open(path, encoding="utf-8") as f:
+            _PIP_DATA = _json.load(f)
+    return _PIP_DATA.get(version or "")
+
+
+def _pip_sticks(pips, fragile):
+    """Health pips as thin rounded sticks, levels split by "/" (owner 2026-11-19: variant A, "чуть ближе палочки")."""
+    levels = pips if isinstance(pips, list) else [pips]
+    cls = " pip-fragile" if fragile else ""
+    return '<span class="pip-sep">/</span>'.join(
+        f'<span class="pip-sticks{cls}" aria-label="{n} pips">' + "<i></i>" * n + "</span>" for n in levels)
+
+
+def pip_rows(raw, version):
+    """Valve's Pip Health list (7.42 "All units are now able to damage units with health bar pips") as a table: the
+    ability's or item's icon and name — no hero column, the ability says whose it is (owner 2026-11-19) — and its pips
+    as sticks, Fragile ones orange; a talent / upgrade in the name's hover; a count read from the game files but not
+    traced in the code is dimmed. data/rules/pip_health.json; None when that patch has no data or a line is missing."""
+    data = _pip_entries(version)
+    lines = [x.strip() for x in raw.split("<br>") if x.strip()]
+    if not data:
+        return None
+    by_line = {e["line"]: e for e in data}
+    if any(line not in by_line for line in lines):
+        return None
+    rows = []
+    for line in lines:
+        e = by_line[line]
+        parsed = _parse_line(line)
+        label, icon = (_ABILITY_ONLY.get(parsed[0], parsed[0]), parsed[1]) if parsed else (line, None)
+        tip = "<br>".join(x for x in (e.get("note"), "" if e.get("sure", True) else
+                                      "From the game files, not checked in the game's code") if x)
+        name = _html.escape(label)
+        if tip:
+            name = (f'<span class="iab-hint abil-ico-hint" data-tooltip="{_html.escape(tip, quote=True)}">'
+                    f'{name}</span>')
+        img = f'<img src="{icon}" alt="" loading="lazy" width="22" height="22">' if icon and not icon.startswith("facet:") else ""
+        dim = "" if e.get("sure", True) else " pip-unsure"
+        rows.append(f'<span class="mech-abil-row{dim}"><span class="mech-cell pip-name">{img}{name}</span>'
+                    f'<span class="mech-cell pip-cell">{_pip_sticks(e["pips"], e.get("fragile"))}</span></span>')
+    legend = (f'<span class="pip-legend"><span>{_pip_sticks(2, False)} 1 hero hit each</span>'
+              f'<span>{_pip_sticks(2, True)} Fragile: a melee hero hits 2</span></span>')
+    return f'<!--MECHTABLE--><span class="mech-abils pip-table">{"".join(rows)}</span>{legend}<!--/MECHTABLE-->'
+
+
 def mech_change_cells(old, new, l=False):
     """A change as three table cells — before (dim), after (in the colour of what it means), its % (owner 2026-11-19,
     7.42 building bounty: "забыли значения до … один столбец до, другой после и в конце % разницу"). "110-130" reads

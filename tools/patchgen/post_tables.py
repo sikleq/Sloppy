@@ -196,6 +196,13 @@ def _postprocess_from_to_list(lines):
     return out
 
 
+def _postprocess_pip_list(lines):
+    """Valve's list of the units with health bar pips (7.42 "All units are now able to damage units with health bar
+    pips") → pip_list: each unit's pips as sticks when data/rules/pip_health.json has the patch (owner 2026-11-19)."""
+    return [ln.replace("extra=inline_list(", "extra=pip_list(", 1)
+            if re.search(r'W\(li\("[^"]*health bar pips', ln) and "extra=inline_list(" in ln else ln for ln in lines]
+
+
 def _postprocess_bounty_range_row(lines):
     """"Buildings no longer have variable last hit bounties" next to the building bounty table: its "before" column
     shows the old ranges (110-130 → 100), so the row is covered — hidden, still counted (owner 2026-11-19: "строка не

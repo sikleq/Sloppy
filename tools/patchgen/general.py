@@ -188,7 +188,11 @@ def _story_of(group, tag):
         info = (n.get('info') or '').strip()
         if info and _LIST_INFO_RE.match(info) and table is None:
             units = [_owner_form(re.sub(r'^\s*\*\s*', '', p).strip()) for p in info.split('<br>') if p.strip()]
-            table = "mech_list(info_tip(" + ", ".join(_py_str(u) for u in units) + "))"
+            if re.search(r'health bar pips', text, re.I):
+                # the pip-health units: each one's pips as sticks (owner 2026-11-19), the list as ever without data
+                table = "pip_story_list(" + _py_str("<br>".join(units)) + ")"
+            else:
+                table = "mech_list(info_tip(" + ", ".join(_py_str(u) for u in units) + "))"
         elif info and '<br>' not in info and len(info) < 160:
             aside = _strip_html(info).strip().rstrip('.').replace(' * ', ' × ')
             word = aside.split(" ", 1)[0]

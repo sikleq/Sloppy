@@ -510,7 +510,8 @@ def test_a_system_block_is_told_as_a_paragraph():
                             'now able to damage units with health bar pips: attacks from heroes deal 1 full pip per '
                             'attack; attacks from illusions and creeps deal 1/4 pip per attack.", "Some units have a '
                             'Fragile debuff (" + mech_example("Courier", label="Courier")')
-    assert 'table=mech_list(info_tip("Couriers", "Gyrocopter: Homing Missile"))' in story
+    # the pip-health units: each one's pips as sticks (owner 2026-11-19), the icons' table without data
+    assert 'table=pip_story_list("Couriers<br>Gyrocopter: Homing Missile")' in story
 
 
 def test_a_teaser_row_has_its_own_chip_and_no_place_in_the_cells():
@@ -725,3 +726,19 @@ def test_the_738c_gate_row_opens_the_picture_of_its_two_cells():
     phrase, shots = terrain_notes.terrain_note("7.38c", "Fixed unnecessary pathing blockers at the left of the entrance to the Dire Base through the team only gate")
     assert phrase == "pathing blockers"
     assert "738c_11.webp" in shots
+
+
+def test_pip_health_list_is_a_table_of_sticks_from_the_game_data():
+    # owner 2026-11-19: the pips of each unit, variant A (thin sticks, closer together), no hero column, Fragile apart
+    from patch.mech_abilities import pip_rows
+    html = pip_rows("Couriers<br>Pugna: Nether Ward<br>Shadow Shaman: Urnaconda", "7.42")
+    assert html.count('class="mech-abil-row') == 3
+    assert html.count("<i></i>") >= 2 + 3 + 4 + 5 + 6 + 8 + 4                 # sticks + the legend's
+    assert '<span class="pip-sticks pip-fragile" aria-label="2 pips">' in html  # the courier is Fragile
+    assert '<span class="pip-sep">/</span>' in html                            # Nether Ward 3/4/5/6
+    assert "pip-unsure" in html and "not checked in the game&#x27;s code" in html   # Urnaconda: files only
+    assert ">Nether Ward<" in html and "Pugna" not in html                     # no hero column
+    assert pip_rows("Couriers<br>Some New Unit", "7.42") is None               # a line without data: the list as ever
+    assert pip_rows("Couriers", "7.41") is None
+    row = 'W(li("All units are now able to damage units with health bar pips", t("REWORK"), extra=inline_list("Couriers")))'
+    assert g._postprocess_pip_list([row]) == [row.replace("inline_list(", "pip_list(")]     # the generator marks it

@@ -1343,6 +1343,19 @@ def inline_note(text):
     return f'<!--INLINETIP-->{info_tip(text)}<!--/INLINETIP-->'
 
 
+def pip_list(text):
+    """Valve's list of pip-health units: the pips of each as sticks when the patch has the data (mech_abilities.pip_rows,
+    owner 2026-11-19), else the list as ever."""
+    from .mech_abilities import pip_rows
+    return pip_rows(text, _State.current_patch_version) or inline_list(text)
+
+
+def pip_story_list(text):
+    """The same for a mech_story's table: the sticks, else the table of icons (mech_list)."""
+    from .mech_abilities import mech_list, pip_rows
+    return pip_rows(text, _State.current_patch_version) or mech_list(info_tip(*text.split("<br>")))
+
+
 def inline_list(text):
     """inline_note of a list the row introduces (Valve's "…:" / "The following …"): in a Reworked mechanic it is a
     table open under the row, not a "?" (owner 2026-10-28, 7.38 Lifesteal)."""
