@@ -116,7 +116,9 @@ def _name_cell(name, icon, owner="", span=1, wide=True):
     w, h = (44, 32) if wide else (32, 32)
     rs = f' rowspan="{span}"' if span > 1 else ''
     who = f'<span class="ipot-owner">{_esc(owner)}</span>' if owner else ''
-    img = f'<img src="{icon}" alt="" loading="lazy" width="{w}" height="{h}">' if icon else ''
+    # no file, no picture: a broken image showed its file name (design review 2026-11-19)
+    img = (f'<img src="{icon}" alt="" loading="lazy" width="{w}" height="{h}">'
+           if icon and (_HERE / icon).exists() else '')
     return f'<td class="ipot-name"{rs}><span class="ipot-nm-wrap">{img}<span class="ipot-nm">{_esc(name)}{who}</span></span></td>'
 
 
@@ -153,7 +155,8 @@ def _items_rows(version, rules):
             hint = f' data-tooltip="{_esc(sentence)}"' if sentence else ''
             prop = f'<span class="{"iab-hint abil-ico-hint " if sentence else ""}ipot-prop"{hint}>{_esc(label)}</span>'
             v = _num(value)
-            ill = "".join(f'<td class="ipot-v ipot-v-ill">{_fmt(v * p / 100) if v is not None else "—"}</td>'
+            # the illusions' columns brighter as their potency grows (20 → 35 → 40%): how much of the hero's value is left
+            ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-p{p}">{_fmt(v * p / 100) if v is not None else "—"}</td>'
                           for _, p in ILLUSIONS)
             rows.append(f'<tr{cls} data-name="{_esc(name.lower())}">{head}<td class="ipot-ab">{_esc(ab)}</td>'
                         f'<td class="ipot-text">{prop}</td><td class="ipot-v ipot-v-hero">{_esc(value)}</td>{ill}</tr>')
@@ -210,8 +213,10 @@ def render_html() -> str:
             "ipot-sources", ["Source", "Attacks", "Item Potency"], _sources_rows(version, rules, names, "added")))
         + _section("Illusions", _table(
             "ipot-sources", ["Source", "Illusions", "Item Potency"], _sources_rows(version, rules, names, "illusions")))
-        + _section("Dormant Curio", _table(
-            "ipot-curio", ["Item", "Ability", "Value", "Now", f"With Curio ×{CURIO:g}"], _curio_rows(version)))
+        # 84 rows: folded by default (design review 2026-11-19: "3672 px … длинная простыня")
+        + '<details class="ipot-fold"><summary><h3 class="ipot-title">Dormant Curio</h3></summary>'
+        + _table("ipot-curio", ["Item", "Ability", "Value", "Now", f"With Curio ×{CURIO:g}"], _curio_rows(version))
+        + '</details>'
     )
     nav = _site.render_top_nav('materials', _latest_href(), patch_context=False, subtabs_active='item_potency',
                                subnav_in_header=False)

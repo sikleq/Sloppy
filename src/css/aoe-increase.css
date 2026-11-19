@@ -313,3 +313,25 @@ table.mr-table.ipot-table tr.ipot-gone td { opacity: 0.45; }
   background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
 .ipot-chip.ipot-buff { background: rgba(85, 205, 115, 0.14); color: #6fd08a; }
 .ipot-chip.ipot-nerf { background: rgba(224, 114, 122, 0.14); color: #e98a91; }
+/* design review 2026-11-19: headers as AoE Increase (the first bright, the others dim; text columns left), the
+   illusions' values brighter with their potency, the Curio list folded, names wrapping on a phone */
+table.mr-table.ipot-table thead th { color: var(--text-dim); text-align: center; }
+table.mr-table.ipot-table thead th:first-child { color: var(--text-main); text-align: left; }
+table.mr-table.ipot-items thead th:nth-child(2), table.mr-table.ipot-items thead th:nth-child(3),
+table.mr-table.ipot-curio thead th:nth-child(2), table.mr-table.ipot-curio thead th:nth-child(3),
+table.mr-table.ipot-sources thead th:nth-child(2) { text-align: left; }
+table.mr-table.ipot-table td.ipot-p20 { color: rgba(214, 208, 196, 0.45); }
+table.mr-table.ipot-table td.ipot-p35 { color: rgba(214, 208, 196, 0.68); }
+table.mr-table.ipot-table td.ipot-p40 { color: rgba(214, 208, 196, 0.85); }
+.ipot-fold { margin-top: 22px; }
+.ipot-fold > summary { cursor: pointer; list-style: none; }
+.ipot-fold > summary::-webkit-details-marker { display: none; }
+.ipot-fold > summary .ipot-title { display: inline-block; }
+.ipot-fold > summary .ipot-title::after { content: " ▸"; color: var(--text-dim); }
+.ipot-fold[open] > summary .ipot-title::after { content: " ▾"; }
+@media (max-width: 760px) {
+  .ipot-name { white-space: normal; min-width: 130px; }
+  .ipot-nm-wrap { align-items: flex-start; flex-wrap: wrap; gap: 4px; max-width: 100%; }
+  .ipot-nm { min-width: 0; overflow-wrap: anywhere; }
+  table.mr-table.ipot-table td { padding: 6px 8px; }
+}

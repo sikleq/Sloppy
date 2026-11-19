@@ -20,7 +20,7 @@
     "dark_seer_normal_punch": "Replica: 60%",
     "pangolier_swashbuckle": "Slashes: 60%",
     "gyrocopter_flak_cannon": "Extra attacks: 50%",
-    "gyrocopter_side_gunner": "Attacks: 75%",
+    "gyrocopter_side_gunner_spawn_ability": "Attacks: 75%",
     "ember_spirit_sleight_of_fist": "Attacks: 80%",
     "kez_falcon_rush": "Echo attacks: equal to their damage (30/35/40/45%)",
     "abaddon_death_coil": "Aghanim's Scepter attack: 80%",
@@ -41,7 +41,7 @@
     "own": [
       "pangolier_swashbuckle",
       "gyrocopter_flak_cannon",
-      "gyrocopter_side_gunner",
+      "gyrocopter_side_gunner_spawn_ability",
       "ember_spirit_sleight_of_fist",
       "kez_falcon_rush",
       "abaddon_death_coil",
@@ -117,7 +117,7 @@
     ],
     [
       "Illusions",
-      "20",
+      "IllusionPotency = 20",
       [
         "20",
         "35 / 40",
