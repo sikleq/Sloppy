@@ -778,7 +778,9 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be", "REWORK"),
     ("Radiant Tier 1 tower moved ever so slightly to the south", "REWORK"),
     ("Dire fountain moved ~300 units closer to the Dire Ancient", "REWORK"),
-    ("Dire base shop moved 256 units west", "REWORK"),
+    # the shop zone and its stash moved by (-256, -256) in the map file, not only west (owner 2026-11-20: "на
+    # рисунке будто ещё и вниз"; terrain_diff_7.42.json zones.shops, entities.stash 7564,6313 -> 7308,6057)
+    ("Dire base shop moved 256 units west and 256 units south", "REWORK"),
     ("Slightly rearranged the trees around Radiant Safelane Tier 1 small camp", "REWORK"),
     ("Slightly increased the amount of highground to the north of the Radiant midlane ramp", "REWORK"),
     ("Spawn boxes of the Safelane Tier 1 small and large camps have been decreased", "REWORK"),

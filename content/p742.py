@@ -172,7 +172,7 @@ def build():
     W(li("Removed a bunch of trees on the cliff overlooking the stream near the Safelane Tier 1 Towers", t("DEL")))
     W(li("Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu", t("TEASER")))
     W(li("Slightly rearranged the trees around Radiant Safelane Tier 1 small camp", t("REWORK")))
-    W(li("Dire base shop moved 256 units west", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
+    W(li("Dire base shop moved 256 units west and 256 units south", t("REWORK"), extra=inline_note("Not in the patch notes: found in the game files")))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====

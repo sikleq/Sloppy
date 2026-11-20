@@ -1,5 +1,4 @@
 """Camp compositions as a light table (camp_table) — out of patch/elements.py, which grew past its size."""
-from pathlib import Path
 
 
 def camp_table(rows):
@@ -47,8 +46,6 @@ def camp_table(rows):
 
 _CAMP_ICONS = {"small": "../icons/camps/creepcamp_small_22", "medium": "../icons/camps/creepcamp_mid_22",
                "large": "../icons/camps/creepcamp_big_22", "ancient": "../icons/camps/creepcamp_ancient_22"}
-_FACES = Path(__file__).resolve().parents[1] / "icons" / "camps" / "faces"
-_UNIT_PREFIX = "npc_dota_neutral_"
 
 
 def _img(path, cls=""):
@@ -59,37 +56,19 @@ def _img(path, cls=""):
 
 
 def camp_faces(creeps, gone=False):
-    """a camp's creeps as faces only (a repeat with its count) — a cell of a "before / now" table (7.42 camp changes).
-    gone=True: a camp that left the game, its faces grey like a removed entity's icon (owner 2026-11-19: "просто
+    """a camp's creeps as portraits only (a repeat: its portrait again) — a cell of a "before / now" table (7.42 camp
+    changes). gone=True: a camp that left the game, its portraits grey like a removed entity's icon (owner 2026-11-19: "просто
     серые иконки, как мы делаем с удаленными предметами")"""
     return camp_crew(creeps, gone)
 
 
 def camp_ref(name, creeps, new=False):
-    """a camp named in a table whose column already says its size (7.42 "home jungle"): the faces of its creeps (a
-    repeat with its count) before its name, no type glyph — camp_ref("Kobold camp", [(2, "Kobold", icon), ...]).
+    """a camp named in a table whose column already says its size (7.42 "home jungle"): the portraits of its creeps (a
+    repeat: its portrait again) before its name, no type glyph — camp_ref("Kobold camp", [(2, "Kobold", icon), ...]).
     new=True: a camp new in this patch, its name in the site's gold instead of Valve's "(new!)" (owner 2026-11-19)"""
     faces = camp_crew(creeps)
     cls = "camp-ref-name camp-ref-new" if new else "camp-ref-name"
     return f'<span class="camp-ref">{faces}<span class="{cls}">{name}</span></span>' if faces else name
-
-
-def camp_icon(size, creeps):
-    """the camp's own icon (owner 2026-11-19): the game's camp-type glyph, then each kind of
-    creep's whole face, a repeated creep with its count in the corner. A creep without a face (not in
-    gen_camp_icons.FACE_CX) is left out; with no faces at all the type glyph alone stays."""
-    glyph = _CAMP_ICONS.get(size.lower(), "")
-    parts = []
-    if glyph:
-        parts.append(f'<span class="camp-type">{_img(glyph)}</span>')
-    for n, _name, icon in creeps:
-        slug = Path(icon).stem
-        slug = slug[len(_UNIT_PREFIX):] if slug.startswith(_UNIT_PREFIX) else slug
-        if not (_FACES / f"{slug}.png").exists():
-            continue
-        count = _img(f"../icons/camps/count_{n}", "camp-count") if 1 < n < 10 else ""
-        parts.append(f'<span class="camp-face">{_img(f"../icons/camps/faces/{slug}")}{count}</span>')
-    return f'<span class="camp-ico">{"".join(parts)}</span>' if parts else ""
 
 
 def camp_glyph(size):
