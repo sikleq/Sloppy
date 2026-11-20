@@ -71,7 +71,10 @@ def _resolve(kind, owner, abil, text):
 
 def _chip(kind, owner, name, src, texts):
     from .elements import _slugify
-    head = _html.escape(f"{owner}: {name}" if kind == "hero" and name != owner else owner)
+    # the ability's name alone, no hero (owner 2026-11-20: "не надо писать героев — только название способности");
+    # a talent of no one ability keeps its hero ("Kunkka: Talents"), the tree icon says nothing of whose
+    head = _html.escape(name if kind == "hero" and name != "Talents" else f"{owner}: {name}" if kind == "hero"
+                        else owner)
     # a little table, as the site's other tooltips with numbers (calendar's tb-tip-table): the change on the left, its
     # % on the right; the name over it stands out (owner 2026-11-20: "в табличном виде … название … выделять")
     rows = "".join(f"<tr><td>{_html.escape(t)}</td><td>{_pct_html(t).strip()}</td></tr>" for t in texts)
@@ -89,7 +92,8 @@ def icons_with_notes(pairs):
         parsed = _parse_line(name)
         if not parsed or not parsed[1] or parsed[1].startswith("facet:"):
             raise ValueError(f"icons_with_notes: no icon for {name!r}")
-        tip = f"<b>{_html.escape(name)}</b><br>{_html.escape(note)}"
+        # the item's name in gold over its note, as the changes' tooltips (owner 2026-11-20)
+        tip = f'<b class="tip-head">{_html.escape(name)}</b>{_html.escape(note)}'
         out.append(ability_chip(name, parsed[1], tip=tip))
     return "".join(out)
 

@@ -605,9 +605,11 @@ def save_html(filename):
     # a card's values as a table (owner 2026-11-05); a deck's card, even one value (2026-11-09)
     out = value_tables(out, decks=DECK_PAGES is None or _stem in DECK_PAGES)
     from .card_pairs import pair_new_cards
-    from .card_sections import card_sections, drop_upgrade_rows_said_below, hide_rows_the_aghs_card_says
+    from .card_sections import (card_sections, drop_added_caption_under_upgrade_row, drop_upgrade_rows_said_below,
+                                hide_rows_the_aghs_card_says)
     out = hide_rows_the_aghs_card_says(out)   # an Aghanim's row its old -> new card shows already (2026-11-06)
     out = drop_upgrade_rows_said_below(out)   # a card's upgrade row the Aghanim's card below shows (2026-11-06)
+    out = drop_added_caption_under_upgrade_row(out)   # "Added Aghanim's X." under Valve's "Now upgraded with X" (11-20)
     out = card_sections(out, _stem)        # rows led by an ability's icon: lines between, a head each (2026-11-06)
     out = pair_new_cards(out, _stem)       # two new cards side by side (2026-11-06)
     from .card_pairs import pair_replaced_facets

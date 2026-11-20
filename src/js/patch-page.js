@@ -644,6 +644,12 @@
         'invoker_sun_strike',
       ],
     },
+    // a summon's ability → its unit's block (owner 2026-11-20, 7.42 Ancient Thunderhide: "стрелочку, как мы делаем
+    // со связными способностями")
+    {
+      parent: 'beastmaster_summon_thunderhide',
+      children: ['beastmaster_thunderhide_unit'],
+    },
     {
       parent: 'ringmaster_sideshow_secrets',
       children: [

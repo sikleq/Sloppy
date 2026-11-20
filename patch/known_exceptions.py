@@ -141,6 +141,8 @@ KNOWN_DISPLAY_NAME_OVERRIDES = set()
 KNOWN_ICON_URL_PSEUDO_SLUGS = {
     "brewmaster_earth_unit", "brewmaster_storm_unit",
     "brewmaster_fire_unit", "brewmaster_void_unit",
+    # a summon's unit block (7.42 Ancient Thunderhide): the dashed line from its ability finds it by this slug
+    "beastmaster_thunderhide_unit",
 }
 
 KNOWN_SYNTHETIC_SUBBLOCKS = {

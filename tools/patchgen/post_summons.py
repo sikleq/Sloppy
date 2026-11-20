@@ -244,10 +244,53 @@ def _postprocess_summon_units(lines, version):
         # the indent of what comes next: a reworked card's slug sits on a line inside its call, deeper
         ind = re.match(r"^\s*", out[k]).group(0) if k < len(out) else m.group(1)
         name, icon = _SUMMON_UNITS[slug]
-        block = [f'{ind}W(ability("{name}", icon_url="../icons/units/{icon}.png"))', f"{ind}W(ul_open())",
+        # a pseudo-slug "<hero>_<unit>_unit" (known_exceptions): the page's dashed line from the ability finds it
+        unit = slug.replace("_summon_", "_") + "_unit"
+        block = [f'{ind}W(ability("{name}", slug="{unit}", icon_url="../icons/units/{icon}.png"))', f"{ind}W(ul_open())",
                  f'{ind}W(summon_sheet("{slug}", version="{version}"))', f"{ind}W(ul_close())"]
         out[k:k] = block
         i = k + len(block)
+    return out
+
+
+_INNATE_HDR_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([a-z0-9_]+)", innate=True\)\)\s*$')
+_GAINS_RE = re.compile(r'^\s*W\(li\("Now also [^"]*", t\("NEW"\)')
+_LOSES_RE = re.compile(r'^\s*W\(li\("No longer [^"]*", t\("DEL"\)')
+
+
+def _postprocess_reworked_innates(lines, version):
+    """An innate that both gains a part ("Now also creates a ghost …", NEW) and loses one ("No longer provides …", DEL)
+    is reworked (owner 2026-11-20, 7.42 Death Prophet's Witchcraft: "похоже на реворк, поэтому old > new карточки
+    нужны"): the card old -> new from the game's texts of both patches, Valve's rows in sight above it."""
+    from patch import aghs_text
+    from patch.meta import _prev_patch_version
+    prev = _prev_patch_version(version) if version else None
+    out, i, n = list(lines), 0, 0
+    while i < len(out):
+        m = _INNATE_HDR_RE.match(out[i])
+        if not (m and prev and i + 1 < len(out) and out[i + 1].strip() == "W(ul_open())"):
+            i += 1
+            continue
+        end = next((k for k in range(i + 2, len(out)) if out[k].strip() == "W(ul_close())"), None)
+        body = out[i + 2:end] if end else []
+        if not (end and any(_GAINS_RE.match(r) for r in body) and any(_LOSES_RE.match(r) for r in body)
+                and aghs_text.ability_text(m.group(3), prev) and aghs_text.ability_text(m.group(3), version)):
+            i += 1
+            continue
+        ind, name, slug = m.groups()
+        n += 1
+        v = f"_ri{n}"
+        setup = [r for r in body if not r.strip().startswith("W(")]       # "_pill1 = scale_pill(…)": before the card
+        rows = [r.strip()[2:-1] for r in body if r.strip().startswith("W(")]
+        card = setup + [f'{ind}{v}_old, {v}_new = game_ability_pair("{slug}", "{version}")',
+                        f'{ind}W(ability_change(',
+                        f'{ind}    old=dict(name="{name}", slug="{slug}", innate=True, desc={v}_old),',
+                        f'{ind}    new=dict(name="{name}", slug="{slug}", innate=True, desc={v}_new),',
+                        f'{ind}    summary="Innate reworked.",',
+                        f'{ind}    tag="rework",',
+                        f'{ind}    rows_first=lambda: [{", ".join(rows)}]))']
+        out[i:end + 1] = card
+        i += len(card)
     return out
 
 
@@ -263,7 +306,35 @@ def _brewling_row(line):
     return f'{m.group(1)}W(li("{head}{rest}'
 
 
-def _postprocess_brewlings(lines):
+_NOW_HAS_RE = re.compile(r'^(\s*)W\(li\("Now has ([A-Z][\w\' ]+?) ability", t\("NEW"\)(.*)\)\)\s*$')
+
+
+def _slug_of_name(prefix, name, version):
+    """The slug of the one ability of these files ("brewmaster_…") the game names so, or None."""
+    from patch.ability_kv import _hero_blocks
+    from patch.aghs_text import ability_name
+    hits = [s for s in _hero_blocks(version) if s.startswith(prefix) and ability_name(s, version) == name]
+    return hits[0] if len(hits) == 1 else None
+
+
+def _brewling_new_abilities(block, version):
+    """A Brewling's "Now has Cinder Dash ability" with the ability retold in its "?" → the row hidden, the ability a
+    card under the Brewling, its text from the game (owner 2026-11-20: "забыл оформить как новой способностью, убрав
+    всё из [?]")."""
+    out, cards = [], []
+    for ln in block:
+        m = _NOW_HAS_RE.match(ln)
+        slug = m and version and _slug_of_name("brewmaster_", m.group(2), version)
+        if not slug:
+            out.append(ln)
+            continue
+        out.append(f'{m.group(1)}W(li("Now has {m.group(2)} ability", t("NEW"), covered=True))')
+        cards.append(f'{m.group(1)}W(ability_change(None, dict(name={m.group(2)!r}, slug="{slug}", '
+                     f'desc=game_ability_desc("{slug}", "{version}")), summary="New ability.", tag="new", sub=True))')
+    return out, cards
+
+
+def _postprocess_brewlings(lines, version=None):
     """Primal Split's rows about one Brewling ("Earth's Health decreased …", "Fire now has Cinder Dash ability") -> a
     block of that Brewling under Primal Split, its unit icon, the rows without its name, as 7.40 / 7.41 have them (owner
     2026-11-20: "ты не определил, что это Fire Brewling, Earth Brewling … их мы оформляем по-особенному")."""
@@ -292,8 +363,9 @@ def _postprocess_brewlings(lines):
         for name in _BREWLINGS:
             if name in by:
                 slug = f"brewmaster_{name.lower()}_unit"
+                rows, cards = _brewling_new_abilities(by[name], version)
                 block += [f'{ind}W(ability("{name} Brewling", slug="{slug}", icon_url="../icons/units/{slug}.png"))',
-                          f"{ind}W(ul_open())", *by[name], f"{ind}W(ul_close())"]
+                          f"{ind}W(ul_open())", *rows, f"{ind}W(ul_close())", *cards]
         out[i:end + 1] = block
         i += len(block)
     return out

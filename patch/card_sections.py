@@ -108,6 +108,29 @@ def _pane(pane, version):
 
 _AGHS_ROW_RE = re.compile(r'<div class="ability-change-row( aghanim-(?:scepter|shard) acr-aghs)">')
 
+# Valve's "Now upgraded with Aghanim's Scepter instead of Aghanim's Shard" over the upgrade's card: the card's own
+# caption "Added Aghanim's Scepter." says it again — it goes, Valve's row is the caption (owner 2026-11-20, 7.42 Spirit
+# Siphon: "дублирует … Added Aghanim's Scepter")
+_UPGRADED_INSTEAD_RE = re.compile(r"Now upgraded with Aghanim(?:'|&#x27;)s (Scepter|Shard) instead of", re.I)
+
+
+def drop_added_caption_under_upgrade_row(html):
+    starts = [m.start() for m in re.finditer(r'<div class="ability-block', html)] + [len(html)]
+    out, pos = [], 0
+    for a, b in zip(starts, starts[1:]):
+        seg = html[a:b]
+        m = _UPGRADED_INSTEAD_RE.search(seg)
+        if not m:
+            continue
+        cap = re.search(r'<ul class="changes ability-change-summary-ul under-rows-caption"><li data-tag="new">'
+                        r'<span class="badge new" data-tag="new">NEW</span><span class="row-text">Added Aghanim\'s '
+                        + m.group(1) + r'\.</span></li></ul>', seg)
+        if cap:
+            out.append(html[pos:a + cap.start()])
+            pos = a + cap.end()
+    out.append(html[pos:])
+    return "".join(out)
+
 
 # an Aghanim's row "… from A to B" over its upgrade's old -> new card that shows A on the old side and B on the new one
 # says it twice: the row is hidden, its tag kept for the filters (owner 2026-11-06, 7.41f Fiend's Gate "Aghanim's

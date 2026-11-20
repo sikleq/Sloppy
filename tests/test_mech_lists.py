@@ -173,7 +173,8 @@ def test_a_summon_gets_its_unit_block_after_its_card():
         'W(li("Active. No target", t("NEW"), covered=True))', 'W(ul_close())',
         'W(ability_change(None, dict(name=\'Slam\', slug="big_thunder_lizard_slam"), sub=True))',
         'W(subgroup("Talents"))'], "7.42")
-    assert out[4:8] == ['W(ability("Ancient Thunderhide", icon_url="../icons/units/npc_dota_neutral_big_thunder_lizard.png"))',
+    assert out[4:8] == ['W(ability("Ancient Thunderhide", slug="beastmaster_thunderhide_unit", '
+                        'icon_url="../icons/units/npc_dota_neutral_big_thunder_lizard.png"))',
                         'W(ul_open())', 'W(summon_sheet("beastmaster_summon_thunderhide", version="7.42"))',
                         'W(ul_close())']
     assert out[8].startswith("W(ability_change(None, dict(name='Slam'")         # the unit's abilities under it
@@ -239,7 +240,9 @@ def test_neutral_tiers_parse_and_table_before_after():
     table = _tier_table((tiers, free), ({1: {"start_time": "0:00", "craft_cost": "6"}}, "65:00"))
     assert "*mech_change_cells('60:00', '—', l=True)" in table                # a tier gone
     assert '["Infinite Madstone", *mech_change_cells(\'70:00\', \'65:00\', l=True)' in table
-    assert 'mech_example("Madstone Bundle") + " Madstone cost"' in table and "mech-change-grid" in table
+    # the game's Madstone glyph, not the Bundle's placeholder twig; the % columns titled Diff
+    assert 'icon_word("Madstone", "../icons/misc/madstone.png") + " Madstone cost"' in table and "mech-change-grid" in table
+    assert table.count('"Diff"') == 3
 
 
 def test_one_rule_in_several_rows_becomes_one_sentence_with_its_table():
@@ -285,7 +288,8 @@ def test_pip_story_base_rules_are_a_table_and_a_bracket_of_listed_names_goes():
 def test_icons_with_notes_names_each_item_and_its_note_on_hover():
     from patch.mech_marked import icons_with_notes
     html = icons_with_notes([("Skull Basher", "Bash"), ("Audacious Enchantment", "Bonus magic damage on attack")])
-    assert html.count('class="ability-chip abil-ico-hint"') == 2 and "&lt;br&gt;Bash" in html
+    # the item's name in gold over its note (tip-head), as the changes' tooltips
+    assert html.count('class="ability-chip abil-ico-hint"') == 2 and "tip-head&quot;&gt;Skull Basher&lt;/b&gt;Bash" in html
     with pytest.raises(ValueError):
         icons_with_notes([("No Such Item", "x")])
 
@@ -297,7 +301,7 @@ def test_a_generic_innate_chip_shows_its_heros_face_and_its_own_words_on_hover(m
     html, _notes = ability_list_rows("Leshrac's Defilement Fully disabled by Break<br>Techies's M.A.D. Partially "
                                      "disabled by Break (disables the mana regen)", least=1)
     assert "chip-hero-mini" in html                                              # Defilement has no icon of its own
-    assert 'data-tooltip="&lt;b&gt;M.A.D.&lt;/b&gt;&lt;br&gt;Disables the mana regen"' in html
+    assert 'tip-head&quot;&gt;M.A.D.&lt;/b&gt;Disables the mana regen"' in html
     assert "qhint" not in html                                                   # no "?" after the sentence
 
 

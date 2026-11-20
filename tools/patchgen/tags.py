@@ -88,8 +88,17 @@ CANONICAL_TAGS = [
     # own, a cooldown added to a passive — NERF; an effect moved into another ability, a cost of another kind — REWORK
     (re.compile(r'\bcan now be seen by selecting\b|\bon-screen effect\b|\bfor clarity\b|\bnow displays a number\b'
                 r'|\bis now reflected on the health regen bar\b', re.I), 'QoL'),
+    # owner 2026-11-20 (was NERF by the Fable audit): a unit that loses its immunity to some damage (Pip Health
+    # standardization), a hero disarmed during his spell, a dispel of another strength, bounces that became attacks —
+    # how it works, REWORK; an Aghanim's upgrade that now also does more — NEW
     (re.compile(r'\bis no longer immune to damage from\b|\bis now fully disarmed during\b'
-                r'|\bnow has an internal \d+(?:\.\d+)?s cooldown\b', re.I), 'NERF'),
+                r'|\bdispel at the end of the spell instead of\b|\binstead of a (?:strong|basic) one\b'
+                r'|\bare now full attacks\b', re.I), 'REWORK'),
+    # … a new effect ("now also fires two cannons"); a number it now also moves ("now also decreases cooldown by 10s")
+    # is a BUFF / NERF as ever
+    (re.compile(r"^\s*Aghanim's (?:Scepter|Shard) now also (?!(?:increases|decreases|reduces|lowers|raises)\b)", re.I),
+     'NEW'),
+    (re.compile(r'\bnow has an internal \d+(?:\.\d+)?s cooldown\b', re.I), 'NERF'),
     (re.compile(r'\bmoved into a separate ability\b|\bhas been replaced with a health cost\b'
                 r'|\bmin(?:imum)? health is now set by\b|\bnow has a "home jungle"', re.I), 'REWORK'),
     (re.compile(r'\bcreated illusions now apply\b|\bmay now target (?:himself|herself|itself)\b', re.I), 'NEW'),

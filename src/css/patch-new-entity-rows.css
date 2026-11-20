@@ -477,6 +477,8 @@ h4.subgroup {
 .mech-abils.mech-change-grid .mech-abil-row > span:nth-child(2n + 2) { border-left-color: var(--line-mid, rgba(227, 196, 106, 0.25)); }
 .mech-abils.mech-change-grid .mech-abil-row > span:nth-child(2n + 3) { border-left-color: transparent; }
 .mech-pct-cell { font-size: 12px; font-weight: 700; }
+/* nothing on that side of a change (a tier gone): a small dim cross, not a long dash (owner 2026-11-20) */
+.mech-none-x { color: var(--text-dim, #969289); font-size: 11px; }
 /* PIP HEALTH (mech_abilities.pip_rows, owner 2026-11-19): the unit's icon and name, its pips as thin rounded sticks
    (variant A, "чуть ближе палочки друг к другу"), Fragile orange; two pairs of columns, left-aligned */
 .mech-abils.pip-table { display: grid; grid-template-columns: repeat(2, max-content minmax(max-content, 1fr)); text-align: left; }

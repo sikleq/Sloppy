@@ -98,7 +98,7 @@ def test_reflected_damage_sources_are_a_table_of_icons():
     labels = re.findall(r'<span class="mech-cell mech-label">([^<]*)', row)
     # "Always" has no "?" after it any more: its abilities' words are on their own icons (owner 2026-11-20)
     assert labels == ["Condition", "Always", "Triggered by Bristleback passive"]
-    assert "Blade Mail&lt;/b&gt;&lt;br&gt;Both active and passive" in row      # its caveat: on its own icon's hover
+    assert "Blade Mail&lt;/b&gt;Both active and passive" in row      # its caveat: on its own icon's hover, name in gold
 
 
 def test_one_box_block_puts_every_row_in_one_box_without_chips():

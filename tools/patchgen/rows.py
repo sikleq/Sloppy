@@ -211,7 +211,9 @@ def _prev_version_in_stats(version):
         return version
 
 
-_ATTR_NOW_RE = re.compile(r'^(?:Is now|Now) an? (Strength|Agility|Intelligence|Universal) Hero\.?$', re.I)
+# also with the hero's name first: "Meepo is now a Universal hero" (7.42, owner 2026-11-20: as the coloured old → new)
+_ATTR_NOW_RE = re.compile(r"^(?:(?:[A-Z][\w' -]+ )?is now|Now) an? (Strength|Agility|Intelligence|Universal) Hero\.?$",
+                          re.I)
 _ATTR_KV = {"DOTA_ATTRIBUTE_STRENGTH": "Strength", "DOTA_ATTRIBUTE_AGILITY": "Agility",
             "DOTA_ATTRIBUTE_INTELLECT": "Intelligence", "DOTA_ATTRIBUTE_ALL": "Universal"}
 

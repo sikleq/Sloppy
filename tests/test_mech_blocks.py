@@ -412,7 +412,7 @@ def test_long_level_tables_lie_across_and_shared_values_pivot():
     out = g._postprocess_from_to_list([bounty])[0]
     # before | after | % per value (owner 2026-11-19: "забыли значения до")
     # "before → after" in one column, its % coloured (owner 2026-11-19)
-    assert ('extra=mech_table(["", "Last hit gold", "", "Gold per player", ""], '
+    assert ('extra=mech_table(["", "Last hit gold", "Diff", "Gold per player", "Diff"], '      # % columns titled (11-20)
             '[["Tier 1 tower", *mech_change_cells("110-130", "100"), *mech_change_cells("90", "75")], '
             '["Tier 2 tower", ') in out
     assert '["Barracks", *mech_change_cells("90-135", "100"), "–", ""]' in out and 'cls="mech-grid mech-change-grid"' in out

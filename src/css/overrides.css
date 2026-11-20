@@ -413,9 +413,10 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
    icon (.entity-block.is-removed), not a red mark */
 .mech-abils.camp-changes { grid-template-columns: max-content max-content 1fr 1fr; }
 /* a camp's creeps as portraits without names, a repeat its portrait again (camp_crew, owner 2026-11-20) */
-.camp-crew { display: inline-flex; flex: none; gap: 8px; align-items: center; }
-/* a kind's portraits side by side, 2 px apart; the next kind 8 px on */
-.creep-ref.camp-kind { display: inline-flex; align-items: center; gap: 2px; }
+/* one step between every two portraits, a repeat of the same creep too (owner 2026-11-20: "расстояние между иконками
+   нейтралов разное, надо одинаковое, даже если крипы дублируются"; was 2 px within a kind, 8 px between kinds) */
+.camp-crew { display: inline-flex; flex: none; gap: 4px; align-items: center; }
+.creep-ref.camp-kind { display: inline-flex; align-items: center; gap: 4px; }
 .creep-ref.camp-kind img { margin: 0; vertical-align: middle; }
 /* a creep's portrait grows on hover to be made out, as an ability's square does (.ability-chip, owner 2026-11-20: "иконки
    нейтралов … должны выдвигаться как у нас в примерах со способностями"); from its centre, over the text */

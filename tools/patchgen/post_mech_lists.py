@@ -159,8 +159,10 @@ def _tier_table(old, new):
                     f'{pair(o.get("recraft_cost"), w.get("recraft_cost"))}]')
     if of or nf:
         rows.append(f'["Infinite Madstone", {pair(of, nf)}, "", "", "", ""]')
-    return ('mech_table(["Tier", "Available at", "", mech_example("Madstone Bundle") + " Madstone cost", "", '
-            f'"Recraft cost", ""], [{", ".join(rows)}], cls="mech-grid mech-change-grid")')
+    # the game's own Madstone glyph (client hud/neutral_currency_icon), not the Madstone Bundle item's placeholder twig
+    # (owner 2026-11-20: "Madstone bundle иконка не та"); each % column titled Diff (owner: "подписать Diff")
+    return ('mech_table(["Tier", "Available at", "Diff", icon_word("Madstone", "../icons/misc/madstone.png") + '
+            f'" Madstone cost", "Diff", "Recraft cost", "Diff"], [{", ".join(rows)}], cls="mech-grid mech-change-grid")')
 
 
 def _postprocess_neutral_tiers(lines, version=None):
@@ -188,6 +190,117 @@ def _postprocess_neutral_tiers(lines, version=None):
             out[k] = re.sub(r"\)\)\s*$", ", covered=True))", out[k].rstrip())
         k += 1
     return out
+
+
+# ---- "now increases by X per hero level" -----------------------------------------------------------------------------
+
+_PER_HERO_LEVEL_RE = re.compile(r'^(\s*)W\(li\("([^"]* now increases by (\d+(?:\.\d+)?) per hero level)", t\("\w+"\)\)\)\s*$')
+_ABIL_SLUG_RE = re.compile(r'^\s*W\(ability\("[^"]+", slug="([a-z0-9_]+)"')
+
+
+def _levelup_change(slug, step, version):
+    """(old value, new base) of the one value of the ability that gained a "hero_levelup" of this step, or None."""
+    from patch.ability_kv import _hero_blocks
+    from patch.meta import _prev_patch_version
+    new = (_hero_blocks(version).get(slug) or {}).get("AbilityValues") or {}
+    old = (_hero_blocks(_prev_patch_version(version)).get(slug) or {}).get("AbilityValues") or {}
+    hits = []
+    for key, raw in new.items():
+        if isinstance(raw, dict) and str(raw.get("hero_levelup", "")).lstrip("+") and \
+                float(str(raw["hero_levelup"]).lstrip("+")) == float(step):
+            prev = old.get(key)
+            prev = prev.get("value") if isinstance(prev, dict) else prev
+            if prev is not None and not (isinstance(old.get(key), dict) and old[key].get("hero_levelup")):
+                hits.append((float(prev), float(raw.get("value", 0))))
+    return hits[0] if len(hits) == 1 else None
+
+
+def _postprocess_per_hero_level_rows(lines, version):
+    """"Armor change per stack now increases by 0.1 per hero level" (7.42 Dazzle Weave) → a formula row, before and
+    after, from the ability's values in both patches (owner 2026-11-20: "formula table"): 1 → 0.9 + 0.1 per hero level
+    (the value at level 1 stays the game's own)."""
+    out, slug = list(lines), None
+    for i, ln in enumerate(out):
+        a = _ABIL_SLUG_RE.match(ln)
+        if a:
+            slug = a.group(1)
+        m = _PER_HERO_LEVEL_RE.match(ln)
+        if not (m and slug and version):
+            continue
+        found = _levelup_change(slug, m.group(3), version)
+        if not found:
+            continue
+        old, base = found
+        step = float(m.group(3))
+        start = base - step
+        ind, text = m.group(1), m.group(2)
+        out[i] = (f'{ind}W(li_formula("{text}", "{old:g}", "{start:g} + {step:g} per hero level", '
+                  f'lambda L: {old:g}, lambda L: {start:g} + {step:g} * L))')
+    return out
+
+
+# ---- "Now upgraded with Aghanim's X instead of …": its "?" without what the upgrade's card says ------------------------
+
+_UPGRADED_ROW_RE = re.compile(r'^(\s*W\(li\("Now upgraded with Aghanim\'s (Scepter|Shard) instead of [^"]*", t\("\w+"\))'
+                              r', extra=inline_note\("((?:[^"\\]|\\.)*)"\)\)\)\s*$')
+_WORD_RE = re.compile(r"[a-z]{5,}")
+_NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+
+
+def _said_by(line, card):
+    """A line of the "?" the card's text says already: its numbers all in the card, and most of its long words."""
+    nums = _NUMBER_RE.findall(line)
+    words = set(_WORD_RE.findall(line.lower()))
+    if not nums or not words:
+        return False
+    low = card.lower()
+    return all(n in _NUMBER_RE.findall(card) for n in nums) and sum(w[:6] in low for w in words) >= len(words) * 0.6
+
+
+def _postprocess_upgrade_row_notes(lines, version):
+    """7.42 Spirit Siphon: "Now upgraded with Aghanim's Scepter instead of Aghanim's Shard" and in its "?" the upgrade
+    retold — the Aghanim's card under the ability says it (owner 2026-11-20: "в [?] по сути дублирует, что в карточке
+    … кроме … Both effects pierce Debuff Immunity"): the "?" keeps only the lines the card doesn't say."""
+    from patch.aghs_text import aghs_text
+    out, slug = list(lines), None
+    for i, ln in enumerate(out):
+        a = _ABIL_SLUG_RE.match(ln)
+        if a:
+            slug = a.group(1)
+        m = _UPGRADED_ROW_RE.match(ln)
+        if not (m and slug and version):
+            continue
+        card = aghs_text(slug, m.group(2).lower(), version) or ""
+        if not card:
+            continue
+        kept = [x for x in m.group(3).split("<br>") if not _said_by(x, card)]
+        out[i] = m.group(1) + (f', extra=inline_note("{"<br>".join(kept)}")))' if kept else "))")
+    return out
+
+
+# ---- Valve's "– Item - Ability" list in a "?" ------------------------------------------------------------------------
+
+_DASH_LIST_RE = re.compile(r'extra=inline_note\("(?:Affects the following:)?((?:<br>&nbsp;&nbsp;– [^<"]+)+)"\)')
+
+
+def _dash_line(item):
+    """"Bloodthorn - Soul Rend" → ["Bloodthorn: Soul Rend"]; "Maelstrom and Mjollnir - Chain Lightning" → two lines;
+    "Dark Seer's Normal Punch" → ["Dark Seer: Normal Punch"]."""
+    from .names import _owner_form
+    if " - " in item:
+        owners, ability = item.split(" - ", 1)
+        return [f"{o.strip()}: {ability.strip()}" for o in re.split(r",\s*|\s+and\s+", owners) if o.strip()]
+    return [_owner_form(item.strip())]
+
+
+def _postprocess_dash_lists(lines):
+    """A "?" that lists what a row affects as Valve's "– Bloodthorn - Soul Rend" lines (7.42 trees that take the
+    attacks ignoring evasion) → inline_list of "Owner: Ability" lines, a table of icons (owner 2026-11-20: "список под
+    [?] сделать с иконками и в виде таблицы — упустил")."""
+    def repl(m):
+        items = [x for x in m.group(1).split("<br>&nbsp;&nbsp;– ") if x.strip()]
+        return 'extra=inline_list("' + "<br>".join(ln for it in items for ln in _dash_line(it)) + '")'
+    return [_DASH_LIST_RE.sub(repl, ln) for ln in lines]
 
 
 # ---- One rule told in several rows -----------------------------------------------------------------------------------

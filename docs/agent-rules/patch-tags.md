@@ -1100,6 +1100,28 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   Soldier: «Break for … 4.5s» указано неверно): метка и описание одной строкой, «Ability reworked: after a 1s cast
   time, …» (`cards_ability_change._merge_reworked_label`); только если среди скрытых строк есть «Ability Reworked»
   самой Valve, иначе строка карточки своя (7.41 «The result of these changes»).
+- Канон (владелец 2026-11-20, второй круг): «… is no longer immune to damage from certain types of units» (Pip Health),
+  «is now fully disarmed during», «… dispel at the end of the spell instead of a Strong one», «Bounces are now full
+  attacks» — REWORK; «Aghanim's Scepter now also fires …» (новое действие) — NEW, а «now also decreases cooldown by
+  10s» остаётся BUFF.
+- «… now increases by 0.1 per hero level» — формула «было → стало» из значений способности двух патчей (Dazzle Weave:
+  1 → 0.9 + 0.1 per hero level, `_postprocess_per_hero_level_rows`).
+- «Meepo is now a Universal hero» — цветной переход атрибута `attr_change` первой строкой General (имя героя впереди
+  теперь тоже ловится).
+- Brewling «Now has Cinder Dash ability» — строка скрыта, способность карточкой New ability из текста игры (slug по
+  игровому имени среди способностей brewmaster_).
+- Врождённая, которая и получает часть («Now also …», NEW), и теряет («No longer …», DEL), — реворк: карточка
+  «было → стало», строки Valve над ней (Death Prophet Witchcraft, `_postprocess_reworked_innates`).
+- «Now upgraded with Aghanim's Scepter instead of Aghanim's Shard»: подпись «Added Aghanim's Scepter.» у карточки под
+  ней убрана (строка Valve и есть подпись), в [?] только то, чего нет в карточке («Both effects pierce Debuff
+  Immunity»).
+- Список Valve «– Bloodthorn - Soul Rend» в [?] — «Владелец: Способность» строками; вне General он остаётся под [?],
+  но внутри [?] таблицей со значками (`_list_tip_as_table`). Имя «Gut 'Em» с апострофом теперь находит значок.
+- Подсказка значка: название золотом сверху (`tip-head`), у способности — только её имя, без героя.
+- Таблицы «было → стало»: колонки % подписаны «Diff»; пустая сторона — крестик, не длинное тире. Значок Madstone —
+  глиф из клиента (`hud/neutral_currency_icon` → `icons/misc/madstone.png`), не веточка Madstone Bundle.
+- Портреты крипов в таблицах лагерей — один шаг между всеми, повтор того же крипа тоже.
+- Призыв → блок юнита соединён пунктирной стрелкой, как связанные способности (псевдо-slug `<герой>_<юнит>_unit`).
 - Разброс урона («Damage spread decreased from 20 to 10»): меньше — лучше, удар ровнее (владелец 2026-11-20); и в
   метке строки, и в цвете числа в [?].
 - Таблица по уровням: перед L20 тонкая линия потемнее, не пустая полоса 6 px (в узкой карточке она читалась дырой).

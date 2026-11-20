@@ -300,7 +300,7 @@ def _pivot(hits):
                              for t in things)
             heads = [""]
             for v in kinds:                   # "before → after" and its % (owner 2026-11-19: in one column)
-                heads += [v[:1].upper() + v[1:], ""]
+                heads += [v[:1].upper() + v[1:], "Diff"]   # the % column titled (owner 2026-11-20: "подписать Diff")
             head = "[" + ", ".join(_py_str(x) for x in heads) + "]"
             return f'mech_table({head}, [{rows}], cls="mech-grid mech-change-grid")'
     return None

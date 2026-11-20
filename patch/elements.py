@@ -1203,8 +1203,25 @@ def _li_tips(text, extra):
         for _n in _list_notes:              # "All three of these …": in one line with the row's text (owner 2026-10-28)
             _end = "" if text_base.rstrip().endswith((".", ":", "!", "?")) else "."
             text_base = f'{text_base.rstrip()}{_end} <span class="mech-row-note">{_n}</span>'
+    else:
+        trailing_tips = [_list_tip_as_table(x) for x in trailing_tips]
     trailing_tips = merge_tips(trailing_tips)
     return text_base, trailing_tips, _abil_rows, extra
+
+
+def _list_tip_as_table(tip):
+    """Outside General a row's list of abilities and items (inline_list) stays behind its "?", but as a table of icons,
+    not lines of text (owner 2026-11-20, 7.42 the attacks that can be redirected to trees: "список под [?] сделать с
+    иконками и в виде таблицы"). A tip that is not such a list is returned as it is."""
+    from .mech_abilities import LIST_TIPS, TIP_RAW, hero_ability_rows
+    if tip.strip() not in LIST_TIPS:
+        return tip
+    raw = TIP_RAW.get(tip.strip())
+    found = raw and hero_ability_rows(raw, least=2)
+    if not found:
+        return tip
+    return (f'<!--TIP--><span class="info-tip" tabindex="0">?<span class="info-pop info-pop-table">{found[0]}</span>'
+            f'</span><!--/TIP-->')
 
 
 def _li_inner(text_base, trailing_tips, _abil_rows, classes, marker, _tphrase, facet):

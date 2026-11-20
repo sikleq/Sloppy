@@ -36,7 +36,8 @@ _TRAIL_ABILITY_RE = re.compile(r" ability$")
 # an ability's name: capitalised words ("Fortune's End", "Storm Hammer"); the sentence starts at the first lower-case one
 # ("Scream of Pain", "Echo of the Wild": a small "of" / "the" between capitalised words is still the name)
 # "Dead in the Water", "Eyes in the Forest" (7.42 Pip Health), "M.A.D." (Techies' Mutually Assured Destruction)
-_ABIL_RE = re.compile(r"((?:(?:[A-Z]\.){2,}|[A-Z][\w'\-!]*)(?: (?:of |the |of the |and |in |in the )?[A-Z][\w'\-!]*)*)"
+# "Gut 'Em" (Serrated Shiv, 7.42): a word may open with an apostrophe before its capital
+_ABIL_RE = re.compile(r"((?:(?:[A-Z]\.){2,}|[A-Z][\w'\-!]*)(?: (?:of |the |of the |and |in |in the )?'?[A-Z][\w'\-!]*)*)"
                       r"(?: (?=[a-z])|[.,]|$)")
 # "Oracle's Fortune's End", "Mars' Bulwark", and 7.37's lists "Chen: Divine Favor"
 _OWNER_END_RE = re.compile(r"'s |(?<=s)' |: ")
@@ -368,7 +369,8 @@ def ability_list_rows(raw, least=2):
         # extra words about one ability: on hover of its own icon (owner 2026-11-20, 7.42 Breakability: "[?] лучше при
         # наведении на свою иконку"); before, one "?" after the row's sentence held them all (7.40 Bloodlust)
         name = _html.escape(_ABILITY_ONLY.get(label, label))
-        tip = f"<b>{name}</b><br>{_html.escape(caveat[:1].upper() + caveat[1:])}" if caveat else None
+        tip = (f'<b class="tip-head">{name}</b>{_html.escape(caveat[:1].upper() + caveat[1:])}'
+               if caveat else None)
         groups.setdefault(sentence, []).append(ability_chip(label, icon, tip=tip))
         kinds.add("item" if icon.startswith(ITEM_CDN) else "ability")
     if sum(len(v) for v in groups.values()) < least:
@@ -715,9 +717,13 @@ def mech_change_cells(old, new, l=False):
         nums = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", str(v))]
         return sum(nums) / len(nums) if nums else None
     a, b = mid(old), mid(new)
+    # "nothing" on a side (a tier gone, a recraft cost that wasn't there): a cross, not a long dash (owner 2026-11-20:
+    # "— → 6 / 60:00 → — не нравится, может вместо длинного тире крестик?")
+    none = '<span class="mech-none-x" aria-label="none">✕</span>'
+    show = lambda v: none if str(v) in ("—", "-", "–", "") else v
     # before → after in one cell, the % beside it in the colour of what it means (owner 2026-11-19: "цветом надо
     # выделить -17%, а не after … before/after в один столбец")
-    both = f'<span class="mech-old">{old}</span> → <b>{new}</b>'
+    both = f'<span class="mech-old">{show(old)}</span> → <b>{show(new)}</b>'
     if a is None or b is None or a == b or not a:
         return [both, ""]
     tone = "buff" if (b > a) != l else "nerf"
