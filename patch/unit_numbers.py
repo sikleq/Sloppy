@@ -137,7 +137,9 @@ def _kv(v):
 
 
 def _per_level(text, levelup):
-    return f"{text} + {_g(str(levelup).lstrip('+'))} per level" if levelup else text
+    """"21-25" and "+2 per level" under it, small: a sheet's tile is a number, not a formula to read (the site's
+    formulas in a card are pills with a level table, tests/test_value_tables.py)."""
+    return f'{text}<span class="us-per-lvl">+{_g(str(levelup).lstrip("+"))} per level</span>' if levelup else text
 
 
 def summon_unit(ability_slug):

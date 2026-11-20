@@ -519,6 +519,8 @@ ul.changes li.unit-sheet::before { content: none; display: none; }
 .us-mp { background: linear-gradient(#3a6fc0, #27518f); }
 .us-regen { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 12px; opacity: 0.85; }
 .us-bar .us-v { color: #fff; }
+/* a summon's number that grows with the hero's level: "+2 per level" small under it (7.41f Chen's Zealot) */
+.us-per-lvl { display: block; font-size: 10px; font-weight: 400; color: var(--text-dim, #969289); }
 .us-bar .us-v.iab-buff, .us-bar .us-v.iab-nerf { padding: 0 6px; background: rgba(0, 0, 0, 0.6); border-radius: 2px; text-shadow: none; }
 .us-tiles { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .us-tile {

@@ -189,7 +189,7 @@
 /* a long name with its owner keeps one line, whole: the list grows wider than the field instead (owner 2026-11-20:
    "Summon Ancient Thunderhide в поиске на 2 строчки переползает", then "а может не обрезать?") */
 .search-results .result-item .result-name { white-space: nowrap; }
-.search-results { right: auto; width: max-content; min-width: 100%; max-width: min(560px, 92vw); }
+.search-results { width: max-content; min-width: 100%; max-width: min(560px, 92vw); }
 .search-results .result-item .kind {
   margin-left: auto;
   font-size: 10.5px;

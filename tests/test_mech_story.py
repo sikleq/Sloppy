@@ -329,7 +329,8 @@ def test_an_example_has_its_icon_and_a_name_without_one_stops_the_build(monkeypa
     monkeypatch.setattr(_State, "current_patch_version", "7.39")
     # the icon alone, its name on hover (owner 2026-11-06)
     assert 'src="../icons/items/sange.png"' in mech_example("Sange") and 'data-tooltip="Sange"' in mech_example("Sange")
-    assert 'src="../icons/items/enhancement_crude.png"' in mech_example("Crude Enchantment")
+    # an enchantment's chip: the copy cut to its art (scripts/gen/gen_enchant_chips.py, owner 2026-11-20)
+    assert 'src="../icons/items/chip/enhancement_crude.png"' in mech_example("Crude Enchantment")
     assert 'src="../icons/items/aeon_disk.png"' in mech_example("Aeon Disk's Combo Breaker")
     with pytest.raises(ValueError):
         mech_example("Attacks against a hero")
