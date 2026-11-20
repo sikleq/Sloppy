@@ -172,9 +172,10 @@ ul.changes li.li-formula { container-type: inline-size; }
 }
 .formula-table .row-label-old { color: #ff9a8c; }
 .formula-table .row-label-new { color: #92c89e; }
-/* Visual gap before L20 (after L1-15 sequential block) */
+/* The break before L20 (after L1-15 sequential block): a firmer line, not an empty 6px strip — in a card's narrow table
+   it read as a hole (owner 2026-11-20: "между 15 и 20 уровнем сильный зазор") */
 .formula-table .lvl-jump {
-  border-left: 6px solid transparent;
+  border-left: 2px solid rgba(254, 247, 232, 0.28);
   background-clip: padding-box !important;
 }
 

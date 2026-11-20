@@ -217,3 +217,51 @@ def _postprocess_summon_sub_cards(lines):
         out[end + 1:end + 1] = cards
         i = end + 1 + len(cards)
     return out
+
+
+_BREWLINGS = ("Earth", "Storm", "Fire", "Void")
+_BREW_ROW_RE = re.compile(r'^(\s*)W\(li\("(Earth|Storm|Fire|Void)(?:\'s (\w)| now )')
+
+
+def _brewling_row(line):
+    """"Earth's Health decreased …" -> "Health decreased …"; "Fire now has Cinder Dash ability" -> "Now has …"."""
+    m = _BREW_ROW_RE.match(line)
+    rest = line[m.end():]
+    head = m.group(3).upper() if m.group(3) else "Now "
+    return f'{m.group(1)}W(li("{head}{rest}'
+
+
+def _postprocess_brewlings(lines):
+    """Primal Split's rows about one Brewling ("Earth's Health decreased …", "Fire now has Cinder Dash ability") -> a
+    block of that Brewling under Primal Split, its unit icon, the rows without its name, as 7.40 / 7.41 have them (owner
+    2026-11-20: "ты не определил, что это Fire Brewling, Earth Brewling … их мы оформляем по-особенному")."""
+    out, i = list(lines), 0
+    while i < len(out):
+        m = _ABIL_HDR_RE.match(out[i])
+        if not (m and m.group(3) == "brewmaster_primal_split" and i + 1 < len(out)
+                and out[i + 1].strip() == "W(ul_open())"):
+            i += 1
+            continue
+        ind = m.group(1)
+        end = next((k for k in range(i + 2, len(out)) if out[k].strip() == "W(ul_close())"), None)
+        if end is None:
+            break
+        rows = out[i + 2:end]
+        own = [r for r in rows if not _BREW_ROW_RE.match(r)]
+        by = {}
+        for r in rows:
+            b = _BREW_ROW_RE.match(r)
+            if b:
+                by.setdefault(b.group(2), []).append(_brewling_row(r))
+        if not by:
+            i = end + 1
+            continue
+        block = [out[i]] + ([f"{ind}W(ul_open())"] + own + [f"{ind}W(ul_close())"] if own else [])
+        for name in _BREWLINGS:
+            if name in by:
+                slug = f"brewmaster_{name.lower()}_unit"
+                block += [f'{ind}W(ability("{name} Brewling", slug="{slug}", icon_url="../icons/units/{slug}.png"))',
+                          f"{ind}W(ul_open())", *by[name], f"{ind}W(ul_close())"]
+        out[i:end + 1] = block
+        i += len(block)
+    return out

@@ -1344,7 +1344,8 @@ _POP_SUB = '&nbsp;&nbsp;– '
 
 
 _POP_FROMTO_RE = re.compile(r'\bfrom (\d+(?:\.\d+)?)(?:%|s|g)? to (\d+(?:\.\d+)?)(?:%|s|g)?(?![\d/]|\.\d)')
-_POP_LOWER_RE = re.compile(r'\b(?:cooldown|cost|cast point|delay|respawn|channel time)\b', re.I)
+# a damage spread narrower = a steadier hit (owner 2026-11-20: "Damage spread from 20 to 10 это же скорее бафф")
+_POP_LOWER_RE = re.compile(r'\b(?:cooldown|cost|cast point|delay|respawn|channel time|damage spread)\b', re.I)
 
 
 def value_hint(value_html, pct, tone):

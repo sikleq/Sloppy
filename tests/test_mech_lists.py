@@ -148,6 +148,30 @@ def test_illusion_excluded_table_puts_items_and_neutral_items_in_two_columns_und
     assert "mech-abil-name" not in html                                         # icons only, names on hover
 
 
+def test_primal_split_rows_of_one_brewling_go_to_its_block():
+    from tools.patchgen.post_summons import _postprocess_brewlings
+    out = _postprocess_brewlings([
+        'W(ability("Primal Split", slug="brewmaster_primal_split"))', 'W(ul_open())',
+        'W(li("Earth\'s Health decreased from 1400 to 1300", b(1400, 1300)))',
+        'W(li("Fire now has Cinder Dash ability", t("NEW")))', 'W(ul_close())'])
+    assert out == ['W(ability("Primal Split", slug="brewmaster_primal_split"))',
+                   'W(ability("Earth Brewling", slug="brewmaster_earth_unit", '
+                   'icon_url="../icons/units/brewmaster_earth_unit.png"))', 'W(ul_open())',
+                   'W(li("Health decreased from 1400 to 1300", b(1400, 1300)))', 'W(ul_close())',
+                   'W(ability("Fire Brewling", slug="brewmaster_fire_unit", '
+                   'icon_url="../icons/units/brewmaster_fire_unit.png"))', 'W(ul_open())',
+                   'W(li("Now has Cinder Dash ability", t("NEW")))', 'W(ul_close())']
+
+
+def test_a_narrower_damage_spread_is_better():
+    import sys
+    sys.path.insert(0, "tools")
+    from patch.elements import _pop_hint_value
+    from patchgen.tags import _is_lower_better
+    assert _is_lower_better("Damage spread decreased from 20 to 10")
+    assert "iab-hl-buff" in _pop_hint_value("Damage spread decreased from 20 to 10")
+
+
 def test_owner_tags_of_2026_11_20():
     from tools.patchgen.tags import _guess_tag
     assert _guess_tag("Now applies only from attack and ability damage") == "REWORK"

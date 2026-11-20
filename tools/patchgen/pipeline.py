@@ -7,8 +7,9 @@ from .normalize import fetch_datafeed
 from .notes import _postprocess_group_rows_home, _postprocess_same_change_abilities
 from .post_facets import _postprocess_removed_facet_groups, _postprocess_removed_facets, _postprocess_renamed_facets
 from .post_shared import _postprocess_shared_row_group
-from .post_summons import (_postprocess_aghs_rework_rows, _postprocess_card_tail_rows, _postprocess_covered_row_tags,
-                           _postprocess_reworked_ability_cards, _postprocess_summon_sub_cards)
+from .post_summons import (_postprocess_aghs_rework_rows, _postprocess_brewlings, _postprocess_card_tail_rows,
+                           _postprocess_covered_row_tags, _postprocess_reworked_ability_cards,
+                           _postprocess_summon_sub_cards)
 from .post_level_values import _postprocess_level_values
 from .post_mech_lists import (_postprocess_breakability_list, _postprocess_item_potency, _postprocess_neutral_tiers,
                               _postprocess_one_sentence_blocks, _postprocess_spell_power_list)
@@ -297,6 +298,7 @@ def generate(version):
     out = _postprocess_new_innate_cards(out, version)  # "New innate ability" -> the hero's old innate -> new (7.37)
     out = _postprocess_new_facet_rows(out)             # a "New Facet" row -> the new facet card (7.37 Medusa)
     out = _postprocess_summon_sub_cards(out)           # a summon's own abilities: cards (7.42 Thunderhide, 2026-11-19)
+    out = _postprocess_brewlings(out)                  # Primal Split's "Earth's …" rows -> Brewling blocks (11-20)
     out = _postprocess_reworked_ability_cards(out, version)   # "Ability Reworked" + retold rows -> a card (2026-11-19)
     out = _postprocess_aghs_rework_rows(out)           # an Aghanim's rework retold in rows -> its (?) (2026-11-19)
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)

@@ -397,6 +397,7 @@ LOWER_IS_BUFF = re.compile(
     r'|base attack time|\bBAT\b'
     r'|incoming damage|damage taken|damage vulnerability|building damage penalty'
     r'|status duration|stun resistance'
+    r'|damage spread'                         # narrower = steadier hits (owner 2026-11-20)
     r'|attack point|projectile speed.*incoming'
     r'|penalty'
     r'|(?:intelligence|agility|strength)\s+required'
