@@ -124,6 +124,108 @@ def _postprocess_spell_power_list(lines):
     return out[:head + 1] + keep + [table] + out[end:]
 
 
+# ---- Neutral item tiers --------------------------------------------------------------------------------------------
+
+_TIERS_ROW_RE = re.compile(r'^(\s*)W\(li\("(Number of item tiers (?:de|in)creased from \d+ to \d+)", ')
+_MADSTONE_ROW_RE = re.compile(r'^(\s*)W\(li\("Madstone cost[^"]*"(.*)\)\)\s*$')
+_KV_TIER_RE = re.compile(r'^\t\t"(\d+)"\s*\{(.*?)^\t\t\}', re.S | re.M)
+
+
+def neutral_tiers(text):
+    """neutral_items.txt → ({tier: {"start_time", "craft_cost", "recraft_cost"}}, the infinite Madstone time)."""
+    tiers = {}
+    for m in _KV_TIER_RE.finditer(text):
+        head = m.group(2).split('"item', 1)[0]
+        tiers[int(m.group(1))] = dict(re.findall(r'"(start_time|craft_cost|recraft_cost)"\s+"([^"]+)"', head))
+    free = re.search(r'"madstone_no_limit_time"\s+"([^"]+)"', text)
+    return tiers, free.group(1) if free else None
+
+
+def _tier_table(old, new):
+    """The tiers of both patches side by side, each value "before → after" with its % (owner 2026-11-20: "Number of item
+    tiers decreased from 5 to 4 сделать как было до и после, учитывая ещё madstone косты"): a later tier and a dearer
+    Madstone are worse (l=True), an earlier infinite Madstone better."""
+    (ot, of), (nt, nf) = old, new
+
+    def pair(a, b, lower=True):
+        if a is None and b is None:
+            return '"", ""'
+        return f'*mech_change_cells({a or "—"!r}, {b or "—"!r}, l={lower})'
+    rows = []
+    for n in sorted(set(ot) | set(nt)):
+        o, w = ot.get(n, {}), nt.get(n, {})
+        rows.append(f'["Tier {n}", {pair(o.get("start_time"), w.get("start_time"))}, '
+                    f'{pair(o.get("craft_cost"), w.get("craft_cost"))}, '
+                    f'{pair(o.get("recraft_cost"), w.get("recraft_cost"))}]')
+    if of or nf:
+        rows.append(f'["Infinite Madstone", {pair(of, nf)}, "", "", "", ""]')
+    return ('mech_table(["Tier", "Available at", "", mech_example("Madstone Bundle") + " Madstone cost", "", '
+            f'"Recraft cost", ""], [{", ".join(rows)}], cls="mech-grid mech-change-grid")')
+
+
+def _postprocess_neutral_tiers(lines, version=None):
+    """"Number of item tiers decreased from 5 to 4" + its rows of Madstone costs → one row, the tiers of both patches a
+    table "before → after" from the game's neutral_items.txt (start time, Madstone cost, recraft cost, infinite
+    Madstone); the Madstone rows hidden under it (they stay for the filters). No store of game files (CI): unchanged."""
+    out = list(lines)
+    i = next((k for k, ln in enumerate(out) if _TIERS_ROW_RE.match(ln)), None)
+    if i is None or not version:
+        return out
+    from patch import game_files
+    from patch.meta import _prev_patch_version
+    prev = _prev_patch_version(version)
+    texts = [game_files.read(v, "scripts/npc/neutral_items.txt") if game_files.available() else None
+             for v in (prev, version)]
+    if not all(texts):
+        return out
+    ind, text = _TIERS_ROW_RE.match(out[i]).groups()
+    # a rework of the tiers, not a -20% of a number: what changed is in the table (7.42 page: REWORK)
+    out[i] = (f'{ind}W(li("{text}", t("REWORK"), '
+              f'extra={_tier_table(neutral_tiers(texts[0]), neutral_tiers(texts[1]))}))')
+    k = i + 1
+    while k < len(out) and _MADSTONE_ROW_RE.match(out[k]):
+        if "covered=True" not in out[k]:
+            out[k] = re.sub(r"\)\)\s*$", ", covered=True))", out[k].rstrip())
+        k += 1
+    return out
+
+
+# ---- One rule told in several rows -----------------------------------------------------------------------------------
+
+# Valve's rows of one block that tell one rule in pieces, each a row with its own tag → one sentence, one tag, the
+# block's table and note kept (owner 2026-11-20, 7.42 Artifact Pools: "совместить в одно предложение … нет смысла в 3
+# разных предложения с 3 тегами", as Spell Power Reduction above: one sentence, the table under it)
+_ONE_SENTENCE = {
+    ("Options for a tier are no longer randomly rolled amongst all the items available for a tier",
+     "Each tier is now separated into multiple pools of Artifacts, and 1 Artifact is chosen per pool",
+     "All options for every tier are now decided at the beginning of the game"):
+    ("Each tier is now separated into multiple pools of Artifacts and 1 Artifact is chosen per pool, instead of a "
+     "random roll amongst all the tier's items; all options for every tier are decided at the beginning of the game",
+     "REWORK"),
+}
+_EXTRA_RE = re.compile(r', extra=(.*)\)\)\s*$')
+
+
+def _postprocess_one_sentence_blocks(lines):
+    out, i = list(lines), 0
+    while i < len(out):
+        texts, k = [], i
+        while k < len(out) and _ROW_TEXT_RE.match(out[k]) and out[k].lstrip().startswith("W(li(\""):
+            texts.append(_ROW_TEXT_RE.match(out[k]).group(1))
+            k += 1
+        found = _ONE_SENTENCE.get(tuple(texts))
+        if not found:
+            i = max(k, i + 1)
+            continue
+        sentence, tag = found
+        extras = [m.group(1) for m in (_EXTRA_RE.search(out[j]) for j in range(i, k)) if m]
+        extra = " + ".join(extras)
+        ind = re.match(r"^\s*", out[i]).group(0)
+        out[i:k] = [f'{ind}W(li("{sentence}", t("{tag}"){", extra=" + extra if extra else ""}))']
+        i += 1
+    return out
+
+
 # ---- Item Potency -----------------------------------------------------------------------------------------------------
 
 _MECH_PAGES = {"Item Potency": "item_potency.html"}

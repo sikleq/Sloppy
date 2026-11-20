@@ -472,6 +472,8 @@ h4.subgroup {
 /* "before → after" | % per value (mech_change_cells, owner 2026-11-19): the % column narrow and coloured, a stronger
    line between the values' groups, no line between a value and its % */
 .mech-abils.mech-cols-5.mech-change-grid { grid-template-columns: fit-content(30%) repeat(2, 1.6fr 0.6fr); }
+/* three values (7.42 neutral tiers: time, Madstone cost, recraft cost) */
+.mech-abils.mech-cols-7.mech-change-grid { grid-template-columns: fit-content(30%) repeat(3, 1.6fr 0.6fr); }
 .mech-abils.mech-change-grid .mech-abil-row > span:nth-child(2n + 2) { border-left-color: var(--line-mid, rgba(227, 196, 106, 0.25)); }
 .mech-abils.mech-change-grid .mech-abil-row > span:nth-child(2n + 3) { border-left-color: transparent; }
 .mech-pct-cell { font-size: 12px; font-weight: 700; }

@@ -148,6 +148,44 @@ def test_illusion_excluded_table_puts_items_and_neutral_items_in_two_columns_und
     assert "mech-abil-name" not in html                                         # icons only, names on hover
 
 
+def test_owner_tags_of_2026_11_20():
+    from tools.patchgen.tags import _guess_tag
+    assert _guess_tag("Now applies only from attack and ability damage") == "REWORK"
+    assert _guess_tag("No longer has a separate health threshold at which it takes effect") == "DEL"
+    assert _guess_tag("Buff is now undispellable") == "NEW"                     # the bare row (Alchemist)
+    assert _guess_tag("Shield is now undispellable") == "BUFF"                  # the canon stays
+
+
+def test_neutral_tiers_parse_and_table_before_after():
+    from tools.patchgen.post_mech_lists import _tier_table, neutral_tiers
+    old = ('"neutral_items"\n{\n\t"madstone_limits"\n\t{\n\t\t"madstone_no_limit_time"\t"70:00"\n\t}\n\t"neutral_tiers"\n\t{\n'
+           '\t\t"1"\n\t\t{\n\t\t\t"start_time"\t"0:00"\n\t\t\t"craft_cost"\t"6"\n\t\t\t"items"\n\t\t\t{\n\t\t\t\t"item_a"\t"1"\n'
+           '\t\t\t}\n\t\t}\n\t\t"2"\n\t\t{\n\t\t\t"start_time"\t"60:00"\n\t\t\t"craft_cost"\t"10"\n\t\t\t"recraft_cost"\t"10"\n'
+           '\t\t}\n\t}\n}\n')
+    tiers, free = neutral_tiers(old)
+    assert tiers == {1: {"start_time": "0:00", "craft_cost": "6"},
+                     2: {"start_time": "60:00", "craft_cost": "10", "recraft_cost": "10"}} and free == "70:00"
+    table = _tier_table((tiers, free), ({1: {"start_time": "0:00", "craft_cost": "6"}}, "65:00"))
+    assert "*mech_change_cells('60:00', '—', l=True)" in table                # a tier gone
+    assert '["Infinite Madstone", *mech_change_cells(\'70:00\', \'65:00\', l=True)' in table
+    assert 'mech_example("Madstone Bundle") + " Madstone cost"' in table and "mech-change-grid" in table
+
+
+def test_one_rule_in_several_rows_becomes_one_sentence_with_its_table():
+    from tools.patchgen.post_mech_lists import _postprocess_one_sentence_blocks
+    out = _postprocess_one_sentence_blocks([
+        'W(ul_open())',
+        'W(li("Options for a tier are no longer randomly rolled amongst all the items available for a tier", t("MISC")))',
+        'W(li("Each tier is now separated into multiple pools of Artifacts, and 1 Artifact is chosen per pool", t("MISC"), '
+        'extra=artifact_pools([])))',
+        'W(li("All options for every tier are now decided at the beginning of the game", t("MISC"), '
+        'extra=inline_note("Neutral Options can be seen in the Neutrals tab in the shop")))',
+        'W(ul_close())'])
+    assert len(out) == 3 and out[1].startswith('W(li("Each tier is now separated into multiple pools of Artifacts and 1 '
+                                               'Artifact is chosen per pool, instead of a random roll')
+    assert 't("REWORK"), extra=artifact_pools([]) + inline_note("Neutral Options can be seen' in out[1]
+
+
 def test_pip_buttons_stand_over_every_table_of_the_story(monkeypatch):
     from patch.api import mech_story, mech_table, pip_story_list
     from patch.state import _State

@@ -213,7 +213,8 @@
    `::after` would be hidden behind the sticky header / scroll boundary. */
 .qhint-tip {
   position: fixed;
-  z-index: 1100;
+  /* over a pinned "?" box (1100): a dotted value inside one shows its % on hover (owner 2026-11-20) */
+  z-index: 1200;
   pointer-events: none;
   display: none;
   max-width: 320px;

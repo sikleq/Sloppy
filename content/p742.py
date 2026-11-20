@@ -1000,9 +1000,9 @@ def build():
 
     W(plain_header("Global Changes", dynamics=False, sublabel=True))
     W(ul_open())
-    W(li("Number of item tiers decreased from 5 to 4", t("REWORK"), extra=mech_table(["Tier", "Available at"], [["Tier 1", "<b>0:00</b>"], ["Tier 2", "<b>15:00</b>"], ["Tier 3", "<b>30:00</b>"], ["Tier 4", "<b>50:00</b>"], ["Infinite Madstone", "<b>65:00</b>"]])))
-    W(li("Madstone cost for Tier 4 items increased from 10 to 14", b(10, 14, l=True)))
-    W(li("Madstone cost increment for recrafting Tier 4 items decreased from 10 to 6", b(10, 6, l=True)))
+    W(li("Number of item tiers decreased from 5 to 4", t("REWORK"), extra=mech_table(["Tier", "Available at", "", mech_example("Madstone Bundle") + " Madstone cost", "", "Recraft cost", ""], [["Tier 1", *mech_change_cells('0:00', '0:00', l=True), *mech_change_cells('6', '6', l=True), "", ""], ["Tier 2", *mech_change_cells('15:00', '15:00', l=True), *mech_change_cells('10', '10', l=True), "", ""], ["Tier 3", *mech_change_cells('25:00', '30:00', l=True), *mech_change_cells('10', '10', l=True), "", ""], ["Tier 4", *mech_change_cells('35:00', '50:00', l=True), *mech_change_cells('10', '14', l=True), *mech_change_cells('—', '6', l=True)], ["Tier 5", *mech_change_cells('60:00', '—', l=True), *mech_change_cells('10', '—', l=True), *mech_change_cells('10', '—', l=True)], ["Infinite Madstone", *mech_change_cells('70:00', '65:00', l=True), "", "", "", ""]], cls="mech-grid")))
+    W(li("Madstone cost for Tier 4 items increased from 10 to 14", b(10, 14, l=True), covered=True))
+    W(li("Madstone cost increment for recrafting Tier 4 items decreased from 10 to 6", b(10, 6, l=True), covered=True))
     W(ul_close())
 
     W(plain_header("Artifact Changes", dynamics=False, sublabel=True))
@@ -1333,9 +1333,7 @@ def build():
 
     W(plain_header("Artifact Pools", dynamics=False, sublabel=True))
     W(ul_open())
-    W(li("Options for a tier are no longer randomly rolled amongst all the items available for a tier", t("REWORK")))
-    W(li("Each tier is now separated into multiple pools of Artifacts, and 1 Artifact is chosen per pool", t("REWORK"), extra=artifact_pools([[['Chipped Vest', 'Ash Legion Shield', 'Possessed Mask'], ['Dormant Curio', 'Red Ledger', 'Weighted Dice'], ['Pollywog Charm', 'Seeds of Serenity', "Forager's Kit"], ['Kobold Cup', 'Stonefeather Satchel', "Tumbler's Toy"]], [['Psychic Headband', 'Safety Bubble', 'Metamorphic Mandible'], ['Jidi Pollen Bag', 'Brick', 'Crippling Crossbow'], ['Imp Claw', 'Gunpowder Gauntlets', 'Defiant Shell'], ["Partisan's Brand", 'Spellslinger', 'Mana Draught']], [["Prophet's Pendulum", 'Dandelion Amulet', "Idol of Scree'Auk"], ['Balmhook', 'Rattlecage', 'Stormcrafter'], ["Enchanter's Bauble", 'Ceremonial Robe', 'Harmonizer'], ['Vile Phial', 'Serrated Shiv', "Revenant's Brooch"]], [['Fallen Sky', 'Flicker', 'Minotaur Horn'], ['Mind Breaker', 'Divine Regalia', 'Witchbane'], ['Helm of the Hivemind', 'Dezun Bloodrite', "Conjurer's Catalyst"], ["Giant's Ring", 'Book of the Dead', 'Riftshadow Prism']]])))
-    W(li("All options for every tier are now decided at the beginning of the game", t("REWORK"), extra=inline_note("Neutral Options can be seen in the Neutrals tab in the shop")))
+    W(li("Each tier is now separated into multiple pools of Artifacts and 1 Artifact is chosen per pool, instead of a random roll amongst all the tier's items; all options for every tier are decided at the beginning of the game", t("REWORK"), extra=artifact_pools([[['Chipped Vest', 'Ash Legion Shield', 'Possessed Mask'], ['Dormant Curio', 'Red Ledger', 'Weighted Dice'], ['Pollywog Charm', 'Seeds of Serenity', "Forager's Kit"], ['Kobold Cup', 'Stonefeather Satchel', "Tumbler's Toy"]], [['Psychic Headband', 'Safety Bubble', 'Metamorphic Mandible'], ['Jidi Pollen Bag', 'Brick', 'Crippling Crossbow'], ['Imp Claw', 'Gunpowder Gauntlets', 'Defiant Shell'], ["Partisan's Brand", 'Spellslinger', 'Mana Draught']], [["Prophet's Pendulum", 'Dandelion Amulet', "Idol of Scree'Auk"], ['Balmhook', 'Rattlecage', 'Stormcrafter'], ["Enchanter's Bauble", 'Ceremonial Robe', 'Harmonizer'], ['Vile Phial', 'Serrated Shiv', "Revenant's Brooch"]], [['Fallen Sky', 'Flicker', 'Minotaur Horn'], ['Mind Breaker', 'Divine Regalia', 'Witchbane'], ['Helm of the Hivemind', 'Dezun Bloodrite', "Conjurer's Catalyst"], ["Giant's Ring", 'Book of the Dead', 'Riftshadow Prism']]]) + inline_note("Neutral Options can be seen in the Neutrals tab in the shop")))
     W(ul_close())
 
     W(plain_header("Enchantment Changes", dynamics=False, sublabel=True))
@@ -1461,8 +1459,8 @@ def build():
     W(ul_open())
     W(li("Now always reduces the enemy's health restoration, scaling linearly with enemy's current health, with 10% at full health and max effect at no health", t("NEW")))
     W(li_formula("Max Health Restoration Reduction increased", "29.5% + 0.5% per hero level", "40% + 1% per hero level", lambda L: 29.5 + 0.5*L, lambda L: 40 + 1*L, value_fmt="{:g}%"))
-    W(li("Now applies only from attack and ability damage", t("NERF"), extra=inline_note("Item Damage doesn't count")))
-    W(li("No longer has a separate health threshold at which it takes effect", t("MISC")))
+    W(li("Now applies only from attack and ability damage", t("REWORK"), extra=inline_note("Item Damage doesn't count")))
+    W(li("No longer has a separate health threshold at which it takes effect", t("DEL")))
     W(ul_close())
     W(ability("Mist Coil", slug="abaddon_death_coil"))
     W(ul_open())
@@ -1500,7 +1498,7 @@ def build():
     W(ability("Berserk Potion", slug="alchemist_berserk_potion"))
     W(ul_open())
     W(li("Mana Cost decreased from 100 to 75", b(100, 75, l=True)))
-    W(li("Buff is now undispellable", t("BUFF")))
+    W(li("Buff is now undispellable", t("NEW")))
     W(ul_close())
 
     # Ancient Apparition

@@ -1076,6 +1076,17 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   строка значков без названий, что не срабатывает — в подсказке (`data/rules/illusion_onhit_excluded.json`: 16
   предметов, найдены в коде игры, server.dll 6983 против 6976, в матчах не проверено). Последней — «How Item Potency
   adds up»: формула со страницы Item Potency, без примера.
+- Канон (владелец 2026-11-20): «Now applies only from attack and ability damage» — REWORK (какой урон запускает
+  эффект — как он работает); «No longer has a separate health threshold» — DEL; голая строка «Buff is now
+  undispellable» — NEW (Alchemist Berserk Potion), остальные «… is now undispellable» — по-прежнему BUFF.
+- Одно правило несколькими строками Valve (7.42 Artifact Pools: «no longer randomly rolled», «separated into
+  pools», «decided at the beginning of the game») — одна строка, одно предложение, один тег REWORK, таблица и
+  пояснение блока под ней (`_ONE_SENTENCE`). Почему: три строки с тремя тегами говорят об одном механизме, читателю
+  нужно одно утверждение и таблица, а лишние теги раздувают фильтры и счёт правок.
+- Тиры нейтральных предметов: «Number of item tiers decreased from 5 to 4» — одна строка с таблицей «было → стало»
+  по `neutral_items.txt` обоих патчей (время открытия, цена в Madstone, перекрафт, бесконечный Madstone, значок
+  Madstone Bundle в шапке); строки Valve про цены Madstone спрятаны под ней (`_postprocess_neutral_tiers`; без
+  хранилища файлов игры, как в CI, строка не меняется).
 - Живая формула: переменная одна на обе части, поэтому поле ввода только в левой, в правой то же число простым
   текстом (`.fx-mirror`, не поле: невидимое поле всё равно ловило курсор), пустое левое — справа значение по
   умолчанию (владелец 2026-11-20). Подсказки-таблицы — с полупрозрачными линиями между ячейками и шире обычных.

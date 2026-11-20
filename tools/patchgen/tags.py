@@ -45,6 +45,9 @@ CANONICAL_TAGS = [
     (re.compile(r'\bmoved (?:back )?(?:to|from) (?:the )?(?:Secret|Side|Base|Miscellaneous|Home) Shop\b', re.I), 'REWORK'),
     # ── 2026-10-03 second audit (7.38b-7.41e): classes the scaffold got wrong ──
     (re.compile(r'\bno longer gets? knocked off\b', re.I),           'BUFF'),   # own mount restriction lifted
+    # "Buff is now undispellable" alone (7.42 Alchemist Berserk Potion, owner 2026-11-20: "new"): a property the buff
+    # gained — before the canon BUFF of an undispellable effect below
+    (re.compile(r'^\s*(?:Buff|Debuff|Effect) is now undispellable\.?\s*$', re.I), 'NEW'),
     (re.compile(r'\b(?:is now|now) undispellable\b|^\s*Now cannot be dispelled\b', re.I), 'BUFF'),
     (re.compile(r'^\s*Now (?:dispelled|dispellable)\b', re.I),       'NERF'),   # a new way to lose an own buff
     (re.compile(r'\bnow affected by negative\b', re.I),              'NERF'),   # enemy heal cuts now apply to it
@@ -90,6 +93,10 @@ CANONICAL_TAGS = [
     (re.compile(r'\bmoved into a separate ability\b|\bhas been replaced with a health cost\b'
                 r'|\bmin(?:imum)? health is now set by\b|\bnow has a "home jungle"', re.I), 'REWORK'),
     (re.compile(r'\bcreated illusions now apply\b|\bmay now target (?:himself|herself|itself)\b', re.I), 'NEW'),
+    # owner 2026-11-20, 7.42 Wraith King Wraithfire / Alchemist: which damage triggers it now — how it works, REWORK; a
+    # threshold the effect no longer has — DEL (the undispellable buff: NEW, above the canon BUFF near the top)
+    (re.compile(r'\bnow applies only from (?:\w+ ){0,3}damage\b', re.I), 'REWORK'),
+    (re.compile(r'\bno longer has a separate (?:\w+ ){0,3}threshold\b', re.I), 'DEL'),
     # an Aghanim's upgrade that stops giving its benefit = DEL, wind-up included ("Aghanim's Scepter no longer
     # decreases max wind-up time": the 7.37e tooltip "Decreases wind-up time …", audit 2026-10-03)
     (re.compile(r"^\s*Aghanim's (?:Scepter|Shard) no longer (?:decreases|reduces)\b", re.I), 'DEL'),
