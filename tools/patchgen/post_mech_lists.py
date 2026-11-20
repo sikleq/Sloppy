@@ -4,6 +4,7 @@ worked examples as a table, its title a link to the site's Item Potency page."""
 import re
 
 _ROW_TEXT_RE = re.compile(r'^\s*W\(li(?:_formula)?\("((?:[^"\\]|\\.)*)"')
+_FORMULA_ROW_RE = re.compile(r'^\s*W\(li_formula\("((?:[^"\\]|\\.)*)", "([^"]+)", "([^"]+)"')
 _HERO_RE = re.compile(r'^\s*W\(hero_header\("([^"]+)"')
 _ITEM_RE = re.compile(r'^\s*W\(item_header\("([^"]+)"')
 _ABIL_RE = re.compile(r'^\s*W\(ability\("([^"]+)"')
@@ -104,6 +105,9 @@ def _postprocess_spell_power_list(lines):
         if not m:
             continue
         text = m.group(1)
+        f = _FORMULA_ROW_RE.match(out[i])
+        if f:              # "Max Damage/Heal Amp decreased" says by how much only in its formulas (owner 2026-11-20)
+            text = f"{text} from {f.group(2)} to {f.group(3)}"
         title = next(k for k, rx in _SPR_KINDS if not rx or re.search(rx, text))
         groups[title].append((kind, owner, abil, text))
     if not any(groups.values()):
@@ -144,7 +148,8 @@ def _example_label(who):
     # the source alone, with its icon: "Hero with Tier 4 Evolved Enchantment" was long (owner 2026-11-20)
     m = re.match(r"(?:Any hero attacking with a (?:Tier \d+ )?|Attacks from )(.+)$", who)
     name = m.group(1) if m else who
-    return f'mech_example("{name}") + " {name}"'
+    shown = re.sub(r"^[^']+'s ", "", name)          # "Swashbuckle": the icon says whose (owner 2026-11-20)
+    return f'mech_example("{name}") + " {shown}"'
 
 
 def _potency_cell(pct, top):
@@ -163,6 +168,20 @@ def _illusion_excluded(version):
     path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "rules", "illusion_onhit_excluded.json")
     with open(path, encoding="utf-8") as f:
         return json.load(f).get(version, {}).get("items", [])
+
+
+def _adds_up_rule():
+    """(formula, its example) of "An attack with its own potency" from the Item Potency page's rules
+    (data/rules/item_potency_abilities.json), or None."""
+    import json
+    import os
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "rules", "item_potency_abilities.json")
+    with open(path, encoding="utf-8") as f:
+        rules = json.load(f).get("rules", [])
+    for _title, formula, (a, b, what) in rules:
+        if formula.startswith("Own"):
+            return formula, f" ({what}: {a} &rarr; {b})"     # never a literal arrow in content (hygiene test)
+    return None
 
 
 def _postprocess_item_potency(lines, version=None):
@@ -184,24 +203,28 @@ def _postprocess_item_potency(lines, version=None):
     base = float(examples[0].group("base"))
     item = examples[0].group("item")
     default = next((int(m.group(1)) for m in map(_DEFAULT_RE.search, block) if m), 100)
+    # the defaults first (any hero, an illusion), then the attacks with their own potency, then the bonuses (owner
+    # 2026-11-20: "Any Hero и Standard Illusion пусть идут сначала, потом уже Swashbuckle / Evolved")
     rows = [(default, '"Any Hero"', _fmt(base * default / 100))]
-    for e in examples:                       # "+20% Item Potency" is on top of the default
-        pct = default + int(e.group("pct")) if e.group("plus") else int(e.group("pct"))
-        rows.append((pct, _example_label(e.group("who")), e.group("val")))
     ill = next((int(m.group(1)) for m in map(_ILLUSION_RE.search, block) if m), None)
     if ill is not None:
         rows.append((ill, '"Standard Illusion"', _fmt(base * ill / 100)))
-    rows.sort(key=lambda r: -r[0])                                    # strongest first
-    top = rows[0][0]
+    for e in sorted(examples, key=lambda e: bool(e.group("plus"))):   # own potency before a bonus
+        pct = default + int(e.group("pct")) if e.group("plus") else int(e.group("pct"))  # "+20%" on top of default
+        rows.append((pct, _example_label(e.group("who")), e.group("val")))
+    top = max(p for p, _w, _v in rows)
     cells = ", ".join(f'[{who}, {_potency_cell(p, top)}, "{val}"]' for p, who, val in rows)
-    # Valve's "(excluding Skull Basher and a few other items)": a line of the table with all of them (owner
-    # 2026-11-20: "указать отдельной строкой … выяснить какие все эти excluded items")
+    # the head names the item alone, no icon, no link: the table is about the attack (owner 2026-11-20)
+    table = f'mech_table(["Attack", "Item Potency", "{item} armor reduction"], [{cells}], cls="mech-grid")'
+    # Valve's "(excluding Skull Basher and a few other items)": all of them, a table of items and neutral items under
+    # it (owner 2026-11-20: "указать отдельной строкой", "в столбце … items и neutral items"); then how the potencies
+    # add up, as the Item Potency page says it
     excluded = _illusion_excluded(version) if version else []
     if excluded:
-        cells += f', "Illusions still don\'t apply: " + icons_with_notes({[tuple(x) for x in excluded]!r})'
-    # the item in the head is an icon and its name, no link: the table is about the attack, not the item (11-20)
-    table = (f'mech_table(["Attack", "Item Potency", mech_example("{item}") + " {item} armor reduction"], '
-             f'[{cells}], cls="mech-grid")')
+        table += f' + illusion_excluded_table({[tuple(x) for x in excluded]!r})'
+    rule = _adds_up_rule()
+    if rule:
+        table += f' + mech_table(["How Item Potency adds up"], [mech_formula({rule[0]!r}) + {rule[1]!r}])'
     s = _STORY_EXAMPLE_RE.sub("", out[story])
     s = _STORY_FILLER_RE.sub(")", s)
     if excluded:                                 # the table's last line names them all

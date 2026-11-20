@@ -512,12 +512,12 @@ def test_a_system_block_is_told_as_a_paragraph():
              {"indent_level": 1, "note": "Some units have a Fragile debuff", "info": "Courier and Roshan's Banner"}]
     from tools.patchgen import general
     story = general._story_of(group, "REWORK")
+    # the base rules a table of their own, the bracket of names the units' table lists anyway gone (owner 2026-11-20)
     assert story.startswith('W(mech_story(["Standardized rules for units that take a fixed number of hits. All units are '
-                            'now able to damage units with health bar pips: attacks from heroes deal 1 full pip per '
-                            'attack; attacks from illusions and creeps deal 1/4 pip per attack.", "Some units have a '
-                            'Fragile debuff (" + mech_example("Courier", label="Courier")')
+                            'now able to damage units with health bar pips.", "Some units have a Fragile debuff."]')
     # the pip-health units: each one's pips as sticks (owner 2026-11-19), the icons' table without data
-    assert 'table=pip_story_list("Couriers<br>Gyrocopter: Homing Missile")' in story
+    assert ('table=mech_table(["Attacks from", "Damage per attack"], [["Heroes", "1 full pip"], ["Illusions and '
+            'creeps", "1/4 pip"]]) + pip_story_list("Couriers<br>Gyrocopter: Homing Missile")') in story
 
 
 def test_a_teaser_row_has_its_own_chip_and_no_place_in_the_cells():

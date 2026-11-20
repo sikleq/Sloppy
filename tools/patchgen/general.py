@@ -1,4 +1,5 @@
 """General Updates: its topics and mechanic blocks, and the lane creeps in them."""
+import functools
 import re
 
 from .data import _strip_html
@@ -143,6 +144,16 @@ _HEADING_ROWS = {"Examples": "For example", "Example": "For example"}
 _KEEP_CAPITAL = re.compile(r"^(?:[A-Z]{2,}|[A-Z][\w-]*'s?\b)")
 
 
+_ATTACK_RULE_RE = re.compile(r"^[Aa]ttacks from (.+?) deal (.+?) per attack$")
+
+
+def _is_name_list(aside):
+    """"Courier, Templar Assassin's Psionic Trap, and Roshan's Banner": names only — each part a few words, each a
+    capital first (a sentence in brackets is not one)."""
+    parts = [p for p in re.split(r",\s*(?:and\s+)?|\s+and\s+", aside) if p]
+    return len(parts) >= 2 and all(len(p.split()) <= 5 and p[:1].isupper() for p in parts)
+
+
 def _sentence_case(text, first):
     """A row as part of a sentence: its first word lower-case, unless it is a name ("Roshan's", "M.A.D.")."""
     from patch.images import HERO_SLUG
@@ -180,7 +191,7 @@ def _story_of(group, tag):
     starred list of units ("* Couriers<br>* …") is the story's table of icons (mech_list). W(mech_story(...)) or None."""
     from .names import _py_str
     from .names import _owner_form
-    items, table = [], None
+    items, table, asides = [], None, []
     for n in group:
         text = _strip_html(n.get('note', '')).strip().rstrip('.').replace('’', "'")
         if n.get('hide_dot') or not text:
@@ -196,7 +207,9 @@ def _story_of(group, tag):
         elif info and '<br>' not in info and len(info) < 160:
             aside = _strip_html(info).strip().rstrip('.').replace(' * ', ' × ')
             word = aside.split(" ", 1)[0]
-            text += f" ({word.lower() + aside[len(word):] if word in _ASIDE_LEAD else aside})"
+            aside = word.lower() + aside[len(word):] if word in _ASIDE_LEAD else aside
+            text += f" ({aside})"
+            asides.append(aside)
         level = n.get('indent_level') or 1
         if text in _HEADING_ROWS and level >= 2:             # Valve's "Examples" over its own sub-rows: a sentence
             items.append((_HEADING_ROWS[text], [], level))
@@ -208,15 +221,32 @@ def _story_of(group, tag):
         items.append((text, [], level))
     if len(items) < 2:
         return None
+    if table is not None:
+        # a bracket of names the table under the story lists anyway ("melee heroes (Courier, Templar Assassin's
+        # Psionic Trap, …)"): out of the sentence (owner 2026-11-20: "убрать из скобок — мы уже вставили в таблицу")
+        names = [a for a in asides if _is_name_list(a)]
+        items = [(functools.reduce(lambda t, a: t.replace(f" ({a})", ""), names, text), subs, lvl)
+                 for text, subs, lvl in items]
+    rules = []
     sentences = []
     for text, subs, _level in items:
-        if len(subs) >= 2:
+        found = [_ATTACK_RULE_RE.match(s) for s in subs]
+        if len(subs) >= 2 and all(found):
+            # "attacks from heroes … deal 1 full pip per attack; attacks from illusions … 1/4 pip": the base rules,
+            # a table of their own over the units (owner 2026-11-20: "отдельным блоком в таблице, как базовые правила")
+            sentences.append(text + ".")
+            rules += [[m.group(1)[:1].upper() + m.group(1)[1:], m.group(2)] for m in found]
+        elif len(subs) >= 2:
             sentences.append(text + ": " + "; ".join(_sentence_case(s, False) for s in subs) + ".")
         else:
             sentences.append(text + ".")
             sentences += [s + "." for s in subs]
     paragraphs = [" ".join(sentences[:2]), " ".join(sentences[2:])] if len(sentences) > 2 else [" ".join(sentences)]
     body = ", ".join(_with_icons(p) for p in paragraphs if p)
+    if rules:
+        cells = ", ".join(f"[{_py_str(a)}, {_py_str(b)}]" for a, b in rules)
+        rules_table = f'mech_table(["Attacks from", "Damage per attack"], [{cells}])'
+        table = f"{rules_table} + {table}" if table else rules_table
     under = f", table={table}" if table else ""
     return f'W(mech_story([{body}], tags=("{tag.lower()}",){under}))'
 

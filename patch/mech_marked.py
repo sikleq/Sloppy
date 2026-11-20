@@ -8,7 +8,8 @@ import re
 from .mech_abilities import _icon, _item_icon, ability_chip, mech_table
 
 _TALENT_RE = re.compile(r"^Level \d+ Talent (.+)$")
-_FROM_TO_RE = re.compile(r"\bfrom ([^ ]+(?: \([^)]*\))?) to ([^ ]+)")
+_FROM_TO_RE = re.compile(r"\bfrom (.+?) to (.+)$")
+_PER_LEVEL_RE = re.compile(r"^\d+(?:\.\d+)?% \+ (\d+(?:\.\d+)?)% per level$")
 _NUM_RE = re.compile(r"\d+(?:\.\d+)?")
 
 
@@ -31,6 +32,12 @@ def _pct_html(text):
     m = _FROM_TO_RE.search(text)
     if not m:
         return ""
+    a, b = _PER_LEVEL_RE.match(m.group(1)), _PER_LEVEL_RE.match(m.group(2))
+    if a and b:          # "4% + 0.4% per level → 4% + 0.3% per level" (Io Equilibrium): the part that moved
+        pa, pb = float(a.group(1)), float(b.group(1))
+        p = round((pb - pa) / pa * 100) if pa else 0
+        tone = " iab-buff" if p > 0 else " iab-nerf" if p < 0 else ""
+        return f' <span class="iab-num{tone}">{"+" if p > 0 else "−" if p < 0 else ""}{abs(p)}% per level</span>'
     old, new = [float(x) for x in _NUM_RE.findall(m.group(1))], [float(x) for x in _NUM_RE.findall(m.group(2))]
     if not old or not new:
         return ""
@@ -65,7 +72,10 @@ def _resolve(kind, owner, abil, text):
 def _chip(kind, owner, name, src, texts):
     from .elements import _slugify
     head = _html.escape(f"{owner}: {name}" if kind == "hero" and name != owner else owner)
-    tip = f"<b>{head}</b>" + "".join(f"<br>{_html.escape(t)}{_pct_html(t)}" for t in texts)
+    # a little table, as the site's other tooltips with numbers (calendar's tb-tip-table): the change on the left, its
+    # % on the right; the name over it stands out (owner 2026-11-20: "в табличном виде … название … выделять")
+    rows = "".join(f"<tr><td>{_html.escape(t)}</td><td>{_pct_html(t).strip()}</td></tr>" for t in texts)
+    tip = f'<b class="tip-head">{head}</b><table class="tb-tip-table">{rows}</table>'
     return (f'<a class="mech-jump" href="#dyn-{kind}-{_slugify(owner)}">'
             f'{ability_chip(name, src, owner=owner if kind == "hero" else None, tip=tip)}</a>')
 
@@ -82,6 +92,22 @@ def icons_with_notes(pairs):
         tip = f"<b>{_html.escape(name)}</b><br>{_html.escape(note)}"
         out.append(ability_chip(name, parsed[1], tip=tip))
     return "".join(out)
+
+
+def illusion_excluded_table(entries):
+    """[(item, what of it illusions don't apply, "item" / "neutral"), …] → a table under "Illusions still don't apply":
+    an Items column and a Neutral items column, each item its icon and name, what of it on hover (owner 2026-11-20,
+    7.42 Item Potency: "в столбце, а не просто через «:» … мини таблицей с двумя столбцами")."""
+    # icons only, the name and what of it on hover, one row (owner 2026-11-20: "без названий … в одну строку")
+    cols = {"item": [], "neutral": []}
+    for name, note, kind in entries:
+        cols[kind].append(icons_with_notes([(name, note)]))
+    rows = [["".join(cols["item"]), "".join(cols["neutral"])]]
+    html = mech_table(["Items", "Neutral items"], rows, labels=False, cls="mech-grid")
+    # the table's caption over its column titles, as a list a row leads (mech-table-lead)
+    lead = ('<span class="mech-abil-row"><span class="mech-cell mech-abil-line mech-table-lead">'
+            "Illusions still don't apply:</span></span>")
+    return re.sub(r'(<span class="mech-abils[^"]*">)', lambda m: m.group(1) + lead, html, count=1)
 
 
 def marked_changes(groups):

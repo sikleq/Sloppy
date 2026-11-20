@@ -81,6 +81,11 @@ def test_marked_changes_one_icon_per_ability_its_changes_and_their_pct_on_hover(
                                        ("hero", "Kunkka", "Talents", "Level 25 Talent Spell Area of Effect decreased")])])
     assert html.count('aria-label="Chakram"') == 1                              # two changes, one icon
     assert "Pass Damage decreased" in html and "Damage per second decreased" in html
+    from patch.mech_marked import _pct_html
+    assert "−25% per level" in _pct_html("Max Damage/Heal Amp decreased from 4% + 0.4% per level to 4% + 0.3% per level")
+    assert "−20%" in _pct_html("Cold Attack slow decreased from 25/50% (melee/ranged) to 20/40% (melee/ranged)")
+    # a little table: the change left, its % right; the name over it set apart
+    assert 'tip-head' in html and 'tb-tip-table' in html and "&lt;td&gt;Pass Damage decreased" in html
     assert "−7%" in html and "iab-nerf" in html                                 # 75 → 70: its % coloured
     assert "<b>" not in html.split("Damage</span>")[0]                           # no count after the kind
     assert 'href="#dyn-hero-timbersaw"' in html and "talents.svg" in html       # a talent of no one ability: the tree
@@ -105,12 +110,15 @@ def test_item_potency_title_links_its_page_and_examples_become_a_table():
     assert out[0] == 'W(plain_header("Item Potency", new="Reworked mechanic", page="item_potency.html"))'
     story = out[2]
     assert "For example" not in story and "Specific details" not in story and "(excluding X and a few other items)." in story
-    assert ('table=mech_table(["Attack", "Item Potency", mech_example("Desolator") + " Desolator armor reduction"], '
-            '[[mech_example("Evolved Enchantment") + " Evolved Enchantment", \'<span class="pot-bar" style="--pot:100%">'
-            '120%</span>\', "7.2"], ["Any Hero", \'<span class="pot-bar" style="--pot:83%">100%</span>\', "6"], '
-            '[mech_example("Pangolier\'s Swashbuckle") + " Pangolier\'s Swashbuckle", \'<span class="pot-bar" '
-            'style="--pot:50%">60%</span>\', "3.6"], ["Standard Illusion", \'<span class="pot-bar" style="--pot:17%">'
-            '20%</span>\', "1.2"]], cls="mech-grid")))') in story
+    # the defaults first, then own potency, then a bonus; the item named alone in the head; how potencies add up last
+    assert ('table=mech_table(["Attack", "Item Potency", "Desolator armor reduction"], '
+            '[["Any Hero", \'<span class="pot-bar" style="--pot:83%">100%</span>\', "6"], '
+            '["Standard Illusion", \'<span class="pot-bar" style="--pot:17%">20%</span>\', "1.2"], '
+            '[mech_example("Pangolier\'s Swashbuckle") + " Swashbuckle", \'<span class="pot-bar" '
+            'style="--pot:50%">60%</span>\', "3.6"], '
+            '[mech_example("Evolved Enchantment") + " Evolved Enchantment", \'<span class="pot-bar" style="--pot:100%">'
+            '120%</span>\', "7.2"]], cls="mech-grid") + mech_table(["How Item Potency adds up"], '
+            '[mech_formula(\'Own * (100 + Bonuses) / 100\') + \' (Swashbuckle with Evolved: 60 &rarr; 72)\'])))') in story
 
 
 def test_item_potency_names_every_item_illusions_still_dont_apply():
@@ -126,8 +134,32 @@ def test_item_potency_names_every_item_illusions_still_dont_apply():
         'W(ul_close())'], "7.42")
     story = out[2]
     assert "can now apply most item on hit effects.\"]" in story and "excluding" not in story
-    assert "\"Illusions still don't apply: \" + icons_with_notes([('Skull Basher', 'Bash'), ('Abyssal Blade', 'Bash')" in story
-    assert story.split("icons_with_notes(")[1].count("), (") == 15                # 16 items
+    assert "illusion_excluded_table([('Skull Basher', 'Bash', 'item'), ('Abyssal Blade', 'Bash', 'item')" in story
+    assert story.split("illusion_excluded_table(")[1].count("), (") == 15         # 16 items
+    assert "('Mind Breaker', 'Silence Strike and its magic damage', 'neutral')" in story
+
+
+def test_illusion_excluded_table_puts_items_and_neutral_items_in_two_columns_under_its_caption():
+    from patch.mech_marked import illusion_excluded_table
+    html = illusion_excluded_table([("Skull Basher", "Bash", "item"), ("Maelstrom", "Chain Lightning", "item"),
+                                    ("Heavy Blade", "Subjugate", "neutral")])
+    assert 0 <= html.find("Illusions still don") < html.find(">Items<")           # the caption over the titles
+    assert ">Neutral items<" in html and html.count('class="mech-abil-row"') == 2   # caption + one row of icons
+    assert "mech-abil-name" not in html                                         # icons only, names on hover
+
+
+def test_pip_story_base_rules_are_a_table_and_a_bracket_of_listed_names_goes():
+    from tools.patchgen.general import _story_of
+    group = [{"note": "All units are now able to damage units with health bar pips", "indent_level": 1,
+              "info": "* Couriers<br>* Zeus: Nimbus"},
+             {"note": "Attacks from heroes, Roshan, towers, and the fountain deal 1 full pip per attack", "indent_level": 2},
+             {"note": "Attacks from illusions and creeps deal 1/4 pip per attack", "indent_level": 2},
+             {"note": "Some units have a Fragile debuff", "indent_level": 1, "info": "Courier, Zeus's Nimbus"}]
+    out = _story_of(group, "REWORK")
+    assert "All units are now able to damage units with health bar pips." in out and "deal 1 full pip" not in out
+    assert ('mech_table(["Attacks from", "Damage per attack"], [["Heroes, Roshan, towers, and the fountain", '
+            '"1 full pip"], ["Illusions and creeps", "1/4 pip"]]) + pip_story_list(') in out
+    assert "Some units have a Fragile debuff." in out and "(Courier" not in out
 
 
 def test_icons_with_notes_names_each_item_and_its_note_on_hover():

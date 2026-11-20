@@ -1,24 +1,24 @@
 {
-  "_about": "Items whose attack effects illusions still don't apply, per patch: Valve's notes say only 'excluding Skull Basher and a few other items' (7.42). Found in the game's code: every item modifier's attack handler that returns when the attacker is an illusion (m_bIsIllusion), compared with the previous patch. Static analysis of copies of server.dll, not checked in a match.",
+  "_about": "Items whose attack effects illusions still don't apply, per patch: Valve's notes say only 'excluding Skull Basher and a few other items' (7.42). Found in the game's code: every item modifier's attack handler that returns when the attacker is an illusion (m_bIsIllusion), compared with the previous patch. Static analysis of copies of server.dll, not checked in a match. Each entry: item, what of it illusions don't apply, 'item' or 'neutral'.",
   "7.42": {
     "source": "server.dll 6983 vs 6976, 2026-11-20",
     "items": [
-      ["Skull Basher", "Bash"],
-      ["Abyssal Blade", "Bash"],
-      ["Maelstrom", "Chain Lightning"],
-      ["Mjollnir", "Chain Lightning"],
-      ["Echo Sabre", "Echo Strike and its slow"],
-      ["Harpoon", "Echo Strike and its slow"],
-      ["Battle Fury", "Cleave"],
-      ["Witch Blade", "Witch Blade's poison"],
-      ["Parasma", "Witch Blade's poison (Magic Corruption does apply)"],
-      ["Orb of Venom", "Poison"],
-      ["Hydra's Breath", "Miasma"],
-      ["Specialist's Array", "Splitshot"],
-      ["Gunpowder Gauntlets", "Beat the Crowd"],
-      ["Heavy Blade", "Subjugate"],
-      ["Mind Breaker", "Silence Strike and its magic damage"],
-      ["Audacious Enchantment", "Bonus magic damage on attack"]
+      ["Skull Basher", "Bash", "item"],
+      ["Abyssal Blade", "Bash", "item"],
+      ["Maelstrom", "Chain Lightning", "item"],
+      ["Mjollnir", "Chain Lightning", "item"],
+      ["Echo Sabre", "Echo Strike and its slow", "item"],
+      ["Harpoon", "Echo Strike and its slow", "item"],
+      ["Battle Fury", "Cleave", "item"],
+      ["Witch Blade", "Witch Blade's poison", "item"],
+      ["Parasma", "Witch Blade's poison (Magic Corruption does apply)", "item"],
+      ["Orb of Venom", "Poison", "item"],
+      ["Hydra's Breath", "Miasma", "item"],
+      ["Specialist's Array", "Splitshot", "item"],
+      ["Gunpowder Gauntlets", "Beat the Crowd", "neutral"],
+      ["Heavy Blade", "Subjugate", "neutral"],
+      ["Mind Breaker", "Silence Strike and its magic damage", "neutral"],
+      ["Audacious Enchantment", "Bonus magic damage on attack", "neutral"]
     ]
   }
 }

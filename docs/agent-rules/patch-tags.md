@@ -1056,13 +1056,22 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   предложением, под ним таблица всех правок с пометкой «As a part of the comprehensive Spell Power Reduction»,
   разложенных по тому, что меняет сама строка (усиление, AoE и дальность, замедления и длительности, урон, прочее),
   без чисел у групп; один значок на способность или предмет, в подсказке все его правки строками с % в цвете (как
-  в карточках); значок ведёт к герою или предмету (`marked_changes`). Группы Valve («item contributions», «damage», «slows») по строкам не
+  в карточках); значок ведёт к герою или предмету (`marked_changes`). Подсказка — маленькая таблица (`tb-tip-table`,
+  как на календаре): правка слева, % справа, имя над ней золотом; у правки-формулы («Max Damage/Heal Amp decreased»)
+  в подсказке обе формулы и % той части, что изменилась («−25% per level»).
+- Pip Health: «attacks from heroes … deal 1 full pip per attack; attacks from illusions … 1/4 pip» — не в предложении,
+  а таблицей базовых правил «Attacks from | Damage per attack» над таблицей юнитов; скобка с именами, которые эта
+  таблица и так перечисляет («melee heroes (Courier, …)»), из текста убрана (`general._story_of`, 2026-11-20). Группы Valve («item contributions», «damage», «slows») по строкам не
   разложить честно, поэтому группы — по словам строки. Чипов-тегов в этих блоках нет, тег скрытый (для фильтров).
 - Item Potency: название в шапке — ссылка на страницу механики (`plain_header(page=…)`); примеры Valve («… would reduce
-  armor by 7.2 (6 × 120%)») уходят из абзаца в таблицу «Attack | Item Potency | Desolator armor reduction»: в Attack
-  только источник со значком («Evolved Enchantment», «Any Hero», «Standard Illusion»), потенция — полосой своей
-  силы, предмет в шапке без ссылки; строка иллюзии (20%) досчитана по правилу Valve; хвост «Specific details can be
-  found …» убран.
+  armor by 7.2 (6 × 120%)») уходят из абзаца в таблицу «Attack | Item Potency | Desolator armor reduction»: строки по
+  порядку Any Hero, Standard Illusion, атаки со своей потенцией (Swashbuckle — без имени героя, значок говорит чей),
+  бонусы (Evolved Enchantment); потенция — полосой своей силы; предмет в шапке словом, без значка и ссылки; строка
+  иллюзии (20%) досчитана по правилу Valve; хвост «Specific details can be found …» убран. «(excluding Skull Basher and
+  a few other items)» — под ней таблица «Illusions still don't apply»: колонки Items и Neutral items, в каждой одна
+  строка значков без названий, что не срабатывает — в подсказке (`data/rules/illusion_onhit_excluded.json`: 16
+  предметов, найдены в коде игры, server.dll 6983 против 6976, в матчах не проверено). Последней — «How Item Potency
+  adds up»: формула и пример со страницы Item Potency.
 - Живая формула: переменная одна на обе части, поэтому поле ввода только в левой, в правой то же число без рамки
   (владелец 2026-11-20: «нельзя менять слева и справа разные значения»).
 - Список «Hero: Ability» плоской сеткой: имя способности больше не подписывает героя при наведении (2026-11-20).
