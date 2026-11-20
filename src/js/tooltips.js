@@ -60,6 +60,8 @@ function ecPinnableTip(tip, show, hide, sel) {
     tip.innerHTML = text.replace(
       /%([A-Za-z0-9_]+)%/g,
       '<span class="abil-var">$1</span>');
+    // a tooltip that holds a little table of changes is wider (owner 2026-11-20: "слишком сильно сдвиг строк")
+    tip.classList.toggle('qhint-wide', text.indexOf('tb-tip-table') >= 0);
     tip.classList.add('is-visible');
     // Position above the badge; flip below if it would overflow the viewport top.
     const r = target.getBoundingClientRect();

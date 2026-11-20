@@ -224,7 +224,8 @@ def _postprocess_item_potency(lines, version=None):
         table += f' + illusion_excluded_table({[tuple(x) for x in excluded]!r})'
     rule = _adds_up_rule()
     if rule:
-        table += f' + mech_table(["How Item Potency adds up"], [mech_formula({rule[0]!r}) + {rule[1]!r}])'
+        # the formula alone, no worked example after it (owner 2026-11-20: "(Swashbuckle with Evolved: 60 → 72) убрать")
+        table += f' + mech_table(["How Item Potency adds up"], [mech_formula({rule[0]!r})])'
     s = _STORY_EXAMPLE_RE.sub("", out[story])
     s = _STORY_FILLER_RE.sub(")", s)
     if excluded:                                 # the table's last line names them all

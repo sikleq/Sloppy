@@ -391,6 +391,10 @@ h4.subgroup {
 }
 /* the row's own words lead the table; its items one line, then the heroes (owner 2026-10-30) */
 .mech-cols-hero > .mech-abil-row > .mech-table-lead { color: var(--text-main); }
+/* a values table's caption (7.42 "Illusions still don't apply:"): across, by the left edge, as every table's lead
+   (owner 2026-11-20) */
+.mech-abils.mech-values > .mech-abil-row > .mech-table-lead { grid-column: 1 / -1; justify-content: flex-start;
+  text-align: left; color: var(--text-main); }
 .mech-abil-set { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
 .mech-hero-item > img { object-fit: contain; }    /* an item / Twin Gates in the hero column (owner 2026-10-30) */
 .mech-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
@@ -477,7 +481,12 @@ h4.subgroup {
 .mech-abils.pip-table .mech-abil-row { display: contents; }
 .mech-abils.pip-table .mech-cell { justify-content: flex-start; text-align: left; padding: 5px 14px 5px 10px;
   border-top: 1px solid var(--line-soft); display: flex; align-items: center; gap: 8px; }
-.mech-abils.pip-table .pip-name img { width: 22px; height: 22px; border-radius: 3px; flex: none; }
+.mech-abils.pip-table .pip-name img { width: 22px; height: 22px; border-radius: 3px; flex: none;
+  transition: transform 0.12s ease; transform-origin: center; }
+/* the unit's icon grows on hover, as every icon of a table (.ability-chip:hover, owner 2026-11-20: "при наведении на
+   иконку она не поднимается") */
+.mech-abils.pip-table .pip-name img:hover { position: relative; z-index: 101; transform: scale(2.6);
+  box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55); }
 .mech-abils.pip-table .pip-cell { flex-wrap: nowrap; white-space: nowrap; }     /* a row's levels on one line */
 .mech-abils.pip-table .pip-unsure .mech-cell { opacity: 0.6; }
 .pip-sticks { display: inline-flex; align-items: center; gap: 2px; }

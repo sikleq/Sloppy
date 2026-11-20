@@ -220,12 +220,15 @@ def _formula_live(name, old, new, badge, tag_id, inputs, chart, unit, lower_bett
             if v not in inputs:
                 return m.group(0)
             d = inputs[v]
+            if mirror:
+                # the value as text, not a field: a read-only field still took the cursor on a click (owner
+                # 2026-11-20: "поле ввода не видно, но мышка ставится")
+                return (f'<span class="fx-var-in">{m.group(0)}<span class="fx-mirror" data-var="{v}" '
+                        f'data-default="{d}">{d:g}</span></span>')
             rng = (f' min="{chart[2]}" max="{chart[3]}" step="1"' if chart and v == chart[0] else ' min="0"')
-            ro = ' readonly tabindex="-1"' if mirror else ''
-            cls = "formula-input fx-mirror" if mirror else "formula-input"
-            return (f'<label class="fx-var-in">{m.group(0)}<input type="number" class="{cls}" '
+            return (f'<label class="fx-var-in">{m.group(0)}<input type="number" class="formula-input" '
                     f'data-var="{v}" data-default="{d}"{rng} inputmode="decimal" value="{d:g}" '
-                    f'aria-label="{v}"{ro}></label>')
+                    f'aria-label="{v}"></label>')
         return re.sub(r'<span class="f-var">(\w+)</span>', one, code)
 
     def _pane(expr, cls, val, pct):

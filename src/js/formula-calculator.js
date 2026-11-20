@@ -173,8 +173,14 @@
       return e;
     }
     // a field typed into: its twin in the other pane follows (owner 2026-11-19: the fields inside the formulas)
+    // the second pane shows the value as text (.fx-mirror, owner 2026-11-20): the one in use, the default when empty
+    const mirrors = [...block.querySelectorAll('.fx-mirror[data-var]')];
     function sync(src) {
       inputs.forEach((i) => { if (i !== src && i.dataset.var === src.dataset.var) i.value = src.value; });
+      const v = parseFloat(src.value);
+      mirrors.forEach((m) => {
+        if (m.dataset.var === src.dataset.var) m.textContent = String(isFinite(v) ? v : parseFloat(m.dataset.default));
+      });
     }
     const call = (f, e) => f(...vars.map((v) => e[v]));
     function draw(e) {

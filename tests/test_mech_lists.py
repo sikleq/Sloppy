@@ -118,7 +118,7 @@ def test_item_potency_title_links_its_page_and_examples_become_a_table():
             'style="--pot:50%">60%</span>\', "3.6"], '
             '[mech_example("Evolved Enchantment") + " Evolved Enchantment", \'<span class="pot-bar" style="--pot:100%">'
             '120%</span>\', "7.2"]], cls="mech-grid") + mech_table(["How Item Potency adds up"], '
-            '[mech_formula(\'Own * (100 + Bonuses) / 100\') + \' (Swashbuckle with Evolved: 60 &rarr; 72)\'])))') in story
+            '[mech_formula(\'Own * (100 + Bonuses) / 100\')])))') in story
 
 
 def test_item_potency_names_every_item_illusions_still_dont_apply():
@@ -197,4 +197,5 @@ def test_the_second_pane_of_a_live_formula_mirrors_its_fields():
     html = formula_change("Hero kill bounty", "125 + 8 * VictimLevel", "100 + 10 * VictimLevel",
                           inputs={"VictimLevel": 10})
     old, new = html.split('formula-pane-new')
-    assert 'readonly' not in old and 'class="formula-input fx-mirror"' in new and 'readonly tabindex="-1"' in new
+    # the second pane: the value as text, no field to click into (owner 2026-11-20)
+    assert '<input' in old and '<input' not in new and 'class="fx-mirror" data-var="VictimLevel"' in new
