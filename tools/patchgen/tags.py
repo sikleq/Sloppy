@@ -98,6 +98,9 @@ CANONICAL_TAGS = [
     # is a BUFF / NERF as ever
     (re.compile(r"^\s*Aghanim's (?:Scepter|Shard) now also (?!(?:increases|decreases|reduces|lowers|raises)\b)", re.I),
      'NEW'),
+    # a unit put under the Pip Health standardization ("Now Nimbus has fragile pip health") — MISC, as its other pip
+    # rows (owner 2026-11-20: "в других случаях подобных мы misc ставили")
+    (re.compile(r'\bfragile pip health\b', re.I), 'MISC'),
     (re.compile(r'\bnow has an internal \d+(?:\.\d+)?s cooldown\b', re.I), 'NERF'),
     (re.compile(r'\bmoved into a separate ability\b|\bhas been replaced with a health cost\b'
                 r'|\bmin(?:imum)? health is now set by\b|\bnow has a "home jungle"', re.I), 'REWORK'),

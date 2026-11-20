@@ -741,7 +741,7 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     ("Force's push now cannot be dispelled", "BUFF"),
     ("Frost now pierces debuff immunity", "NEW"),
     ("Corruption now works with illusions", "NEW"),
-    ("Couriers now have fragile pip health", "NEW"),
+    ("Couriers now have fragile pip health", "MISC"),          # as the other Pip Health rows (owner 2026-11-20)
     ("Now fully disabled by Break", "NERF"),                    # IsBreakable absent in 7.41f, "1" in 7.42
     ("Now partially disabled by Break: disables the gaining of new stacks", "NERF"),
     ("No longer has reduced damage taken from allies on the first pip of health", "QoL"),     # owner 2026-11-19

@@ -114,6 +114,64 @@ _AGHS_ROW_RE = re.compile(r'<div class="ability-change-row( aghanim-(?:scepter|s
 _UPGRADED_INSTEAD_RE = re.compile(r"Now upgraded with Aghanim(?:'|&#x27;)s (Scepter|Shard) instead of", re.I)
 
 
+_AGHS_DEF_LI_RE = re.compile(r'<li data-tag="[^"]*" class="(aghanim-(?:scepter|shard)[^"]*)">(.*?)</li>', re.S)
+
+
+def hide_aghs_rows_the_card_retells(html):
+    """Valve's "Aghanim's Scepter: Increases Cast Range by 425 … Sand King leaves behind a trail of spines …" over the
+    upgrade's old -> new card whose new side tells the same (7.42 Burrowstrike, the Scepter moved from Epicenter): the
+    row is hidden, its tag kept for the filters (owner 2026-11-20: "дублирование информации?")."""
+    out, pos = [], 0
+    for m in _AGHS_DEF_LI_RE.finditer(html):
+        if "iab-covered" in m.group(1):
+            continue
+        plain = _PLAIN(m.group(2))
+        head = re.match(r"Aghanim's (?:Scepter|Shard): (.{25,})", plain)
+        if not head:
+            continue
+        nxt = html.find('<div class="ability-block', m.end())
+        nxt = len(html) if nxt < 0 else nxt
+        card = html.find('aghs-change', m.end(), nxt)
+        new_at = html.find('ability-change-pane ability-change-new', card, nxt) if card >= 0 else -1
+        if new_at < 0:
+            continue
+        new_side = _PLAIN(html[new_at:nxt])
+        # its words after the first figure: "Sand King leaves behind a trail of spines …" (the card says "Increases
+        # Cast Range to 975/…" where Valve says "by 425 (to …)")
+        words = re.sub(r"[^a-z ]", " ", head.group(1).lower()).split()
+        said = sum(w in new_side.lower() for w in words if len(w) > 4)
+        if said < 0.8 * sum(1 for w in words if len(w) > 4):
+            continue
+        out.append(html[pos:m.start(1)] + "iab-covered covered-card ")
+        pos = m.start(1)
+    out.append(html[pos:])
+    return "".join(out)
+
+
+# a new ability the upgrade grants: its own "New ability" card says "granted by Aghanim's X" and shows its text; the
+# upgrade's "Added Aghanim's X." card under it with "Grants this ability: <the same text>" is the same twice (owner
+# 2026-11-20, 7.42 Undying's Zombie Bite: "дублирование информации?")
+def drop_grants_card_under_new_ability(html):
+    starts = [m.start() for m in re.finditer(r'<div class="ability-block', html)] + [len(html)]
+    out, pos = [], 0
+    for a, b in zip(starts, starts[1:]):
+        seg = html[a:b]
+        if "– granted by" not in seg and "&ndash; granted by" not in seg:
+            continue
+        g = seg.find("Grants this ability:")
+        if g < 0:
+            continue
+        svg = seg.rfind('<svg class="ability-change-connector under-rows-connector"', 0, g)
+        card = seg.find('<div class="ability-change unified-panes aghs-change', svg if svg >= 0 else 0, g)
+        if svg < 0 or card < 0:
+            continue
+        end = _div_end(seg, card)
+        out.append(html[pos:a + svg])
+        pos = a + end
+    out.append(html[pos:])
+    return "".join(out)
+
+
 def drop_added_caption_under_upgrade_row(html):
     starts = [m.start() for m in re.finditer(r'<div class="ability-block', html)] + [len(html)]
     out, pos = [], 0

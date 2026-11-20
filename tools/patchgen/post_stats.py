@@ -27,8 +27,17 @@ _PER_LEVEL_FORMULA_RE = re.compile(
     # interpolates the hero name ("4% per Enchantress level"), which the old
     # bare "per level" pattern silently missed (7.40 Rabble-Rouser bug).
     r'(?P<base>\d+(?:\.\d+)?)(?P<pct>%?)\s*\+\s*(?P<inc>\d+(?:\.\d+)?)\2'
-    r"\s+per(?:\s+[A-Z][\w'-]*)?\s+level(?: up)?\b"
+    # ... and a step every N levels: "10% + 10% per 15 hero levels" (7.42 Riki's Backstab, owner 2026-11-20:
+    # "генератор упустил и не показывает formula table")
+    r"\s+per(?:\s+(?P<every>\d+))?(?:\s+[A-Z][\w'-]*|\s+hero)?\s+levels?(?: up)?\b"
 )
+
+
+def _level_fn(m):
+    """The lambda's body of a matched formula: base + inc per level, or per a step of N levels."""
+    every = m.group("every")
+    step = f"(L // {every})" if every else "L"
+    return f"{m.group('base')} + {m.group('inc')}*{step}"
 
 # "X changed from <formula> to <formula>" — a DIFF of two per-level formulas
 # must become li_formula(...) (old vs new table), not a scale_pill around one
@@ -129,13 +138,11 @@ def _postprocess_scale_pill(lines):
                 out.append(
                     f'W(li_formula("{diff.group("prefix")}", '
                     f'"{diff.group("old")}", "{diff.group("new")}", '
-                    f'lambda L: {mo.group("base")} + {mo.group("inc")}*L, '
-                    f'lambda L: {mn.group("base")} + {mn.group("inc")}*L, '
+                    f'lambda L: {_level_fn(mo)}, '
+                    f'lambda L: {_level_fn(mn)}, '
                     f'value_fmt={fmt}))'
                 )
                 continue
-        base_s = m.group('base')
-        inc_s = m.group('inc')
         formula_text = m.group(0)
         # Linear formula L → base + inc * L (per memory rule
         # sloppy_per_level_formula). Build a string lambda that survives
@@ -148,7 +155,7 @@ def _postprocess_scale_pill(lines):
             # scale every X>1 levels get a custom step-X grid (manual).
             f'{var} = scale_pill('
             f'"{formula_text}", '
-            f'lambda L: {base_s} + {inc_s}*L)'
+            f'lambda L: {_level_fn(m)})'
         )
         # Replace the formula substring inside the li text with the
         # trigger HTML (formed by an f-string concatenation at runtime).

@@ -200,6 +200,10 @@ def holders(hero, kind, version):
     flag (owner 2026-10-27: Ice Age, Naga's Critical Strike, Invoker's Ability Draft copies)."""
     if not hero or kind not in _FLAGS:
         return []
+    # the image slug is not always the abilities' prefix: sand_king -> sandking_ (7.42 Sand King's Scepter moved from
+    # Epicenter to Burrowstrike showed no old -> new card, owner 2026-11-20: "это же реворк и требует old > new")
+    from .elements import HERO_TO_ABIL_PREFIX
+    hero = HERO_TO_ABIL_PREFIX.get(hero, hero)
     return sorted(s for s, b in _blocks(version).items()
                   if s.startswith(hero + "_") and isinstance(b, dict) and s not in not_in_game()
                   and any(str(b.get(f, "0")).strip() == "1" for f in _FLAGS[kind]))

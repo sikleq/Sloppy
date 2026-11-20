@@ -220,6 +220,14 @@ def test_a_narrower_damage_spread_is_better():
     assert "iab-hl-buff" in _pop_hint_value("Damage spread decreased from 20 to 10")
 
 
+def test_a_step_of_n_hero_levels_gets_its_level_table():
+    from tools.patchgen.post_stats import _postprocess_scale_pill
+    out = _postprocess_scale_pill(['W(li("Attacks from behind now also have bonus item potency of 10% + 10% per 15 '
+                                   'hero levels", t("NEW")))'])
+    assert out[0] == '_pill1 = scale_pill("10% + 10% per 15 hero levels", lambda L: 10 + 10*(L // 15))'
+    assert "_pill1[0]" in out[1] and "extra=_pill1[1]" in out[1]
+
+
 def test_owner_tags_of_2026_11_20():
     from tools.patchgen.tags import _guess_tag
     assert _guess_tag("Now applies only from attack and ability damage") == "REWORK"
