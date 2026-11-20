@@ -48,10 +48,38 @@ _OWNER_END_RE = re.compile(r"'s |(?<=s)' |: ")
 _ABILITY_ONLY = {}
 
 
-def ability_chip(label, src):
+def _owner_of(label, name):
+    """"Leshrac's Defilement" / "Leshrac: Defilement" with its ability "Defilement" → "Leshrac"."""
+    if label == name or not label.endswith(name):
+        return None
+    owner = label[:-len(name)].rstrip()
+    return owner[:-2] if owner.endswith("'s") else owner[:-1] if owner.endswith(":") else None
+
+
+def _hero_mini(src, owner):
+    """An innate with no icon of its own shows the generic innate mark: its hero's face, small, at the bottom of it
+    tells the many such chips of one list apart (owner 2026-11-20, 7.42 Breakability: "иконки generic innate
+    одинаковые")."""
+    from .elements import INNATE_ICON_URL
+    from .images import HERO_CDN, HERO_SLUG
+    if src != INNATE_ICON_URL or owner not in HERO_SLUG:
+        return ""
+    return (f'<img src="{HERO_CDN}{HERO_SLUG[owner]}.png" alt="" class="chip-innate-marker chip-hero-mini" '
+            f'loading="lazy" width="13" height="13">')
+
+
+def ability_chip(label, src, owner=None, tip=None):
     """An ability's icon as a small square, its name on hover only (facet rows, mechanic lists). A facet ("facet:<colour>:
-    <icon>", from _icon_of_patch) is its coloured chip, as on every patch page (owner 2026-10-30: "фасеты … с цветами")."""
-    label = _html.escape(_ABILITY_ONLY.get(label, label))
+    <icon>", from _icon_of_patch) is its coloured chip, as on every patch page (owner 2026-10-30: "фасеты … с цветами").
+    tip: what to say on hover instead of the name (HTML; the page's own tooltip) — the name stays the chip's label, so
+    the page's search finds the ability, not the sentence."""
+    name = _ABILITY_ONLY.get(label, label)
+    owner = owner or _owner_of(label, name)
+    label = _html.escape(name)
+    if tip and not src.startswith("facet:"):
+        return (f'<span class="ability-chip abil-ico-hint" data-tooltip="{_html.escape(tip, quote=True)}" role="img" '
+                f'aria-label="{label}"><img src="{src}" alt="" loading="lazy" width="19" height="19">'
+                f'{_innate_marker(src) or _hero_mini(src, owner)}</span>')
     if src.startswith("facet:"):
         from .badges import _FACET_COLOR_GRADIENT
         _f, colour, icon = src.split(":", 2)
@@ -60,7 +88,7 @@ def ability_chip(label, src):
                 f'aria-label="{label}"><img src="../icons/facets/{icon}.png" alt="" loading="lazy" width="16" '
                 f'height="16"></span>')
     return (f'<span class="ability-chip" data-tooltip="{label}" role="img" aria-label="{label}"><img src="{src}" '
-            f'alt="" loading="lazy" width="19" height="19">{_innate_marker(src)}</span>')
+            f'alt="" loading="lazy" width="19" height="19">{_innate_marker(src) or _hero_mini(src, owner)}</span>')
 
 
 def _innate_marker(src):
@@ -337,11 +365,11 @@ def ability_list_rows(raw, least=2):
         if parsed is None:
             return None
         label, icon, sentence, caveat = parsed
-        groups.setdefault(sentence, []).append(ability_chip(label, icon))
-        if caveat:
-            # extra words about one ability: a "?" after the row's sentence, not among the icons where it read as one
-            # more ability (owner 2026-10-28, 7.40 Bloodlust)
-            caveats.setdefault(sentence, []).append(f"{label}: {caveat[:1].upper()}{caveat[1:]}")
+        # extra words about one ability: on hover of its own icon (owner 2026-11-20, 7.42 Breakability: "[?] лучше при
+        # наведении на свою иконку"); before, one "?" after the row's sentence held them all (7.40 Bloodlust)
+        name = _html.escape(_ABILITY_ONLY.get(label, label))
+        tip = f"<b>{name}</b><br>{_html.escape(caveat[:1].upper() + caveat[1:])}" if caveat else None
+        groups.setdefault(sentence, []).append(ability_chip(label, icon, tip=tip))
         kinds.add("item" if icon.startswith(ITEM_CDN) else "ability")
     if sum(len(v) for v in groups.values()) < least:
         return None
@@ -917,15 +945,10 @@ def hero_ability_rows(raw, least=1, row_text=""):
         named = sum(1 for _n, _a, d in abils if d) > 1
         return "<br>".join(f"{n}: {d}" if named and n else d for n, _a, d in abils if d)
     if not with_details:
-        # no hero column: the ability says whose it is, its owner in the name's hover; the freed room is a third
-        # column (owner 2026-11-19: "тоже убрать иконки героев, но освободившийся слот …")
-        flat = []
-        for hero, abils in pairs:
-            owner = _html.unescape(_re_tags.sub("", hero)).strip()
-            for _n, a, d in abils:
-                a = a.replace('<span class="mech-abil-name">',
-                              f'<span class="mech-abil-name iab-hint abil-ico-hint" data-tooltip="{_html.escape(owner, quote=True)}">', 1)
-                flat.append(tipped(a, d))
+        # no hero column, the freed room is a third column (owner 2026-11-19: "тоже убрать иконки героев, но
+        # освободившийся слот …"); the name no longer names its hero on hover (owner 2026-11-20: "убрать подписи при
+        # наведении на имя способности")
+        flat = [tipped(a, d) for _hero, abils in pairs for _n, a, d in abils]
         per = 3 if len(flat) >= 6 else 2 if len(flat) >= 2 else 1
         for k in range(0, len(flat), per):
             chunk = flat[k:k + per] + [""] * (per - len(flat[k:k + per]))

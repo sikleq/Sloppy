@@ -1051,14 +1051,21 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - Строка Valve «Specifics … can be found in the corresponding ability notes» — пустая отсылка, на странице её нет:
   вместо неё таблица тех самых правок (`post_mech_lists.py`, владелец 2026-11-20). Breakability of innates — одна
   строка, под ней таблица «Fully / Partially disabled by Break | значки» из строк «Now … disabled by Break» у врождённых
-  (что Break выключает частично — в [?]). Spell Power Reduction — строка «Changes marked as a part of it in this
-  patch»: все правки с пометкой «As a part of the comprehensive Spell Power Reduction», разложенные по тому, что
-  меняет сама строка (усиление, AoE и дальность, замедления и длительности, урон, прочее), с числом; значок ведёт к
-  герою или предмету (`marked_changes`). Группы Valve («item contributions», «damage», «slows») по строкам не
+  (что Break выключает частично — в подсказке своего значка, не общим [?]; у врождённой без своей иконки внизу
+  мини-лицо героя, иначе одинаковые значки не различить). Spell Power Reduction — три строки Valve одним
+  предложением, под ним таблица всех правок с пометкой «As a part of the comprehensive Spell Power Reduction»,
+  разложенных по тому, что меняет сама строка (усиление, AoE и дальность, замедления и длительности, урон, прочее),
+  без чисел у групп; один значок на способность или предмет, в подсказке все его правки строками с % в цвете (как
+  в карточках); значок ведёт к герою или предмету (`marked_changes`). Группы Valve («item contributions», «damage», «slows») по строкам не
   разложить честно, поэтому группы — по словам строки. Чипов-тегов в этих блоках нет, тег скрытый (для фильтров).
 - Item Potency: название в шапке — ссылка на страницу механики (`plain_header(page=…)`); примеры Valve («… would reduce
-  armor by 7.2 (6 × 120%)») уходят из абзаца в таблицу «Attack | Item Potency | Desolator armor reduction», строка
-  иллюзии (20%) досчитана по правилу Valve; хвост «Specific details can be found …» убран.
+  armor by 7.2 (6 × 120%)») уходят из абзаца в таблицу «Attack | Item Potency | Desolator armor reduction»: в Attack
+  только источник со значком («Evolved Enchantment», «Any Hero», «Standard Illusion»), потенция — полосой своей
+  силы, предмет в шапке без ссылки; строка иллюзии (20%) досчитана по правилу Valve; хвост «Specific details can be
+  found …» убран.
+- Живая формула: переменная одна на обе части, поэтому поле ввода только в левой, в правой то же число без рамки
+  (владелец 2026-11-20: «нельзя менять слева и справа разные значения»).
+- Список «Hero: Ability» плоской сеткой: имя способности больше не подписывает героя при наведении (2026-11-20).
 - «Aghanim's Scepter reworked» / «Now upgraded with Aghanim's Scepter instead of …» и пересказ строками → одна строка,
   пересказ в её [?] (`_postprocess_aghs_rework_rows`). Подстроки Valve у строк про Аганим тоже уходят в [?]
   (`notes.py`), а не стоят отдельными BUFF/MISC (Tinker Deploy Turrets).

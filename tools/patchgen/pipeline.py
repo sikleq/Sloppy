@@ -320,7 +320,7 @@ def generate(version):
     out = _postprocess_per_death(out)               # "A to B + C per Tormentor's death" -> a table (2026-11-18)
     out = _postprocess_breakability_list(out)          # "Breakability rules of many innates updated" -> a table (11-20)
     out = _postprocess_spell_power_list(out)           # Spell Power Reduction's marked rows -> a table (11-20)
-    out = _postprocess_item_potency(out)               # Item Potency: page link, examples as a table (11-20)
+    out = _postprocess_item_potency(out, version)             # Item Potency: page link, examples as a table (11-20)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)
     out = _postprocess_returning_rows(out)             # a returning / new item's description rows are NEW (as 7.38)
     out = _postprocess_mechanic_lists(out)             # General subgroups of lists -> mechanic blocks, tables (10-30)
