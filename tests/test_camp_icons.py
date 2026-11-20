@@ -91,6 +91,16 @@ def test_a_removed_camps_portraits_are_grey_not_a_red_mark():
     assert "camp-crew-gone" not in camp_faces(creeps)
 
 
+def test_a_wide_last_column_table_keeps_a_phone_page_its_width():
+    # 7.42 Tormentor drops on a phone: "Greater Horn of Battle" in one line left "Details" 54 px and the page grew 13 px
+    # (owner 2026-11-20 "лишние 10px на телефоне поправь"); an item name wraps, a long word breaks
+    phones = (ROOT / "src" / "css" / "phones.css").read_text(encoding="utf-8")
+    assert ".mech-abils.mech-wide-last .mech-item { white-space: normal; min-width: 0; }" in phones
+    # the item column as wide as its icon and longest word: at fit-content(20%) "Aghanim's" stuck out of 66 px
+    assert ".mech-abils.mech-cols-3.mech-wide-last { grid-template-columns: fit-content(28%) min-content minmax(0, 1fr); }" in phones
+    assert ".mech-abils.mech-wide-last > .mech-abil-row > .mech-cell { min-width: 0; overflow-wrap: break-word; }" in phones
+
+
 def test_radiant_and_dire_are_always_in_their_colours():
     # owner 2026-11-20: "Radiant и Dire всегда выделяем цветами"
     html = mech_table(["Side", "Camps"], [["Radiant", "x"], ["Dire", "y"], ["Both", "z"]])
