@@ -60,6 +60,35 @@ def test_every_creep_ability_on_neutral_stats_has_its_icon():
     assert not missing, missing
 
 
+def test_fetch_icons_knows_the_creep_abilities_and_the_file_the_game_draws_them_with():
+    # owner 2026-11-20 "научи": fetch_icons.py read the pages (a missing creep icon is text there, never named) and
+    # AbilityTextureName for heroes only
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts" / "fetch"))
+    import creep_ability_icons as cai
+    slugs = cai.creep_ability_slugs()
+    assert {"odobenus_blight", "mud_golem_hurl_big_boulder", "dark_troll_warlord_ensnare"} <= slugs
+    kv = '''"DOTAAbilities"
+{
+\t"odobenus_blight"
+\t{
+\t\t"MaxLevel"\t\t"1"
+\t\t"AbilityTextureName"\t\t\t"odobenus_footman_odobenus_blight"
+\t\t"AbilityValues"
+\t\t{
+\t\t\t"AbilityTextureName"\t"not_this_one"
+\t\t}
+\t}
+\t"kobold_aura"\t// no texture of its own
+\t{
+\t\t"MaxLevel"\t"1"
+\t}
+}'''
+    assert cai.kv_texture_names(kv) == {"odobenus_blight": "odobenus_footman_odobenus_blight"}
+    assert cai.creep_texture_name("mud_golem_hurl_big_boulder") == "mud_golem_hurl_boulder"
+
+
 def test_camp_sits_in_basic_after_unit_and_the_icon_column_is_headed_copy():
     # owner 2026-11-19
     basic = dict(creeps.CATEGORIES)['Basic']
