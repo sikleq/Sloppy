@@ -74,7 +74,8 @@ def _changed_part(other, this):
     a, b = other.split(), this.split()
     if len(a) != len(b):
         return other
-    diff = [x for x, y in zip(a, b) if x != y]
+    # a word's case is no change: "… Move Speed Per Hero" / "… per Hero" (7.42 Elder Titan) read as two talents
+    diff = [x for x, y in zip(a, b) if x.lower() != y.lower()]
     if diff and all(any(c.isdigit() for c in x) for x in diff):
         return " ".join(diff)
     return other

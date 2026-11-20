@@ -242,7 +242,10 @@ html.cb-mode .pop-pct-nerf { color: #eb7115; }
 .tal-moves { display: grid; grid-template-columns: auto auto auto; column-gap: 14px; }
 .tal-moves > span { padding: 3px 0; border-top: 1px solid var(--line-soft); white-space: nowrap; }
 .tal-moves > .tm-h { border-top: 0; padding-top: 0; color: var(--text-dim); font-size: 12px; }
-.tal-moves > .tm-n { white-space: normal; max-width: 260px; }
+/* the talent's name keeps a readable width; a long value wraps instead of squeezing it to a word a line (owner
+   2026-11-20, 7.42 Elder Titan's "+3.5% Astral Spirit Bonus Move Speed per Hero" in six lines) */
+.tal-moves > .tm-n { white-space: normal; min-width: 150px; max-width: 260px; }
+.tal-moves > .tm-c:last-child, .tal-moves > .tm-c:nth-child(3n) { white-space: normal; max-width: 260px; }
 .tal-moves .tm-pct, .tal-moves .tm-same { color: var(--text-dim); font-size: 12px; }
 /* one "?" holding several notes of a row (patch/elements.py merge_tips): a thin line between them */
 .pop-part { display: block; }

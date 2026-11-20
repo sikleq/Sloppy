@@ -13,6 +13,14 @@ def test_connectors_redraw_only_on_a_new_width_and_once_it_settles():
     assert "window.innerWidth === lastW" in js and "setTimeout(window.sloppyDrawConnectors" in js
 
 
+def test_a_moved_talent_with_another_case_is_the_same_talent():
+    # 7.42 Elder Titan: "+2.5% … Move Speed Per Hero" -> "+3.5% … Move Speed per Hero" read as two talents ("was …")
+    from patch.talent_marks import change_cells
+    name, _level, value = change_cells("+2.5% Astral Spirit Bonus Move Speed Per Hero",
+                                       "+3.5% Astral Spirit Bonus Move Speed per Hero", 10, 15)
+    assert name == "Astral Spirit Bonus Move Speed per Hero" and value.startswith("+2.5% → ") and "was" not in value
+
+
 def test_a_phone_has_no_blur_under_the_sticky_header():
     css = (ROOT / "src" / "css" / "phones.css").read_text(encoding="utf-8")
     block = css[css.index("@media (max-width: 760px)"):]
