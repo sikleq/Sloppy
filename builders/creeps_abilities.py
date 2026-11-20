@@ -255,6 +255,23 @@ ABIL_MANUAL = {
         'effect': 'AoE damage',
         'effect2': '300/300 vision',
         'effect3': 'Slow'},
+    # the new creeps of 7.42, from their KV and texts in the game files (owner 2026-11-20: "А в Neutral abilities
+    # вкладке обновил?" — their rows had no Property, Blight not even its duration)
+    'odobenus_blight': {
+        'duration': '4', 'effect': 'Attacks reduce armor by 2/3/4/5'},
+    'mud_golem_hurl_big_boulder': {
+        'damage': '75/85/95/105', 'aoe': '175',
+        'duration': _val_qhint('2', 'Stun duration; the boulder flies 0.8-1.2s'),
+        'effect': 'Stun in an area'},
+    'eimermole_miners_slam': {
+        'duration': _val_qhint('0.2', 'Slow duration of each blow'), 'ms_effect': '-100%',
+        'effect': '3 blows in front of him, each with damage and a slow'},
+    'ogre_seal_flop': {
+        'damage': '250', 'duration': '1.5', 'ms_effect': '-100%',
+        'effect': '2 leaps of 400, damage and a slow on each landing'},
+    'radigull_eggstremism': {
+        'duration': _val_qhint('2', 'Silence duration; each egg explodes after 2s'),
+        'effect': 'Silence in an area', 'effect2': '2 eggs in a cone in front of it'},
     'kobold_tunneler_prospecting': {
         'effect': '+20/25/30/40 gold per minute'},
     'kobold_disarm': {
