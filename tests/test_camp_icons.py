@@ -43,7 +43,9 @@ def test_a_repeated_creep_is_its_portrait_again_not_a_count():
     # owner 2026-11-20: "вместо x2 повторяющиеся иконки"; names only where the camps are new
     kind = camp_kind(3, "k.png")
     assert kind.count('<img src="k.png"') == 3 and "\u00d7" not in kind and "<b>" not in kind
-    assert camp_kind(2, "k.png", "Kobold").endswith('<img src="k.png" alt="" width="28" height="16"><b>Kobold</b></span>')
+    # the name plain after the portraits, not bold (owner 2026-11-20)
+    assert camp_kind(2, "k.png", "Kobold").endswith(
+        '<img src="k.png" alt="" width="28" height="16"><span class="camp-kind-name">Kobold</span></span>')
 
 
 def test_camp_ref_puts_the_portraits_before_the_name_without_the_type_glyph():
@@ -101,5 +103,5 @@ def test_old_tables_get_the_type_from_the_camp_name():
     # the glyph a column of its own, the name plain (owner 2026-11-20: "убираем подсказки с camp")
     assert '<span class="camp-name camp-type-col"><span class="camp-type"><img src="../icons/camps/creepcamp_small_22.png"' in html
     assert '<span class="camp-cell camp-label-cell">Small camp</span>' in html and "data-tooltip" not in html
-    assert html.count('src="../icons/units/npc_dota_neutral_tadpole.png"') == 3 and "<b>Pollywog</b>" in html
+    assert html.count('src="../icons/units/npc_dota_neutral_tadpole.png"') == 3 and '<span class="camp-kind-name">Pollywog</span>' in html and "<b>" not in html
     assert "--camp-kinds:1" in html and ">Side<" not in html
