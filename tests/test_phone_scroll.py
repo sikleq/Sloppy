@@ -21,6 +21,17 @@ def test_a_moved_talent_with_another_case_is_the_same_talent():
     assert name == "Astral Spirit Bonus Move Speed per Hero" and value.startswith("+2.5% → ") and "was" not in value
 
 
+def test_a_neutral_ability_with_four_values_scales_with_game_time():
+    # 7.42 Odobenus Blight "2 3 4 5": level 2 at 15:00, 3 at 30:00, 4 from Helm of the Overlord / Chen's Shard
+    from patch.ability_kv import ability_props
+    from patch.card_sections import time_levels_hint
+    assert ability_props("odobenus_blight", "7.42").get("time_scaled")
+    html = ('<div class="ability-change x"><div class="ability-change-pane">Passive – scales with game time</div>'
+            '<div class="vt-v"><b class="iab-num">2/3/4/5</b></div></div><div class="ability-block">')
+    out = time_levels_hint(html)
+    assert "Levels with game time" in out and "From 15:00" in out and "Helm of the Overlord" in out
+
+
 def test_a_phone_has_no_blur_under_the_sticky_header():
     css = (ROOT / "src" / "css" / "phones.css").read_text(encoding="utf-8")
     block = css[css.index("@media (max-width: 760px)"):]

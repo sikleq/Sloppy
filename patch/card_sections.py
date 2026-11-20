@@ -114,6 +114,39 @@ _AGHS_ROW_RE = re.compile(r'<div class="ability-change-row( aghanim-(?:scepter|s
 _UPGRADED_INSTEAD_RE = re.compile(r"Now upgraded with Aghanim(?:'|&#x27;)s (Scepter|Shard) instead of", re.I)
 
 
+# a neutral creep's ability "scales with game time": its 4 values are its levels — level 2 at 15:00, 3 at 30:00, 4 from
+# Helm of the Overlord or Chen's Aghanim's Shard (7.33 notes, the items in the game files of 7.42); on the value's hover
+# (owner 2026-11-20, 7.42 Odobenus Blight: "не скейлится с уровнем?")
+_TIME_LEVELS = (("From 0:00", 0), ("From 15:00", 1), ("From 30:00", 2),
+                ("Helm of the Overlord or Chen's Aghanim's Shard", 3))
+_VT_VALUE_RE = re.compile(r'(<div class="vt-v[^"]*">)((?:<[^>]+>)*)(\d+(?:\.\d+)?%?(?:/\d+(?:\.\d+)?%?){3})((?:</[^>]+>)*</div>)')
+
+
+def time_levels_hint(html):
+    out, pos = [], 0
+    for m in re.finditer(r'scales with game time', html):
+        # the card's values may stand beside its pane, not in it (a one-sided card): the side's whole card
+        start = html.rfind('<div class="ability-change ', 0, m.start())
+        if start < pos or start < 0:
+            continue
+        nxt = [x for x in (html.find('<div class="ability-change ', m.end()), html.find('<div class="ability-block', m.end()))
+               if x >= 0]
+        end = min(nxt) if nxt else len(html)
+        pane = html[start:end]
+
+        def hint(v):
+            vals = v.group(3).split("/")
+            rows = "".join(f"<tr><td>{_html.escape(w)}</td><td>{vals[i]}</td></tr>" for w, i in _TIME_LEVELS)
+            tip = _html.escape(f'<b class="tip-head">Levels with game time</b><table class="tb-tip-table">{rows}</table>',
+                               quote=True)
+            return (f'{v.group(1)}{v.group(2)}<span class="iab-hint abil-ico-hint" data-tooltip="{tip}">{v.group(3)}'
+                    f'</span>{v.group(4)}')
+        out.append(html[pos:start] + _VT_VALUE_RE.sub(hint, pane))
+        pos = end
+    out.append(html[pos:])
+    return "".join(out)
+
+
 _AGHS_DEF_LI_RE = re.compile(r'<li data-tag="[^"]*" class="(aghanim-(?:scepter|shard)[^"]*)">(.*?)</li>', re.S)
 
 

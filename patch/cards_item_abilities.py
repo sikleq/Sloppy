@@ -294,6 +294,7 @@ _PANE_DEPENDS_RE = re.compile(r"\s+depends on the level of ([A-Z][\w' ]+):")
 # no words for it, but a formula of the text grows with it: "+ 20 per minute of game time" (7.38 Tormentor, Roshan),
 # "10% + 1.5% per hero level" (7.41 Dark Seer); "per level of his bonus movement speed" is no hero level
 _PANE_TIME_RE = re.compile(r"\bper minute of (?:the )?game(?: time)?\b|\bScales with game time\b", re.I)
+_SCALES = {"level_scaled": "scales with level", "time_scaled": "scales with game time"}   # hero lvl; neutral minutes
 _PANE_LEVEL_RE = re.compile(r"\d%? [+\-] \d+(?:\.\d+)?%? per (?:hero )?level\b(?! of| up)")
 
 
@@ -478,8 +479,7 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
     title = (f'<b class="iab-kind">{kind}:</b> <span class="iab-name">{name}</span>' if kind and name
              else f'<b class="iab-kind">{kind}</b>' if kind
              else f'<span class="iab-name">{name}</span>' if name else "")
-    if kind and not scale and (props or {}).get("level_scaled"):
-        scale = "scales with level"             # the game files: a value grows with hero level (7.41 innates)
+    scale = scale or (kind and _SCALES.get(next((k for k in _SCALES if (props or {}).get(k)), ""), "")) or ""
     scale = strip_tags(scale)      # never coloured in the header (owner 2026-10-25: "не крась scales with")
     # "Aghanim's" as the upgrade's own icon: the header stays on one line (owner 2026-10-27, Planar Pocket 7.41)
     grant = (f'granted by <span class="aghanim-marker {granted}" role="img" aria-label="Aghanim\'s"></span>'

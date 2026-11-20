@@ -208,6 +208,10 @@ def ability_props(slug, version):
                    manacost=_levels(other.get("AbilityManaCost") or npc.get("AbilityManaCost", "")),
                    cooldown=_levels(other.get("AbilityCooldown") or npc.get("AbilityCooldown", "")),
                    aoe=next((_levels(npc[f"av_{k}"]) for k in _RADIUS_KEYS if f"av_{k}" in npc), ""))
+        # a neutral creep's ability with 4 values: they come with the game's minutes — level 2 at 15:00, 3 at 30:00, 4
+        # from Helm of the Overlord or Chen's Aghanim's Shard (7.33 notes; owner 2026-11-20, 7.42 Odobenus Blight:
+        # "не скейлится с уровнем?")
+        out["time_scaled"] = any(len(str(v).split()) == 4 for k, v in npc.items() if k.startswith("av_"))
     return out
 
 

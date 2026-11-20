@@ -607,7 +607,7 @@ def save_html(filename):
     from .card_pairs import pair_new_cards
     from .card_sections import (card_sections, drop_added_caption_under_upgrade_row, drop_grants_card_under_new_ability,
                                 drop_upgrade_rows_said_below, hide_aghs_rows_the_card_retells,
-                                hide_rows_the_aghs_card_says)
+                                hide_rows_the_aghs_card_says, time_levels_hint)
     out = hide_rows_the_aghs_card_says(out)   # an Aghanim's row its old -> new card shows already (2026-11-06)
     out = drop_upgrade_rows_said_below(out)   # a card's upgrade row the Aghanim's card below shows (2026-11-06)
     out = drop_added_caption_under_upgrade_row(out)   # "Added Aghanim's X." under Valve's "Now upgraded with X" (11-20)
@@ -619,6 +619,7 @@ def save_html(filename):
     out = pair_replaced_facets(out, _stem)  # a lost facet left, the new one with its card right (2026-11-06)
     from .card_deck import deck_cards
     out = deck_cards(out, _stem)           # old -> new as a deck: the old card under the new one (2026-11-09)
+    out = time_levels_hint(out)            # a neutral's 4 values: which comes when, on hover (11-20; after the decks)
     if TAG_MARK_PAGES is None or _stem in TAG_MARK_PAGES:
         from .tag_marks import terrain_rows_tagged
         out = terrain_rows_tagged(out)     # a terrain row: its tag as a tile, no number

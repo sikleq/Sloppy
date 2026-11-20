@@ -1156,3 +1156,8 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   «displays a number») — QoL; «is no longer immune to damage from», «fully disarmed during», «internal Ns cooldown» —
   NERF; «moved into a separate ability», «replaced with a Health Cost», «home jungle» — REWORK; тизеры Ringmaster — TEASER.
 
+- Способность нейтрала с 4 значениями («2 3 4 5», MaxLevel 1) растёт со временем игры: уровень 2 с 15:00, 3 с 30:00,
+  4 от Helm of the Overlord или Aghanim's Shard у Chen (заметки 7.33, предметы — файлы игры 7.42; минуты в коде 7.42
+  не проверены). Шапка карточки — «scales with game time», на значении «2/3/4/5» — подсказка-таблица, когда какое
+  (`ability_props time_scaled`, `card_sections.time_levels_hint`; владелец 2026-11-20, Odobenus Blight).
+- Таланты в подсказке-таблице переезда: слова, отличающиеся только регистром («Per Hero» / «per Hero»), — тот же талант.
