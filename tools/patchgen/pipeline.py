@@ -9,7 +9,7 @@ from .post_facets import _postprocess_removed_facet_groups, _postprocess_removed
 from .post_shared import _postprocess_shared_row_group
 from .post_summons import (_postprocess_aghs_rework_rows, _postprocess_brewlings, _postprocess_card_tail_rows,
                            _postprocess_covered_row_tags, _postprocess_reworked_ability_cards,
-                           _postprocess_summon_sub_cards)
+                           _postprocess_summon_sub_cards, _postprocess_summon_units)
 from .post_level_values import _postprocess_level_values
 from .post_mech_lists import (_postprocess_breakability_list, _postprocess_item_potency, _postprocess_neutral_tiers,
                               _postprocess_one_sentence_blocks, _postprocess_spell_power_list)
@@ -301,6 +301,7 @@ def generate(version):
     out = _postprocess_brewlings(out)                  # Primal Split's "Earth's …" rows -> Brewling blocks (11-20)
     out = _postprocess_reworked_ability_cards(out, version)   # "Ability Reworked" + retold rows -> a card (2026-11-19)
     out = _postprocess_aghs_rework_rows(out)           # an Aghanim's rework retold in rows -> its (?) (2026-11-19)
+    out = _postprocess_summon_units(out, version)      # a summon's unit block with its sheet (11-20)
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
     out = _postprocess_stance_blocks(out)              # "Earth Brawler …" rows -> stance blocks, as 7.40 (10-30)

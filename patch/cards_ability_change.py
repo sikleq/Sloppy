@@ -123,7 +123,44 @@ def ability_change(old, new, summary=None, tag=None, sub=False, rows_first=None)
     are in one place above the card (owner 2026-11-05, Arc Warden 7.38). A function, as a row must be made after the card
     has set the ability it belongs to and the values it hides."""
     html = _ability_change(old, new, summary, tag, sub, bool(rows_first))
-    return html.replace(_ROWS_FIRST, "".join(rows_first()), 1) if rows_first else html
+    if not rows_first:
+        return html
+    rows = "".join(rows_first())
+    merged = _merge_reworked_label(html, rows, summary)
+    if merged:
+        return merged
+    return html.replace(_ROWS_FIRST, rows, 1)
+
+
+_REWORKED_LABEL_RE = re.compile(r"^(Ability|Innate) reworked\.$")
+_VISIBLE_LI_RE = re.compile(r'<li data-tag="[^"]*">(<span class="badge [^"]*" data-tag="[^"]*">[^<]*</span>)'
+                            r'<span class="row-text">')
+
+
+def _merge_reworked_label(html, rows, summary):
+    """A reworked card whose one row in sight is Valve's description (it stays in sight for a note of its own, 7.42
+    Kobold Soldier's Steal Weapon: "applying Break for 3/3.5/4/4.5s" is wrongly stated): the label and the description
+    are one row, "Ability reworked: after a 1s cast time, …" (owner 2026-11-20: "Ability reworked и After a 1s cast
+    time … соединить строки"). None when the card is not such a case."""
+    if not (summary and _REWORKED_LABEL_RE.match(summary)):
+        return None
+    # Valve's own "Ability Reworked" row among the hidden ones: the row in sight is its description, not a row of
+    # the card's own ("The result of these changes: …", 7.41 — it was glued to the label by mistake)
+    if not re.search(r'class="iab-covered[^"]*"><span class="badge [^"]*" data-tag="[^"]*">[^<]*</span>'
+                     r'<span class="row-text">(?:Ability|Innate) (?:<span class="li-tail">)?Reworked', rows, re.I):
+        return None
+    visible = _VISIBLE_LI_RE.findall(rows)
+    if len(visible) != 1:
+        return None
+    m = _VISIBLE_LI_RE.search(rows)
+    first = rows[m.end():m.end() + 1]
+    label = summary[:-1]
+    rows = rows[:m.end()] + f"{label}: {first.lower()}" + rows[m.end() + 1:]
+    # the label's own row goes: its words now lead the description
+    out = re.sub(r'<li data-tag="[^"]*"(?: class="aghanim-[^"]*")?><span class="badge [^"]*" data-tag="[^"]*">[^<]*</span>'
+                 r'<span class="row-text">' + re.escape(label) + r'(?:<span class="aghanim-marker[^"]*"></span>)?</span></li>',
+                 "", html, count=1)
+    return out.replace(_ROWS_FIRST, rows, 1)
 
 
 def _ability_change(old, new, summary, tag, sub, rows_first):

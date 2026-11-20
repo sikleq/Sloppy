@@ -148,6 +148,53 @@ def test_illusion_excluded_table_puts_items_and_neutral_items_in_two_columns_und
     assert "mech-abil-name" not in html                                         # icons only, names on hover
 
 
+def test_reworked_label_and_valves_description_in_sight_are_one_row(monkeypatch):
+    from patch.api import ability_change, li, t
+    from patch.state import _State
+    monkeypatch.setattr(_State, "current_patch_version", "7.42")
+    old = dict(name="Steal Weapon", icon_url="../icons/abilities/kobold_disarm.png", desc="Old text.")
+    new = dict(name="Steal Weapon", icon_url="../icons/abilities/kobold_disarm.png", desc="New text.")
+    html = ability_change(old, new, summary="Ability reworked.", tag="rework", rows_first=lambda: [
+        li("Ability Reworked", t("REWORK"), covered=True),
+        li("After a 1s cast time, pierces all enemies in a line", t("REWORK")),
+        li("Cast Range 500", t("REWORK"), covered=True)])
+    assert "Ability reworked: after a 1s cast time, pierces all enemies in a line" in html
+    assert html.count(">Ability reworked<") == 0                                # the label's own row is gone
+    # no Valve "Ability Reworked" row: the card's own row stays apart from the label (7.41 "The result of these …")
+    html = ability_change(old, new, summary="Innate reworked.", tag="rework", rows_first=lambda: [
+        li("The result of these changes:", t("MISC"))])
+    assert "Innate reworked: " not in html
+
+
+def test_a_summon_gets_its_unit_block_after_its_card():
+    from tools.patchgen.post_summons import _postprocess_summon_units
+    out = _postprocess_summon_units([
+        'W(new_ability("Summon Ancient Thunderhide", "beastmaster_summon_thunderhide", version="7.42"))', 'W(ul_open())',
+        'W(li("Active. No target", t("NEW"), covered=True))', 'W(ul_close())',
+        'W(ability_change(None, dict(name=\'Slam\', slug="big_thunder_lizard_slam"), sub=True))',
+        'W(subgroup("Talents"))'], "7.42")
+    assert out[4:8] == ['W(ability("Ancient Thunderhide", icon_url="../icons/units/npc_dota_neutral_big_thunder_lizard.png"))',
+                        'W(ul_open())', 'W(summon_sheet("beastmaster_summon_thunderhide", version="7.42"))',
+                        'W(ul_close())']
+    assert out[8].startswith("W(ability_change(None, dict(name='Slam'")         # the unit's abilities under it
+
+
+def test_summon_sheet_takes_the_numbers_its_ability_gives():
+    import re
+    from patch import game_files
+    if not game_files.available():
+        pytest.skip("no game-files store")
+    from patch.unit_numbers import summon_sheet
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", summon_sheet("beastmaster_summon_thunderhide", "7.42")))
+    assert "2200" in text and "Damage 90" in text and "Move Speed 355" in text and "1700" not in text
+
+
+def test_chens_zealot_is_no_summon_block():
+    # 7.42: any unit of Chen's is anointed; his innate's bonuses are for all his creeps, in % — no one-unit sheet
+    from tools.patchgen.post_summons import _SUMMON_UNITS
+    assert "chen_zealot" not in _SUMMON_UNITS
+
+
 def test_primal_split_rows_of_one_brewling_go_to_its_block():
     from tools.patchgen.post_summons import _postprocess_brewlings
     out = _postprocess_brewlings([

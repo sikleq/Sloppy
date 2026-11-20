@@ -1651,11 +1651,9 @@ def build():
     W(li("Thunderhide Drum: Passive. Aura. Affects the owner and their controlled units only. Cannot be dispelled", t("NEW"), covered=True))
     W(li("Whenever Ancient Thunderhide, its owner or other unit they control within the aura make an attack, the ability gains a stack. Each stack increases the max health and base damage of all affected units. If no attacks are made, Ancient Thunderhide dies or a unit leaves the aura radius, stacks are gradually lost, 1 per second. Also grants 1 stack per Slam's wave that hit an enemy hero", t("NEW"), extra=inline_note("Aura Radius: 1200. Max Stacks: 20. Max HP and Base Damage per stack: 1%<br>The stack-losing timer starts immediately after the last attack was made<br>Hitting multiple heroes with a single Slam wave still grants only 1 stack"), covered=True))
     W(ul_close())
-    # PROPOSAL (owner 2026-11-20, waits for a yes before the generator learns it): the summoned unit as a block of its
-    # own, as the Brewlings — its icon, its sheet from npc_units.txt, its abilities under it
     W(ability("Ancient Thunderhide", icon_url="../icons/units/npc_dota_neutral_big_thunder_lizard.png"))
     W(ul_open())
-    W(unit_sheet("npc_dota_beastmaster_thunderhide", version="7.42"))
+    W(summon_sheet("beastmaster_summon_thunderhide", version="7.42"))
     W(ul_close())
     W(ability_change(None, dict(name='Slam', slug="big_thunder_lizard_slam", desc=game_ability_desc("big_thunder_lizard_slam", "7.42")), summary="New ability.", tag="new", sub=True))
     W(ability_change(None, dict(name='Thunderhide Drum', slug="beastmaster_thunderhide_drum", desc=game_ability_desc("beastmaster_thunderhide_drum", "7.42")), summary="New ability.", tag="new", sub=True))

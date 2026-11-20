@@ -219,6 +219,38 @@ def _postprocess_summon_sub_cards(lines):
     return out
 
 
+# a summoning ability → the name the game shows for its unit and the icon of its look (the summon has no icon of its
+# own; the Thunderhide is a big Thunderhide). Not Chen's Zealot: in 7.42 any unit of his is anointed, the innate's
+# bonuses ("damage_bonus" 5% + 2%) are for all his creeps — a sheet of one "Zealot" would add them as flat numbers
+_SUMMON_UNITS = {"beastmaster_summon_thunderhide": ("Ancient Thunderhide", "npc_dota_neutral_big_thunder_lizard")}
+_CARD_OF_RE = re.compile(r'^(\s*)(?:W\(new_ability\("[^"]+", "([a-z0-9_]+)"|.*\bslug="([a-z0-9_]+)"[^)]*desc=_rw\d+_new\))')
+_NEXT_PART_RE = re.compile(r'^\s*(?:W\((?:ability|new_ability|subgroup|hero_header|unit_header|item_header|section)\(|'
+                           r'W\(ability_change\(None,|_rw\d+_old|# )')
+
+
+def _postprocess_summon_units(lines, version):
+    """A new or reworked ability that summons a unit of its own (7.42 Ancient Thunderhide, Chen's Zealot): the unit as a
+    block under the card — its icon and name, its sheet with the numbers the ability gives it (summon_sheet) — before
+    the cards of the unit's abilities (owner 2026-11-20: "раз это отдельный юнит, а не просто новая способность")."""
+    out, i, done = list(lines), 0, set()
+    while i < len(out):
+        m = _CARD_OF_RE.match(out[i])
+        slug = m and (m.group(2) or m.group(3))
+        if not slug or slug not in _SUMMON_UNITS or slug in done:
+            i += 1
+            continue
+        done.add(slug)
+        k = next((j for j in range(i + 1, len(out)) if _NEXT_PART_RE.match(out[j])), len(out))
+        # the indent of what comes next: a reworked card's slug sits on a line inside its call, deeper
+        ind = re.match(r"^\s*", out[k]).group(0) if k < len(out) else m.group(1)
+        name, icon = _SUMMON_UNITS[slug]
+        block = [f'{ind}W(ability("{name}", icon_url="../icons/units/{icon}.png"))', f"{ind}W(ul_open())",
+                 f'{ind}W(summon_sheet("{slug}", version="{version}"))', f"{ind}W(ul_close())"]
+        out[k:k] = block
+        i = k + len(block)
+    return out
+
+
 _BREWLINGS = ("Earth", "Storm", "Fire", "Void")
 _BREW_ROW_RE = re.compile(r'^(\s*)W\(li\("(Earth|Storm|Fire|Void)(?:\'s (\w)| now )')
 

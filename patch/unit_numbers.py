@@ -121,6 +121,57 @@ def render(nums, changes=None, notes=None, tags="buff new"):
     return f'<li class="unit-sheet" data-tag="{tags}"><span class="us-bars">{bars}</span><span class="us-tiles">{tiles}</span></li>'
 
 
+# a summon's numbers its ability sets (7.42 Beastmaster's Ancient Thunderhide: "thunderhide_base_max_health" 2200 over
+# the unit file's 1700) or adds to the unit's own (Chen's Zealot: "damage_bonus" 5 + 2 per hero level)
+_SUMMON_SETS = {"Health": r"(?:base_max_health|health_min|base_health)$", "Damage": r"base_damage$",
+                "Move Speed": r"base_movespeed$", "XP": r"base_xp_bounty$"}
+_SUMMON_ADDS = {"Damage": r"^damage_bonus$", "Move Speed": r"^movement_speed_bonus$"}
+
+
+def _kv(v):
+    """An AbilityValues entry → (its value, its "hero_levelup" or None)."""
+    if isinstance(v, dict):
+        return v.get("value"), v.get("hero_levelup")
+    return v, None
+
+
+def _per_level(text, levelup):
+    return f"{text} + {_g(str(levelup).lstrip('+'))} per level" if levelup else text
+
+
+def summon_unit(ability_slug):
+    """The unit an ability summons, by the game's naming: beastmaster_summon_thunderhide → npc_dota_beastmaster_thunderhide,
+    chen_zealot → npc_dota_chen_zealot."""
+    return "npc_dota_" + ability_slug.replace("_summon_", "_")
+
+
+def summon_sheet(ability_slug, version=None):
+    """The sheet of the unit an ability summons, with the numbers the ability gives it in place of the unit file's (owner
+    2026-11-20: Ancient Thunderhide / Zealot as units, "с числами из способности"). A number that grows with the hero's
+    level reads "400 + 50 per level"."""
+    from .ability_kv import _hero_blocks
+    version = version or _State.current_patch_version
+    text = game_files.read(version, _UNITS_FILE)
+    if not text:
+        raise ValueError(f"summon_sheet: no {_UNITS_FILE} for {version} in the game-files store")
+    nums = numbers(text, summon_unit(ability_slug))
+    values = (_hero_blocks(version).get(ability_slug) or {}).get("AbilityValues") or {}
+    for name, rx in _SUMMON_SETS.items():
+        for key, raw in values.items():
+            base, levelup = _kv(raw)
+            if re.search(rx, key) and base not in (None, ""):
+                nums[name] = _per_level(_g(base), levelup)
+    for name, rx in _SUMMON_ADDS.items():
+        for key, raw in values.items():
+            base, levelup = _kv(raw)
+            if not re.search(rx, key) or base in (None, ""):
+                continue
+            own = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", nums[name].split(" + ")[0])]
+            shown = "-".join(_g(x + float(base)) for x in own)
+            nums[name] = _per_level(shown, levelup)
+    return render(nums)
+
+
 def unit_sheet(slug, changes=None, notes=None, version=None):
     """The sheet of npc_dota_neutral_<slug> (or a full npc_ name) in the current patch, a row of a W(ul_open()) list."""
     version = version or _State.current_patch_version
