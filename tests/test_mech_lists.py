@@ -148,6 +148,17 @@ def test_illusion_excluded_table_puts_items_and_neutral_items_in_two_columns_und
     assert "mech-abil-name" not in html                                         # icons only, names on hover
 
 
+def test_pip_buttons_stand_over_every_table_of_the_story(monkeypatch):
+    from patch.api import mech_story, mech_table, pip_story_list
+    from patch.state import _State
+    monkeypatch.setattr(_State, "current_patch_version", "7.42")
+    html = mech_story(["Pips."], tags=("rework",),
+                      table=mech_table(["Attacks from", "Damage per attack"], [["Heroes", "1 full pip"]])
+                      + pip_story_list("Couriers<br>Observer Wards<br>Zeus: Nimbus"))
+    assert html.index('class="pip-bar"') < html.index(">Attacks from<") < html.index("pip-table")
+    assert 'class="mech-story-table pip-block"' in html and html.count("pip-block") == 1
+
+
 def test_pip_story_base_rules_are_a_table_and_a_bracket_of_listed_names_goes():
     from tools.patchgen.general import _story_of
     group = [{"note": "All units are now able to damage units with health bar pips", "indent_level": 1,

@@ -819,7 +819,14 @@ def mech_story(text, tags=("new",), table="", maps=(), buttons=()):
         style = f' style="--story-side:{story_side_width(paragraphs) / (_STORY_INNER / 100):.1f}%"'
     body = "".join(f'<span class="mech-story-p">{p}</span>' for p in paragraphs)
     table = re.sub(r"<!--/?MECHTABLE-->", "", table)
-    under = f'<span class="mech-story-table">{table}</span>' if table else ""
+    bar = re.search(r'<span class="pip-bar">.*?</span></span>(?=<span class="mech-abils pip-table">)', table)
+    if bar and not table.startswith('<span class="pip-block">'):
+        # the pips' buttons and keys over every table of the story, not between the base rules and the units (owner
+        # 2026-11-20: "панель кнопок поставь выше таблиц"); the whole story table is then the block they switch
+        table = bar.group(0) + table.replace(bar.group(0), "", 1).replace('<span class="pip-block">', "<span>", 1)
+        under = f'<span class="mech-story-table pip-block">{table}</span>'
+    else:
+        under = f'<span class="mech-story-table">{table}</span>' if table else ""
     pics = f'<span class="tshots mech-story-maps">{"".join(shown)}</span>' if shown else ""
     return (f'<li class="mech-desc mech-first mech-last li-notag mech-story{side}" data-tag="{tag_attr}"{style}>'
             f'<span class="row-tag-empty"></span><span class="row-text">{body}</span>{pics}{under}{parts}</li>')
