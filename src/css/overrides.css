@@ -393,19 +393,24 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* a camp named in another table (7.42 "home jungle", camp_ref): its portraits before the name, one camp a line */
 .camp-ref { display: inline-flex; max-width: 100%; align-items: center; gap: 6px; vertical-align: middle; margin: 1px 0; }
 .camp-ref .camp-ref-name { text-align: left; }
-.mech-abils.camp-jungle { grid-template-columns: auto repeat(3, minmax(0, 1fr)); }   /* the three sizes equal (owner 2026-11-20: симметрия) */
 /* one camp a line (no <br>: in a flex row it does not break), the camps flush left, the side's word in the middle of
    its row's height (owner 2026-11-19: "нет выравнивания по левому краю … radiant/dire по центру") */
 .camp-jungle .mech-cell { flex-direction: column; gap: 4px; justify-content: center; }
 .camp-jungle .mech-abil-row:not(.mech-head) .mech-cell:not(.mech-label) { align-items: flex-start; }
 .camp-jungle .mech-head .mech-cell { flex-direction: row; gap: 6px; }
-/* each column's camps as a little grid: the creeps one column, the names lined up after the widest of them */
+/* each size two columns of the table itself, the creeps' portraits one, the camps' names the next, a line between
+   them, the same for Radiant and Dire (owner 2026-11-20: "иконки крипов в одной ячейке, а их название в другой — так
+   будет симметричнее"): a size's cell spans both, its camps laid on them through subgrid */
+.mech-abils.camp-jungle { grid-template-columns: auto repeat(3, max-content minmax(0, 1fr)); }
+.camp-jungle .mech-abil-row > .mech-cell:not(:first-child) { grid-column: span 2; }
 .camp-jungle .mech-abil-row:not(.mech-head) .mech-cell:not(.mech-label) {
-  display: grid; grid-template-columns: max-content minmax(0, auto); column-gap: 8px; row-gap: 4px; align-content: center; justify-content: start; justify-items: start;
+  display: grid; grid-template-columns: subgrid; column-gap: 0; row-gap: 0; align-content: center; justify-items: start;
+  padding-left: 0; padding-right: 0;
 }
 .camp-jungle .camp-ref { display: contents; }
-.camp-jungle .camp-ref .camp-crew, .camp-jungle .camp-ref .camp-ref-name { align-self: center; }
-.camp-jungle .camp-ref .camp-crew { justify-self: end; }
+.camp-jungle .camp-ref .camp-crew { align-self: stretch; padding: 3px 10px; }
+.camp-jungle .camp-ref .camp-ref-name { align-self: stretch; display: flex; align-items: center; padding: 3px 10px;
+  border-left: 1px solid rgba(213, 207, 195, 0.15); }
 /* the camp's name after its glyph column reads left, like a label */
 .mech-abils.camp-changes .mech-abil-row > .mech-cell:nth-child(2) { justify-content: flex-start; text-align: left; }
 /* 7.42 camps changed / removed (mech_table cls="camp-changes"): Camp / Before / Now across the block like the site's

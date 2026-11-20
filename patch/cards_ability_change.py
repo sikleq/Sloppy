@@ -378,9 +378,10 @@ def _ability_change(old, new, summary, tag, sub, rows_first):
             # 2026-11-19, 7.42 Miner's Aura: "New ability с точкой — убери, в других таких же случаях тоже")
             summary_txt = summary_txt[:-1]
         if _aghs and _aghs in (_granted_by["new"], _granted_by["old"]):
-            # the headers say "granted by Aghanim's X": the summary keeps only the stripe (owner 2026-10-26, 7.41
-            # Kinetic Fence: "убрать (Aghanim's Shard upgrade) из строки")
-            summary_txt += f'<span class="aghanim-marker {_aghs}"></span>'
+            # the headers say "granted by Aghanim's X": the summary says nothing of it — no words (owner 2026-10-26,
+            # 7.41 Kinetic Fence: "убрать (Aghanim's Shard upgrade) из строки"), and no stripe either (owner
+            # 2026-11-20, 7.42 Through the Realm: the header's words, the row's stripe said it twice — "полоску убери")
+            aghs_cls = ''
         elif _aghs:
             body = summary_txt[:-1] if summary_txt.endswith(".") else summary_txt
             summary_txt = (f'{body} <span class="ac-aghs">(Aghanim\'s {_aghs.title()} upgrade)</span>.'

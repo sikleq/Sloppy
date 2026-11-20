@@ -77,6 +77,9 @@ def ability_chip(label, src, owner=None, tip=None):
     name = _ABILITY_ONLY.get(label, label)
     owner = owner or _owner_of(label, name)
     label = _html.escape(name)
+    # an enchantment's glyph is small on its wide dark field: its chip uses the copy cut to the art
+    # (scripts/gen/gen_enchant_chips.py; owner 2026-11-20: "иконка нейтралки меньше чем у других")
+    src = re.sub(r"/items/(enhancement_[a-z_]+)\.png$", r"/items/chip/\1.png", src)
     if tip and not src.startswith("facet:"):
         return (f'<span class="ability-chip abil-ico-hint" data-tooltip="{_html.escape(tip, quote=True)}" role="img" '
                 f'aria-label="{label}"><img src="{src}" alt="" loading="lazy" width="19" height="19">'
@@ -684,7 +687,11 @@ def pip_rows(raw, version):
         parsed = _parse_line(line)
         label, icon = (_ABILITY_ONLY.get(parsed[0], parsed[0]), parsed[1]) if parsed else (line, None)
         name = _html.escape(label)
-        img = f'<img src="{icon}" alt="" loading="lazy" width="22" height="22">' if icon and not icon.startswith("facet:") else ""
+        # its name in gold on hover, as every icon of a table (owner 2026-11-20: "в таблице Pip Health при наведении не
+        # пишется ничего")
+        tip = _html.escape(f'<b class="tip-head">{name}</b>', quote=True)
+        img = (f'<img class="abil-ico-hint" data-tooltip="{tip}" src="{icon}" alt="" loading="lazy" width="22" '
+               f'height="22">' if icon and not icon.startswith("facet:") else "")
         dim = "" if e.get("sure", True) else " pip-unsure"
         used |= {b["src"] for b in e.get("bonus", ())}
         rows.append(f'<span class="mech-abil-row{dim}"><span class="mech-cell pip-name">{img}{name}</span>'

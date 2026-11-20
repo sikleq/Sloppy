@@ -125,7 +125,8 @@ def render(nums, changes=None, notes=None, tags="buff new"):
 # the unit file's 1700) or adds to the unit's own (Chen's Zealot: "damage_bonus" 5 + 2 per hero level)
 _SUMMON_SETS = {"Health": r"(?:base_max_health|health_min|base_health)$", "Damage": r"base_damage$",
                 "Move Speed": r"base_movespeed$", "XP": r"base_xp_bounty$"}
-_SUMMON_ADDS = {"Damage": r"^damage_bonus$", "Move Speed": r"^movement_speed_bonus$"}
+# "damage" with only a hero_levelup (7.41f Chen's Zealot: "+2 per hero level" on the creep's own damage)
+_SUMMON_ADDS = {"Damage": r"^damage(?:_bonus)?$", "Move Speed": r"^movement_speed_bonus$"}
 
 
 def _kv(v):
@@ -164,12 +165,21 @@ def summon_sheet(ability_slug, version=None):
     for name, rx in _SUMMON_ADDS.items():
         for key, raw in values.items():
             base, levelup = _kv(raw)
+            if base in (None, "") and levelup:
+                base = "0"                  # only a per-level part: nothing at level 0
             if not re.search(rx, key) or base in (None, ""):
                 continue
             own = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", nums[name].split(" + ")[0])]
             shown = "-".join(_g(x + float(base)) for x in own)
             nums[name] = _per_level(shown, levelup)
     return render(nums)
+
+
+def summon_sheet_pane(ability_slug, version):
+    """The summon's sheet as a table of one side of an ability's card (ability_change(old=dict(tables=[…]))): 7.41f
+    Chen's Zealot was a creep of its own, its numbers belong on the card's old side (owner 2026-11-20: "мы же
+    переключать на старую способность можем, вот там бы и показать")."""
+    return f'<ul class="changes unit-sheet-ul">{summon_sheet(ability_slug, version)}</ul>'
 
 
 def unit_sheet(slug, changes=None, notes=None, version=None):

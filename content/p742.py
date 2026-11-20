@@ -1824,7 +1824,7 @@ def build():
     W(hero_header("Chen"))
     _rw1_old, _rw1_new = game_ability_pair("chen_zealot", "7.42")
     W(ability_change(
-        old=dict(name="Zealot", slug="chen_zealot", innate=True, desc=_rw1_old),
+        old=dict(name="Zealot", slug="chen_zealot", innate=True, desc=_rw1_old, tables=[summon_sheet_pane("chen_zealot", "7.41f")]),
         new=dict(name="Zealot", slug="chen_zealot", innate=True, desc=_rw1_new),
         summary="Innate reworked.",
         tag="rework",
@@ -1999,7 +1999,7 @@ def build():
         new=dict(name="Witchcraft", slug="death_prophet_witchcraft", innate=True, desc=_ri1_new),
         summary="Innate reworked.",
         tag="rework",
-        rows_first=lambda: [li("Now also creates a ghost whenever Death Prophet attacks an enemy. The spirit deals a portion of Death Prophet's attack damage, and then heals her for 50% of the damage dealt upon return", t("NEW"), extra=inline_note("Ghost's Damage: " + _pill1[0] + " — Damage against buildings is reduced by 50%<br>Ghost's Speed: 650 <span class=\"pop-note\">(Exorcism spirits have movespeed of 525)</span><br>Illusions of Death Prophet also summon ghosts on attack") + _pill1[1]), li_formula("Movement Speed decreased", "0.5% + 0.75% per level", "0.5% per level", lambda L: 0.5 + 0.75*L, lambda L: 0.5*L, value_fmt="{:g}%", inline_note_text="From 1.25% to 0.5% on level 1"), li("No longer provides 0.75% ability cooldown reduction per hero level", t("DEL"))]))
+        rows_first=lambda: [li("Now also creates a ghost whenever Death Prophet attacks an enemy. The spirit deals a portion of Death Prophet's attack damage, and then heals her for 50% of the damage dealt upon return", t("NEW"), extra=inline_note("Ghost's Damage: " + _pill1[0] + " — Damage against buildings is reduced by 50%<br>Ghost's Speed: 650 <span class=\"pop-note\">(Exorcism spirits have movespeed of 525)</span><br>Illusions of Death Prophet also summon ghosts on attack") + _pill1[1], covered=True), li_formula("Movement Speed decreased", "0.5% + 0.75% per level", "0.5% per level", lambda L: 0.5 + 0.75*L, lambda L: 0.5*L, value_fmt="{:g}%", inline_note_text="From 1.25% to 0.5% on level 1"), li("No longer provides 0.75% ability cooldown reduction per hero level", t("DEL"))]))
     W(ability("Crypt Swarm", slug="death_prophet_carrion_swarm"))
     W(ul_open())
     W(li("Aghanim's Shard: Grants 2 charges with 1s cooldown between uses and 10/9/8/7s charge restoration time. Crypt Swarm slows movement of affected enemies by 100% for 0.5s", t("NEW")))

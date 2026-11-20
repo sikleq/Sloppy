@@ -36,7 +36,7 @@ def camp_table(rows):
         for i in range(width):
             if i < len(creeps):
                 n, name, icon = creeps[i]
-                cells.append(f'<span class="camp-cell">{camp_kind(n, icon, name)}</span>')
+                cells.append(f'<span class="camp-cell">{camp_kind(n, icon, name)}</span>')   # its name beside it
             else:
                 cells.append('<span class="camp-cell"></span>')
     return (f'<span class="camp-table{" camp-table-sided" if sided else ""}" '
@@ -77,10 +77,14 @@ def camp_glyph(size):
     return f'<span class="camp-type">{_img(glyph)}</span>' if glyph else ""
 
 
-def camp_kind(n, icon, name=""):
+def camp_kind(n, icon, name="", tip=""):
     """one kind of a camp's creeps: its portrait once per creep, no "2x" (owner 2026-11-20: "вместо x2 повторяющиеся
-    иконки"); with a name only where the camps are new (Added N new neutral camps)"""
-    img = f'<img src="{icon}" alt="" width="28" height="16">'
+    иконки"); with a name only where the camps are new (Added N new neutral camps). tip: the creep's name in gold on
+    hover (owner 2026-11-20: "золотым тоже у многих не написано в разных таблицах")"""
+    import html as _h
+    hint = (f' class="abil-ico-hint" data-tooltip="{_h.escape(f"<b class=\"tip-head\">{_h.escape(tip)}</b>", quote=True)}"'
+            if tip else "")
+    img = f'<img{hint} src="{icon}" alt="" width="28" height="16">'
     # the name plain, after the portraits, as the home jungle's camp names (owner 2026-11-20: "убрать жирность")
     label = f'<span class="camp-kind-name">{name}</span>' if name else ""
     return f'<span class="creep-ref camp-kind">{img * max(1, n)}{label}</span>'
@@ -89,5 +93,5 @@ def camp_kind(n, icon, name=""):
 def camp_crew(creeps, gone=False):
     """a camp's creeps as portraits without names, each repeated per creep (owner 2026-11-20). gone=True: a camp that
     left the game, grey."""
-    refs = "".join(camp_kind(n, icon) for n, _name, icon in creeps)
+    refs = "".join(camp_kind(n, icon, tip=name) for n, name, icon in creeps)
     return f'<span class="camp-crew{" camp-crew-gone" if gone else ""}">{refs}</span>' if refs else ""

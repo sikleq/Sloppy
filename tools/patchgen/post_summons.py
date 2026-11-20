@@ -93,6 +93,11 @@ def _block_end(out, i):
     return next((k for k in range(i + 2, len(out)) if out[k].strip() == "W(ul_close())"), None)
 
 
+# reworked abilities that summoned a creep of their own before (7.41f Chen's Zealot: "joined by a Zealot"; in 7.42 he
+# anoints any unit): the old side of the card shows that creep's sheet (owner 2026-11-20)
+_OLD_SIDE_SUMMONS = {"chen_zealot"}
+
+
 def _postprocess_reworked_ability_cards(lines, version):
     """Valve's "Ability Reworked" and the new ability retold in MISC rows (Fable audit 2026-11-19, 7.42 Chen Zealot,
     Leshrac Nihilism, Nature's Prophet Curse of the Oldgrowth: 12 visible MISC rows) → the card old → new from the
@@ -131,9 +136,11 @@ def _postprocess_reworked_ability_cards(lines, version):
         n += 1
         v = f"_rw{n}"
         inn = ", innate=True" if innate else ""
+        # an ability that summoned a creep of its own before the rework (7.41f Chen's Zealot): its sheet on the old side
+        old_sheet = f', tables=[summon_sheet_pane("{slug}", "{prev}")]' if slug in _OLD_SIDE_SUMMONS else ""
         card = [f'{ind}{v}_old, {v}_new = game_ability_pair("{slug}", "{version}")',
                 f'{ind}W(ability_change(',
-                f'{ind}    old=dict(name="{name}", slug="{slug}"{inn}, desc={v}_old),',
+                f'{ind}    old=dict(name="{name}", slug="{slug}"{inn}, desc={v}_old{old_sheet}),',
                 f'{ind}    new=dict(name="{name}", slug="{slug}"{inn}, desc={v}_new),',
                 f'{ind}    summary="{"Innate reworked." if innate else "Ability reworked."}",',
                 f'{ind}    tag="rework",',
@@ -282,6 +289,10 @@ def _postprocess_reworked_innates(lines, version):
         v = f"_ri{n}"
         setup = [r for r in body if not r.strip().startswith("W(")]       # "_pill1 = scale_pill(…)": before the card
         rows = [r.strip()[2:-1] for r in body if r.strip().startswith("W(")]
+        # the part it gained is the new card's text: that row hidden under it (owner 2026-11-20: "разве это не надо
+        # убрать, раз всё в карточке?"); what it lost and its numbers stay in sight
+        rows = [re.sub(r"\)\s*$", ", covered=True)", r) if _GAINS_RE.match("W(" + r + ")") and "covered=True" not in r
+                else r for r in rows]
         card = setup + [f'{ind}{v}_old, {v}_new = game_ability_pair("{slug}", "{version}")',
                         f'{ind}W(ability_change(',
                         f'{ind}    old=dict(name="{name}", slug="{slug}", innate=True, desc={v}_old),',

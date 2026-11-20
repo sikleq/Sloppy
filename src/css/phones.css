@@ -200,7 +200,7 @@
   /* camp compositions table inside a row: scrolls inside itself */
   .camp-table { max-width: 100%; overflow-x: auto; }
   /* 7.42 "home jungle": the camps' faces don't fit four columns of a phone, the table scrolls inside itself */
-  .mech-abils.camp-jungle { max-width: 100%; overflow-x: auto; grid-template-columns: repeat(4, max-content); }
+  .mech-abils.camp-jungle { max-width: 100%; overflow-x: auto; grid-template-columns: max-content repeat(6, max-content); }
   .camp-jungle .camp-ref-name { white-space: nowrap; }
   /* a table with a wide last column of phrases (7.42 Tormentor drops "When / Drops / Details"): an item's name wraps at
      its spaces and a long word breaks, so the phrases keep room and the page stays the phone's width (it was 13 px
@@ -210,7 +210,12 @@
   .mech-abils.mech-wide-last .mech-item > .ability-chip { flex: none; }
   .mech-abils.mech-wide-last > .mech-abil-row > .mech-cell { min-width: 0; overflow-wrap: break-word; }
   /* 7.42 camps changed: three faces a cell, scrolls inside itself */
-  .mech-abils.camp-changes { overflow-x: auto; grid-template-columns: repeat(3, max-content); }
+  /* its four columns as on a computer (glyph | camp | before | now), scrolled sideways if wider: three columns
+     broke its rows across lines (owner 2026-11-20: "Neutral camps changed таблица кривая — с телефона") */
+  .mech-abils.camp-changes { max-width: 100%; overflow-x: auto; grid-template-columns: repeat(4, max-content); }
+  /* a "before → after" table of three values (7.42 neutral tiers, 7 columns) scrolls sideways, the page keeps the
+     phone's width (it was 406 at 375) */
+  .mech-abils.mech-cols-7.mech-change-grid { max-width: 100%; overflow-x: auto; grid-template-columns: repeat(7, max-content); }
   /* 7.38 "List of Neutral Enchantments" table: icon + name, then the tier values, then the squares */
   body.patch-page .entity-block.enchant-list-head,
   body.patch-page .entity-block.enchant-list-row { margin-left: -6px; margin-right: 0; padding-left: 8px; padding-right: 8px; }

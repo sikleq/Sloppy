@@ -20,7 +20,7 @@ from .ability_group import ability_group, facet_group
 from .two_selves import two_selves_change
 from .scaling_card import scaling_rework
 from .item_links import artifact_pools, item_icon, item_link
-from .unit_numbers import summon_sheet, unit_sheet
+from .unit_numbers import summon_sheet, summon_sheet_pane, unit_sheet
 from .mech_abilities import formula_approx, mech_before_after, mech_change_cell, mech_change_cells, mech_example, mech_formula, mech_level_table, mech_list, mech_pair, mech_story, mech_table, mech_text
 from .mech_marked import icons_with_notes, illusion_excluded_table, marked_changes
 from .mech_abilities import icon_word

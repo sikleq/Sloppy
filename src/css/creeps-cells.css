@@ -233,6 +233,7 @@
 /* a tooltip of changes: the name over a little table, the change left, its % right (owner 2026-11-20, 7.42 Spell
    Power Reduction) */
 .qhint-tip .tip-head { display: block; margin-bottom: 4px; color: var(--gold); font-size: 12px; font-weight: 700; }
+.qhint-tip .tip-head:last-child { margin-bottom: 0; }      /* a tooltip of the name alone */
 .qhint-tip .tb-tip-table td:first-child { text-align: left; min-width: 240px; }
 /* wider than a plain tooltip: the change stays on a line or two, not four (owner 2026-11-20: "слишком сильно сдвиг
    строк", Rubick's Arcane Supremacy) */

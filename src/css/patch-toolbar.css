@@ -186,9 +186,10 @@
 /* its gap from the name is a margin: the space written before it in the script is lost when the script is minified
    (owner 2026-11-10: "Side Gunner(Gyrocopter)", "пропущен пробел перед (") */
 .search-results .result-item .result-owner { font-size: 11.5px; line-height: 1.2; color: var(--text-dim); white-space: nowrap; margin-left: 4px; }
-/* a long name with its owner keeps one line, the end cut with "…" (owner 2026-11-20: "Summon Ancient Thunderhide в
-   поиске на 2 строчки переползает") */
-.search-results .result-item .result-name { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* a long name with its owner keeps one line, whole: the list grows wider than the field instead (owner 2026-11-20:
+   "Summon Ancient Thunderhide в поиске на 2 строчки переползает", then "а может не обрезать?") */
+.search-results .result-item .result-name { white-space: nowrap; }
+.search-results { right: auto; width: max-content; min-width: 100%; max-width: min(560px, 92vw); }
 .search-results .result-item .kind {
   margin-left: auto;
   font-size: 10.5px;

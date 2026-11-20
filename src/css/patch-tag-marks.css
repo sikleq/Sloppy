@@ -70,6 +70,22 @@
   vertical-align: -3px; -webkit-mask: var(--tm) center / contain no-repeat; mask: var(--tm) center / contain no-repeat; }
 .tnum-dia.tnum-buff { color: #55cd73; }
 .tnum-dia.tnum-nerf { color: #c55252; }
+/* a phone shows the tiles too, not the tag words (owner 2026-11-20: "на телефоне отображаются старые теги вместо
+   новых"; till then "a phone keeps its tags as words"): the same tile, where the word stood */
+@media (max-width: 760px) {
+  .tag-marks ul.changes > li > .badge[data-tag], .tag-marks .properties-change .property-tag .badge[data-tag],
+  .tag-marks .formula-change-title > .badge[data-tag] {
+    width: 22px; min-width: 22px; height: 18px; padding: 0; align-items: center; justify-content: center;
+    border: 0; border-radius: 3px; font-size: 0; line-height: 0; letter-spacing: 0;
+    background: color-mix(in srgb, currentColor 94%, #000); }
+  .tag-marks ul.changes > li > .badge[data-tag]:not([hidden]), .tag-marks .formula-change-title > .badge[data-tag],
+  .tag-marks .properties-change .property-tag .badge[data-tag] { display: inline-flex; }
+  .tag-marks ul.changes > li > .row-text::before { width: 30px; }    /* the old word's wide column: the tile is narrow */
+  .tag-marks ul.changes > li > .badge[data-tag]::before, .tag-marks .formula-change-title > .badge[data-tag]::before,
+  .tag-marks .properties-change .property-tag .badge[data-tag]::before { content: ""; flex: none; width: 12px;
+    height: 12px; background: #15120f; -webkit-mask: var(--tm) center / contain no-repeat;
+    mask: var(--tm) center / contain no-repeat; }
+}
 /* a phone's row is a grid with the tag word over the text: the small diamond goes on the text's first line instead */
 @media (max-width: 760px) {
   .tag-marks ul.changes > li.terrain-row { display: block; }

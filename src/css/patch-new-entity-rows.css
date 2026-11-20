@@ -267,7 +267,10 @@ h4.subgroup {
   transform: translateX(-50%);
   white-space: nowrap;
   background: var(--bg-deep-97);
-  color: var(--text-main);
+  /* the name in gold, as every tooltip's name over its lines (tip-head; owner 2026-11-20: "золотым тоже у многих не
+     написано в разных таблицах") */
+  color: var(--gold);
+  font-weight: 700;
   font-size: 12px;
   padding: 5px 9px;
   border: 1px solid var(--muted-35);
