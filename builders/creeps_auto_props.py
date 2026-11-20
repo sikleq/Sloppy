@@ -76,16 +76,3 @@ def auto_effects(fields, description=""):
         if first:
             out.append(first if len(first) <= 70 else first[:67].rsplit(" ", 1)[0] + "…")
     return out
-
-
-def first_key(fields, keys):
-    """The first of these keys the ability has, worth more than zero; "" when none."""
-    return next((fields[k] for k in keys if fields.get(k) and not _ZERO.match(str(fields[k]))), "")
-
-
-def auto_damage(fields):
-    return first_key(fields, _DAMAGE_KEYS)
-
-
-def auto_duration(fields):
-    return first_key(fields, _DURATION_KEYS)
