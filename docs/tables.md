@@ -466,3 +466,13 @@ CSS: `.stat-hist-tip .stat-net` (divider) + `.stat-net-label`.
 - Dota attribute colours (str/agi/int/uni) — canonical hex, see `MEMORY.md`.
 - Dark theme, glass nav, heatmap cells, sticky polish; user reviews locally via Ctrl+F5
   (no preview servers / screenshots) and triggers deploys himself.
+
+## Neutral Abilities: Property, урон и длительность — из файлов игры (2026-11-20)
+
+Колонка Property больше не пишется вручную: `builders/creeps_auto_props.py` берёт её из ключей способности в KV
+патча (`stun_duration` → «Stun», `armor_reduction` → «Armor reduction 2/3/4/5», `movespeed_slow` → «Slow 15/17/19/21%»,
+`restoration_reduction` → «Health restoration −20%», с радиусом — «… in an area»), если ключ не говорит — по глаголу
+описания игры («silencing» → Silence), иначе первая фраза описания. Урон и длительность тоже из большего набора ключей
+(`base_damage`, `flop_damage`; стан раньше `av_duration`). `ABIL_MANUAL` — только то, чего файлы не говорят, и он
+главнее. Сторож — `tests/test_neutral_abilities_742.py`: пустая Property у любой строки ломает сборку (владелец:
+«мы разве автоматически из патчей и файлов не должны подтягивать»; в 7.42 пять новых способностей остались пустыми).

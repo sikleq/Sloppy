@@ -255,23 +255,11 @@ ABIL_MANUAL = {
         'effect': 'AoE damage',
         'effect2': '300/300 vision',
         'effect3': 'Slow'},
-    # the new creeps of 7.42, from their KV and texts in the game files (owner 2026-11-20: "А в Neutral abilities
-    # вкладке обновил?" — their rows had no Property, Blight not even its duration)
-    'odobenus_blight': {
-        'duration': '4', 'effect': 'Attacks reduce armor by 2/3/4/5'},
-    'mud_golem_hurl_big_boulder': {
-        'damage': '75/85/95/105', 'aoe': '175',
-        'duration': _val_qhint('2', 'Stun duration; the boulder flies 0.8-1.2s'),
-        'effect': 'Stun in an area'},
-    'eimermole_miners_slam': {
-        'duration': _val_qhint('0.2', 'Slow duration of each blow'), 'ms_effect': '-100%',
-        'effect': '3 blows in front of him, each with damage and a slow'},
-    'ogre_seal_flop': {
-        'damage': '250', 'duration': '1.5', 'ms_effect': '-100%',
-        'effect': '2 leaps of 400, damage and a slow on each landing'},
-    'radigull_eggstremism': {
-        'duration': _val_qhint('2', 'Silence duration; each egg explodes after 2s'),
-        'effect': 'Silence in an area', 'effect2': '2 eggs in a cone in front of it'},
+    # 7.42's new creeps: their Property, damage and duration come from the game files (creeps_auto_props.py); here only
+    # what the files can't say — where the radius is under another key, a slow given as "-100" with no slow key
+    'mud_golem_hurl_big_boulder': {'aoe': '175'},
+    'eimermole_miners_slam': {'ms_effect': '-100%'},
+    'ogre_seal_flop': {'ms_effect': '-100%'},
     'kobold_tunneler_prospecting': {
         'effect': '+20/25/30/40 gold per minute'},
     'kobold_disarm': {
@@ -579,7 +567,8 @@ def _abil_damage(g):
     #  2) plain av_damage / AbilityDamage
     #  3) av_damage_per_second → "<v> per sec."
     #  4) av_burn_damage + av_burn_interval → "<v/interval> per sec."
-    dmg = g('av_damage') or g('AbilityDamage')
+    from builders.creeps_auto_props import _DAMAGE_KEYS
+    dmg = next((g(k) for k in _DAMAGE_KEYS if g(k)), '')     # more keys than av_damage (7.42 Seal Flop, Big Boulder)
     dmg_creeps = g('av_damage_creeps')
     if dmg and dmg_creeps:
         return f'{_prog(dmg)} (герои) / {_prog(dmg_creeps)} (крипы)'
@@ -610,7 +599,8 @@ def _abil_duration(g):
         return f'{_prog(hd)} (герои) / {_prog(nd)} (крипы)'
     if hsd and nsd:
         return f'{_prog(hsd)} (герои) / {_prog(nsd)} (крипы)'
-    return _prog(g('av_duration') or g('AbilityDuration') or hd or hsd)
+    from builders.creeps_auto_props import _DURATION_KEYS
+    return _prog(next((g(k) for k in _DURATION_KEYS if g(k)), '') or hd or hsd)   # 7.42 Blight's armor duration
 
 
 def _abil_cast_range(g):
@@ -649,6 +639,9 @@ def _leveled_cells(props):
     return leveled
 
 
+_DESCS: dict = {}        # the game's ability descriptions, read once (load_ability_descriptions)
+
+
 def abil_props(slug, cur_ab):
     """Every property cell value for one ability. `cur_ab` is the current
     patch's npc_abilities data ({slug: {field: value}}); ABIL_MANUAL wins
@@ -681,6 +674,12 @@ def abil_props(slug, cur_ab):
     # Duration cell so it isn't confused with empty/instant abilities.
     if typ == 'Aura' and not props['duration']:
         props['duration'] = '0.5'
+    # Property from the game files (builders/creeps_auto_props.py); the hand-written list wins where it has a cell
+    from builders.creeps_auto_props import auto_effects
+    if not _DESCS:
+        _DESCS.update(load_ability_descriptions())
+    for col, text in zip(('effect', 'effect2', 'effect3'), auto_effects(a, _DESCS.get(slug, ''))):
+        props[col] = text
     props.update(ABIL_MANUAL.get(slug, {}))
     leveled = _leveled_cells(props)
     # Manual overrides can force cells to render as leveled even when the
