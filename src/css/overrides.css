@@ -402,29 +402,52 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .camp-ref { display: inline-flex; max-width: 100%; align-items: center; gap: 6px; vertical-align: middle; margin: 1px 0; }
 .camp-ref .camp-ico { display: inline-flex; flex: none; gap: 2px; }       /* the faces never squeeze under the name */
 .camp-ref .camp-ref-name { text-align: left; }
-.mech-abils.camp-jungle { grid-template-columns: auto auto auto auto; }   /* columns by their camps, not 1fr for one */
+.mech-abils.camp-jungle { grid-template-columns: auto repeat(3, minmax(0, 1fr)); }   /* the three sizes equal (owner 2026-11-20: симметрия) */   /* columns by their camps, not 1fr for one */
 /* one camp a line (no <br>: in a flex row it does not break), the camps flush left, the side's word in the middle of
    its row's height (owner 2026-11-19: "нет выравнивания по левому краю … radiant/dire по центру") */
 .camp-jungle .mech-cell { flex-direction: column; gap: 4px; justify-content: center; }
 .camp-jungle .mech-abil-row:not(.mech-head) .mech-cell:not(.mech-label) { align-items: flex-start; }
+.camp-jungle .mech-head .mech-cell { flex-direction: row; gap: 6px; }
+/* each column's camps as a little grid: the creeps one column, the names lined up after the widest of them */
+.camp-jungle .mech-abil-row:not(.mech-head) .mech-cell:not(.mech-label) {
+  display: grid; grid-template-columns: max-content minmax(0, auto); column-gap: 8px; row-gap: 4px; align-content: center; justify-content: start; justify-items: start;
+}
+.camp-jungle .camp-ref { display: contents; }
+.camp-jungle .camp-ref .camp-crew, .camp-jungle .camp-ref .camp-ref-name { align-self: center; }
+.camp-jungle .camp-ref .camp-crew { justify-self: end; }
+/* the camp's name after its glyph column reads left, like a label */
+.mech-abils.camp-changes .mech-abil-row > .mech-cell:nth-child(2) { justify-content: flex-start; text-align: left; }
 /* 7.42 camps changed / removed (mech_table cls="camp-changes"): Camp / Before / Now across the block like the site's
    other tables (owner 2026-11-19: "все другие у нас по ширине"); a removed camp's faces grey as a removed entity's
    icon (.entity-block.is-removed), not a red mark */
-.mech-abils.camp-changes { grid-template-columns: max-content 1fr 1fr; }
+.mech-abils.camp-changes { grid-template-columns: max-content max-content 1fr 1fr; }
 .camp-changes .camp-ico-gone img:not(.camp-count) { filter: grayscale(1) brightness(0.7); opacity: 0.55; }
 .camp-changes .camp-ico { display: inline-flex; flex: none; gap: 2px; }
 .camp-changes .camp-ico img { width: 22px; height: 22px; display: block; image-rendering: pixelated; }
 .camp-changes .camp-face { position: relative; flex: none; }
 .camp-changes .camp-face img { width: 34px; }
 .camp-changes .camp-face img.camp-count { position: absolute; right: 0; bottom: 0; width: 9px; height: 11px; }
+/* a camp's creeps as "2x [portrait]" without names (camp_crew, owner 2026-11-20), the type glyph a column of its own */
+.camp-crew { display: inline-flex; flex: none; gap: 8px; align-items: center; }
+/* a kind's portraits side by side, 2 px apart; the next kind 8 px on */
+.creep-ref.camp-kind { display: inline-flex; align-items: center; gap: 2px; }
+.creep-ref.camp-kind img { margin: 0; vertical-align: middle; }
+.creep-ref.camp-kind b { margin-left: 4px; }
+.camp-crew-gone img { filter: grayscale(1) brightness(0.7); opacity: 0.55; }
+.camp-table .camp-type-col { padding-right: 0; }
+.camp-table .camp-type img, .mech-abils .camp-type img { width: 22px; height: 22px; display: block; image-rendering: pixelated; }
+.camp-table .camp-label-cell { border-left: 0; padding-left: 8px; color: var(--text-dim, #969289); }
+.mech-abils .camp-type { display: inline-flex; flex: none; }
 /* a camp new in this patch: its name in gold, not Valve's "(new!)" */
 .camp-ref .camp-ref-new { color: var(--gold, #e3c46a); }
 /* with the Side column and the icons 7.42's table was 36 px wider than its block at 1400 px: narrower cell padding */
 .camp-table-sided .camp-cell { padding: 3px 8px; }
 .camp-table .camp-face img.camp-count, .camp-ref .camp-face img.camp-count { position: absolute; right: 0; bottom: 0; width: 9px; height: 11px; }
 .camp-table .camp-side { justify-content: center; font-weight: 600; }
-.camp-table .camp-side-radiant { color: #7fd08c; }
-.camp-table .camp-side-dire { color: #cf828d; }
+/* Radiant / Dire always in their colours (owner 2026-11-20), in camp_table and in mech_table cells */
+.camp-table .camp-side-radiant, .side-word.side-radiant { color: #7fd08c; }
+.camp-table .camp-side-dire, .side-word.side-dire { color: #cf828d; }
+.side-word { font-weight: 600; }
 .camp-table .camp-num { justify-content: center; font-variant-numeric: tabular-nums; font-weight: 700; }
 .camp-table .camp-head { color: var(--text-dim, #969289); font-size: 12px; font-weight: 400; }
 

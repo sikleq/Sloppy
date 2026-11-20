@@ -512,6 +512,9 @@ def _list_title(row_text):
     return _sentence(m.group(1)) if m else "Case"
 
 
+_SIDE_WORDS = ('Radiant', 'Dire')
+
+
 def mech_table(head, rows, labels=True, wide_last=False, cls=""):
     """A mechanic's rules as a table written in the content (7.38 Lifesteal: Lifesteal / Spell Lifesteal × what each
     applies to × its cut against non-heroes — Valve's three sentences, owner 2026-10-28 "неудобно читается"). head: the
@@ -523,6 +526,8 @@ def mech_table(head, rows, labels=True, wide_last=False, cls=""):
     label_col = 0 if labels and cols > 1 else None
 
     def cell(c):                 # a cell is a flex box: words round a <b> must stay one item, or they break apart
+        if c in _SIDE_WORDS:     # Radiant / Dire always in their colours (owner 2026-11-20)
+            return f'<span class="side-word side-{c.lower()}">{c}</span>'
         return f"<span>{c}</span>" if "<b>" in c else c
     out = ('<span class="mech-abil-row mech-head">'
            + "".join(f'<span class="mech-cell{" mech-label" if i == label_col else ""}">{h}</span>' for i, h in enumerate(head))
