@@ -81,7 +81,8 @@ def camp_kind(n, icon, name=""):
     """one kind of a camp's creeps: its portrait once per creep, no "2x" (owner 2026-11-20: "вместо x2 повторяющиеся
     иконки"); with a name only where the camps are new (Added N new neutral camps)"""
     img = f'<img src="{icon}" alt="" width="28" height="16">'
-    label = f"<b>{name}</b>" if name else ""
+    # the name plain, after the portraits, as the home jungle's camp names (owner 2026-11-20: "убрать жирность")
+    label = f'<span class="camp-kind-name">{name}</span>' if name else ""
     return f'<span class="creep-ref camp-kind">{img * max(1, n)}{label}</span>'
 
 

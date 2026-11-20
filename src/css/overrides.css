@@ -417,7 +417,16 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* a kind's portraits side by side, 2 px apart; the next kind 8 px on */
 .creep-ref.camp-kind { display: inline-flex; align-items: center; gap: 2px; }
 .creep-ref.camp-kind img { margin: 0; vertical-align: middle; }
-.creep-ref.camp-kind b { margin-left: 4px; }
+/* a creep's portrait grows on hover to be made out, as an ability's square does (.ability-chip, owner 2026-11-20: "иконки
+   нейтралов … должны выдвигаться как у нас в примерах со способностями"); from its centre, over the text */
+.creep-ref img { position: relative; transition: transform 0.12s ease; transform-origin: center; }
+.creep-ref img:hover {
+  z-index: 101;
+  transform: scale(2.6);
+  box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
+}
+@media (prefers-reduced-motion: reduce) { .creep-ref img { transition: none; } }
+.creep-ref.camp-kind .camp-kind-name { margin-left: 6px; font-weight: 400; }
 .camp-crew-gone img { filter: grayscale(1) brightness(0.7); opacity: 0.55; }
 .camp-table .camp-type-col { padding-right: 0; }
 .camp-table .camp-type img, .mech-abils .camp-type img { width: 22px; height: 22px; display: block; image-rendering: pixelated; }
