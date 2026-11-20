@@ -11,6 +11,9 @@
    as possible. Keep this block LAST in the file so it wins the cascade.
    ========================================================================== */
 @media (max-width: 760px) {
+  /* the sticky header's blur re-sampled the page under it every frame of a scroll, and its opaque background shows
+     none of it: off on a phone (owner 2026-11-20: "сайт на телефоне очень лагает") */
+  nav.top-nav { backdrop-filter: none; -webkit-backdrop-filter: none; will-change: auto; }
   /* ---- Site header: brand + version picker on row 1, the tabs on row 2 ---- */
   .nav-inner {
     grid-template-columns: minmax(0, 1fr) auto;

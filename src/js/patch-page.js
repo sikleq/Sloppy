@@ -574,7 +574,6 @@
   }
   drawAbilityChangeConnectors();
 
-  window.addEventListener('resize', drawAbilityChangeConnectors);
   // a deck swapped its card (card-deck.js): only the lines, every kind whose place a height change moves (code review
   // 2026-11-09: Brewmaster's lines stayed where they were)
   window.sloppyDrawConnectors = () => { drawAbilityChangeConnectors(); drawBrewlingConnectors(); };
@@ -745,7 +744,11 @@
     document.body.appendChild(svg);
   }
   drawBrewlingConnectors();
-  window.addEventListener('resize', drawBrewlingConnectors);
+  // a phone's address bar hiding on scroll is a height-only resize; each redrew every line (155 ms here, seconds on a
+  // phone: owner 2026-11-20 "фриз на 3 секунды"). Only a new width moves the cards: redraw once it settles.
+  let lastW = window.innerWidth, redraw = 0;
+  window.addEventListener('resize', () => { if (window.innerWidth === lastW) return; lastW = window.innerWidth;
+    clearTimeout(redraw); redraw = setTimeout(window.sloppyDrawConnectors, 150); }, { passive: true });
   window.addEventListener('load', drawBrewlingConnectors);
   // a card's folded text (.acr-fold, patch/cards_item_abilities._fold_named_parts): its chevron button opens and
   // closes it, a click on the faded text opens it; the card's connectors and the dashed tree below follow the card's
