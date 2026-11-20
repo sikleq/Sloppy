@@ -285,6 +285,8 @@ h4.subgroup {
 /* a transparent name still has width: by the right edge it widened the phone page (7.38, 7.40, 7.41 Lifesteal tables) */
 .facet-chip[data-tooltip]:not(:hover)::after,
 .ability-chip[data-tooltip]:not(:hover)::after { display: none; }
+/* a chip with words of its own (ability_chip tip=…): the page's tooltip shows them, not this plain-text one */
+.ability-chip.abil-ico-hint[data-tooltip]::after { display: none; }
 /* a facet row's ability ("Defense Matrix: …"): its icon as a square the size of the facet chip in place of the
    name, the name on hover (owner 2026-10-27) */
 .ability-chip {
@@ -318,6 +320,15 @@ h4.subgroup {
   height: 11px;
   border-radius: 50%;
   background: var(--bg-page);
+}
+/* an innate with only the generic innate icon: its hero's face in the mark's place (owner 2026-11-20, 7.42) */
+.ability-chip > .chip-hero-mini {
+  width: 13px;
+  height: 13px;
+  bottom: -5px;
+  object-fit: cover;
+  object-position: 50% 30%;
+  box-shadow: 0 0 0 1px var(--bg-page);
 }
 .ability-chip:hover > .chip-innate-marker {
   position: absolute;

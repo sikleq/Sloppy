@@ -236,6 +236,12 @@ ul.subnote-items > li::before {
 .fx-var-in { display: inline-flex; align-items: baseline; gap: 4px; }
 .formula-live .fx-var-in .formula-input { width: 46px; padding: 1px 5px; font-size: 12px; text-align: center;
   font-family: inherit; color: #e0b87a; }
+/* Item Potency's table: each potency over a bar of its strength (owner 2026-11-20, 7.42) */
+.pot-bar { display: block; width: 100%; padding: 1px 0; border-radius: 3px; color: var(--gold-strong);
+  font-weight: 600; background: linear-gradient(90deg, var(--gold-line-soft) var(--pot), transparent var(--pot)); }
+/* the second pane's copy of a field: the same value, shown, not typed into (owner 2026-11-20) */
+.formula-live .fx-var-in .formula-input.fx-mirror { border-color: transparent; background: transparent; cursor: default;
+  pointer-events: none; }
 .fx-result {
   display: flex;
   align-items: baseline;

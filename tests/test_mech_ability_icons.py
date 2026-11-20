@@ -50,9 +50,9 @@ def test_abilities_with_the_same_sentence_share_one_row_of_icons():
     # one more ability (owner 2026-10-28); the list's closing note stays a line under the rows
     icons = same.split('<span class="mech-cell mech-icons">', 1)[1]
     assert "info-tip" not in icons
-    assert ("Can no longer target invulnerable units <!--TIP-->" in row
-            and "Ogre Magi&#x27;s Bloodlust: Can still target invulnerable buildings" not in row
-            and "Ogre Magi's Bloodlust: Can still target invulnerable buildings" in row)
+    # the ability's own words: on hover of its own icon, not a "?" after the sentence (owner 2026-11-20)
+    assert "Can no longer target invulnerable units <!--TIP-->" not in row
+    assert 'aria-label="Bloodlust"' in row and "Can still target invulnerable buildings" in row
     # the list's closing note: in one line with the row's text, not the table's last line (owner 2026-10-28)
     assert ('The following spells have been changed. <span class="mech-row-note">All of these were changed</span>'
             in row.split('<span class="mech-abils">')[0])
@@ -91,13 +91,14 @@ def test_reflected_damage_sources_are_a_table_of_icons():
         "Tidehunter's Anchor Smash triggered by Kraken Shell passive", "Viper's Corrosive Skin",
         "Warlock's Fatal Bonds",
         header="The following items and abilities deal reflected damage:"))
-    assert row.count('class="ability-chip"') == 15
+    assert row.count('class="ability-chip') == 15          # one with words of its own: "ability-chip abil-ico-hint"
     assert "miniboss_reflect.png" in row and "items/blade_mail.png" in row and "bristleback_quill_spray.png" in row
     assert "centaur_return.png" in row and "queenofpain_scream_of_pain.png" in row
     row = "".join(re.split(r'(?=<span class="mech-cell mech-label">Triggered by Kraken)', row)[:1])
     labels = re.findall(r'<span class="mech-cell mech-label">([^<]*)', row)
-    assert labels == ["Condition", "Always ", "Triggered by Bristleback passive"]
-    assert "Blade Mail: Both active and passive" in row                  # its caveat: a "?" after "Always"
+    # "Always" has no "?" after it any more: its abilities' words are on their own icons (owner 2026-11-20)
+    assert labels == ["Condition", "Always", "Triggered by Bristleback passive"]
+    assert "Blade Mail&lt;/b&gt;&lt;br&gt;Both active and passive" in row      # its caveat: on its own icon's hover
 
 
 def test_one_box_block_puts_every_row_in_one_box_without_chips():

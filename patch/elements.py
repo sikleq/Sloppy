@@ -544,10 +544,11 @@ def item_header(name, new=False, changed=False, removed=None, old_title=None, co
 </div>'''
 
 
-def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=None, one_box=False):
+def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=None, one_box=False, page=None):
     """new="New mechanic": a label after the title says the whole block is new; its NEW rows
     then drop the per-row chip (the header already says it) — other tags keep theirs. one_box: no row has a chip
-    (owner 2026-10-30, 7.37 Breakability: "везде убрать теги"), as subgroup(one_box=True)."""
+    (owner 2026-10-30, 7.37 Breakability: "везде убрать теги"), as subgroup(one_box=True). page: the site's page of
+    this mechanic, the title links to it (owner 2026-11-20, 7.42 Item Potency)."""
     out = _close_ability_block()
     _State.current_hero = None
     _State.current_unit = None
@@ -579,6 +580,8 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
     _State.new_mech_tag = _mech_tag(new)
     _State.new_mech_one_box = bool(new) and one_box
     label = f' <span class="entity-new-type">{new}</span>' if new else ''
+    if page:
+        name = f'<a class="entity-link" href="../{page}" title="{name} page">{name}</a>'
     return out + head + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}{label}</div>{link_html}</div>'
 
 

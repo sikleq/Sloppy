@@ -1008,11 +1008,21 @@ def test_ability_reworked_rows_become_a_card_of_both_patches_texts():
     out = _postprocess_reworked_ability_cards([
         'W(ability("Nihilism", slug="leshrac_greater_lightning_storm"))', 'W(ul_open())',
         'W(li("Ability Reworked", t("REWORK")))', 'W(li("Mana Cost: 125. Cooldown: 25s", t("MISC")))',
-        'W(li("Radius: 550", t("MISC"), extra=inline_note("No longer applies Ethereal to Leshrac")))', 'W(ul_close())'], "7.42")
+        'W(li("Radius: 550; Duration: 4s", t("MISC"), extra=inline_note("No longer applies Ethereal to Leshrac<br>'
+        'Has no linger duration")))', 'W(ul_close())'], "7.42")
     assert out[0] == '_rw1_old, _rw1_new = game_ability_pair("leshrac_greater_lightning_storm", "7.42")'
     assert 'summary="Ability reworked."' in "".join(out)
     assert 'li("Mana Cost: 125. Cooldown: 25s", t("REWORK"), covered=True)' in "".join(out)
-    assert 'W(li("Radius: 550", t("REWORK"), extra=inline_note("No longer applies Ethereal to Leshrac")))' in out
+    # owner 2026-11-19: the values line goes under the card (it lists them), its notes are the visible rows
+    assert 'li("Radius: 550; Duration: 4s", t("REWORK"), covered=True)' in "".join(out)
+    assert out[-3:] == ['W(li("No longer applies Ethereal to Leshrac", t("REWORK")))',
+                        'W(li("Has no linger duration", t("REWORK")))', 'W(ul_close())']
+    # a kept row that is not only values keeps its note
+    out = _postprocess_reworked_ability_cards([
+        'W(ability("Nihilism", slug="leshrac_greater_lightning_storm"))', 'W(ul_open())',
+        'W(li("Ability Reworked", t("REWORK")))',
+        'W(li("Disarms enemies", t("MISC"), extra=inline_note("No longer applies Ethereal")))', 'W(ul_close())'], "7.42")
+    assert 'W(li("Disarms enemies", t("REWORK"), extra=inline_note("No longer applies Ethereal")))' in out
 
 
 def test_an_aghanims_rework_retold_in_rows_goes_into_its_note():

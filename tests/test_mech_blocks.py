@@ -190,10 +190,11 @@ def test_a_hero_ability_list_is_a_table_led_by_its_row_with_items_on_a_line_of_t
     # pairs keeps it behind a "?"
     assert ">How<" not in html and ">Details<" in html and "mech-cols-hero3" in html
     assert ">Details<" not in long_html
-    # no hero column: the abilities in three columns, the hero in the name's hover (owner 2026-11-19)
+    # no hero column: the abilities in three columns (owner 2026-11-19); the name no longer names its hero on hover
+    # (owner 2026-11-20)
     assert "mech-cols-flat3" in long_html and 'class="mech-hero"' not in long_html
-    assert 'data-tooltip="Faceless Void">Distortion Field<' in long_html
-    assert "Clairvoyant Curse" in oracle and "Clairvoyant Cure" in oracle and oracle.count('data-tooltip="Oracle"') == 2
+    assert '<span class="mech-abil-name">Distortion Field<' in long_html
+    assert "Clairvoyant Curse" in oracle and "Clairvoyant Cure" in oracle and 'data-tooltip="Oracle"' not in oracle
     # an item's own active from the game's tooltip (owner 2026-10-30: "у предметов тоже есть способности")
     assert '>Teleport</span>' in html
 
