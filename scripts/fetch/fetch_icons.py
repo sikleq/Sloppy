@@ -13,6 +13,8 @@
 ищешь в файлах игры»): сначала значок, который игра рисует для способности
 (KV `AbilityTextureName`, 7.41 Squee's Scope = techies_stasis_trap) — на CDN и в VPK,
 потом `panorama/images/spellicons/<slug>_png.vtex_c` в pak01_dir.vpk клиента.
+Способности нейтральных крипов берутся и прямо из строк их таблиц, и их AbilityTextureName — из npc_abilities.txt
+(creep_ability_icons.py; 2026-11-20: в таблице без значка стоит имя, страница файл не называла).
 Только то, чего нет и там (innate без своего арта), остаётся с пометкой —
 сборка сразу ставит им в src innate_icon.png (docs/architecture.md, «Ability icons —
 missing-file fallback»); такие slug'и вносить
@@ -56,6 +58,13 @@ if DIST.is_dir():
     for html_file in DIST.rglob("*.html"):
         for m in re.finditer(r'icons/abilities/([^"\']+)\.png', html_file.read_text(encoding="utf-8", errors="ignore")):
             slugs.append(m.group(1))
+
+# the neutral creeps' abilities: their tables show a name instead of a missing icon, so the pages never name it
+# (2026-11-20: 7.42's Odobenus Blight and Hurl Big Boulder stayed iconless)
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import creep_ability_icons  # noqa: E402
+
+slugs += creep_ability_icons.creep_ability_slugs()
 
 slugs = sorted(set(slugs))
 
@@ -122,7 +131,7 @@ def texture_name(slug):
         block = _blocks(p["version"]).get(slug)
         if isinstance(block, dict):
             return block.get("AbilityTextureName") or None
-    return None
+    return creep_ability_icons.creep_texture_name(slug)    # a neutral creep's ability (npc_abilities.txt)
 
 
 _VPK = {}
