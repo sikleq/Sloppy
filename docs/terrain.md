@@ -533,6 +533,10 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   "no picture yet", rerun later). Such a file gets no Terrain page of its own — it stays a row of Terrain Stats
   (the owner 2026-10-20, 7.41f-v2: "Оставь строкой в Terrain Stats"; glued to 7.41a's row while nothing it
   counts moved). What else changed in it (keys of existing entities) waits for the full map comparison, docs/todo.md.
+  The table's head sticks on a phone too (2026-11-20, owner "пофиксить"): the table's wrap no longer scrolls itself
+  (a scroll box of its own holds a sticky head, so the head ran off with the page); the page's `.creeps-scroll` box
+  scrolls it sideways like Mana Items, and the tiles, charts and headings above it are sticky at the left edge
+  (`.ts-wrap` is `display: contents` there). Test: tests/test_phone_scroll.py.
 - **Bigger pictures with a minimap (2026-10-03)** — the owner: "when you show where something is, add a minimap
   with a mark, otherwise it's unclear; the pictures should be bigger and the camera a bit further out". The row
   picture is 726 x 360 (360-px halves, shown 480 x 238 css), the large copy 1450 x 720; every spot's square is

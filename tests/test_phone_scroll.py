@@ -32,6 +32,14 @@ def test_a_neutral_ability_with_four_values_scales_with_game_time():
     assert "Levels with game time" in out and "From 15:00" in out and "Helm of the Overlord" in out
 
 
+def test_terrain_stats_head_sticks_on_a_phone():
+    # 2026-11-20: the table's own sideways scroll box held its sticky head, so on a phone the head ran off with the page
+    css = (ROOT / "src" / "css" / "terrain-controls.css").read_text(encoding="utf-8")
+    assert not re.search(r"\.ts-table-wrap\s*\{[^}]*overflow-x:\s*auto", css)
+    phone = css[css.index(".terrain-stats-page .ts-wrap { display: contents; }") - 40:]
+    assert "@media (max-width: 760px)" in phone and "position: sticky; left: 0;" in phone
+
+
 def test_a_phone_has_no_blur_under_the_sticky_header():
     css = (ROOT / "src" / "css" / "phones.css").read_text(encoding="utf-8")
     block = css[css.index("@media (max-width: 760px)"):]

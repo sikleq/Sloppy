@@ -193,12 +193,15 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .ts-chart .ts-tip text { font-size: 11.5px; font-weight: 600; fill: #fff3d6; text-anchor: middle; }
 .ts-chart .ts-pt:hover .ts-tip { opacity: 1; }
 .ts-chart .ts-pt:hover .ts-dot { r: 5; fill: #fff3d6; }
-.terrain-stats-page .ts-table-wrap { overflow-x: auto; }
-/* a computer's table fits the page: the wrap scrolls nothing, so the head sticks to the top of the page's scroll box
-   as on the other tables (audit 2026-11-08: the wrap's own scrolling let the head run away, top -64); a phone keeps
-   sideways scrolling */
-@media (min-width: 761px) {
-  .terrain-stats-page .ts-table-wrap { overflow-x: visible; }
+/* the wrap scrolls nothing, so the head sticks to the top of the page's scroll box as on the other tables (audit
+   2026-11-08: the wrap's own scrolling let the head run away, top -64). A phone (owner 2026-11-20 "пофиксить"): the
+   wide table scrolls sideways in that same box like Mana Items; the tiles, charts and headings above it stay put
+   (sticky at the left edge, as .inbox-bar) */
+.terrain-stats-page .ts-table-wrap { overflow-x: visible; }
+@media (max-width: 760px) {
+  .terrain-stats-page .ts-wrap { display: contents; }
+  .terrain-stats-page .ts-wrap > :not(.ts-table-wrap) { position: sticky; left: 0; }
+  .terrain-stats-page .ts-table-wrap { padding: 4px 0 40px; }
 }
 .ts-table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
 .ts-table th, .ts-table td { padding: 5px 4px; text-align: center; vertical-align: middle;
