@@ -150,7 +150,7 @@ def test_an_ability_of_boxes_only_keeps_its_name_above_the_box():
 
 def test_camps_show_gold_and_xp_in_columns_and_no_question_mark():
     html = camp_table([("Small camp", [(3, "Pollywog", "a.png")], 54, 90), ("Medium camp", [(2, "Boglet", "b.png"), (1, "Mage", "c.png")], 81, 126)])
-    assert "info-tip" not in html and "--camp-cols:4" in html
+    assert "info-tip" not in html and "--camp-cols:5" in html
     assert '<span class="camp-cell camp-num camp-gold">54</span><span class="camp-cell camp-num camp-xp">90</span>' in html
     assert "Average Gold" in html and "Average XP" in html and "grid-column: span 2" in html
 

@@ -25,19 +25,39 @@ def test_a_removed_creep_says_so_after_its_name_and_unit_changes_files_it_as_rem
     # removed включен"
     # no mark after the name: the row is grey (owner 2026-11-19 "не нравится, сделай просто серым")
     assert creeps._name_inner("Warpine Raider", {"createhero": "pine", "npc_key": "x"}, {}) == "Warpine Raider"
-    # the camp cell's hover says its camps and when (server.dll 6976 vs 6984; first patch: game files, 7.31 notes
-    # "New Large Camp: 2 Warpine Raiders")
-    assert creeps.camp_history("pine") == ["Large camp until 7.42", "In the game since 7.31"]
-    assert creeps.camp_history("outrunner") == ["Large camp", "Medium camp until 7.42"]
-    assert creeps.camp_history("trickster") == ["Medium camp", "Large camp until 7.42"]
-    assert creeps.camp_history("radigull") == ["Medium camp", "In the game since 7.42"]
-    assert creeps.camp_history("kobold") == ["Small camp"]
-    cell = creeps._camp_inner("big", {"createhero": "pine"})
-    assert 'class="camp-hint abil-ico-hint" data-tooltip="Large camp until 7.42&lt;br&gt;In the game since 7.31"' in cell
-    assert "title=" not in cell                                  # one hover, not the browser's title too
+    # the camp cell's history in the stat cells' popup, ADDED / REMOVED rows, no % (owner 2026-11-20: "наподобии как
+    # в других ячейках, только без % разницы"); server.dll 6976 vs 6984; first patch: game files, 7.31 notes
+    # "New Large Camp: 2 Warpine Raiders"
+    d = {"7.31": "23.02.2022", "7.42": "18.11.2026"}
+    assert creeps.camp_changelog("pine", d) == [("7.31", "23.02.2022", "A", "Large camp"),
+                                                ("7.42", "18.11.2026", "R", "Large camp")]
+    assert creeps.camp_changelog("outrunner", d) == [("7.42", "18.11.2026", "R", "Medium camp")]
+    assert creeps.camp_changelog("trickster", d) == [("7.42", "18.11.2026", "R", "Large camp")]
+    assert creeps.camp_changelog("radigull", d) == [("7.42", "18.11.2026", "A", "Medium camp")]
+    assert creeps.camp_changelog("kobold", d) == []
+    src = creeps.CreepSources(units={}, npc_data={}, abil_slim={}, hist=_hist(dates=d))
+    row = {"data": {"camp": "big", "createhero": "pine"}, "npc_key": None}
+    cell = creeps._stats_cell("camp", row, src, {})
+    assert 'has-history' in cell and 'data-hist="7.31|23.02.2022|A|Large camp;7.42|18.11.2026|R|Large camp"' in cell
+    assert "data-tooltip" not in cell and "title=" not in cell   # one hover: the history popup
     gone = ec._removed_creeps()
     assert gone == {"npc_dota_neutral_warpine_raider", "npc_dota_neutral_big_thunder_lizard",
                     "npc_dota_neutral_small_thunder_lizard"}
+
+
+def test_every_creep_ability_on_neutral_stats_has_its_icon():
+    # owner 2026-11-20 "некоторые иконки почему-то отсутствуют": 7.42's Odobenus Blight and Hurl Big Boulder draw
+    # another file (AbilityTextureName odobenus_footman_odobenus_blight / mud_golem_hurl_boulder); the icon is saved
+    # under the ability's own name. A new one: python scripts/fetch/fetch_icons.py, or the game's spellicons.
+    import csv
+    import os
+    path = os.path.join(os.path.dirname(creeps.__file__), "..", "data", "creeps_raw.csv")
+    with open(path, encoding="utf-8") as f:
+        rows = creeps.build_rows(list(csv.reader(f)), creeps.load_sources())
+    missing = sorted({r["data"][k + "_slug"] for r in rows for k in creeps.ABILITY_COLS
+                      if r["data"].get(k) and r["data"].get(k + "_slug")
+                      and not cc.has_abil_icon(r["data"][k + "_slug"])})
+    assert not missing, missing
 
 
 def test_camp_sits_in_basic_after_unit_and_the_icon_column_is_headed_copy():
