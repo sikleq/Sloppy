@@ -97,8 +97,23 @@ def river_currents(src):
 def current_paths(src, steps=8):
     """[[x, y], …] per river current: its spline (cubic Bézier between nodes: node + out-tangent, next node +
     in-tangent) sampled `steps` points a segment."""
+    return _spline_lines(river_currents(src), steps)
+
+
+def lane_creep_paths(src):
+    """The lane creeps' movespeed paths (7.42: one a lane, base to base; extract_map_entities keeps them apart from
+    the currents)."""
+    return [p for p in src.get("lane_creep_movespeed_path", []) if p.get("npc")]
+
+
+def lane_zone_paths(src, steps=8):
+    """[[x, y], …] per lane creeps' path: its centre line, as current_paths."""
+    return _spline_lines(lane_creep_paths(src), steps)
+
+
+def _spline_lines(paths, steps):
     out = []
-    for cur in river_currents(src):
+    for cur in paths:
         nodes, pts = cur.get("nodes", []), []
         for a, b in zip(nodes, nodes[1:]):
             p0, p3 = (a["x"], a["y"]), (b["x"], b["y"])
@@ -237,28 +252,37 @@ def current_areas(src, code, steps=24):
     outline rings [[[x, y], …], …] (an island in the stream is a ring of its own; draw them even-odd) — with its max
     bonus speed: [{"max": 150, "rings": …}, …]. Needs numpy + contourpy (the owner's PC; the site build only reads
     the result)."""
+    return [{"max": current_max_bonus(cur, code), "rings": _swept_rings(cur, steps)} for cur in river_currents(src)]
+
+
+def lane_zone_areas(src, steps=24):
+    """Where a lane creep counts as in its lane (7.42, the map's lane creeps' paths swept by each node's radius, as
+    current_areas): led out of it, a creep gets modifier_lane_creep_out_of_lane_slow — up to -25% move speed over
+    10 s (the 7.42 notes: "Lane creeps now move up to 25% slower if they are pulled out of lane"); inside,
+    modifier_path_in_lane (server.dll 6989). [{"rings": …}, …], one a lane."""
+    return [{"rings": _swept_rings(cur, steps)} for cur in lane_creep_paths(src)]
+
+
+def _swept_rings(cur, steps):
+    """A path's spline swept by its node radius, traced as outline rings (needs numpy + contourpy)."""
     import numpy as np
     from contourpy import contour_generator
-    out = []
-    for cur in river_currents(src):
-        s = np.array(_spline_samples(cur, steps), dtype=float)
-        if not len(s) or not s[:, 2].any():
-            out.append({"max": current_max_bonus(cur, code), "rings": []})
-            continue
-        pad = s[:, 2].max() + 2 * AREA_CELL
-        xs = np.arange(s[:, 0].min() - pad, s[:, 0].max() + pad, AREA_CELL)
-        ys = np.arange(s[:, 1].min() - pad, s[:, 1].max() + pad, AREA_CELL)
-        gx, gy = np.meshgrid(xs, ys)
-        field = np.full(gx.shape, -1e9)
-        for x, y, r in s:                       # inside where some circle reaches: max(r - distance) > 0
-            np.maximum(field, r - np.hypot(gx - x, gy - y), out=field)
-        rings = []
-        for line in contour_generator(xs, ys, field).lines(0.0):
-            ring = [[int(round(x)), int(round(y))] for x, y in line]
-            if len(ring) > 3:
-                rings.append(_simplify(ring[:-1] if ring[0] == ring[-1] else ring, AREA_TOLERANCE))
-        out.append({"max": current_max_bonus(cur, code), "rings": rings})
-    return out
+    s = np.array(_spline_samples(cur, steps), dtype=float)
+    if not len(s) or not s[:, 2].any():
+        return []
+    pad = s[:, 2].max() + 2 * AREA_CELL
+    xs = np.arange(s[:, 0].min() - pad, s[:, 0].max() + pad, AREA_CELL)
+    ys = np.arange(s[:, 1].min() - pad, s[:, 1].max() + pad, AREA_CELL)
+    gx, gy = np.meshgrid(xs, ys)
+    field = np.full(gx.shape, -1e9)
+    for x, y, r in s:                       # inside where some circle reaches: max(r - distance) > 0
+        np.maximum(field, r - np.hypot(gx - x, gy - y), out=field)
+    rings = []
+    for line in contour_generator(xs, ys, field).lines(0.0):
+        ring = [[int(round(x)), int(round(y))] for x, y in line]
+        if len(ring) > 3:
+            rings.append(_simplify(ring[:-1] if ring[0] == ring[-1] else ring, AREA_TOLERANCE))
+    return rings
 
 
 def _dotted(code):
@@ -308,6 +332,15 @@ def _areas_of(src, code):
     if code not in _AREAS:
         _AREAS[code] = current_areas(src, code)
     return _AREAS[code]
+
+
+_LANE_ZONES = {}
+
+
+def _lane_zones_of(src, code):
+    if code not in _LANE_ZONES:
+        _LANE_ZONES[code] = lane_zone_areas(src)
+    return _LANE_ZONES[code]
 
 
 def _diff_pair(old_code, new_code):
@@ -406,6 +439,9 @@ def _diff_pair(old_code, new_code):
         "lanes": {"old": lane_paths(A), "new": lane_paths(B)},
         "currents": {"old": current_paths(A), "new": current_paths(B)},
         "currentAreas": {"old": _areas_of(A, old_code), "new": _areas_of(B, new_code)},
+        # 7.42+: where a lane creep counts as in its lane (out of it, slowed); [] on both sides before 7.42
+        "laneZones": {"old": _lane_zones_of(A, old_code), "new": _lane_zones_of(B, new_code)},
+        "laneZoneLines": {"old": lane_zone_paths(A), "new": lane_zone_paths(B)},
         # one polygon per hull; old/newVolume = the entity each belongs to (a fountain's shop is 3 hulls)
         "zones": {name: {"old": [[[p["x"], p["y"]] for p in z["points"]] for z in A.get(key, [])],
                          "new": [[[p["x"], p["y"]] for p in z["points"]] for z in B.get(key, [])],

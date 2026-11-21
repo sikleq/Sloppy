@@ -129,6 +129,50 @@ def test_oldgrowths_map_file_splits_into_five_currents(ver, total):
     assert len(btd.river_currents({"dota_movespeed_modifier_path": paths})) == 5
 
 
+def test_a_lane_zone_is_its_creep_path_swept_by_the_node_radius():
+    pytest.importorskip("contourpy")
+    path = {"nodes": [{"x": 0, "y": 0, "in": [0, 0], "out": [300, 0]}, {"x": 900, "y": 0, "in": [-300, 0], "out": [0, 0]}],
+            "radius": [600, 600], "types": [2, 2], "npc": 1}
+    src = {"dota_movespeed_modifier_path": [], "lane_creep_movespeed_path": [path]}
+    ((zone),) = btd.lane_zone_areas(src)
+    (ring,) = zone["rings"]
+    assert abs(max(p[1] for p in ring) - 600) <= 16 and abs(min(p[0] for p in ring) + 600) <= 16
+    assert btd.current_areas(src, "742") == [] and len(btd.lane_zone_paths(src)) == 1
+
+
+def test_only_the_742_steps_carry_lane_zones():
+    for path in glob.glob(os.path.join(ROOT, "data", "terrain", "terrain_diff_*.json")):
+        with open(path, encoding="utf-8") as f:
+            d = json.load(f)
+        z = d.get("laneZones") or {}
+        page = os.path.basename(path)[len("terrain_diff_"):-len(".json")]
+        if page == "7.42":
+            assert (len(z["old"]), len(z["new"]), len(d["laneZoneLines"]["new"])) == (0, 3, 3)
+            assert all(a["rings"] for a in z["new"])
+        elif page.startswith("7.42"):
+            assert len(z["old"]) == len(z["new"]) == 3
+        else:
+            assert not z.get("old") and not z.get("new"), page
+
+
+def test_the_lane_zones_layer_and_its_button_are_only_where_the_map_has_them():
+    proj = terrain._projector(terrain._load_map_meta())
+    svg = terrain._line_zone_svgs(terrain_index._load_diff("7.42"), proj)
+    assert "tm-layer-lanezones tm-new" in svg and "tm-layer-lanezones tm-old" not in svg
+    assert "tm-layer-lanezones" not in terrain._line_zone_svgs(terrain_index._load_diff("7.41f"), proj)
+    bar, _ = terrain._controls_html(lane_zones=True)
+    assert 'data-layer="lanezones"' in bar and "tc_lanezones.png" in bar
+    assert 'data-layer="lanezones"' not in terrain._controls_html()[0]
+    assert os.path.exists(os.path.join(ROOT, "icons", "ui", "gothic", "tc_lanezones.png"))
+
+
+def test_the_742_chips_count_three_new_lane_zones():
+    chips = [c for c in terrain_index._layer_changes(terrain_index._load_diff("7.42")) if c[0] == "lane creep zones"]
+    assert chips == [("lane creep zones", "delta", 3, 0, 3)]
+    assert not [c for c in terrain_index._layer_changes(terrain_index._load_diff("7.42-v2"))
+                if c[0] == "lane creep zones"]
+
+
 def test_a_currents_zone_is_its_spline_swept_by_the_node_radius():
     pytest.importorskip("contourpy")
     src = {"dota_movespeed_modifier_path": [{

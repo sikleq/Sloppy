@@ -404,6 +404,26 @@ def ready_icon(name):
     return Image.open(os.path.join(_REF, READY_ICONS[name])).convert("RGBA")
 
 
+# Lane creep zones (7.42, 2026-11-21): no free pixel set has a road / lane — the Lane creep paths picture (its two
+# paths) in the zone's orange, on a dim orange band: the zone around the path where a creep is "in its lane"
+LANE_ZONE = (240, 149, 60)
+LANE_ZONE_BAND = (128, 76, 34)
+
+
+def lanezones_icon():
+    src = Image.open(os.path.join(_OUT, "tc_lanes.png")).convert("RGBA").resize((N, N), Image.NEAREST)
+    line = {(x, y) for y in range(N) for x in range(N)
+            if src.getpixel((x, y))[3] and src.getpixel((x, y))[:3] != OUTLINE[:3]}
+    im = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+    for y in range(N):
+        for x in range(N):
+            if (x, y) in line:
+                im.putpixel((x, y), LANE_ZONE + (255,))
+            elif any((x + dx, y + dy) in line for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
+                im.putpixel((x, y), LANE_ZONE_BAND + (255,))
+    return _outline(im).resize((ICON_RES, ICON_RES), Image.NEAREST)
+
+
 def glyph_icon(name):
     rows, pal = NEW_LAYER_GLYPHS[name]
     im = Image.new("RGBA", (N, N), (0, 0, 0, 0))
@@ -460,6 +480,12 @@ def main(only=()):
     for name in (*READY_ICONS, *NEW_LAYER_GLYPHS):  # 2026-10-06 layers: lanes, currents, shops, spawns
         if want(name):
             im = ready_icon(name) if name in READY_ICONS else glyph_icon(name)
+            im.save(os.path.join(_OUT, f"{name}.png"))
+            cells.append((name, im))
+            print("wrote", name)
+    for name, make in (("tc_lanezones", lanezones_icon),):     # after tc_lanes: drawn from it
+        if want(name):
+            im = make()
             im.save(os.path.join(_OUT, f"{name}.png"))
             cells.append((name, im))
             print("wrote", name)

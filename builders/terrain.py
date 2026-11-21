@@ -42,7 +42,7 @@ import patch.map_versions as _map_versions
 from patch.versions import map_update as _map_update
 # which patches get a page and what moved on the map: data, in patch/terrain_index.py (the header needs it too)
 from patch.terrain_index import (_MOVED_NAMES, _SAME_CAMP, _box_key, _box_key_xy, _current_shapes,
-                                 _moved_items, _retiered_pairs, _terrain_filename, page_patches)
+                                 _lane_zone_shapes, _moved_items, _retiered_pairs, _terrain_filename, page_patches)
 ASSET_VERSION = _site.compute_asset_version()
 
 
@@ -379,6 +379,26 @@ def _current_svg(lines, areas, proj):
     return body
 
 
+_LANE_ZONE_COLOUR = "#f0953c"     # orange: not a team (green / red), not water (blue), not a shop (gold)
+
+
+def _lane_zone_svg(lines, areas, proj):
+    """Where a lane creep counts as in its lane (7.42+, the map's lane creeps' paths swept by their node radius:
+    build_terrain_diff.lane_zone_areas): filled once for all three lanes (where two meet they are not darker),
+    outlined, the path's centre line dashed. Led out of the zone a creep is slowed, up to 25% over 10 s."""
+    fill = "".join(f'<path d="{_ring_path(a["rings"], proj)}" fill-rule="evenodd"/>' for a in areas if a["rings"])
+    body = f'<g class="tc-lanezone" fill="{_LANE_ZONE_COLOUR}" opacity="0.18">{fill}</g>' if fill else ""
+    if fill:
+        body += (f'<g fill="none" stroke="{_LANE_ZONE_COLOUR}" stroke-width="1.4" stroke-opacity="0.9">'
+                 + "".join(f'<path d="{_ring_path(a["rings"], proj)}"/>' for a in areas if a["rings"]) + "</g>")
+    line = "".join(f'<polyline points="{" ".join(f"{proj(x, y)[0]:.1f},{proj(x, y)[1]:.1f}" for x, y in pts)}"/>'
+                   for pts in lines if len(pts) > 1)
+    if line:
+        body += (f'<g class="tc-lanezone-line" fill="none" stroke="{_LANE_ZONE_COLOUR}" stroke-width="1.6" '
+                 f'stroke-dasharray="5 4" stroke-linejoin="round">{line}</g>')
+    return body
+
+
 def _line_zone_svgs(diff, proj):
     """Lane creep paths (Radiant solid, Dire dashed: the two walk the same lane), river currents, shop zones with
     the neutral item stashes, hero / courier spawn points; no-ward zones join the No-ward layer, the Roshan pit
@@ -426,6 +446,10 @@ def _line_zone_svgs(diff, proj):
         areas = (diff.get("currentAreas") or {}).get(side) or []
         if currents or areas:
             out.append(layer("currents", side, _current_svg(currents, areas, proj)))
+        lane_zones = (diff.get("laneZones") or {}).get(side) or []
+        if lane_zones:
+            lane_lines = (diff.get("laneZoneLines") or {}).get(side) or []
+            out.append(layer("lanezones", side, _lane_zone_svg(lane_lines, lane_zones, proj)))
         shops = (zones.get("shops") or {}).get(side) or []
         stash = (ents.get("stash") or {}).get(side) or []
         if shops or stash:
@@ -725,7 +749,7 @@ def _hl_kinds(diff):
 _LAYER_HL = {"lane paths": ("lanes", "lanes"), "river currents": ("currents", "currents"),
              "shop zones": ("shopzones", "shops"), "Roshan pit zones": ("roshanpit", "roshan"),
              "no-ward zones": ("nowardzones", "nowards"), "lane creep spawns": ("lanespawns", "lanes"),
-             "hero spawns": ("herospawns", "spawns")}
+             "hero spawns": ("herospawns", "spawns"), "lane creep zones": ("lanezones", "lanezones")}
 
 
 def _layer_changed(diff):
@@ -742,6 +766,9 @@ def _layer_changed(diff):
     co, cn = _current_shapes(diff, "old"), _current_shapes(diff, "new")
     pairs = list(zip(co, cn))
     out["currents"] = {"moved": [(a, b) for a, b in pairs if a != b], "removed": co[len(cn):], "added": cn[len(co):]}
+    zo, zn = _lane_zone_shapes(diff, "old"), _lane_zone_shapes(diff, "new")
+    out["lanezones"] = {"moved": [(a, b) for a, b in zip(zo, zn) if a != b], "removed": zo[len(zn):],
+                        "added": zn[len(zo):]}
     for key, zkey in (("shopzones", "shops"), ("roshanpit", "roshanPit"), ("nowardzones", "nowardZones")):
         z = (diff.get("zones") or {}).get(zkey) or {}
         a, b = z.get("old") or [], z.get("new") or []
@@ -866,13 +893,13 @@ def _layer_highlights_svg(diff, proj):
             continue
         layer = next(lay for k, lay in _LAYER_HL.values() if k == key)
         point = key in ("lanespawns", "herospawns")
-        closed = key in ("shopzones", "roshanpit", "nowardzones", "currents")
+        closed = key in ("shopzones", "roshanpit", "nowardzones", "currents", "lanezones")
 
         def draw(shapes):
             if point:
                 return "".join(f'<circle cx="{proj(x, y)[0]}" cy="{proj(x, y)[1]}" r="{_ENT_DISC + 3}"/>'
                                for x, y in shapes)
-            if key == "currents":                  # a current is its zone's rings
+            if key in ("currents", "lanezones"):   # a current / lane zone is its rings
                 shapes = [ring for rings in shapes for ring in rings]
             tag = "polygon" if closed else "polyline"
             return "".join(f'<{tag} points="{pts(s)}"/>' for s in shapes if len(s) > 1)
@@ -960,7 +987,7 @@ def _changes_html(subpatches, skip_first_head=False):
     return "\n".join(parts)
 
 
-def _controls_html(layers=True, changes=("", ""), heights=False):
+def _controls_html(layers=True, changes=("", ""), heights=False, lane_zones=False):
     """The control bar ABOVE the map (not overlaid, so it never covers the now
     edge-to-edge map): the Zoom mode button + every overlay-layer toggle (Trees,
     Camps, and the eight point-entity layers). Icon-only square buttons with
@@ -1016,6 +1043,10 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
                                      "spawns; each path ends at the enemy Ancient", "tc_lanes"))
         layer_parts.append(layer_btn("currents", "River currents: where the bonus movement speed acts, downstream "
                                      "(arrows); deeper blue up to +150, paler up to +100 (before 7.41)", "tc_currents"))
+        if lane_zones:   # 7.42+: the lane creeps' own paths in the map file (DEMOS 2026-11-21, "учитываем все")
+            layer_parts.append(layer_btn("lanezones", "Lane creep zones: where a lane creep counts as in its lane; "
+                                         "pulled out of it, it moves up to 25% slower (builds up over 10 s)",
+                                         "tc_lanezones"))
         layer_parts.append(layer_btn("shops", "Shops and neutral item stashes", "tc_shops"))
         layer_parts.append(layer_btn("spawns", "Hero and courier spawn points", "tc_spawns"))
 
@@ -1143,7 +1174,8 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
     new_map = f"icons/maps/map_{new_pic or new_ver}.webp"
     old_src, new_src = _picture_attrs(old_map), _picture_attrs(new_map)
     has_heights = "tm-layer-heights" in markers_svg
-    top_bar, fs_bar = _controls_html(layers=bool(markers_svg), changes=changes, heights=has_heights)
+    top_bar, fs_bar = _controls_html(layers=bool(markers_svg), changes=changes, heights=has_heights,
+                                     lane_zones="tm-layer-lanezones" in markers_svg)
     tiled = _tiled_pictures()
     tiles = "".join(f' data-tiles-{side}="{_TILES_BASE}{v}/"'
                     for side, v in (("old", old_pic or old_ver), ("new", new_pic or new_ver)) if v in tiled)
@@ -1207,7 +1239,7 @@ _ITEM_ICON = {"trees": "ui/gothic/tc_trees", "camps": "camps/creepcamp_mid_16", 
               "lane paths": "ui/gothic/tc_lanes", "river currents": "ui/gothic/tc_currents",
               "shop zones": "ui/gothic/tc_shops", "Roshan pit zones": "ui/gothic/tc_roshan",
               "no-ward zones": "ui/gothic/tc_nowards", "lane creep spawns": "ui/gothic/tc_lanes",
-              "hero spawns": "ui/gothic/tc_spawns"}
+              "hero spawns": "ui/gothic/tc_spawns", "lane creep zones": "ui/gothic/tc_lanezones"}
 
 
 _CHANGED_WORD = {"camp tiers": "re-tiered", "camp spawn boxes": "resized"}

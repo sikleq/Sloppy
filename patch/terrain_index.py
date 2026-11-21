@@ -230,6 +230,10 @@ def _layer_changes(diff):
             out.append(("river currents", "changed", sum(1 for a, b in zip(co, cn) if a != b), 0, len(cn)))
         else:                                      # 7.38: the streams (and their currents) are new
             out.append(("river currents", "delta", len(cn), len(co), len(cn)))
+    zo, zn = _lane_zone_shapes(diff, "old"), _lane_zone_shapes(diff, "new")
+    if zo != zn:                                   # 7.42: the three lane creep zones are new
+        out.append(("lane creep zones", "changed", sum(1 for a, b in zip(zo, zn) if a != b), 0, len(zn))
+                   if len(zo) == len(zn) else ("lane creep zones", "delta", len(zn), len(zo), len(zn)))
     for key, name in (("shops", "shop zones"), ("roshanPit", "Roshan pit zones"), ("nowardZones", "no-ward zones")):
         z = (diff.get("zones") or {}).get(key) or {}
         a, b = _zone_volumes(z, "old"), _zone_volumes(z, "new")
@@ -269,6 +273,11 @@ def _current_shapes(diff, side):
     if areas is not None:
         return [a["rings"] for a in areas]
     return [[line] for line in (diff.get("currents") or {}).get(side) or []]
+
+
+def _lane_zone_shapes(diff, side):
+    """Each lane creep zone of one side (7.42+) as its rings."""
+    return [a["rings"] for a in (diff.get("laneZones") or {}).get(side) or []]
 
 
 def _moved_summary(diff):

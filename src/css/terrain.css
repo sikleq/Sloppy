@@ -291,6 +291,7 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
 /* 2026-10-06 layers from the map file: lane creep paths, river currents, shops, spawn points */
 .terrain-compare.show-lanes .tm-layer-lanes,
 .terrain-compare.show-currents .tm-layer-currents,
+.terrain-compare.show-lanezones .tm-layer-lanezones,
 .terrain-compare.show-shops .tm-layer-shops,
 .terrain-compare.show-spawns .tm-layer-spawns { opacity: 1; }
 /* No-ward ground: the map's gridnav cells (64 units) where a ward can't stand — one pixel per cell, kept square */
