@@ -314,6 +314,22 @@ _LOOSE_PROP_CHANGE_RE = re.compile(r"^([A-Z][a-zA-Z'/ ]+?)\s+bonus\s+(?:increase
 _SILENT_ROW_NOTE = "Not in the patch notes: found in the game files"
 
 
+_OUT_OF_GAME_NOTE = "# Out of the game, not shown; changed in items.txt (for when it returns):"
+
+
+def _out_of_game(header, li_texts):
+    """A cycled-out / removed item: its header label or its one row says so (post_cards._postprocess_removed_label)."""
+    return 'removed="' in header or any(re.match(r"Item (?:Cycled Out|removed)\b", t, re.I) for t in li_texts)
+
+
+def _out_of_game_note(removed, added, changed):
+    from patch.cards_item_stats import _stat_text
+    parts = [f"{_stat_text(s, a)} removed" for s, a, _ in removed]
+    parts += [f"{_stat_text(s, b)} added" for s, _, b in added]
+    parts += [f"{_stat_text(s, a)} -> {_stat_text(s, b)}" for s, a, b in changed]
+    return f"{_OUT_OF_GAME_NOTE} {'; '.join(parts)}"
+
+
 def _postprocess_silent_stats(lines, version):
     """Owner 2026-09-27 (Gleipnir 7.38 lost +25 Damage and +25 Attack Speed without a word in the notes):
     the stats card also gets what the game's items.txt shows changed between the previous patch and this
@@ -345,6 +361,14 @@ def _postprocess_silent_stats(lines, version):
         removed, added, changed = silent_stat_changes(m_hdr.group(1), version,
                                                       (card_rows + " " + grants + " " + changes).lower())
         has_build = any(ln.startswith('W(auto_components_change(') for ln in block)
+        # an item out of the game: its numbers changed in the files touch no match — not on the page, but kept as a
+        # comment in the content for when it returns (owner 2026-11-21: "если выведено, то нет смысла показывать, но
+        # знать полезно, что поменяли (вдруг вернут потом)"; 7.42 Dagger of Ristul +25 -> +30 Damage)
+        if (removed or added or changed) and _out_of_game(lines[i], li_texts):
+            if not any(_OUT_OF_GAME_NOTE in ln for ln in block):
+                block.append(_out_of_game_note(removed, added, changed))   # last: _postprocess_removed_label reads
+                #                                                            the header, ul_open, the row, ul_close
+            removed = added = changed = []
         if (removed or added or changed) and not has_build and card_at is None:
             # no build change -> no stats card (owner 2026-09-28): plain rows, like the notes' own
             # the reader must see these rows are ours, not Valve's (7.42 proofread 2026-11-18: the cycled-out Dagger of

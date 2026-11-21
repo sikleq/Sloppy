@@ -45,7 +45,8 @@ def _item_blocks():
         src = path.read_text(encoding="utf-8")
         for block in re.split(r"(?=W\((?:item|hero|unit|plain)_header\(|W\(section\()", src):
             hm = re.match(r'W\(item_header\("((?:[^"\\]|\\.)*)"(?P<rest>[^\n]*)', block)
-            if not hm or "new=" in hm.group("rest"):
+            # an item out of the game keeps its file changes as a comment, not on the page (owner 2026-11-21)
+            if not hm or "new=" in hm.group("rest") or "# Out of the game, not shown" in block:
                 continue
             name = hm.group(1).replace("\\'", "'")
             card = block[block.find("properties_change("):] if "properties_change(" in block else ""
@@ -117,9 +118,15 @@ def test_generator_invents_no_stat_row_the_notes_already_say_or_for_a_gone_item(
              'W(ul_close())']
     assert g._postprocess_silent_stats(phase, "7.42") == phase
     gone = ['W(item_header("Dagger of Ristul"))', 'W(ul_open())', 'W(li("Item Cycled Out", t("DEL")))', 'W(ul_close())']
-    out = g._postprocess_silent_stats(gone, "7.42")                # the file's change stays, marked as ours
-    assert out[2] == ('W(li("Damage bonus increased from +25 to +30", b(25.0, 30.0), '
-                      'extra=inline_note("Not in the patch notes: found in the game files")))')
+    # an item out of the game: the file's change is no row (it touches no match), a comment keeps it for when the item
+    # returns (owner 2026-11-21: "если выведено, то нет смысла показывать, но знать полезно, что поменяли")
+    out = g._postprocess_silent_stats(gone, "7.42")
+    assert out[-1] == ("# Out of the game, not shown; changed in items.txt (for when it returns): "
+                       "+25 Damage -> +30 Damage") and out[:-1] == gone
+    assert g._postprocess_silent_stats(out, "7.42") == out                              # once
+    assert 'removed="Item cycled out"' in g._postprocess_removed_label(out)[0]          # the label still comes
+    labelled = ['W(item_header("Duelist Gloves", removed="Neutral Item cycled out"))'] + gone[1:]
+    assert "W(li(" not in g._postprocess_silent_stats(labelled, "7.42")[1]
 
 
 def test_generator_never_folds_an_ability_into_the_card():

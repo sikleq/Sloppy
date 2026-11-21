@@ -1009,14 +1009,14 @@ def build():
     W(plain_header("Artifact Changes", dynamics=False, sublabel=True))
     W(item_header("Dagger of Ristul", removed="Neutral Item cycled out"))
     W(ul_open())
-    W(li("Damage bonus increased from +25 to +30", b(25.0, 30.0), extra=inline_note("Not in the patch notes: found in the game files")))
     W(li("Item Cycled Out", t("DEL")))
     W(ul_close())
+    # Out of the game, not shown; changed in items.txt (for when it returns): +25 Damage -> +30 Damage
     W(item_header("Duelist Gloves", removed="Neutral Item cycled out"))
     W(ul_open())
-    W(li("Attack Speed bonus increased from +20 to +26", b(20.0, 26.0), extra=inline_note("Not in the patch notes: found in the game files")))
     W(li("Item Cycled Out", t("DEL")))
     W(ul_close())
+    # Out of the game, not shown; changed in items.txt (for when it returns): +20 Attack Speed -> +26 Attack Speed
     W(item_header("Occult Bracelet", removed="Neutral Item cycled out"))
     W(ul_open())
     W(li("Item Cycled Out", t("DEL")))
