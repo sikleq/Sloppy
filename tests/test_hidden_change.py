@@ -48,5 +48,8 @@ def test_a_glowing_diamond_has_the_tags_ring():
     # 7.42 Dire base shop: the map row's diamond glowed but had no ring (owner 2026-11-21: "тут нет обводки")
     from patch.css_bundle import read_css
     css = read_css()
-    assert ".tnum-dia.hidden-change, .tnum-dia.valve-error { outline: 2px solid #e3c46a; outline-offset: 4px;" in css
-    assert ".tnum-dia.valve-error { outline-color: #ff5a48;" in css
+    # the tag's size and shadows (owner 2026-11-21: "не совпадает с обводкой у тега по размеру")
+    ring = css.split(".tnum-dia.hidden-change::after, .tnum-dia.valve-error::after {", 1)[1].split("}", 1)[0]
+    assert "width: 22px; height: 18px;" in ring and "border-radius: 3px;" in ring
+    tag = css.split(".badge.hidden-change { box-shadow:", 1)[1].split(";", 1)[0].strip()
+    assert f"box-shadow: {tag};" in ring

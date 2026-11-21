@@ -115,3 +115,11 @@ def test_old_tables_get_the_type_from_the_camp_name():
     assert '<span class="camp-cell camp-label-cell">Small camp</span>' in html and "data-tooltip" not in html
     assert html.count('src="../icons/units/npc_dota_neutral_tadpole.png"') == 3 and '<span class="camp-kind-name">Pollywog</span>' in html and "<b>" not in html
     assert "--camp-kinds:1" in html and ">Side<" not in html
+
+
+def test_the_camp_head_has_no_line_before_it():
+    # owner 2026-11-21: "вертикальная линия лишь кусочек перед camp" — the rows have no line between glyph and name
+    from patch.camps import camp_table
+    html = camp_table([("Small camp", [(3, "Pollywog", "x.png")], 54, 90, "small", "Radiant")])
+    assert '<span class="camp-cell camp-label-cell camp-head">Camp</span>' in html
+    assert html.count("camp-label-cell") == 2

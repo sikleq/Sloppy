@@ -15,7 +15,10 @@ def camp_table(rows):
     # a row may also say the camp's size and side (7.42: creeps differ by side now): the size's icon before the name,
     # its words on hover, and a Side column (owner 2026-11-19)
     sided = any(len(row) > 4 for row in rows)
-    cells = ['<span class="camp-name camp-type-col camp-head"></span>', '<span class="camp-cell camp-head">Camp</span>']
+    # "Camp" above the glyph + name pair: no line before it, as in the rows (camp-label-cell; owner 2026-11-21:
+    # "вертикальная линия лишь кусочек перед camp")
+    cells = ['<span class="camp-name camp-type-col camp-head"></span>',
+             '<span class="camp-cell camp-label-cell camp-head">Camp</span>']
     if sided:
         cells.append('<span class="camp-cell camp-head">Side</span>')
     cells += ['<span class="camp-cell camp-num camp-head">Average Gold</span>',
