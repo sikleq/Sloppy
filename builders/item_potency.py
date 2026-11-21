@@ -111,8 +111,11 @@ def _section(title, table):
     return f'<section class="ipot-sec"><h3 class="ipot-title">{title}</h3>{table}</section>'
 
 
+_TEXT_HEADS = {"Ability", "Value", "Attacks", "Illusions"}      # word columns: their heads left, as their cells
+
+
 def _table(cls, head, rows):
-    th = "".join(f"<th>{h}</th>" for h in head)
+    th = "".join(f'<th{" class=ipot-th-text" if h in _TEXT_HEADS and i else ""}>{h}</th>' for i, h in enumerate(head))
     return (f'<table class="mr-table hs-table ipot-table {cls}"><thead><tr class="col-row">{th}</tr></thead>'
             f'<tbody>{"".join(rows)}</tbody></table>')
 
@@ -178,18 +181,44 @@ def no_illusions(key, version):
     return out
 
 
+_SIDE = _re.compile(r"^(?P<base>.+?) \((?P<side>melee|ranged)\)$")
+
+
+def _melee_ranged(vals):
+    """A value given for melee and for ranged heroes is one row "Chance (melee / ranged)" → "25 / 10" (owner
+    2026-11-21: "через слеш, а не в 2 строки"), the melee one first; the rest as they were."""
+    out, used = [], set()
+    for i, (ab, label, value, sentence) in enumerate(vals):
+        if i in used:
+            continue
+        m = _SIDE.match(label)
+        if m:
+            other = "ranged" if m.group("side") == "melee" else "melee"
+            j = next((j for j, v in enumerate(vals) if j not in used and j != i and v[0] == ab
+                      and v[1] == f"{m.group('base')} ({other})"), None)
+            if j is not None:
+                used.add(j)
+                melee, ranged = (vals[i], vals[j]) if m.group("side") == "melee" else (vals[j], vals[i])
+                out.append((ab, f"{m.group('base')} (melee / ranged)", f"{melee[2]} / {ranged[2]}",
+                            melee[3] or ranged[3]))
+                continue
+        out.append((ab, label, value, sentence))
+    return out
+
+
 def _items_rows(version, rules):
     gone = set(rules.get("not_in_game", []))
     rows = []
     for name, key, slug, vals in _scaled_values(version, "apply_effectiveness"):
         no_ill = no_illusions(key, version)
+        vals = _melee_ranged(vals)
         for k, (ab, label, value, sentence) in enumerate(vals):
             cls = ' class="ipot-gone"' if key in gone else ''
             # removed from the game: grey, hidden till "Show removed" (owner 2026-11-19: no "not in the game" words)
             head = _name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals)) if k == 0 else ''
             hint = f' data-tooltip="{_esc(sentence)}"' if sentence else ''
             prop = f'<span class="{"iab-hint abil-ico-hint " if sentence else ""}ipot-prop"{hint}>{_esc(label)}</span>'
-            v = _num(value)
+            sides = [_num(x) for x in str(value).split(" / ")]
             # the illusions' columns brighter as their potency grows (20 → 35 → 40%): how much of the hero's value is left
             note = no_ill.get(ab.lower()) or no_ill.get("*")
             # the first illusions' column opens the illusions' part: a stronger line before it (design review 2026-11-21)
@@ -200,7 +229,8 @@ def _items_rows(version, rules):
                               f'</span></td>' for i, _ in enumerate(ILLUSIONS))
             else:
                 ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-p{p}{first(i)}">'
-                              f'{_fmt(v * p / 100) if v is not None else "—"}</td>' for i, (_, p) in enumerate(ILLUSIONS))
+                              + " / ".join(_fmt(v * p / 100) if v is not None else "—" for v in sides) + '</td>'
+                              for i, (_, p) in enumerate(ILLUSIONS))
             # the ability once for its rows (Eye of Skadi's Cold Attack five times, design review 2026-11-21)
             run = 0 if k and vals[k - 1][0] == ab else next(
                 (j - k for j in range(k + 1, len(vals)) if vals[j][0] != ab), len(vals) - k)

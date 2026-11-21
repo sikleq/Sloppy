@@ -40,11 +40,19 @@ def test_the_items_table_reads_like_the_sites_tables():
         pytest.skip("no game-files store")
     rows = "".join(ip._items_rows(ip._versions()[-1], {"not_in_game": []}))
     skadi = "".join(r for r in ip._items_rows(ip._versions()[-1], {"not_in_game": []}) if 'data-name="eye of skadi"' in r)
-    assert skadi.count('<td class="ipot-ab"') == 1 and '<td class="ipot-ab" rowspan=5>Cold Attack</td>' in skadi
+    assert skadi.count('<td class="ipot-ab"') == 1 and '<td class="ipot-ab" rowspan=3>Cold Attack</td>' in skadi
     assert "ipot-ill-first" in rows
     assert ip.REMOVED_BUTTON.startswith('<div class="cal-toggle-bar inbox-bar ipot-tools"><div class="toolbar-panel">')
     css = read_css()
     assert "table.mr-table.ipot-table td { text-align: center;" in css
+    # the words left, one first-column width for every table (owner 2026-11-21: all centred "не очень")
+    assert "table.mr-table.ipot-table thead th.ipot-th-text { text-align: left; }" in css
+    assert "thead th:first-child { width: 230px; min-width: 230px; }" in css
+    # melee / ranged in one row (owner 2026-11-21: "через слеш, а не в 2 строки")
+    basher = "".join(r for r in ip._items_rows(ip._versions()[-1], {"not_in_game": []}) if 'data-name="skull basher"' in r)
+    assert basher.count("<tr") == 1 and "Chance (melee / ranged)" in basher and ">25 / 10<" in basher
+    skadi_rows = [r for r in ip._items_rows(ip._versions()[-1], {"not_in_game": []}) if 'data-name="eye of skadi"' in r]
+    assert len(skadi_rows) == 3 and ">-20 / -40<" in "".join(skadi_rows) and ">-4 / -8<" in "".join(skadi_rows)
     assert "table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items thead th:nth-child(2) { display: none; }" in css
 
 

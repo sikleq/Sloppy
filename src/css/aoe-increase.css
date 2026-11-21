@@ -69,8 +69,8 @@
   border-bottom: none;
   box-shadow: inset 0 -1px 0 rgba(54, 53, 50, 0.5);
   white-space: normal;
-  /* centred like every table of the site (owner 2026-11-21 chose it over icons in a straight left column) */
-  text-align: center;
+  /* icons hug the left edge so they line up vertically (centred was tried 2026-11-21: "ужасно смотрятся") */
+  text-align: left;
 }
 /* Elevate the whole cell when its ability icon is hovered — same pattern as
    dyn-cell-wrap:hover { z-index:7 }. The z-index on the TD's stacking context
@@ -309,7 +309,11 @@ table.mr-table.ipot-table { width: 100%; min-width: 0; }
 /* values and their names centred like every table of the site, the item's name with its icon left (ui-style.md "Любая
    таблица", design review 2026-11-21) */
 table.mr-table.ipot-table td { text-align: center; vertical-align: middle; padding: 7px 12px; }
-table.mr-table.ipot-table td.ipot-name { text-align: left; }
+/* the words left, the numbers centred (owner 2026-11-21: all centred "не очень" — the tables of the page came out with
+   different column widths); the first column one width in every table, so they line up under each other */
+table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table td.ipot-ab, table.mr-table.ipot-table td.ipot-text,
+table.mr-table.ipot-table thead th.ipot-th-text { text-align: left; }
+table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table thead th:first-child { width: 230px; min-width: 230px; }
 /* the illusions' part starts with a stronger line */
 table.mr-table.ipot-table .ipot-ill-first { border-left: 2px solid var(--line-soft); }
 /* the lower tables: the potency column as narrow as its chip */
