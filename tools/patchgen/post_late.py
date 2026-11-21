@@ -464,6 +464,50 @@ def _postprocess_hidden_rows(lines, version):
     return out
 
 
+def _postprocess_valve_card_errors(lines, version):
+    """An item card whose "from" in Valve's notes is not what the files had (data/rules/valve_errors.json, owner
+    2026-11-21; 7.42 Crimson Guard "+4 → +5 Armor", the files 6 → 5): the card shows the files' number, its badge
+    counts from it, the tag turns by it (more is better for every card stat) and glows red with Valve's words."""
+    import json
+    import os
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "rules", "valve_errors.json")
+    with open(path, encoding="utf-8") as f:
+        errors = json.load(f).get(version or "", [])
+    out = list(lines)
+    for e in errors:
+        start = next((i for i, ln in enumerate(out) if f'item_header("{e["item"]}"' in ln), None)
+        if start is None:
+            raise ValueError(f"valve_errors.json {version}: no item {e['item']!r} on the page")
+        end = next((i for i in range(start + 1, len(out)) if re.match(r"\s*W\((?:item|hero|unit|plain)_header\(", out[i])),
+                   len(out))
+        vm = re.match(r"^([+-]?)([\d.]+)(%?) (.+)$", e["valve"])
+        real = float(re.match(r"^[+-]?([\d.]+)", e["real"]).group(1))
+        stat = re.escape(vm.group(4))
+        old_rx = re.compile(r'\("(?:BUFF|NERF|REWORK|MISC|)",\s*"' + re.escape(e["valve"]) + r'"\)')
+        new_rx = re.compile(r'\("",\s*"([+-]?)([\d.]+)(%?) ' + stat + r'",\s*b\(([\d.]+),\s*([\d.]+)\)\)')
+        done = 0
+        for i in range(start, end):
+            ln, n0 = out[i], done
+            ln, k = old_rx.subn(f'("", "{e["real"]}")', ln)
+            done += k
+
+            def fix(m):
+                new = float(m.group(2))
+                tag = "NERF" if new < real else "BUFF"
+                tip = (f"Error in the patch notes. Valve wrote {e['valve']} &rarr; {m.group(1)}{m.group(2)}{m.group(3)} "
+                       f"{vm.group(4)}; the game files had {e['real']}")
+                return f'("{tag}|{tip}", "{m.group(1)}{m.group(2)}{m.group(3)} {vm.group(4)}", b({real:g}, {m.group(2)}))'
+            ln, k = new_rx.subn(fix, ln)
+            done += k
+            if done != n0:
+                out[i] = ln
+        if done == 0:
+            continue                                   # already rewritten (the content keeps the files' number)
+        if done != 2:
+            raise ValueError(f"valve_errors.json {version} {e['item']}: the card's rows for {e['valve']} not found")
+    return out
+
+
 def _postprocess_row_notes(lines):
     out = []
     for ln in lines:

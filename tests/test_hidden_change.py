@@ -9,7 +9,7 @@ _ROW = ('<li data-tag="buff" class="li-bg"><span class="badge buff-text" data-ta
 
 def test_the_stock_note_becomes_the_tags_hover():
     out = hidden_change_tags("<ul>" + _ROW.format(note="Not in the patch notes: found in the game files") + "</ul>")
-    assert f'data-tooltip="{TIP}" class="tb-tip-target hidden-change badge buff-text"' in out
+    assert f'data-tooltip="{TIP}" tabindex="0" class="tb-tip-target hidden-change badge buff-text"' in out
     assert "info-tip" not in out and "Not in the patch notes" not in out
 
 

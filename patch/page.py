@@ -620,12 +620,15 @@ def save_html(filename):
     from .card_deck import deck_cards
     out = deck_cards(out, _stem)           # old -> new as a deck: the old card under the new one (2026-11-09)
     out = time_levels_hint(out)            # a neutral's 4 values: which comes when, on hover (11-20; after the decks)
-    from .hidden_change import hidden_change_tags
-    out = hidden_change_tags(out)          # not in Valve's notes: the tag glows gold, "Hidden change" on hover (11-21)
     if TAG_MARK_PAGES is None or _stem in TAG_MARK_PAGES:
         from .tag_marks import terrain_rows_tagged
         out = terrain_rows_tagged(out)     # a terrain row: its tag as a tile, no number
         out = out.replace('<body class="patch-page">', '<body class="patch-page tag-marks">', 1)
+    # after the terrain rows get their tag tile: the glow goes on a tag
+    from .hidden_change import hidden_change_tags
+    out = hidden_change_tags(out)          # not in Valve's notes: the tag glows gold, "Hidden change" on hover (11-21)
+    from .valve_error import valve_error_tags
+    out = valve_error_tags(out)            # wrong in Valve's notes: the tag glows red, the real change on hover (11-21)
     out = re.sub(r'<!--IABNOTE:(.*?)-->', lambda m: _IAB_NOTES.get(m.group(1), ''), out)
     out = out.replace('<!--INLINETIP-->', '').replace('<!--/INLINETIP-->', '')
     out = out.replace('<!--TIP-->', '').replace('<!--/TIP-->', '')

@@ -577,7 +577,7 @@ def _postprocess_cost_components(lines, version):
 # "сделай с ?". A "Damage at level 1 …" line is the consequence of a base attribute / base damage change, so it
 # becomes a note on that row: the last such row before it in its list, else the first one after it (Invoker 7.39
 # lists it first). Kept as rows: heroes with a hero_stat_card (those rows are hidden and feed the card), a line Valve
-# worded wrongly (wrong-word span + its correction note must stay in sight), and a list with no base attribute /
+# worded wrongly (wrong-word span + its correction, the tag's red glow on the page, must stay in sight), and a list with no base attribute /
 # base damage row (then the line is the change itself). Weights do not move: patch/elements.li scores a folded
 # note exactly like the row it was (_score_folded_damage).
 _DMG_FOLD_PARENT_RE = re.compile(r"^(?:Base (?:damage|strength|agility|intelligence)"

@@ -2,44 +2,35 @@
 2026-11-21, of the mock's variants "Свечение 3, при наведении показывает Hidden Change подсказку"; the [?] alone was
 not seen: "на твоих примерах не вижу, где тихие правки").
 
-Content marks such a row with an inline note starting "Not in the patch notes" (tools/patchgen: post_cards, post_late).
-The stock sentence goes away with its [?]; words of its own stay in the [?] ("It gave +35 Movement Speed before it was
-cycled out.").
+Content marks such a row with an inline note starting "Not in the patch notes" (tools/patchgen: post_cards, post_late,
+data/rules/hidden_rows.json). The stock sentence leaves the [?]; words of its own stay there ("It gave +35 Movement
+Speed before it was cycled out."). A row a card covers keeps its note (a mark there would never be seen).
 
     from patch.hidden_change import hidden_change_tags
     html = hidden_change_tags(html)
 """
 import re
 
+from .tag_glow import cut_note, each_row, has_tag, mark_tag
+
 TIP = "Hidden change"
-_TIP = re.compile(r'<span class="info-tip" tabindex="0">\?<span class="info-pop">((?:(?!</span>).)*?Not in the patch '
-                  r'notes(?:(?!</span>).)*?)</span></span>', re.S)
+MARK = r"Not in the patch notes"
 _STOCK = re.compile(r"\s*Not in the patch notes:\s*(?:found in the game files\.?)?\s*", re.I)
 
 
 def _rest(text):
     """The note without the stock words: '' when nothing else was said."""
     rest = _STOCK.sub(" ", text).strip()
-    rest = re.sub(r"^\((found in the game files)\)$|\s*\(found in the game files\)", "", rest).strip()
+    rest = re.sub(r"\s*\(found in the game files\)", "", rest).strip()
     return rest[:1].upper() + rest[1:] if rest else ""
 
 
 def _one(li):
-    m = _TIP.search(li)
-    if not m or '<span class="badge ' not in li:
+    if re.match(r'<li[^>]*class="[^"]*\bcovered', li) or not has_tag(li):
         return li
-    rest = _rest(m.group(1))
-    tip = (f'<span class="info-tip" tabindex="0">?<span class="info-pop">{rest}</span></span>' if rest else "")
-    li = li[:m.start()] + tip + li[m.end():]
-    return li.replace('<span class="badge ', f'<span data-tooltip="{TIP}" class="tb-tip-target hidden-change badge ', 1)
+    li2, note = cut_note(li, MARK, keep=_rest)          # its own words stay in the [?]
+    return mark_tag(li2, "hidden-change", TIP) if note is not None else li
 
 
 def hidden_change_tags(html):
-    out, pos = [], 0
-    for i in [m.start() for m in re.finditer("Not in the patch notes", html)]:
-        a, b = max(html.rfind("<li ", 0, i), html.rfind("<li>", 0, i)), html.find("</li>", i)
-        if a < pos or b < 0:                     # a second note in a row already done, or no row around it
-            continue
-        out += [html[pos:a], _one(html[a:b + 5])]
-        pos = b + 5
-    return "".join(out) + html[pos:]
+    return each_row(html, MARK, _one)

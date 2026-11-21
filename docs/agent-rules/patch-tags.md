@@ -271,6 +271,14 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
     союзник врага отключает пассивку (Desolate), — `l=True` ставится руками.
   - Опечатка Valve в числах (Techies Proximity Mines 7.41a «450», «225») — `wrong-word` + `note_box` с реальными
     значениями из KV, бейдж по KV. Valve пишет «decreased», а числа выросли — то же (Grimstroke 7.40c).
+    **На странице (владелец 2026-11-21):** тег такой строки светится красным, при наведении — «Error in the patch
+    notes. …» с настоящими числами; [?] с поправкой убирается (`patch/valve_error.py` по фразе note_box «This change is
+    wrongly stated» / «The patch text says»). Строка под карточкой (covered) свою поправку держит — пометку там не
+    видно. Карточка характеристик предмета: «было» сверяется с items.txt прошлого патча
+    (`scripts/audit/audit_card_values.py`, тест падает на расхождении); проверенный случай — в
+    `data/rules/valve_errors.json`, генератор ставит число из файлов и тег `"NERF|Error in the patch notes. …"`
+    (красный, `patch/cards_item_stats._prop_tag`). 7.42 Crimson Guard: у Valve «+4 → +5 Armor», в файлах 6 → 5.
+    В режиме для дальтоников кольцо синее (золото и красное там сливаются).
     Устаревшее «from» (Valve взяли число до прошлой правки: Kinetic Fence 7.41 «20/18/16/14s» — с 7.38 было
     20/17/14/11s; Wild Axes 7.41 «6/9/11/13» — 7.40b дал 7/9/11/13) — так же. Ищет такие строки
     `python scripts/audit/audit_from_values.py`: «from» сверяется с прошлым снимком — строка способности с её блоком

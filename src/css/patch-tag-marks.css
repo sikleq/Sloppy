@@ -115,3 +115,7 @@
   .tag-marks ul.changes > li > .badge.teaser[data-tag] { color: #a98ad8; outline: 1px dashed rgba(200, 160, 255, 0.7);
     outline-offset: -1px; }
 }
+/* a map row's diamond glows as a tag would (patch/tag_glow.py, owner 2026-11-21): gold for a hidden change, red for a
+   mistake in Valve's notes */
+.tnum-dia.hidden-change { text-shadow: 0 0 3px #fff3d6, 0 0 7px rgba(227, 196, 106, 0.9); }
+.tnum-dia.valve-error { text-shadow: 0 0 3px #ffd9d3, 0 0 7px rgba(255, 92, 72, 0.9); }

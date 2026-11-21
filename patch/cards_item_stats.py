@@ -11,12 +11,23 @@ from .row_scores import _dyn_record_card, _note_cost_panel, _prop_row_text
 from .cards_item_abilities import _iab_hint, _iab_note, _tone_cls
 
 
+def _tag_key(tag):
+    """"NERF|Error in the patch notes. …" → "NERF": a card's tag may carry Valve's mistake after a bar
+    (data/rules/valve_errors.json, owner 2026-11-21)."""
+    return tag.split("|", 1)[0] if isinstance(tag, str) else tag
+
+
 def _prop_tag(tag):
     if not tag:
         return '<span class="row-tag-empty"></span>'
+    tag, _, err = tag.partition("|")
     key = tag.upper()
     cls = _PROP_TAG_CSS.get(key, 'misc')
     overall = 'buff' if key in ('BUFF', 'NEW') else ('nerf' if key in ('NERF', 'DEL') else 'buff')
+    if err:      # a mistake in Valve's notes: the tag glows red, the files' number on hover (patch/valve_error.py)
+        import html as _html
+        return (f'<span data-tooltip="{_html.escape(err, quote=True)}" tabindex="0" class="tb-tip-target '
+                f'valve-error badge {cls}" data-tag="{key.lower()}" data-overall="{overall}">{key}</span>')
     return f'<span class="badge {cls}" data-tag="{key.lower()}" data-overall="{overall}">{key}</span>'
 
 
@@ -237,7 +248,7 @@ def properties_change(old, new, old_extras=None, new_extras=None):
         for side in (o, nw):
             if not (isinstance(side, (tuple, list)) and len(side) >= 1):
                 continue
-            tid = _DYN_PROP_MAP.get(side[0])
+            tid = _DYN_PROP_MAP.get(_tag_key(side[0]))
             if not tid:
                 continue
             if tid in ("buff", "nerf"):
