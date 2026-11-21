@@ -49,9 +49,13 @@
 }
 
 /* ---- table cells: centered headers + content, narrow columns ---- */
-.mr-table.aoe-table thead th.aoe-slot-th {
+/* every head stands where its column's content is (owner 2026-11-22: "где-то по левому краю, где-то в центре"): the
+   icons and radii hug the left edge, so do their heads, the hero's and the "Abilities" group's; Item Potency the same —
+   words left, numbers centred, a group as its columns */
+.mr-table.aoe-table thead th.aoe-slot-th, .mr-table.aoe-table thead th.aoe-name,
+.mr-table.aoe-table thead tr.cat-row th.cat-head {
   min-width: 84px;
-  text-align: center;
+  text-align: left;
 }
 .mr-table.aoe-table tbody td {
   vertical-align: middle;

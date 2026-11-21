@@ -105,7 +105,7 @@
 /* OPAQUE hover background — a translucent one let table rows scrolling
    beneath the sticky header bleed through. This is the var(--bg-panel-3) base blended
    with the old rgba(48,54,61,0.5) tint, fully opaque. */
-.mr-table thead th:hover { background: #292825; }
+.mr-table thead th.sortable:hover { background: #292825; }
 /* Sort indicator — identical glyph + dim/active logic to the creeps-table
    convention: ↕ (neutral, dim), ↓ (desc, active), ↑ (asc, active). */
 /* (sort-ind centering is defined once in the shared rule above.) */

@@ -115,10 +115,14 @@ _TEXT_HEADS = {"Ability", "Value", "Attacks", "Illusions"}      # word columns: 
 
 
 def _th(h, i, extra=(), attrs=""):
-    classes = [c for c in ("ipot-th-text" if h in _TEXT_HEADS and i else "", "ipot-th-ab" if h == "Ability" else "",
-                           *extra) if c]
+    """The first column — the item's or the ability's name — sorts by name, with the site's sort mark, as AoE Increase's
+    Hero (owner 2026-11-22: "в одной вкладке нажимаются и сортируются … в другой нет"); the others do not: one column
+    holds values of different kinds (chance, armor, mana)."""
+    classes = [c for c in ("ipot-th-text" if h in _TEXT_HEADS and i else "", "ipot-th-ab" if h == "Ability" and i else "",
+                           "sortable" if i == 0 else "", *extra) if c]
     cls = f' class="{" ".join(classes)}"' if classes else ""
-    return f'<th{cls}{attrs}>{h}</th>'
+    label = f'<span class="th-label">{h}</span><span class="sort-ind"></span>' if i == 0 else h
+    return f'<th{cls}{attrs}>{label}</th>'
 
 
 def _table(cls, head, rows, groups=()):
@@ -153,7 +157,7 @@ def _name_cell(name, icon, owner="", span=1, wide=True):
            if icon and (_HERE / icon).exists() else '<span class="mr-ico mr-ico-blank"></span>')
     # the cell of AoE Increase's hero and Hero Stats' (owner 2026-11-21: "достичь единого формата в обеих вкладках"),
     # so its icon grows on hover as on Mana Items
-    return (f'<td class="mr-name hs-name ipot-name"{rs}>{img}<span class="mr-name-body">'
+    return (f'<td class="mr-name hs-name ipot-name"{rs} data-sort="{_esc(name.lower())}">{img}<span class="mr-name-body">'
             f'<span class="mr-name-text">{_esc(name)}</span>{who}</span></td>')
 
 

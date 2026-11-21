@@ -87,7 +87,8 @@ def test_both_pages_have_the_two_floor_header_of_hero_stats():
     # a column with no group takes both floors, its name in the middle (owner 2026-11-21); the illusions' 2px line
     # starts in both floors
     assert head.startswith('<table class="mr-table hs-table ipot-table ipot-items"><thead><tr class="cat-row">'
-                           '<th class="th-tall" rowspan="2">Item</th>'
+                           '<th class="sortable th-tall" rowspan="2"><span class="th-label">Item</span>'
+                           '<span class="sort-ind"></span></th>'
                            '<th class="ipot-th-text ipot-th-ab th-tall" rowspan="2">Ability</th>')
     assert ('<th class="cat-head" colspan="1">Hero</th><th class="cat-head ipot-ill-first" colspan="1">Illusions</th>'
             '</tr><tr class="col-row"><th>100%</th><th class="ipot-ill-first">20%</th></tr>') in head
@@ -117,7 +118,8 @@ def test_one_name_cell_for_items_and_heroes():
     import item_potency as ip
     from patch.css_bundle import read_css
     cell = ip._name_cell("Skadi", "", span=3)
-    assert cell.startswith('<td class="mr-name hs-name ipot-name" rowspan="3"><span class="mr-ico mr-ico-blank"></span>')
+    assert cell.startswith('<td class="mr-name hs-name ipot-name" rowspan="3" data-sort="skadi">'
+                           '<span class="mr-ico mr-ico-blank"></span>')
     assert '<span class="mr-name-body"><span class="mr-name-text">Skadi</span></span>' in cell
     css = read_css()
     assert ".mr-table.aoe-table td.aoe-name, table.mr-table.ipot-table td.ipot-name {" in css
@@ -200,3 +202,24 @@ def test_rule_cards_and_the_filter_card_are_one_surface():
     assert ".toolbar-panel, .ipot-rule { background-color: var(--px-panel); border-image-source: var(--px-edge-dim); }" in css
     assert "border-radius: 6px; background: rgba(255, 255, 255, 0.02)" not in css.split(".ipot-rule {", 1)[1][:200]
     assert "justify-self: start; width: max-content; }" in css
+
+
+def test_the_heads_follow_one_rule_on_every_materials_table():
+    # owner 2026-11-22: "в одной вкладке нажимаются и сортируются … в другой нет. Где-то по левому краю … где-то в
+    # центре. опять нет единого": the name column sorts (with the sort mark) on Item Potency, Dormant Curio and AoE
+    # Increase; only a sorting head lights on hover; a head stands where its column's content is
+    import item_potency as ip
+    from patch.css_bundle import read_css
+    head = ip._table("ipot-sources", ["Ability", "Attacks", "Item Potency"], [])
+    assert head.count('class="sortable"') == 1 and '<span class="th-label">Ability</span><span class="sort-ind">' in head
+    assert 'data-sort="skadi"' in ip._name_cell("Skadi", "")
+    css = read_css()
+    assert ".mr-table thead th.sortable:hover { background: #292825; }" in css
+    assert ".mr-table thead th:hover {" not in css
+    aoe_heads = css.split("/* every head stands where its column's content is", 1)[1].split("}", 1)[0]
+    assert "th.aoe-slot-th" in aoe_heads and "th.aoe-name" in aoe_heads and "text-align: left;" in aoe_heads
+    curio = (ROOT / "builders" / "dormant_curio.py").read_text(encoding="utf-8")
+    assert '("Value", 2)' not in curio                                      # "Value" over "Value" said twice
+    # the shared sorter moves an item's rows together (a name cell spanning N rows)
+    js = (ROOT / "src" / "js" / "mana-items.js").read_text(encoding="utf-8")
+    assert "c.rowSpan" in js and "blocks.forEach(g => g.forEach(r => tbody.appendChild(r)));" in js

@@ -35,9 +35,22 @@
       ? (headers[sortCol].classList.contains('sort-asc') ? 2 : 1)
       : 0;
 
-    function sortBy(colIdx, dir) {
+    // a name cell spanning several rows (Item Potency: one item, several values) moves with all of them; the group
+    // sorts by its first row (2026-11-22: the name column sorts on every Materials table, owner "опять нет единого")
+    function groups() {
       const rows = [...tbody.querySelectorAll('tr')];
-      rows.sort((a, b) => {
+      const out = [];
+      for (let i = 0; i < rows.length;) {
+        const n = Math.max(1, ...[...rows[i].cells].map(c => c.rowSpan || 1));
+        out.push(rows.slice(i, i + n));
+        i += n;
+      }
+      return out;
+    }
+    function sortBy(colIdx, dir) {
+      const blocks = groups();
+      blocks.sort((ga, gb) => {
+        const a = ga[0], b = gb[0];
         const va = cellVal(a, colIdx);
         const vb = cellVal(b, colIdx);
         if (va == null && vb == null) return 0;
@@ -49,7 +62,7 @@
         const sa = String(va), sb = String(vb);
         return dir === 'asc' ? sa.localeCompare(sb) : sb.localeCompare(sa);
       });
-      rows.forEach(r => tbody.appendChild(r));
+      blocks.forEach(g => g.forEach(r => tbody.appendChild(r)));
     }
 
     headers.forEach((th, i) => {
