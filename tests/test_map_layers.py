@@ -207,13 +207,16 @@ def test_the_new_layer_chips_are_buttons_that_light_their_outlines():
         assert f"tm-hl tm-hl-{key} tm-new" in terrain._highlights_svg(diff, terrain._projector(terrain._load_map_meta())), key
 
 
-def test_the_lanes_button_explains_its_colours():
-    """The owner 2026-10-06: "что значат красная/зелёные линии?"."""
-    html = "".join(part for part in terrain._controls_html() if isinstance(part, str))
-    btn = html[html.index('data-layer="lanes"'):]
-    title = btn[btn.index('title="') + 7:]
-    title = title[:title.index('"')]
-    assert "green solid" in title and "red dashed" in title and "Ancient" in title
+def test_every_layer_buttons_tooltip_is_a_short_name():
+    """The owner 2026-11-21: "у иконок подсказки слишком длинные, надо короткие, как Roshan, Outpost" — the name only
+    (it replaced the 2026-10-06 colour key on Lane Creep Paths)."""
+    import re
+    html = "".join(part for part in terrain._controls_html(lane_zones=True, heights=True) if isinstance(part, str))
+    titles = re.findall(r'class="tc-btn tc-btn-icon tc-layer-btn" data-layer="[^"]+" aria-pressed="false" '
+                        r'title="([^"]*)"', html)
+    assert len(titles) >= 20 and "Lane Creep Zones" in titles
+    long = [t for t in titles if len(t) > 20 or any(c in t for c in ":;—(,")]
+    assert not long, long
 
 
 def test_each_waves_path_runs_into_the_enemy_base_to_its_ancient():

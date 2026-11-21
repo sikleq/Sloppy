@@ -94,7 +94,9 @@ only map data `build_terrain_diff.py` reads.
 
 The owner (2026-10-06): "все слои" — everything the map file holds besides vision. Same extractor, more classes
 (`extract_map_entities._layers`), per Terrain step in the diff (`build_terrain_diff.py`: `lanes`, `currents`,
-`zones`, entities `laneSpawns` / `heroSpawns` / `couriers` / `stash`), drawn by `builders/terrain._line_zone_svgs`:
+`zones`, entities `laneSpawns` / `heroSpawns` / `couriers` / `stash`), drawn by `builders/terrain._line_zone_svgs`.
+A layer button's tooltip is the layer's short name only, like Roshan or Outposts (the owner 2026-11-21: "подсказки
+слишком длинные"; test `test_every_layer_buttons_tooltip_is_a_short_name`) — the colours are explained here:
 
 | Layer (button) | From the map file | On the map |
 |---|---|---|

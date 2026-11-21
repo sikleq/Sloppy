@@ -1035,20 +1035,15 @@ def _controls_html(layers=True, changes=("", ""), heights=False, lane_zones=Fals
             layer_parts.append(layer_btn("heights", "Heights", "tc_heights"))
         for key, label, icon, _color in _ENTITY_LAYERS:
             layer_parts.append(layer_btn(key, label, icon))
-        # 2026-10-06 (the owner: "все слои"): straight from the map file's entities
-        # the colours explained (the owner 2026-10-06 asked what the red and green lines are, and why two dashed
-        # lines stand in the Radiant base: the Dire waves' path goes on past the barracks to the Ancient)
-        layer_parts.append(layer_btn("lanes", "Lane creep paths: green solid — Radiant waves, red dashed — Dire "
-                                     "waves (on a shared lane the green covers the red); a dot — where a wave "
-                                     "spawns; each path ends at the enemy Ancient", "tc_lanes"))
-        layer_parts.append(layer_btn("currents", "River currents: where the bonus movement speed acts, downstream "
-                                     "(arrows); deeper blue up to +150, paler up to +100 (before 7.41)", "tc_currents"))
+        # 2026-10-06 (the owner: "все слои"): straight from the map file's entities. A button's tooltip is just the
+        # layer's name, like Roshan or Outposts (the owner 2026-11-21: "подсказки слишком длинные, надо короткие");
+        # what the colours mean is in docs/terrain.md, not on the button
+        layer_parts.append(layer_btn("lanes", "Lane Creep Paths", "tc_lanes"))
+        layer_parts.append(layer_btn("currents", "River Currents", "tc_currents"))
         if lane_zones:   # 7.42+: the lane creeps' own paths in the map file (DEMOS 2026-11-21, "учитываем все")
-            layer_parts.append(layer_btn("lanezones", "Lane creep zones: where a lane creep counts as in its lane; "
-                                         "pulled out of it, it moves up to 25% slower (builds up over 10 s)",
-                                         "tc_lanezones"))
-        layer_parts.append(layer_btn("shops", "Shops and neutral item stashes", "tc_shops"))
-        layer_parts.append(layer_btn("spawns", "Hero and courier spawn points", "tc_spawns"))
+            layer_parts.append(layer_btn("lanezones", "Lane Creep Zones", "tc_lanezones"))
+        layer_parts.append(layer_btn("shops", "Shops", "tc_shops"))
+        layer_parts.append(layer_btn("spawns", "Spawn Points", "tc_spawns"))
 
     # Top bar: Zoom + Fullscreen + layer toggles
     # Icon-only, the word in the tooltip (2026-10-06): with the four map-file layers 19 toggles + "Zoom" + "Full"
