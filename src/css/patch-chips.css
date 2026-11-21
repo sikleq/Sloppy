@@ -337,3 +337,6 @@ html.cb-mode .pop-pct-nerf { color: #eb7115; }
   line-height: 1.5;
 }
 
+/* a change the game files show and Valve's notes don't (patch/hidden_change.py, owner 2026-11-21 'Свечение 3'): the tag
+   in a gold ring with a soft glow, 'Hidden change' on hover */
+.badge.hidden-change { box-shadow: inset 0 0 0 1px #fff3d6, 0 0 0 1px #a8822f, 0 0 7px 1px rgba(227, 196, 106, 0.6); }

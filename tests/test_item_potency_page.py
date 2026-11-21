@@ -13,9 +13,10 @@ def test_the_page_lists_the_flagged_values_and_the_sources():
     import item_potency
     html = item_potency.render_html()
     for title in ("How Item Potency adds up", "Items", "Attacks with their own Item Potency", "Bonuses and penalties",
-                  "Illusions", "Dormant Curio"):
+                  "Illusions"):
         assert f'<h3 class="ipot-title">{title}</h3>' in html
-    assert html.count('class="ipot-rule"') == 6                         # the rules as cards, not a table of text
+    assert html.count('class="ipot-rule"') == 5                         # the rules as cards, not a table of text
+    assert "ipot-curio" not in html                                     # Curio has its own page (owner 2026-11-21)
     # a row per value: Desolator's armour reduction, the hero's −6 and the same at 20 / 35 / 40%
     assert ">Corruption<" in html and ">-6<" in html
     assert ">-1.2<" in html and ">-2.1<" in html and ">-2.4<" in html
@@ -26,6 +27,14 @@ def test_the_page_lists_the_flagged_values_and_the_sources():
     # removed items: grey, hidden till "Show removed", no words (owner 2026-11-19)
     assert 'class="ipot-gone"' in html and "not in the game" not in html and 'class="ipot-show-gone"' in html
     assert "Pangolier" in html and "Illusion Rune" in html
+
+
+def test_dormant_curio_has_its_own_page():
+    # owner 2026-11-21: "Dormant Curio вынести на свою страницу"; Curio's bonus from items.txt (30% in 7.42)
+    import dormant_curio
+    html = dormant_curio.render_html()
+    assert "<title>s/kle - Dormant Curio</title>" in html and "With Curio +30%" in html
+    assert html.count("<tr data-name=") >= 10 and 'class="ipot-rule"' in html
 
 
 def test_a_name_under_a_key_with_a_grammar_mark_is_found():

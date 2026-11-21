@@ -112,6 +112,7 @@ MATERIALS_GROUPS = [
     ("mechanics_grp", "Mechanics", "aoe_increase.html", [
         ("aoe_increase", "AoE Increase",  "aoe_increase.html"),
         ("item_potency", "Item Potency",  "item_potency.html"),
+        ("dormant_curio", "Dormant Curio", "dormant_curio.html"),     # its own page (owner 2026-11-21)
     ]),
     # Buildings / map objectives — towers, barracks, tormentors.
     ("structures", "Structures", "structures.html", None),

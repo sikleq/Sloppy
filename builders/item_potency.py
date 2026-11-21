@@ -8,7 +8,7 @@ Little text, colour for meaning (owner 2026-11-19: "мешанина … не ч
     items no one can get in this patch dimmed;
   * sources: what sets the potency of attacks, the potency as a chip — green above 100% / a bonus, red below / a
     penalty;
-  * Dormant Curio: the values it raises and the same × 1.3.
+Dormant Curio is a mechanic of its own (owner 2026-11-21: "вынести на свою страницу"): builders/dormant_curio.py.
 Data: the newest patch's items.txt flags (apply_effectiveness / apply_curio_bonus) and the code research of 7.42
 (data/rules/item_potency_abilities.json). Nothing guessed.
 
@@ -38,7 +38,6 @@ _esc = lambda s: _html.escape(str(s), quote=True)
 RULES = _HERE / "data" / "rules" / "item_potency_abilities.json"
 ITEM_CDN = "icons/items/"
 ILLUSIONS = (("Illusion", 20), ("Manta", 35), ("Rune", 40))     # the usual potencies of an illusion
-CURIO = 1.3
 
 
 def _root(src):
@@ -184,21 +183,6 @@ def _sources_rows(version, rules, names, group):
     return rows
 
 
-def _curio_rows(version):
-    rows = []
-    for name, key, slug, vals in _scaled_values(version, "apply_curio_bonus"):
-        for k, (ab, label, value, sentence) in enumerate(vals):
-            head = _name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals)) if k == 0 else ''
-            hint = f' data-tooltip="{_esc(sentence)}"' if sentence else ''
-            prop = f'<span class="{"iab-hint abil-ico-hint " if sentence else ""}ipot-prop"{hint}>{_esc(label)}</span>'
-            v = _num(value)
-            up = _fmt(v * CURIO) if v is not None and v > 0 else (value if v is not None else "—")   # above 0 only
-            rows.append(f'<tr data-name="{_esc(name.lower())}">{head}<td class="ipot-ab">{_esc(ab)}</td>'
-                        f'<td class="ipot-text">{prop}</td><td class="ipot-v ipot-v-hero">{_esc(value)}</td>'
-                        f'<td class="ipot-v ipot-v-up">{up}</td></tr>')
-    return rows
-
-
 def render_html() -> str:
     version = _versions()[-1]
     rules = _json.loads(RULES.read_text(encoding="utf-8"))
@@ -214,18 +198,19 @@ def render_html() -> str:
             "ipot-sources", ["Source", "Attacks", "Item Potency"], _sources_rows(version, rules, names, "added")))
         + _section("Illusions", _table(
             "ipot-sources", ["Source", "Illusions", "Item Potency"], _sources_rows(version, rules, names, "illusions")))
-        # 84 rows: folded by default (design review 2026-11-19: "3672 px … длинная простыня")
-        + '<details class="ipot-fold"><summary><h3 class="ipot-title">Dormant Curio</h3></summary>'
-        + _table("ipot-curio", ["Item", "Ability", "Value", "Now", f"With Curio ×{CURIO:g}"], _curio_rows(version))
-        + '</details>'
     )
-    nav = _site.render_top_nav('materials', _latest_href(), patch_context=False, subtabs_active='item_potency',
+    return page_shell("item_potency", "Item Potency", body)
+
+
+def page_shell(key, title, body):
+    """A Materials ▸ Mechanics page around `body` (Item Potency, Dormant Curio)."""
+    nav = _site.render_top_nav('materials', _latest_href(), patch_context=False, subtabs_active=key,
                                subnav_in_header=False)
-    subnav = _site.render_materials_subnav('item_potency')
+    subnav = _site.render_materials_subnav(key)
     asset_version = _site.compute_asset_version()
     return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        '<title>s/kle - Item Potency</title>\n'
+        f'<title>s/kle - {title}</title>\n'
         + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={asset_version}">\n'
         '</head>\n<body>\n'
