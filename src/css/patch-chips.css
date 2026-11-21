@@ -339,10 +339,11 @@ html.cb-mode .pop-pct-nerf { color: #eb7115; }
 
 /* a change the game files show and Valve's notes don't (patch/hidden_change.py, owner 2026-11-21 'Свечение 3'): the tag
    in a gold ring with a soft glow, 'Hidden change' on hover */
-.badge.hidden-change { box-shadow: inset 0 0 0 1px #fff3d6, 0 0 0 1px #a8822f, 0 0 7px 1px rgba(227, 196, 106, 0.6); }
+/* stronger since owner 2026-11-21 "светящиеся теги надо сделать заметнее": a 2px ring and a wider glow */
+.badge.hidden-change { box-shadow: inset 0 0 0 1px #fff3d6, 0 0 0 2px #e3c46a, 0 0 10px 3px rgba(240, 205, 110, 0.85); }
 /* a mistake in Valve's notes (patch/valve_error.py, owner 2026-11-21): the same ring and glow in red, the real change
    on hover */
-.badge.valve-error { box-shadow: inset 0 0 0 1px #ffd9d3, 0 0 0 1px #b2392c, 0 0 7px 1px rgba(255, 92, 72, 0.6); }
+.badge.valve-error { box-shadow: inset 0 0 0 1px #ffd9d3, 0 0 0 2px #ff5a48, 0 0 10px 3px rgba(255, 80, 60, 0.85); }
 /* colour-blind mode: gold and red glows look alike to red-green blind eyes, so the mistake's ring is blue there
    (Okabe-Ito blue; advisor review 2026-11-21) */
-html.cb-mode .badge.valve-error { box-shadow: inset 0 0 0 1px #ffffff, 0 0 0 2px #0072b2, 0 0 7px 1px rgba(0, 114, 178, 0.85); }
+html.cb-mode .badge.valve-error { box-shadow: inset 0 0 0 1px #ffffff, 0 0 0 2px #2b9be0, 0 0 10px 3px rgba(43, 155, 224, 0.9); }
