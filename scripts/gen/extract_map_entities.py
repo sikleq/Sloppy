@@ -243,7 +243,17 @@ def _current(e):
     scales = e.get("pathnoderadiusscales") or []
     types = e.get("pathnodemovespeedtypes") or []
     return {"nodes": nodes, "radius": [round(s, 2) for s in scales] if isinstance(scales, list) else [],
-            "types": [int(t) for t in types] if isinstance(types, list) else []}
+            "types": [int(t) for t in types] if isinstance(types, list) else [], "npc": path_npc_type(e)}
+
+
+def path_npc_type(e):
+    """Who a dota_movespeed_modifier_path is for: 0 = every unit (a river current), 1 = lane creeps (7.42: one path
+    a lane, base to base — creeps off it get modifier_lane_creep_out_of_lane_slow, up to -25% over 10 s; on it,
+    modifier_path_in_lane). Per node in the map file (pathnodenpctype); maps before 7.42 have no such key = 0.
+    The movespeed type can NOT tell them apart: two real currents of 7.41f are type 2 as well (server.dll 6989)."""
+    raw = e.get("pathnodenpctype")
+    vals = raw if isinstance(raw, list) else [] if raw is None else [raw]
+    return max((int(float(v)) for v in vals), default=0)
 
 
 def _layers(by, zones, bounds, polys=None):
@@ -258,7 +268,11 @@ def _layers(by, zones, bounds, polys=None):
             spawners.append({**_xy(e), "team": m.group(1), "lane": m.group(2),
                              "first": re.sub(r"^\[PR#\]", "", str(e.get("npcfirstwaypoint") or ""))})
     out["npc_dota_spawner"] = sorted(spawners, key=lambda s: (s["team"], s["lane"]))
-    out["dota_movespeed_modifier_path"] = [_current(e) for e in by.get("dota_movespeed_modifier_path", [])]
+    # river currents only; the lane creeps' paths of 7.42 (same class, pathnodenpctype 1) are a layer of their own —
+    # drawn as currents they put 3 fake "+150" streams across the 7.42 map (found by DEMOS 2026-11-21)
+    paths = [_current(e) for e in by.get("dota_movespeed_modifier_path", [])]
+    out["dota_movespeed_modifier_path"] = [p for p in paths if not p["npc"]]
+    out["lane_creep_movespeed_path"] = [p for p in paths if p["npc"]]
     # one record per hull; "volume" = which entity (a fountain's shop is 3 hulls), so a count is of shops, not parts
     for cls, es in zones.items():
         out[cls] = [{"points": shape, "volume": i,

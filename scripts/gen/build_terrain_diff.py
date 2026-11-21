@@ -86,11 +86,19 @@ def lane_paths(src):
     return out
 
 
+def river_currents(src):
+    """The map's river currents: its dota_movespeed_modifier_path records for every unit. A record for lane creeps
+    ("npc" 1, 7.42: one path a lane, base to base) is not a current. extract_map_entities keeps those in a layer of
+    their own since 2026-11-21; this guards a record that still carries one (map data without "npc" is all rivers:
+    Oldgrowth's mapdata.json of 7.42 read before that day lists 8 paths, 3 of them creeps')."""
+    return [cur for cur in src.get("dota_movespeed_modifier_path", []) if not cur.get("npc")]
+
+
 def current_paths(src, steps=8):
     """[[x, y], …] per river current: its spline (cubic Bézier between nodes: node + out-tangent, next node +
     in-tangent) sampled `steps` points a segment."""
     out = []
-    for cur in src.get("dota_movespeed_modifier_path", []):
+    for cur in river_currents(src):
         nodes, pts = cur.get("nodes", []), []
         for a, b in zip(nodes, nodes[1:]):
             p0, p3 = (a["x"], a["y"]), (b["x"], b["y"])
@@ -232,7 +240,7 @@ def current_areas(src, code, steps=24):
     import numpy as np
     from contourpy import contour_generator
     out = []
-    for cur in src.get("dota_movespeed_modifier_path", []):
+    for cur in river_currents(src):
         s = np.array(_spline_samples(cur, steps), dtype=float)
         if not len(s) or not s[:, 2].any():
             out.append({"max": current_max_bonus(cur, code), "rings": []})

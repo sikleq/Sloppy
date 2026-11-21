@@ -80,6 +80,55 @@ def test_every_current_is_one_strength_end_to_end():
                 assert len(set(cur["types"])) == 1 and len(cur["radius"]) == len(cur["nodes"]), path
 
 
+# 7.42 added one movespeed path a lane, base to base, for lane creeps only (pathnodenpctype 1; server.dll 6989):
+# not river currents. DEMOS 2026-11-21: the Terrain page drew them as 3 extra "+150" streams.
+_CREEP_PATH_STARTS = {(-5888, -6016), (5568, 5760), (6048, 5344)}     # bot, top, mid
+
+
+def test_a_paths_npc_type_tells_a_creep_path_from_a_current():
+    assert ext.path_npc_type({}) == 0                                     # maps before 7.42 have no such key
+    assert ext.path_npc_type({"pathnodenpctype": [0.0, 0.0, 0.0]}) == 0
+    assert ext.path_npc_type({"pathnodenpctype": [1.0, 1.0]}) == 1
+    river = {"nodes": [{"x": 0, "y": 0, "in": [0, 0], "out": [0, 0]}], "npc": 0}
+    creeps = {**river, "npc": 1}
+    assert btd.river_currents({"dota_movespeed_modifier_path": [river, creeps, {"nodes": []}]}) == [river, {"nodes": []}]
+
+
+@pytest.mark.parametrize("code, creeps", [("741f", 0), ("742", 3), ("742-v2", 3), ("742-v3", 3)])
+def test_the_site_maps_have_five_currents_and_the_creeps_paths_apart(code, creeps):
+    with open(os.path.join(ROOT, "data", "map", f"mapdata_{code}.json"), encoding="utf-8") as f:
+        d = json.load(f)["data"]
+    assert len(d["dota_movespeed_modifier_path"]) == 5
+    assert all(c["npc"] == 0 for c in d["dota_movespeed_modifier_path"])
+    lanes = d["lane_creep_movespeed_path"]
+    assert len(lanes) == creeps and all(c["npc"] == 1 for c in lanes)
+    if creeps:
+        assert {(c["nodes"][0]["x"], c["nodes"][0]["y"]) for c in lanes} == _CREEP_PATH_STARTS
+
+
+@pytest.mark.parametrize("page", ["7.42", "7.42-v2", "7.42-v3"])
+def test_the_742_terrain_pages_draw_five_currents(page):
+    with open(os.path.join(ROOT, "data", "terrain", f"terrain_diff_{page}.json"), encoding="utf-8") as f:
+        d = json.load(f)
+    assert len(d["currents"]["old"]) == len(d["currents"]["new"]) == 5
+    assert len(d["currentAreas"]["old"]) == len(d["currentAreas"]["new"]) == 5
+
+
+@pytest.mark.parametrize("ver, total", [("7.41f-v2", 5), ("7.42", 8)])
+def test_oldgrowths_map_file_splits_into_five_currents(ver, total):
+    """From the map file's every entity (Oldgrowth, the owner's PC only): 7.41f-v2 loses nothing, 7.42 keeps 5 of 8."""
+    import gzip
+    og = os.environ.get("OLDGROWTH_DIR", os.path.join(os.path.expanduser("~"), "Oldgrowth"))
+    path = os.path.join(og, "versions", ver, "entities.json.gz")
+    if not os.path.exists(path):
+        pytest.skip("no Oldgrowth on this machine")
+    with gzip.open(path, "rt", encoding="utf-8") as f:
+        ents = [e for e in json.load(f) if e.get("classname") == "dota_movespeed_modifier_path"]
+    paths = [ext._current(e) for e in ents]
+    assert len(paths) == total
+    assert len(btd.river_currents({"dota_movespeed_modifier_path": paths})) == 5
+
+
 def test_a_currents_zone_is_its_spline_swept_by_the_node_radius():
     pytest.importorskip("contourpy")
     src = {"dota_movespeed_modifier_path": [{
