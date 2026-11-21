@@ -26,7 +26,12 @@ def _table(version, name):
         text = next((t for t in (game_files.read(version, rel) for rel in FILES[name]) if t), None)
         if text:
             for m in _RX.finditer(text):
-                table.setdefault(m.group(1).lower(), m.group(2))
+                k = m.group(1).lower()
+                table.setdefault(k, m.group(2))
+                # a grammar mark after the key ("…item_riftshadow_prism:n", 7.42) — the name under its plain key too;
+                # without it the page showed "item_riftshadow_prism" (owner 2026-11-21)
+                if re.search(r":[a-z]$", k):
+                    table.setdefault(k[:-2], m.group(2))
         _CACHE[key] = table
     return _CACHE[key]
 

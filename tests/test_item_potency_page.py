@@ -28,6 +28,14 @@ def test_the_page_lists_the_flagged_values_and_the_sources():
     assert "Pangolier" in html and "Illusion Rune" in html
 
 
+def test_a_name_under_a_key_with_a_grammar_mark_is_found():
+    # 7.42 "DOTA_Tooltip_Ability_item_riftshadow_prism:n": the page showed "item_riftshadow_prism" (owner 2026-11-21)
+    from patch.loc_history import tooltip
+    assert tooltip("DOTA_Tooltip_Ability_item_riftshadow_prism", "7.42") == "Riftshadow Prism"
+    import item_potency
+    assert ">item_riftshadow_prism<" not in item_potency.render_html()
+
+
 def test_a_selected_item_of_several_rows_is_framed_as_one():
     # owner 2026-11-19, Eye of Skadi's five rows: "при выделении строки выделяет только 1 вариант"
     from patch.css_bundle import read_css
