@@ -479,7 +479,7 @@ _UNIT_ABILITY_RE = re.compile(r'^(?P<ind>\s*)W\(ability\("(?P<new>[^"]+)", icon_
 _RENAMED_ROW_RE = re.compile(r'^\s*W\(li\("(?P<old>[A-Z][\w\' -]+?)(?: ability)? renamed (?:in)?to (?P<new>[A-Z][\w\' -]+?)"')
 
 
-_REWORKED_ROW_RE = re.compile(r'^\s*W\(li\("Ability [Rr]eworked"')
+_REWORKED_ROW_RE_TABLES = re.compile(r'^\s*W\(li\("Ability [Rr]eworked"')
 _REPLACED_ROW_RE = re.compile(r'^\s*W\(li\("(?P<old>[A-Z][\w\' -]+?) ability replaced with (?P<new>[A-Z][\w\' -]+?)"')
 
 
@@ -500,7 +500,7 @@ def _unit_card(rows, m, version):
         ren = _RENAMED_ROW_RE.match(r)
         if ren and ren.group("new") == name:
             return ren.group("old"), slug, name, slug, "Ability reworked.", "rework"
-        if _REWORKED_ROW_RE.match(r):
+        if _REWORKED_ROW_RE_TABLES.match(r):
             return name, slug, name, slug, "Ability reworked.", "rework"
         rep = _REPLACED_ROW_RE.match(r)
         if rep and rep.group("old") == name:
@@ -562,7 +562,7 @@ def _postprocess_renamed_unit_ability(lines, version=None):
     return out
 
 
-_MECH_HEAD_RE = re.compile(r'^\s*W\(plain_header\("[^"]+", new="(?:Reworked|New) mechanic"')
+_MECH_HEAD_RE_TABLES = re.compile(r'^\s*W\(plain_header\("[^"]+", new="(?:Reworked|New) mechanic"')
 _ROW_HEAD_RE = re.compile(r'^(?P<head>\s*W\(li\("(?P<text>(?:[^"\\]|\\.)*)",.*?)(?P<tail>\)\))\s*$')
 
 
@@ -574,7 +574,7 @@ def _postprocess_mechanic_name_icons(lines):
     out, in_mech = [], False
     for ln in lines:
         if re.match(r'^\s*W\((?:plain_header|section|unit_header|subgroup)\(', ln):
-            in_mech = bool(_MECH_HEAD_RE.match(ln))
+            in_mech = bool(_MECH_HEAD_RE_TABLES.match(ln))
         row = _ROW_HEAD_RE.match(ln) if in_mech else None
         if not row:
             out.append(ln)
@@ -692,7 +692,7 @@ _STATS_ROW_RE = re.compile(r'^\s*W\(li\("New Level \d+ [\w ]+Creep", t\("\w+"\)'
 _BLOCK_START_RE = re.compile(r'^\s*W\((?:unit_header|hero_header|item_header|section|plain_header)\(')
 
 
-def _unit_abilities(npc, version):
+def _unit_abilities_tables(npc, version):
     """{tooltip name: (slug, icon file)} of npc_dota_neutral_<npc>'s abilities in the files of `version`."""
     import os
     from patch import game_files
@@ -725,7 +725,7 @@ def _postprocess_new_creep_abilities(lines, version=None):
     for ln in lines:
         head = _NEW_UNIT_HEAD_RE.match(ln)
         if head:
-            abilities = _unit_abilities(head.group("npc"), version) if version else {}
+            abilities = _unit_abilities_tables(head.group("npc"), version) if version else {}
             ind = head.group("ind")
             out.append(ln)
             continue

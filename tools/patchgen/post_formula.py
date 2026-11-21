@@ -108,7 +108,7 @@ def _formula_triple(lines, i):
 
 def _postprocess_formula_rows(lines):
     """Each old / new formula leaves its list as a block of its own; the lists left empty go."""
-    from .post_general import _drop_empty_lists
+    from .post_general import _drop_empty_lists_general as _drop_empty_lists
     out, changed, i = [], False, 0
     while i < len(lines):
         block, used = formula_block(lines[i]), 1

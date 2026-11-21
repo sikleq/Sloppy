@@ -7,7 +7,7 @@ import re
 from .notes import _LEVELS_OF_RE, _ROW_NOTE_RE
 
 SHARED_LEAST = 3                   # a row two abilities share stays in each (merging neighbours is notes' own rule)
-_HERO_RE = re.compile(r'^\s*W\(hero_header\(')
+_HERO_RE_SHARED = re.compile(r'^\s*W\(hero_header\(')
 _ONE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"\)\)\s*$')
 _GROUP_RE = re.compile(r'^(\s*)W\(ability_group\((.*)\)\)\s*$')
 _PAIR_RE = re.compile(r'\("([^"]+)", "([^"]+)"\)')
@@ -31,7 +31,7 @@ def _blocks(lines, start, end):
 
 def _postprocess_shared_row_group(lines):
     out = list(lines)
-    starts = [i for i, line in enumerate(out) if _HERO_RE.match(line)]
+    starts = [i for i, line in enumerate(out) if _HERO_RE_SHARED.match(line)]
     for start, end in reversed(list(zip(starts, starts[1:] + [len(out)]))):
         blocks = _blocks(out, start, end)
         found = {}                                   # the row's words -> [(block, row index, note)]

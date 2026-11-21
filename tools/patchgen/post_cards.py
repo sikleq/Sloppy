@@ -13,7 +13,7 @@ from .lines import (
 _SAME_EFFECT_ROW_RE = re.compile(
     r'^\s*W\(li\("Now has the same effect for both Arc Warden and Tempest Double", t\("REWORK"\), extra=inline_note\("'
     r'(?P<both>.*?)\s*<span class=\\"pop-note\\">\(Previous values: Arc Warden: (?P<hero>.*?)\.\s*Tempest Double: (?P<double>.*?)\)</span>"\)\)\)\s*$')
-_ABILITY_LINE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"\)\)\s*$')
+_ABILITY_LINE_RE_CARDS = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"\)\)\s*$')
 _UPGRADE_ROW_RE = re.compile(r'^\s*W\(li\("Aghanim\'s (?:Shard|Scepter):')
 
 
@@ -62,7 +62,7 @@ def _postprocess_two_selves_cards(lines, version=None):
     out = []
     i = 0
     while i < len(lines):
-        at = _ABILITY_LINE_RE.match(lines[i])
+        at = _ABILITY_LINE_RE_CARDS.match(lines[i])
         if not at or i + 1 >= len(lines) or lines[i + 1].strip() != 'W(ul_open())':
             out.append(lines[i])
             i += 1

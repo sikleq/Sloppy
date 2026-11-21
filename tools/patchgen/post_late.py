@@ -178,7 +178,7 @@ def _postprocess_facet_improves_row(lines):
     return out
 
 
-_BLOCK_START_RE = re.compile(r'^\s*W\((ability|ability_change|ability_group|two_selves_change|new_ability|facet_header|facet_group|new_facet|facet_change)\(')
+_BLOCK_START_RE_LATE = re.compile(r'^\s*W\((ability|ability_change|ability_group|two_selves_change|new_ability|facet_header|facet_group|new_facet|facet_change)\(')
 _FACET_KINDS = ("facet_header", "facet_group", "new_facet", "facet_change")
 _HERO_END_RE = re.compile(r'^\s*(?:W\((?:hero_header|section|unit_header|item_header|plain_header|enchant_header)\(|write_footer\(|save_html\()')
 
@@ -191,11 +191,11 @@ def _facets_first(span):
         stop = len(span)
         while stop and (not span[stop - 1].strip() or span[stop - 1].lstrip().startswith("#")):
             stop -= 1
-    starts = [k for k in range(stop) if _BLOCK_START_RE.match(span[k])]
+    starts = [k for k in range(stop) if _BLOCK_START_RE_LATE.match(span[k])]
     if not starts or any("sub=True" in ln for ln in span[:stop]):
         return span
     blocks = [span[a:b] for a, b in zip(starts, starts[1:] + [stop])]
-    kinds = [_BLOCK_START_RE.match(b[0]).group(1) in _FACET_KINDS for b in blocks]
+    kinds = [_BLOCK_START_RE_LATE.match(b[0]).group(1) in _FACET_KINDS for b in blocks]
     if kinds == sorted(kinds, reverse=True):
         return span
     facets = [b for b, f in zip(blocks, kinds) if f]
@@ -747,7 +747,7 @@ def _postprocess_new_facet_rows(lines):
     return out
 
 
-_WORD_RE = re.compile(r"[a-z]{4,}")
+_WORD_RE_LATE = re.compile(r"[a-z]{4,}")
 
 
 def _take_innate_text_rows(out, slug, version):
@@ -755,7 +755,7 @@ def _take_innate_text_rows(out, slug, version):
     — 7.37 Visage: "Visage's ability cooldown durations are reduced as long as he's not taking damage …" stood among
     the hero's rows, Lurker's text: most of its words are in the game's description. Taken out of `out` and returned."""
     from patch.aghs_text import ability_text
-    desc = set(_WORD_RE.findall((ability_text(slug, version) or "").lower()))
+    desc = set(_WORD_RE_LATE.findall((ability_text(slug, version) or "").lower()))
     if not desc:
         return []
     start = max((k for k, ln in enumerate(out) if _HERO_LINE_RE.match(ln)), default=None)
@@ -770,7 +770,7 @@ def _take_innate_text_rows(out, slug, version):
         # 2026-10-30, 7.37 Beastmaster: "melee hero damage block chance is increased from 50% to 100% versus non-hero
         # units" is Rugged's whole text: "это разве не innate?")
         least = 0.6 if ', t("' in ln and " from " not in ln else 0.9
-        words = set(_WORD_RE.findall(ln.lower()))
+        words = set(_WORD_RE_LATE.findall(ln.lower()))
         if len(words) >= 8 and len(words & desc) / len(words) >= least:
             taken.insert(0, out.pop(k))
     # a general list left empty goes

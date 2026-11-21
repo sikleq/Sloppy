@@ -18,7 +18,7 @@ _PER_MINUTE_ROW = re.compile(r'^W\(li\("(?P<name>[^"]*?\b(?:upgrade|growth|gain)
 _MINUTE_LEVELS = "[0, 5, 10, 15, 20, 25, 30, 40, 50, 60]"
 
 
-_UNIT_HEAD_RE = re.compile(r'^W\(unit_header\("(?P<name>[^"]+)"')
+_UNIT_HEAD_RE_GENERAL = re.compile(r'^W\(unit_header\("(?P<name>[^"]+)"')
 
 
 def _postprocess_boss_rows_home(lines):
@@ -30,7 +30,7 @@ def _postprocess_boss_rows_home(lines):
         head = f'W(unit_header("{boss}", "{icon}", general=False, track=True))'
         unit, stray = None, []
         for i, line in enumerate(out):
-            m = _UNIT_HEAD_RE.match(line)
+            m = _UNIT_HEAD_RE_GENERAL.match(line)
             if m:
                 unit = m.group("name")
             elif re.match(r'^W\((?:hero_header|item_header|plain_header|section|subgroup)\(', line):
@@ -59,7 +59,7 @@ def _postprocess_unit_possessive(lines):
     "Spawn preference has switched" (owner 2026-10-16: the card already says whose it is)."""
     out, unit = [], None
     for line in lines:
-        m = _UNIT_HEAD_RE.match(line)
+        m = _UNIT_HEAD_RE_GENERAL.match(line)
         if m:
             unit = m.group("name")
         elif re.match(r'^W\((?:hero_header|item_header|plain_header|section)\(', line):
@@ -330,7 +330,7 @@ _COURIER_HEAD = 'W(unit_header("Courier", "../icons/units/npc_dota_courier.png",
 _COURIER_ROW_RE = re.compile(r'^W\(li(?:_formula)?\("(?:Flying )?Couriers? ')
 
 
-def _drop_empty_lists(out):
+def _drop_empty_lists_general(out):
     """The lists a pass left empty go, with their header when nothing else is under it."""
     out, i = list(out), 0
     while i + 1 < len(out):
@@ -346,7 +346,7 @@ def _drop_empty_lists(out):
 
 
 # "like those granted by Gleipnir" (7.38 Ice Wall) names its example after the words about it
-_EXAMPLE_RE = re.compile(r"(?:such as|e\.g\.|for example,?|\blike(?: those (?:granted by|from|of))?) (?P<list>[A-Z][^.;:)]*)")
+_EXAMPLE_RE_GENERAL = re.compile(r"(?:such as|e\.g\.|for example,?|\blike(?: those (?:granted by|from|of))?) (?P<list>[A-Z][^.;:)]*)")
 _EXAMPLE_NAME_RE = re.compile(r"[A-Z][\w'\u2019-]*(?: (?:of|the|[A-Z][\w'\u2019-]*))*")
 _EXAMPLE_ROW_RE = re.compile(r'^(?P<head>\s*W\(li\("(?P<text>(?:[^"\\]|\\.)*)",.*?)(?P<tail>\)\))\s*$')
 
@@ -363,7 +363,7 @@ def _postprocess_example_icons(lines):
             out.append(raw)
             continue
         found = {}
-        for listed in _EXAMPLE_RE.finditer(row.group("text")):
+        for listed in _EXAMPLE_RE_GENERAL.finditer(row.group("text")):
             for name in _EXAMPLE_NAME_RE.findall(listed.group("list")):
                 try:
                     mech_example(name)
@@ -394,7 +394,7 @@ def _postprocess_courier_rows(lines):
         return lines
     if anchor is None:                                 # no list closes after the row: the block goes last
         anchor = len(keep)
-    return _drop_empty_lists(keep[:anchor] + [_COURIER_HEAD, 'W(ul_open())', *rows, 'W(ul_close())'] + keep[anchor:])
+    return _drop_empty_lists_general(keep[:anchor] + [_COURIER_HEAD, 'W(ul_open())', *rows, 'W(ul_close())'] + keep[anchor:])
 
 
 _RUNE_ROW_LINE_RE = re.compile(r'^W\(li\("(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes?: (?P<rest>.*)$')
@@ -437,7 +437,7 @@ def _postprocess_rune_rows(lines):
                 for name, rows in pending.items():
                     out += [_rune_head(name, RUNE_ICONS), 'W(ul_open())', *rows, 'W(ul_close())']
                 pending = {}
-    return _gather_rune_blocks(_drop_empty_lists(out)) if changed else lines
+    return _gather_rune_blocks(_drop_empty_lists_general(out)) if changed else lines
 
 
 def _gather_rune_blocks(lines):
@@ -504,7 +504,7 @@ def _postprocess_team_abilities(lines):
                    if re.match(r'^\s*(?:W\((?:plain_header|section)\(|# =====)', keep[k])), len(keep))
     while anchor > 0 and not keep[anchor - 1].strip():
         anchor -= 1
-    return _drop_empty_lists(keep[:anchor] + block + keep[anchor:])
+    return _drop_empty_lists_general(keep[:anchor] + block + keep[anchor:])
 
 
 def _postprocess_new_block_label(lines):

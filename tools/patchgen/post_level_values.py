@@ -4,7 +4,7 @@ gold). The full levels come from the hero's file of that patch; a line the file 
 was."""
 import re
 
-_ROW_RE = re.compile(r'^(?P<ind>\s*)W\(li\("Added values for (?P<trig>levels? (?P<lv>[\d, and]+))", t\("NEW"\), '
+_ROW_RE_LEVEL_VALUES = re.compile(r'^(?P<ind>\s*)W\(li\("Added values for (?P<trig>levels? (?P<lv>[\d, and]+))", t\("NEW"\), '
                      r'extra=inline_note\("(?P<note>[^"]+)"\)\)\)\s*$')
 _ITEM_RE = re.compile(r'^(?P<ab>[^:]+): (?P<label>.+?)(?: \((?P<scale>[^)]+)\))? (?P<vals>[\d.]+(?:/[\d.]+)+)'
                       r'(?P<unit>%|s)?$')
@@ -97,7 +97,7 @@ def _postprocess_level_values(lines, version):
         if _HERO_RE.search(line):
             names = {}
         names.update(dict(_NAMED_RE.findall(line)))
-        m = _ROW_RE.match(line)
+        m = _ROW_RE_LEVEL_VALUES.match(line)
         if not m or not names:
             out.append(line)
             continue

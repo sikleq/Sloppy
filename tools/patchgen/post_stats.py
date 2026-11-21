@@ -3,6 +3,8 @@ import re
 
 from .entities import _AGHS_LINE_RE
 from .lines import _ENTITY_START_RE, _PROP_CHANGE_RE, _py_repr
+from .names import _py_str  # noqa: F401  (post_late, post_tables import it from here)
+
 
 def _postprocess_aghs_merge(lines):
     """Collapse the v2-emitted aghs upgrade row +its inline-note description
@@ -641,9 +643,6 @@ def _dmg_fold_is_parent(call):
         return bool(_DMG_FOLD_PARENT_RE.match(a0.value))
     return isinstance(a0, _ast.Call) and isinstance(a0.func, _ast.Name) and a0.func.id == "attr_change"
 
-
-def _py_str(s):
-    return '"' + s.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
 
 def fold_damage_l1_src(src):

@@ -1,7 +1,7 @@
 """A hero's General list: the rows that say what the hero is first, a summary the cards below already show hidden."""
 import re
 
-_HERO_RE = re.compile(r'^\s*W\(hero_header\(')
+_HERO_RE_HERO = re.compile(r'^\s*W\(hero_header\(')
 _ATTR_ROW_RE = re.compile(r'^\s*W\(li\(attr_change\(')
 _STAT_CARD_RE = re.compile(r'^\s*W\(hero_stat_card\(')
 # ... and a row of what the chosen facet adds ("Aghanim's Scepter … also provides an additional level to the orb of the
@@ -12,7 +12,7 @@ _NEW_FACET_RE = re.compile(r'^\s*W\(new_facet\(')
 
 def _hero_spans(lines):
     """(start, end) of each hero's lines: from its header to the next one."""
-    starts = [i for i, line in enumerate(lines) if _HERO_RE.match(line)]
+    starts = [i for i, line in enumerate(lines) if _HERO_RE_HERO.match(line)]
     return list(zip(starts, starts[1:] + [len(lines)]))
 
 

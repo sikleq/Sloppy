@@ -5,8 +5,8 @@ import re
 
 _ROW_TEXT_RE = re.compile(r'^\s*W\(li(?:_formula)?\("((?:[^"\\]|\\.)*)"')
 _FORMULA_ROW_RE = re.compile(r'^\s*W\(li_formula\("((?:[^"\\]|\\.)*)", "([^"]+)", "([^"]+)"')
-_HERO_RE = re.compile(r'^\s*W\(hero_header\("([^"]+)"')
-_ITEM_RE = re.compile(r'^\s*W\(item_header\("([^"]+)"')
+_HERO_RE_MECH_LISTS = re.compile(r'^\s*W\(hero_header\("([^"]+)"')
+_ITEM_RE_MECH_LISTS = re.compile(r'^\s*W\(item_header\("([^"]+)"')
 _ABIL_RE = re.compile(r'^\s*W\(ability\("([^"]+)"')
 _TALENTS_RE = re.compile(r'^\s*W\(subgroup\("Talents"')
 _SPECIFICS_RE = re.compile(r'^\s*W\(li\("Specifics for (?:this|these|any of these) changes? can be found in the '
@@ -17,9 +17,9 @@ def _entity_walk(lines):
     """(index, kind, owner, ability) of every line: whose block it is in."""
     kind = owner = abil = None
     for i, ln in enumerate(lines):
-        m = _HERO_RE.match(ln) or _ITEM_RE.match(ln)
+        m = _HERO_RE_MECH_LISTS.match(ln) or _ITEM_RE_MECH_LISTS.match(ln)
         if m:
-            kind, owner, abil = ("hero" if _HERO_RE.match(ln) else "item"), m.group(1), None
+            kind, owner, abil = ("hero" if _HERO_RE_MECH_LISTS.match(ln) else "item"), m.group(1), None
         elif _ABIL_RE.match(ln):
             abil = _ABIL_RE.match(ln).group(1)
         elif _TALENTS_RE.match(ln):
