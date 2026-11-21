@@ -86,8 +86,9 @@
   position: relative;
   z-index: 61;
 }
+/* no background of its own: a `background` here dropped the row / column hover shade on every empty cell, so the hover
+   lit cells "будто рандомно" (owner 2026-11-21); empty cells are a dash, as on Item Potency */
 .mr-table.aoe-table td.aoe-cell-empty {
-  background: rgba(0, 0, 0, 0.12);
   text-align: center;
 }
 .mr-table.aoe-table td.aoe-cell .aoe-cell-dash {
@@ -116,12 +117,15 @@
    .sticky-col — it covers any collapsed-border seam that bleeds through on
    horizontal scroll.  The -1px inset draws the row separator at the bottom of
    the FULL row (same as the non-sticky cells' border-bottom). */
-.mr-table.aoe-table td.aoe-name .hs-ico {
+/* one name cell for AoE Increase's hero and Item Potency's item (owner 2026-11-21: "достичь единого формата в обеих
+   вкладках") */
+.mr-table.aoe-table td.aoe-name .hs-ico, table.mr-table.ipot-table td.ipot-name .mr-ico {
   display: inline-block;
   vertical-align: middle;
   margin-right: 16px;
 }
-.mr-table.aoe-table td.aoe-name .mr-name-body { vertical-align: middle; }
+.mr-table.aoe-table td.aoe-name .mr-name-body,
+table.mr-table.ipot-table td.ipot-name .mr-name-body { vertical-align: middle; }
 /* a phone: the hero as its icon (design review 2026-11-21: the name took 60% of the screen, one ability column showed)
    — the name stays for search and screen readers */
 @media (max-width: 760px) {
@@ -130,7 +134,7 @@
   .mr-table.aoe-table td.aoe-name .hs-ico { margin-right: 0; }
   .mr-table.aoe-table td.aoe-name, .mr-table.aoe-table thead th.aoe-name { min-width: 0; width: 56px; padding: 4px 6px; }
 }
-.mr-table.aoe-table td.aoe-name {
+.mr-table.aoe-table td.aoe-name, table.mr-table.ipot-table td.ipot-name {
   /* Override .mr-table .mr-name {display:grid} — grid on a <td> drops it out
      of the table's automatic row-height equalisation (same fix as td.hs-name). */
   display: table-cell;
@@ -334,11 +338,16 @@ table.mr-table.ipot-table tr.ipot-gone td { opacity: 0.45; }
 table.mr-table.ipot-table tr.ipot-gone { display: none; }
 .ipot-page.ipot-with-gone table.mr-table.ipot-table tr.ipot-gone { display: table-row; }
 /* the "Removed" switch is the site's filter button in the site's filter card (as Neutral Stats'): only its place here */
-.ipot-tools { margin: 0 0 8px; justify-content: flex-start; }
-.ipot-name { white-space: nowrap; font-weight: 600; }
-.ipot-nm-wrap { display: inline-flex; align-items: center; gap: 10px; }
-.ipot-name img { border-radius: 3px; }
-.ipot-owner { display: block; color: var(--text-dim); font-weight: 400; font-size: 12px; }
+.ipot-tools { margin: 0 0 12px; justify-content: flex-start; }
+/* the two-floor header (variant 1, owner 2026-11-21): a thin line under each named group, so the group reads as the
+   roof of its columns ("не хватает горизонтального разделителя?"); a blank group has none */
+table.mr-table.ipot-table thead tr.cat-row th.cat-head:not(:empty),
+.mr-table.aoe-table thead tr.cat-row th.cat-head:not(:empty) { box-shadow: inset 0 -1px 0 var(--line-soft); }
+/* an ability's square icon in the items' 36 px slot, the hero's name under the ability's */
+table.mr-table.ipot-table td.ipot-name .mr-ico.ipot-ico-sq { width: 26px; height: 26px; margin-left: 5px; margin-right: 21px; }
+table.mr-table.ipot-table td.ipot-name .mr-name-body { display: inline-flex; flex-direction: column; align-items: flex-start;
+  gap: 0; }
+.ipot-owner { color: var(--text-dim); font-weight: 400; font-size: 12px; }
 .ipot-prop.iab-hint { text-decoration: underline dotted rgba(150, 146, 137, 0.7); text-underline-offset: 3px; cursor: help; }
 .ipot-chip { display: inline-block; min-width: 46px; padding: 1px 8px; border-radius: 3px; font-weight: 700;
   background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
@@ -356,32 +365,20 @@ table.mr-table.ipot-table td.ipot-p40 { color: rgba(214, 208, 196, 0.85); }
 /* illusions do not get it at all (the game's note on hover, owner 2026-11-21): a faint dash, not a number */
 table.mr-table.ipot-table td.ipot-no-ill { color: rgba(214, 208, 196, 0.3); }
 @media (max-width: 760px) {
-  .ipot-name { white-space: normal; min-width: 130px; }
-  .ipot-nm-wrap { align-items: flex-start; flex-wrap: wrap; gap: 4px; max-width: 100%; }
-  .ipot-nm { min-width: 0; overflow-wrap: anywhere; }
+  table.mr-table.ipot-table td.ipot-name { white-space: normal; min-width: 130px; }
+  table.mr-table.ipot-table td.ipot-name .mr-name-text { white-space: normal; overflow-wrap: anywhere; }
   table.mr-table.ipot-table td { padding: 6px 8px; }
   /* the items' table on a phone (design review 2026-11-21: "Hero" was off screen): the item as its icon, no ability
      column (the value's name keeps the game's sentence on tap), the hero's value next to its name */
   table.mr-table.ipot-items td.ipot-name { min-width: 0; width: 1%; }
-  table.mr-table.ipot-items td.ipot-name .ipot-nm { display: none; }
-  table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items thead th:nth-child(2) { display: none; }
+  table.mr-table.ipot-items td.ipot-name .mr-name-body { display: none; }
+  table.mr-table.ipot-items td.ipot-name .mr-ico { margin-right: 0; }
+  /* the ability column squeezed to nothing, not display:none — the group row above (Item / Hero / Illusions) still
+     counts it, and a hidden cell shifted the rest of its row a column left (2026-11-21) */
+  table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items tr.col-row th:nth-child(2) {
+    width: 0; min-width: 0; max-width: 0; padding: 0; border: 0; overflow: hidden; font-size: 0; }
   table.mr-table.ipot-items td { padding: 6px 5px; }
   .ipot-rules { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 78%; overflow-x: auto;
     scroll-snap-type: x mandatory; padding-bottom: 4px; }
   .ipot-rule { scroll-snap-align: start; }
 }
-
-/* TABLE AS A CARD (owner 2026-11-21: variant 4 of the header mock, tried on Item Potency and AoE Increase first, "там
-   решим потом стоит ли в другие места"): the table in the site's pixel frame, the header row in Jersey on a faint gold
-   tint — much fainter than the mock's ("фон заметно прозрачнее, а то названий заголовок не будет видно"), on an opaque
-   base so a sticky header hides the rows under it — and every second row (Item Potency: every second item) striped */
-.tbl-card { border: 2px solid #6d5c3a; box-shadow: 0 0 0 2px #0c0b09, inset 0 0 0 1px #2a241b; background: #1a1713;
-  margin-bottom: 4px; }
-.tbl-card.tbl-card-fit { width: max-content; max-width: 100%; }
-.tbl-card table.mr-table { margin: 0; }
-.tbl-card table.mr-table thead th {
-  font-family: var(--font-j10); font-weight: 400; font-size: 17px; letter-spacing: .3px; color: #f1e2b3;
-  background: linear-gradient(rgba(227, 196, 106, 0.05), rgba(227, 196, 106, 0.05)), #1a1713;
-  border-bottom: 2px solid #6d5c3a; }
-.tbl-card table.mr-table tbody tr.ipot-alt td,
-.tbl-card table.aoe-table tbody tr:nth-child(even) td:not(.aoe-name) { background-color: rgba(255, 255, 255, 0.025); }

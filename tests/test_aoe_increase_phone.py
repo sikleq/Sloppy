@@ -12,7 +12,7 @@ def test_the_values_hug_the_left_edge():
 
 def test_the_hero_is_its_icon_on_a_phone():
     css = read_css()
-    block = css.split("td.aoe-name .mr-name-body { vertical-align: middle; }", 1)[1].split("}\n}", 1)[0]
+    block = css.split("td.ipot-name .mr-name-body { vertical-align: middle; }", 1)[1].split("}\n}", 1)[0]
     assert "@media (max-width: 760px)" in block
     assert ".mr-table.aoe-table td.aoe-name .mr-name-body, .mr-table.aoe-table thead th.aoe-name .th-label" in block
     assert "clip: rect(0 0 0 0)" in block                 # visually hidden, not display:none: search still reads it

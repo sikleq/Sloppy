@@ -114,11 +114,14 @@ def _section(title, table):
 _TEXT_HEADS = {"Ability", "Value", "Attacks", "Illusions"}      # word columns: their heads left, as their cells
 
 
-def _table(cls, head, rows):
+def _table(cls, head, rows, groups=()):
+    """`groups`: (label, columns) for a row of groups over the columns — the two-floor header of Hero Stats and Neutral
+    Stats (owner 2026-11-21 chose variant 1 of the header mock: one system for the site's tables)."""
     th = "".join(f'<th{" class=ipot-th-text" if h in _TEXT_HEADS and i else ""}>{h}</th>' for i, h in enumerate(head))
-    # in the "card" frame (owner 2026-11-21 chose variant 4 of src mock _table_header_variants: tbl-card, aoe-increase.css)
-    return (f'<div class="tbl-card"><table class="mr-table hs-table ipot-table {cls}"><thead><tr class="col-row">{th}</tr>'
-            f'</thead><tbody>{"".join(rows)}</tbody></table></div>')
+    cat = "".join(f'<th class="cat-head" colspan="{n}">{label}</th>' for label, n in groups)
+    cat_row = f'<tr class="cat-row">{cat}</tr>' if groups else ''
+    return (f'<table class="mr-table hs-table ipot-table {cls}"><thead>{cat_row}<tr class="col-row">{th}</tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody></table>')
 
 
 def _name_cell(name, icon, owner="", span=1, wide=True):
@@ -126,9 +129,13 @@ def _name_cell(name, icon, owner="", span=1, wide=True):
     rs = f' rowspan="{span}"' if span > 1 else ''
     who = f'<span class="ipot-owner">{_esc(owner)}</span>' if owner else ''
     # no file, no picture: a broken image showed its file name (design review 2026-11-19)
-    img = (f'<img src="{icon}" alt="" loading="lazy" width="{w}" height="{h}">'
-           if icon and (_HERE / icon).exists() else '')
-    return f'<td class="ipot-name"{rs}><span class="ipot-nm-wrap">{img}<span class="ipot-nm">{_esc(name)}{who}</span></span></td>'
+    sq = '' if wide else ' ipot-ico-sq'
+    img = (f'<img class="mr-ico{sq}" src="{icon}" alt="" loading="lazy" width="{w}" height="{h}">'
+           if icon and (_HERE / icon).exists() else '<span class="mr-ico mr-ico-blank"></span>')
+    # the cell of AoE Increase's hero and Hero Stats' (owner 2026-11-21: "достичь единого формата в обеих вкладках"),
+    # so its icon grows on hover as on Mana Items
+    return (f'<td class="mr-name hs-name ipot-name"{rs}>{img}<span class="mr-name-body">'
+            f'<span class="mr-name-text">{_esc(name)}</span>{who}</span></td>')
 
 
 def _chip(text):
@@ -210,15 +217,11 @@ def _melee_ranged(vals):
 def _items_rows(version, rules):
     gone = set(rules.get("not_in_game", []))
     rows = []
-    shown = 0                              # items in the game so far: every second one striped, all its rows (card look)
     for name, key, slug, vals in _scaled_values(version, "apply_effectiveness"):
         no_ill = no_illusions(key, version)
         vals = _melee_ranged(vals)
-        alt = key not in gone and shown % 2 == 1
-        shown += key not in gone
         for k, (ab, label, value, sentence) in enumerate(vals):
-            classes = " ".join(c for c in ("ipot-gone" if key in gone else "", "ipot-alt" if alt else "") if c)
-            cls = f' class="{classes}"' if classes else ''
+            cls = ' class="ipot-gone"' if key in gone else ''
             # removed from the game: grey, hidden till "Show removed" (owner 2026-11-19: no "not in the game" words)
             head = _name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals)) if k == 0 else ''
             hint = f' data-tooltip="{_esc(sentence)}"' if sentence else ''
@@ -270,11 +273,14 @@ def render_html() -> str:
     version = _versions()[-1]
     rules = _json.loads(RULES.read_text(encoding="utf-8"))
     names = _load_display_names()
-    head_items = ["Item", "Ability", "Value", "Hero"] + [f"{n} {p}%" for n, p in ILLUSIONS]
+    # under the groups the columns say only what is new: the hero's 100%, the illusion's 20%, Manta, Rune
+    head_items = ["Item", "Ability", "Value", "100%"] + [f"{p}%" if n == "Illusion" else f"{n} {p}%" for n, p in ILLUSIONS]
+    # the first group blank: "Item" over "Item" was said twice (owner 2026-11-21: "два раза hero" on AoE Increase)
+    groups_items = [("", 3), ("Hero", 1), ("Illusions", len(ILLUSIONS))]
     body = (
         _section("How Item Potency adds up", _rules_cards(rules))
         + _section("Items", REMOVED_BUTTON
-                   + _table("ipot-items", head_items, _items_rows(version, rules)))
+                   + _table("ipot-items", head_items, _items_rows(version, rules), groups_items))
         + _section("Attacks with their own Item Potency", _table(
             "ipot-sources", ["Ability", "Attacks", "Item Potency"], _sources_rows(version, rules, names, "own")))
         + _section("Bonuses and penalties", _table(

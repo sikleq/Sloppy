@@ -171,13 +171,22 @@
   // (shard/scepter/talent toggle) cannot cause horizontal layout shift.
   requestAnimationFrame(() => {
     let total = 0;
-    table.querySelectorAll('thead th').forEach(th => {
+    // the column row only: the group row above it (Hero / Abilities, 2026-11-21) spans several columns
+    table.querySelectorAll('thead tr.col-row th').forEach(th => {
       const w = th.offsetWidth;
       total += w;
       th.style.width = w + 'px';
       th.style.minWidth = w + 'px';
       th.style.maxWidth = w + 'px';
     });
+    // a fixed table takes its widths from <col>s or its FIRST row — that is the group row now, so hand them to <col>s
+    const cols = document.createElement('colgroup');
+    table.querySelectorAll('thead tr.col-row th').forEach(th => {
+      const col = document.createElement('col');
+      col.style.width = th.style.width;
+      cols.appendChild(col);
+    });
+    table.insertBefore(cols, table.firstChild);
     table.style.width = total + 'px';
     table.style.tableLayout = 'fixed';
   });
@@ -186,10 +195,13 @@
   // header just below it (exception to the usual "toolbar scrolls away" rule).
   const toolbar = document.querySelector('.aoe-toolbar');
   if (toolbar) {
-    const heads = [...table.querySelectorAll('thead th')];
+    const catRow = table.querySelector('thead tr.cat-row');
     const offsetHead = () => {
       const h = Math.round(toolbar.getBoundingClientRect().height);
-      heads.forEach(th => { th.style.top = h + 'px'; });
+      // two floors: the groups under the toolbar, the columns under the groups (2px overlap: no seam)
+      const cat = catRow ? Math.floor(catRow.getBoundingClientRect().height) - 2 : 0;
+      if (catRow) catRow.querySelectorAll('th').forEach(th => { th.style.top = h + 'px'; });
+      table.querySelectorAll('thead tr.col-row th').forEach(th => { th.style.top = (h + cat) + 'px'; });
     };
     offsetHead();
     window.addEventListener('resize', offsetHead, { passive: true });

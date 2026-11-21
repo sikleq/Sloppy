@@ -783,11 +783,13 @@ def render_html() -> str:
                     f"if it is a real innate with no public Valve CDN art — "
                     f"add it to KNOWN_INNATE_NO_CDN_ICON in "
                     f"patch/known_exceptions.py.")
+            # the name in the site's tooltip, gold as every tooltip's name (owner 2026-11-21: "подсвечиваются не так
+            # как … в любом патче в таблицах (выдвигается, золотое название)"), not the browser's grey title
+            tip = _esc(f'<b class="tip-head">{_esc(ab["name"])}</b>')
             ab_icon = (
-                f'<span class="aoe-ico-wrap">'
+                f'<span class="aoe-ico-wrap abil-ico-hint" data-tooltip="{tip}">'
                 f'<img class="aoe-ico" src="{ab_src}" data-slug="{ab["slug"]}" '
-                f'alt="" loading="lazy" width="32" height="32" '
-                f'title="{_esc(ab["name"])}"{onerr_attr}>'
+                f'alt="{_esc(ab["name"])}" loading="lazy" width="32" height="32"{onerr_attr}>'
                 f'<span class="aoe-marks" aria-hidden="true">{marks}</span>'
                 f'</span>')
 
@@ -949,7 +951,11 @@ def render_html() -> str:
 
     table = (
         '<table class="mr-table hs-table aoe-table sortable-table">'
-        f'<thead><tr class="col-row">{thead}</tr></thead>'
+        # two floors as Hero Stats (owner 2026-11-21, variant 1 of the header mock): the hero, then his abilities
+        # the hero's group cell blank: "Hero" over "Hero" was said twice (owner 2026-11-21)
+        f'<thead><tr class="cat-row"><th class="cat-head"></th>'
+        f'<th class="cat-head" colspan="{thead.count("<th") - 1}">Abilities</th></tr>'
+        f'<tr class="col-row">{thead}</tr></thead>'
         f'<tbody>{"".join(body)}</tbody>'
         '</table>'
     )
@@ -975,8 +981,7 @@ def render_html() -> str:
         f'{subnav}'
         f'{blurb}'
         f'{_item_filter_bar(_resolve_items(latest))}'
-        # the "card" frame (owner 2026-11-21, variant 4), as Item Potency's tables
-        f'<div class="tbl-card tbl-card-fit">{table}</div>\n'
+        f'{table}\n'
         '</div>\n'
         '</div>\n'
         f'<script defer src="src/scripts-table.js?v={asset_version}"></script>\n'

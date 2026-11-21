@@ -43,7 +43,7 @@ def render_html() -> str:
     rule = {"rules": [["A value Dormant Curio improves", f"Value * {mult:g}", ["40", _fmt(40 * mult), "values above 0 only"]]]}
     body = (_section("How Dormant Curio adds up", _rules_cards(rule))
             + _section("Items", _table("ipot-curio", ["Item", "Ability", "Value", "Now", f"With Curio +{pct:g}%"],
-                                       _rows(version, pct))))
+                                       _rows(version, pct), [("", 3), ("Value", 2)])))
     return page_shell("dormant_curio", "Dormant Curio", body)
 
 

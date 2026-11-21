@@ -208,6 +208,35 @@ function ecPinnableTip(tip, show, hide, sel) {
   // On hover of any <td>, light up the entire row + the entire column the
   // cell sits in (visual "+" through the table, like Liquipedia crosstable).
   // Attaches to every <table> on the page after DOM ready.
+  // cell → its visual column in tbody, with rowspan / colspan counted; built once per table, rebuilt after its rows
+  // change (sort, filter rebuilds)
+  const colMaps = new WeakMap();
+  function visualColumns(table) {
+    const body = table.tBodies[0];
+    const key = body ? body.rows.length + ':' + (body.firstElementChild && body.firstElementChild.dataset.slug) : '';
+    const hit = colMaps.get(table);
+    if (hit && hit.key === key && hit.first === (body && body.firstElementChild)) return hit.map;
+    const map = new Map();
+    const byCol = [];                      // column → its cells, so a hover touches only them
+    const taken = [];                      // taken[r] = set of columns filled by spans from rows above
+    [...(body ? body.rows : [])].forEach((tr, r) => {
+      const busy = taken[r] || new Set();
+      let col = 0;
+      [...tr.cells].forEach(c => {
+        while (busy.has(col)) col++;
+        map.set(c, col);
+        (byCol[col] || (byCol[col] = [])).push(c);
+        for (let k = 1; k < (c.rowSpan || 1); k++) {
+          const s = taken[r + k] || (taken[r + k] = new Set());
+          for (let j = 0; j < (c.colSpan || 1); j++) s.add(col + j);
+        }
+        col += c.colSpan || 1;
+      });
+    });
+    map.byCol = byCol;
+    colMaps.set(table, { key, first: body && body.firstElementChild, map });
+    return map;
+  }
   function wireCrossHover(table) {
     if (table.dataset.crossWired === '1') return;
     // Dynamics matrices can be 350 rows x 116 patch columns. Column cross-hover
@@ -235,19 +264,19 @@ function ecPinnableTip(tip, show, hide, sel) {
       if (!cell || !table.contains(cell)) return;
       const row = cell.parentElement;
       if (row.tagName !== 'TR') return;
-      const idx = cell.cellIndex;
-      if (row === activeRow &&
-          colCells.length && colCells[0].cellIndex === idx) return;
+      const cols = visualColumns(table);
+      const idx = cols.get(cell);
+      if (idx === undefined) return;
+      if (row === activeRow && colCells.length && cols.get(colCells[0]) === idx) return;
       clear();
       activeRow = row;
       row.classList.add('cross-row');
-      // Walk only TBODY rows — TH cells in thead never get cross-col.
-      table.querySelectorAll('tbody tr').forEach(tr => {
-        const c = tr.cells && tr.cells[idx];
-        if (c) {
-          c.classList.add('cross-col');
-          colCells.push(c);
-        }
+      // Walk only TBODY rows — TH cells in thead never get cross-col. By visual column, not cellIndex: under a
+      // rowspan (Item Potency: one item over several rows) the 2nd row's first cell is a later column (2026-11-21)
+      (cols.byCol[idx] || []).forEach(c => {
+        if (c.tagName !== 'TD') return;
+        c.classList.add('cross-col');
+        colCells.push(c);
       });
     });
     table.addEventListener('mouseleave', clear);

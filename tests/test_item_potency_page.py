@@ -64,7 +64,9 @@ def test_the_items_table_reads_like_the_sites_tables():
     assert basher.count("<tr") == 1 and "Chance (melee / ranged)" in basher and ">25 / 10<" in basher
     skadi_rows = [r for r in ip._items_rows(ip._versions()[-1], {"not_in_game": []}) if 'data-name="eye of skadi"' in r]
     assert len(skadi_rows) == 3 and ">-20 / -40<" in "".join(skadi_rows) and ">-4 / -8<" in "".join(skadi_rows)
-    assert "table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items thead th:nth-child(2) { display: none; }" in css
+    # on a phone the ability column is squeezed, not display:none — the group row still counts it
+    assert ("table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items tr.col-row th:nth-child(2) {\n"
+            "    width: 0; min-width: 0; max-width: 0;") in css
 
 
 def test_column_lines_run_through_the_rows_under_a_spanning_cell():
@@ -76,25 +78,55 @@ def test_column_lines_run_through_the_rows_under_a_spanning_cell():
     assert "td:first-child { border-left: 0" not in css.split("ipot-table", 1)[1].split("@media", 1)[0]
 
 
-def test_both_pages_show_their_tables_as_cards():
-    # owner 2026-11-21: header mock variant 4 on Item Potency and AoE Increase first; the header tint "заметно
-    # прозрачнее", so the names stay readable; the header's colours live in the card rule, not per page
-    import pytest
+def test_both_pages_have_the_two_floor_header_of_hero_stats():
+    # owner 2026-11-21 chose variant 1 of the header mock ("давай 1 стиль"): groups over the columns, as Hero Stats and
+    # Neutral Stats; no group named as the column under it ("два раза hero"); a line under a named group
     import item_potency as ip
-    from patch import game_files
     from patch.css_bundle import read_css
-    css = read_css()
-    assert ".tbl-card { border: 2px solid #6d5c3a;" in css
-    assert "rgba(227, 196, 106, 0.05)" in css and "rgba(227,196,106,.12)" not in css
-    assert "table.mr-table.ipot-table thead th { text-align: center; }" in css       # no colour of its own
-    assert ip._table("x", ["Item"], []).startswith('<div class="tbl-card"><table')
+    head = ip._table("ipot-items", ["Item", "Ability", "Value", "100%", "20%"], [], [("", 3), ("Hero", 1), ("Illusions", 1)])
+    assert '<thead><tr class="cat-row"><th class="cat-head" colspan="3"></th><th class="cat-head" colspan="1">Hero</th>' in head
+    assert "tbl-card" not in head
+    assert ip._table("x", ["Item"], []).startswith('<table class="mr-table hs-table ipot-table x"><thead><tr class="col-row">')
     aoe = (ROOT / "builders" / "aoe_increase.py").read_text(encoding="utf-8")
-    assert '<div class="tbl-card tbl-card-fit">' in aoe
-    if game_files.available():
-        rows = ip._items_rows(ip._versions()[-1], {"not_in_game": []})
-        assert any("ipot-alt" in r for r in rows)
-    else:
-        pytest.skip("no game-files store")
+    assert '<tr class="cat-row"><th class="cat-head"></th>' in aoe and ">Abilities</th>" in aoe
+    css = read_css()
+    assert ".tbl-card" not in css
+    assert "th.cat-head:not(:empty) { box-shadow: inset 0 -1px 0 var(--line-soft); }" in css
+    # AoE's script freezes widths by the column row and hands them to <col>s: a fixed table reads its first row
+    js = (ROOT / "src" / "js" / "aoe-increase.js").read_text(encoding="utf-8")
+    assert "table.querySelectorAll('thead tr.col-row th').forEach(th => {" in js and "createElement('colgroup')" in js
+
+
+def test_one_name_cell_for_items_and_heroes():
+    # owner 2026-11-21: "столбец hero сделан не так, как в item potency. достичь единого формата" and the item's icon
+    # grows on hover as on Mana Items (.mr-ico)
+    import item_potency as ip
+    from patch.css_bundle import read_css
+    cell = ip._name_cell("Skadi", "", span=3)
+    assert cell.startswith('<td class="mr-name hs-name ipot-name" rowspan="3"><span class="mr-ico mr-ico-blank"></span>')
+    assert '<span class="mr-name-body"><span class="mr-name-text">Skadi</span></span>' in cell
+    css = read_css()
+    assert ".mr-table.aoe-table td.aoe-name, table.mr-table.ipot-table td.ipot-name {" in css
+    assert ".mr-ico:hover {\n  transform: scale(1.8);" in css
+
+
+def test_aoe_icons_name_in_the_sites_gold_tooltip():
+    # owner 2026-11-21: AoE's ability icons showed the browser's grey title — the site's tooltip, gold name, as in the
+    # patch tables; and the empty cells keep no background of their own (it ate the row / column hover shade)
+    from patch.css_bundle import read_css
+    aoe = (ROOT / "builders" / "aoe_increase.py").read_text(encoding="utf-8")
+    assert '<span class="aoe-ico-wrap abil-ico-hint" data-tooltip="{tip}">' in aoe
+    assert 'title="{_esc(ab["name"])}"' not in aoe
+    css = read_css()
+    empty = css.split(".mr-table.aoe-table td.aoe-cell-empty {", 1)[1].split("}", 1)[0]
+    assert "background" not in empty
+
+
+def test_cross_hover_finds_the_column_under_a_rowspan():
+    # Item Potency: the 2nd row of an item starts with a later column; the hover's column is the visual one
+    js = (ROOT / "src" / "js" / "tooltips.js").read_text(encoding="utf-8")
+    assert "function visualColumns(table)" in js and "c.rowSpan" in js
+    assert "tr.cells[idx]" not in js
 
 
 def test_the_page_lists_the_flagged_values_and_the_sources():

@@ -6,7 +6,8 @@
 // two-row sticky header offset (col-row top: calc(--cat-row-h - 2px)) needs —
 // CSS calc can't read it.
 (function() {
-  const box = document.querySelector('.creeps-page .creeps-scroll');
+  // Item Potency / Dormant Curio have no scroll box, but their tables carry the same two-floor header (2026-11-21)
+  const box = document.querySelector('.creeps-page .creeps-scroll') || document.querySelector('.creeps-page');
   if (!box) return;
   const catRow = box.querySelector('table thead tr.cat-row');
   function size() {
