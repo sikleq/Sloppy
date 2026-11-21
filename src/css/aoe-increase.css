@@ -64,7 +64,7 @@
   position: relative;
   vertical-align: middle;
   padding: 6px 10px;
-  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  border-left: 1px solid rgba(213, 207, 195, 0.12);
   border-bottom: none;
   box-shadow: inset 0 -1px 0 rgba(54, 53, 50, 0.5);
   white-space: normal;
@@ -316,7 +316,8 @@ table.mr-table.ipot-table td { text-align: center; vertical-align: middle; paddi
    different column widths); the first column one width in every table, so they line up under each other */
 table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table td.ipot-ab, table.mr-table.ipot-table td.ipot-text,
 table.mr-table.ipot-table thead th.ipot-th-text { text-align: left; }
-table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table thead th:first-child { width: 230px; min-width: 230px; }
+table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table thead tr:first-child th:first-child { width: 230px;
+  min-width: 230px; }
 /* the illusions' part starts with a stronger line */
 /* every column's line drawn by its class, not by :first-child — after an item's name spanning its rows (rowspan) the
    next row starts with the ability or the value, and the site's "first cell: no left line" rule cut the line there
@@ -339,10 +340,27 @@ table.mr-table.ipot-table tr.ipot-gone { display: none; }
 .ipot-page.ipot-with-gone table.mr-table.ipot-table tr.ipot-gone { display: table-row; }
 /* the "Removed" switch is the site's filter button in the site's filter card (as Neutral Stats'): only its place here */
 .ipot-tools { margin: 0 0 12px; justify-content: flex-start; }
+/* in the rules' row: a card of the row, its button in the middle of it */
+.ipot-rules > .ipot-tools { margin: 0; height: auto; align-self: stretch; }
+.ipot-rules > .ipot-tools > .toolbar-panel { height: 100%; }
 /* the two-floor header (variant 1, owner 2026-11-21): a thin line under each named group, so the group reads as the
    roof of its columns ("не хватает горизонтального разделителя?"); a blank group has none */
-table.mr-table.ipot-table thead tr.cat-row th.cat-head:not(:empty),
-.mr-table.aoe-table thead tr.cat-row th.cat-head:not(:empty) { box-shadow: inset 0 -1px 0 var(--line-soft); }
+table.mr-table.ipot-table thead tr.cat-row th.cat-head,
+.mr-table.aoe-table thead tr.cat-row th.cat-head { box-shadow: inset 0 -1px 0 var(--line-soft); }
+/* a column with no group takes both floors, its name in the middle of them (owner 2026-11-21: "hero можно в центр
+   ячейке поставить, а не в нижнюю часть"): the column row's look — panel, gold line under it — pinned with the groups */
+table.mr-table.ipot-table thead tr.cat-row th.th-tall,
+.mr-table.aoe-table thead tr.cat-row th.th-tall {
+  position: sticky; top: 0; z-index: 52; vertical-align: middle; border-bottom: none;
+  background: var(--bg-panel-3); box-shadow: inset 0 -2px 0 var(--blue-bright-85); }
+.mr-table.aoe-table thead tr.cat-row th.th-tall.hs-name { left: 0; z-index: 53; }
+/* every line of the header one strength, the body's (owner 2026-11-21: "линии в таблице где заголовки не равноценно
+   сделаны"): 1px between all heads of both floors; only the illusions' line is 2px, from the top of the header down */
+table.mr-table.ipot-table thead tr.cat-row th + th, table.mr-table.ipot-table thead tr.cat-row + tr.col-row th,
+.mr-table.aoe-table thead tr.cat-row th + th, .mr-table.aoe-table thead tr.cat-row + tr.col-row th {
+  border-left: 1px solid rgba(213, 207, 195, 0.12); }
+table.mr-table.ipot-table thead tr.cat-row th + th.ipot-ill-first,
+table.mr-table.ipot-table thead tr.cat-row + tr.col-row th.ipot-ill-first { border-left: 2px solid var(--line-soft); }
 /* an ability's square icon in the items' 36 px slot, the hero's name under the ability's */
 table.mr-table.ipot-table td.ipot-name .mr-ico.ipot-ico-sq { width: 26px; height: 26px; margin-left: 5px; margin-right: 21px; }
 table.mr-table.ipot-table td.ipot-name .mr-name-body { display: inline-flex; flex-direction: column; align-items: flex-start;
@@ -357,8 +375,7 @@ table.mr-table.ipot-table td.ipot-name .mr-name-body { display: inline-flex; fle
    illusions' values brighter with their potency, names wrapping on a phone; Dormant Curio's page (dormant_curio.py)
    uses the same table look */
 table.mr-table.ipot-table thead th { text-align: center; }
-table.mr-table.ipot-table thead th:first-child { text-align: left; }
-table.mr-table.ipot-items thead th:nth-child(5) { border-left: 2px solid var(--line-soft); }
+table.mr-table.ipot-table thead tr:first-child th:first-child { text-align: left; }
 table.mr-table.ipot-table td.ipot-p20 { color: rgba(214, 208, 196, 0.45); }
 table.mr-table.ipot-table td.ipot-p35 { color: rgba(214, 208, 196, 0.68); }
 table.mr-table.ipot-table td.ipot-p40 { color: rgba(214, 208, 196, 0.85); }
@@ -370,15 +387,17 @@ table.mr-table.ipot-table td.ipot-no-ill { color: rgba(214, 208, 196, 0.3); }
   table.mr-table.ipot-table td { padding: 6px 8px; }
   /* the items' table on a phone (design review 2026-11-21: "Hero" was off screen): the item as its icon, no ability
      column (the value's name keeps the game's sentence on tap), the hero's value next to its name */
-  table.mr-table.ipot-items td.ipot-name { min-width: 0; width: 1%; }
+  table.mr-table.ipot-items td.ipot-name,
+  table.mr-table.ipot-items thead tr:first-child th:first-child { min-width: 0; width: 1%; }
   table.mr-table.ipot-items td.ipot-name .mr-name-body { display: none; }
   table.mr-table.ipot-items td.ipot-name .mr-ico { margin-right: 0; }
   /* the ability column squeezed to nothing, not display:none — the group row above (Item / Hero / Illusions) still
      counts it, and a hidden cell shifted the rest of its row a column left (2026-11-21) */
-  table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items tr.col-row th:nth-child(2) {
+  table.mr-table.ipot-items td.ipot-ab, table.mr-table.hs-table.ipot-items thead th.ipot-th-ab {
     width: 0; min-width: 0; max-width: 0; padding: 0; border: 0; overflow: hidden; font-size: 0; }
   table.mr-table.ipot-items td { padding: 6px 5px; }
   .ipot-rules { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 78%; overflow-x: auto;
     scroll-snap-type: x mandatory; padding-bottom: 4px; }
   .ipot-rule { scroll-snap-align: start; }
+  .ipot-rules > .ipot-tools { order: -1; }          /* the row scrolls sideways on a phone: the switch first, in view */
 }

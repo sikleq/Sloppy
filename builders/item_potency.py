@@ -114,14 +114,33 @@ def _section(title, table):
 _TEXT_HEADS = {"Ability", "Value", "Attacks", "Illusions"}      # word columns: their heads left, as their cells
 
 
+def _th(h, i, extra=(), attrs=""):
+    classes = [c for c in ("ipot-th-text" if h in _TEXT_HEADS and i else "", "ipot-th-ab" if h == "Ability" else "",
+                           *extra) if c]
+    cls = f' class="{" ".join(classes)}"' if classes else ""
+    return f'<th{cls}{attrs}>{h}</th>'
+
+
 def _table(cls, head, rows, groups=()):
     """`groups`: (label, columns) for a row of groups over the columns — the two-floor header of Hero Stats and Neutral
-    Stats (owner 2026-11-21 chose variant 1 of the header mock: one system for the site's tables)."""
-    th = "".join(f'<th{" class=ipot-th-text" if h in _TEXT_HEADS and i else ""}>{h}</th>' for i, h in enumerate(head))
-    cat = "".join(f'<th class="cat-head" colspan="{n}">{label}</th>' for label, n in groups)
-    cat_row = f'<tr class="cat-row">{cat}</tr>' if groups else ''
-    return (f'<table class="mr-table hs-table ipot-table {cls}"><thead>{cat_row}<tr class="col-row">{th}</tr></thead>'
-            f'<tbody>{"".join(rows)}</tbody></table>')
+    Stats (owner 2026-11-21 chose variant 1 of the header mock: one system for the site's tables). A column with no
+    group ("" label) takes both floors, its name in the middle ("hero можно в центр ячейке поставить"); the first
+    column of "Illusions" starts the illusions' 2px line, in both floors."""
+    if not groups:
+        th = "".join(_th(h, i) for i, h in enumerate(head))
+        return (f'<table class="mr-table hs-table ipot-table {cls}"><thead><tr class="col-row">{th}</tr></thead>'
+                f'<tbody>{"".join(rows)}</tbody></table>')
+    top, low, i = [], [], 0
+    for label, n in groups:
+        ill = ("ipot-ill-first",) if label == "Illusions" else ()
+        if not label:
+            top += [_th(head[k], k, ("th-tall",), ' rowspan="2"') for k in range(i, i + n)]
+        else:
+            top.append(f'<th class="{" ".join(("cat-head",) + ill)}" colspan="{n}">{label}</th>')
+            low += [_th(head[k], k, ill if k == i else ()) for k in range(i, i + n)]
+        i += n
+    return (f'<table class="mr-table hs-table ipot-table {cls}"><thead><tr class="cat-row">{"".join(top)}</tr>'
+            f'<tr class="col-row">{"".join(low)}</tr></thead><tbody>{"".join(rows)}</tbody></table>')
 
 
 def _name_cell(name, icon, owner="", span=1, wide=True):
@@ -150,14 +169,16 @@ def _chip(text):
     return f'<span class="ipot-chip{f" ipot-{tone}" if tone else ""}">{_esc(text)}</span>'
 
 
-def _rules_cards(rules):
+def _rules_cards(rules, extra=""):
+    """`extra`: one more card at the row's end (Item Potency's "Removed" switch, owner 2026-11-21: "кнопку removed может
+    куда-то сюда" — the empty room right of the rule cards)."""
     cards = []
     for title, formula, (a, b, what) in rules["rules"]:
         ex = (f'<span class="ipot-ex-old">{_esc(a)}</span> → <span class="ipot-ex-new">{_esc(b)}</span>'
               f'<span class="ipot-ex-what">{_esc(what)}</span>')
         cards.append(f'<div class="ipot-rule"><div class="ipot-rule-h">{_esc(title)}</div>'
                      f'<code class="formula-expr">{_fmt_formula(formula)}</code><div class="ipot-rule-ex">{ex}</div></div>')
-    return f'<div class="ipot-rules">{"".join(cards)}</div>'
+    return f'<div class="ipot-rules">{"".join(cards)}{extra}</div>'
 
 
 # the game's own notes on an item that its effect does not come from illusions (owner 2026-11-21: "basher/abyssal не
@@ -278,9 +299,8 @@ def render_html() -> str:
     # the first group blank: "Item" over "Item" was said twice (owner 2026-11-21: "два раза hero" on AoE Increase)
     groups_items = [("", 3), ("Hero", 1), ("Illusions", len(ILLUSIONS))]
     body = (
-        _section("How Item Potency adds up", _rules_cards(rules))
-        + _section("Items", REMOVED_BUTTON
-                   + _table("ipot-items", head_items, _items_rows(version, rules), groups_items))
+        _section("How Item Potency adds up", _rules_cards(rules, REMOVED_BUTTON))
+        + _section("Items", _table("ipot-items", head_items, _items_rows(version, rules), groups_items))
         + _section("Attacks with their own Item Potency", _table(
             "ipot-sources", ["Ability", "Attacks", "Item Potency"], _sources_rows(version, rules, names, "own")))
         + _section("Bonuses and penalties", _table(

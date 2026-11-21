@@ -697,8 +697,10 @@ def render_html() -> str:
         rows.append((hero, slug, ordered))
 
     # ---- header ---- (Hero column is the only sortable one)
-    head = ['<th class="mr-th hs-th hs-name aoe-name sortable" data-col="name">'
-            '<span class="th-label">Hero</span><span class="sort-ind"></span></th>']
+    # the hero's head takes both floors of the header, its name in the middle (owner 2026-11-21)
+    hero_th = ('<th class="mr-th hs-th hs-name aoe-name sortable th-tall" data-col="name" rowspan="2">'
+               '<span class="th-label">Hero</span><span class="sort-ind"></span></th>')
+    head = []
     for i in range(min(max_slots, 6)):              # Innate, #1-#4, one "Other"
         # Slot 0 = Innate; everything after restarts at #1.
         label = "Innate" if i == 0 else (f"#{i}" if i <= 4 else "Other")
@@ -952,9 +954,9 @@ def render_html() -> str:
     table = (
         '<table class="mr-table hs-table aoe-table sortable-table">'
         # two floors as Hero Stats (owner 2026-11-21, variant 1 of the header mock): the hero, then his abilities
-        # the hero's group cell blank: "Hero" over "Hero" was said twice (owner 2026-11-21)
-        f'<thead><tr class="cat-row"><th class="cat-head"></th>'
-        f'<th class="cat-head" colspan="{thead.count("<th") - 1}">Abilities</th></tr>'
+        # "Hero" over "Hero" was said twice (owner 2026-11-21): the hero's head spans both floors instead
+        f'<thead><tr class="cat-row">{hero_th}'
+        f'<th class="cat-head" colspan="{thead.count("<th")}">Abilities</th></tr>'
         f'<tr class="col-row">{thead}</tr></thead>'
         f'<tbody>{"".join(body)}</tbody>'
         '</table>'

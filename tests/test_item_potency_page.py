@@ -58,14 +58,14 @@ def test_the_items_table_reads_like_the_sites_tables():
     assert "table.mr-table.ipot-table td { text-align: center;" in css
     # the words left, one first-column width for every table (owner 2026-11-21: all centred "не очень")
     assert "table.mr-table.ipot-table thead th.ipot-th-text { text-align: left; }" in css
-    assert "thead th:first-child { width: 230px; min-width: 230px; }" in css
+    assert "thead tr:first-child th:first-child { width: 230px;\n  min-width: 230px; }" in css
     # melee / ranged in one row (owner 2026-11-21: "через слеш, а не в 2 строки")
     basher = "".join(r for r in ip._items_rows(ip._versions()[-1], {"not_in_game": []}) if 'data-name="skull basher"' in r)
     assert basher.count("<tr") == 1 and "Chance (melee / ranged)" in basher and ">25 / 10<" in basher
     skadi_rows = [r for r in ip._items_rows(ip._versions()[-1], {"not_in_game": []}) if 'data-name="eye of skadi"' in r]
     assert len(skadi_rows) == 3 and ">-20 / -40<" in "".join(skadi_rows) and ">-4 / -8<" in "".join(skadi_rows)
     # on a phone the ability column is squeezed, not display:none — the group row still counts it
-    assert ("table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items tr.col-row th:nth-child(2) {\n"
+    assert ("table.mr-table.ipot-items td.ipot-ab, table.mr-table.hs-table.ipot-items thead th.ipot-th-ab {\n"
             "    width: 0; min-width: 0; max-width: 0;") in css
 
 
@@ -84,17 +84,31 @@ def test_both_pages_have_the_two_floor_header_of_hero_stats():
     import item_potency as ip
     from patch.css_bundle import read_css
     head = ip._table("ipot-items", ["Item", "Ability", "Value", "100%", "20%"], [], [("", 3), ("Hero", 1), ("Illusions", 1)])
-    assert '<thead><tr class="cat-row"><th class="cat-head" colspan="3"></th><th class="cat-head" colspan="1">Hero</th>' in head
+    # a column with no group takes both floors, its name in the middle (owner 2026-11-21); the illusions' 2px line
+    # starts in both floors
+    assert head.startswith('<table class="mr-table hs-table ipot-table ipot-items"><thead><tr class="cat-row">'
+                           '<th class="th-tall" rowspan="2">Item</th>'
+                           '<th class="ipot-th-text ipot-th-ab th-tall" rowspan="2">Ability</th>')
+    assert ('<th class="cat-head" colspan="1">Hero</th><th class="cat-head ipot-ill-first" colspan="1">Illusions</th>'
+            '</tr><tr class="col-row"><th>100%</th><th class="ipot-ill-first">20%</th></tr>') in head
     assert "tbl-card" not in head
     assert ip._table("x", ["Item"], []).startswith('<table class="mr-table hs-table ipot-table x"><thead><tr class="col-row">')
     aoe = (ROOT / "builders" / "aoe_increase.py").read_text(encoding="utf-8")
-    assert '<tr class="cat-row"><th class="cat-head"></th>' in aoe and ">Abilities</th>" in aoe
+    assert 'hs-name aoe-name sortable th-tall" data-col="name" rowspan="2">' in aoe and ">Abilities</th>" in aoe
     css = read_css()
     assert ".tbl-card" not in css
-    assert "th.cat-head:not(:empty) { box-shadow: inset 0 -1px 0 var(--line-soft); }" in css
+    assert ".mr-table.aoe-table thead tr.cat-row th.cat-head { box-shadow: inset 0 -1px 0 var(--line-soft); }" in css
+    # one strength of line in both floors and the body (owner 2026-11-21: "где-то чуть тоньше, где-то толще")
+    assert ".mr-table.aoe-table thead tr.cat-row th + th, .mr-table.aoe-table thead tr.cat-row + tr.col-row th {\n" \
+           "  border-left: 1px solid rgba(213, 207, 195, 0.12); }" in css
+    assert "rgba(255, 255, 255, 0.04)" not in css.split(".mr-table.aoe-table tbody td", 1)[1][:600]
     # AoE's script freezes widths by the column row and hands them to <col>s: a fixed table reads its first row
     js = (ROOT / "src" / "js" / "aoe-increase.js").read_text(encoding="utf-8")
-    assert "table.querySelectorAll('thead tr.col-row th').forEach(th => {" in js and "createElement('colgroup')" in js
+    assert "table.querySelectorAll('thead tr.cat-row th.th-tall, thead tr.col-row th')" in js
+    assert "createElement('colgroup')" in js
+    # the Removed switch is a card of the rules' row (owner 2026-11-21: "кнопку removed может куда-то сюда")
+    assert ip.render_html().count("ipot-show-gone") == 1
+    assert '{"".join(cards)}{extra}</div>' in (ROOT / "builders" / "item_potency.py").read_text(encoding="utf-8")
 
 
 def test_one_name_cell_for_items_and_heroes():

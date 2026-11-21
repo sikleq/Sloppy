@@ -171,8 +171,9 @@
   // (shard/scepter/talent toggle) cannot cause horizontal layout shift.
   requestAnimationFrame(() => {
     let total = 0;
-    // the column row only: the group row above it (Hero / Abilities, 2026-11-21) spans several columns
-    table.querySelectorAll('thead tr.col-row th').forEach(th => {
+    // one head per column: the hero's (both floors) and the column row — not the group "Abilities" over them
+    const colHeads = table.querySelectorAll('thead tr.cat-row th.th-tall, thead tr.col-row th');
+    colHeads.forEach(th => {
       const w = th.offsetWidth;
       total += w;
       th.style.width = w + 'px';
@@ -181,7 +182,7 @@
     });
     // a fixed table takes its widths from <col>s or its FIRST row — that is the group row now, so hand them to <col>s
     const cols = document.createElement('colgroup');
-    table.querySelectorAll('thead tr.col-row th').forEach(th => {
+    colHeads.forEach(th => {
       const col = document.createElement('col');
       col.style.width = th.style.width;
       cols.appendChild(col);
@@ -198,8 +199,9 @@
     const catRow = table.querySelector('thead tr.cat-row');
     const offsetHead = () => {
       const h = Math.round(toolbar.getBoundingClientRect().height);
-      // two floors: the groups under the toolbar, the columns under the groups (2px overlap: no seam)
-      const cat = catRow ? Math.floor(catRow.getBoundingClientRect().height) - 2 : 0;
+      // two floors: the groups under the toolbar, the columns under the groups. No 2px pull-up: the hero's head spans
+      // both floors and its gold line would sit 2px below the columns' (floor() alone leaves no seam)
+      const cat = catRow ? Math.floor(catRow.getBoundingClientRect().height) : 0;
       if (catRow) catRow.querySelectorAll('th').forEach(th => { th.style.top = h + 'px'; });
       table.querySelectorAll('thead tr.col-row th').forEach(th => { th.style.top = (h + cat) + 'px'; });
     };
