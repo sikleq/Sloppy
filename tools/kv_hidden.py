@@ -29,7 +29,8 @@ ROOT = Path(__file__).resolve().parents[1]
 _NUM = re.compile(r"-?\d+(?:\.\d+)?")
 _NOISE_KEY = re.compile(r"facet|display_type|tooltip|AbilityDraft|dynamic_value|DependentOnAbility|"
                         r"TooltipSummary|RequiresShard|RequiresScepter|LinkedSpecialBonus|apply_curio_bonus|"
-                        r"affected_by_aoe_increase|DamageTypeTooltip|CalculateSpellDamageTooltip", re.I)
+                        r"affected_by_aoe_increase|DamageTypeTooltip|CalculateSpellDamageTooltip|apply_effectiveness|"
+                        r"^IsObsolete$|^ItemPurchasable$|^ItemIsNeutral\w*Drop$", re.I)
 _HEADER = re.compile(r'W\((?:hero|item|unit|plain|enchant)_header\(\s*"([^"]+)"')
 _LP_MARK = re.compile(r"\{\{cf\|[Uu]\}\}|\{\{[Uu]ndocumented[^}]*\}\}")
 _LP_SKIP = re.compile(r"shop category|icon", re.I)
@@ -56,6 +57,28 @@ def page_blocks(version):
     for i, m in enumerate(marks):
         end = marks[i + 1].start() if i + 1 < len(marks) else len(src)
         out[m.group(1).lower()] = out.get(m.group(1).lower(), "") + src[m.start():end]
+    # + the built page's text of the block: the numbers the generator draws itself (stats cards, components, base
+    # damage cards) are not in the source (7.42 audit)
+    for name, text in html_blocks(version).items():
+        out[name] = out.get(name, "") + "\n" + text
+    return out
+
+
+def html_blocks(version):
+    """{entity name (lower): visible text of its entity-block} of dist/patches/<v>.html (empty when not built)."""
+    path = ROOT / "dist" / "patches" / f"{version}.html"
+    if not path.exists():
+        return {}
+    html = path.read_text(encoding="utf-8")
+    out = {}
+    parts = html.split('<div class="entity-block')
+    for part in parts[1:]:
+        m = re.search(r'class="entity-name">(.*?)</div>', part, re.S)
+        if not m:
+            continue
+        name = re.sub(r"<[^>]+>", "", m.group(1)).strip().lower()
+        text = re.sub(r"<[^>]+>", " ", part)
+        out[name] = out.get(name, "") + "\n" + text
     return out
 
 
@@ -102,6 +125,8 @@ def _noise(f, o, n, block):
 def uncovered(fields, block, talents=None):
     """{field: (old, new)} the page block does not write: what is left after the rules of the module doc.
     `talents`: the hero's talent names (both patches) — a talent value of another talent is a dead reference."""
+    if re.search(r'_header\("[^"]+",\s*removed=', block):
+        return {}                                      # out of the game: no change counts (owner 2026-11-21)
     have = set(nums(block))
     out = {}
     for f, (o, n) in fields.items():

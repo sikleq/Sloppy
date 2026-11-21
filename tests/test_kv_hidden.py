@@ -50,6 +50,13 @@ def test_the_noise_is_left_out():
     assert not uncovered({"shard_bonus_damage.special_bonus_shard": ("125", None)}, shard)
 
 
+def test_an_item_out_of_the_game_and_item_marks_are_left_out():
+    # 7.42 Flayer's Bota cycled out: its files changed, the match does not see it; apply_effectiveness: Item Potency
+    gone = 'W(item_header("Flayer\'s Bota", removed="Neutral Item cycled out"))\n    W(ul_open())'
+    assert not uncovered({"duration": ("6", "9")}, gone)
+    assert not uncovered({"slow.apply_effectiveness": (None, "1"), "IsObsolete": ("1", None)}, "W(li(\"x\"))")
+
+
 def test_a_summon_is_found_in_its_heros_block():
     blocks = {"beastmaster": 'W(ability("Summon Razorback"))\n W(li("Boar\'s armor increased by 1", …))'}
     assert "Razorback" in entity_block(blocks, "Razorback")
