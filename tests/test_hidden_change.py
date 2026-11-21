@@ -42,3 +42,11 @@ def test_hidden_rows_go_under_their_anchor_once():
 def test_other_rows_are_left_alone():
     row = _ROW.format(note="Dormant Curio increases min range to 260")
     assert hidden_change_tags(row) == row
+
+
+def test_a_glowing_diamond_has_the_tags_ring():
+    # 7.42 Dire base shop: the map row's diamond glowed but had no ring (owner 2026-11-21: "тут нет обводки")
+    from patch.css_bundle import read_css
+    css = read_css()
+    assert ".tnum-dia.hidden-change, .tnum-dia.valve-error { outline: 2px solid #e3c46a; outline-offset: 4px;" in css
+    assert ".tnum-dia.valve-error { outline-color: #ff5a48;" in css

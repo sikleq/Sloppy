@@ -119,3 +119,9 @@
    mistake in Valve's notes */
 .tnum-dia.hidden-change { text-shadow: 0 0 3px #fff3d6, 0 0 6px #f0cd6e, 0 0 12px rgba(240, 205, 110, 0.95); }
 .tnum-dia.valve-error { text-shadow: 0 0 3px #ffd9d3, 0 0 6px #ff5a48, 0 0 12px rgba(255, 80, 60, 0.95); }
+/* and the tag's ring around it: a diamond alone glowed but had no ring (owner 2026-11-21: "тут нет обводки, потому что
+   это ромбик") — a square ring a few px off the glyph, its glow by drop-shadow (it takes the outline too) */
+.tnum-dia.hidden-change, .tnum-dia.valve-error { outline: 2px solid #e3c46a; outline-offset: 4px; border-radius: 0;
+  filter: drop-shadow(0 0 4px rgba(240, 205, 110, 0.85)); }
+.tnum-dia.valve-error { outline-color: #ff5a48; filter: drop-shadow(0 0 4px rgba(255, 80, 60, 0.85)); }
+html.cb-mode .tnum-dia.valve-error { outline-color: #2b9be0; filter: drop-shadow(0 0 4px rgba(43, 155, 224, 0.9)); }
