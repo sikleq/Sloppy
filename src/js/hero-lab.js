@@ -222,7 +222,9 @@
         const manaPool = a && a._manaPool ? a._manaPool : 0;
         total += manaPool * (entry.base_pct + entry.per_level_pct * (level || 1));
       } else if (f === 'attr_floor_capped') {
-        total += Math.min(Math.floor(a[eff.source] / (eff.divisor || 1)), eff.cap || 100);
+        // the patch's numbers sit in the history entry (Tinker Eureka!: 1% per 3 Intelligence, at most 60%) — the
+        // effect's own fields are only the KV keys; read from them it was 1% per point, uncapped (Sonnet check 2026-11-21)
+        total += Math.min(Math.floor(a[eff.source] / (entry.divisor || eff.divisor || 1)), entry.cap || eff.cap || 100);
       }
     }
     return total;
