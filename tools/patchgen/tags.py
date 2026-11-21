@@ -1,5 +1,7 @@
 """Which tag a patch note gets: the canonical phrases, Valve's own errors, the owner's decisions."""
+import json
 import re
+from pathlib import Path
 
 from .data import _strip_html
 
@@ -506,175 +508,11 @@ _NOT_LOWER_IS_BUFF = re.compile(
 )
 
 
-# Exact-substring overrides for cases where heuristics give the wrong tag.
-# Key = substring to look for (case-insensitive), Value = forced tag.
-# Add here when a generated scaffold consistently gets the wrong tag.
-TAG_OVERRIDES = {
-    # owner 2026-11-05: the behaviour changed, neither side only loses (7.40 The Shining, 7.41 free movement uphill)
-    "only starts dealing damage to the surrounding enemies when attacked": "REWORK",
-    "units with free movement now can miss their attacks":                 "REWORK",
-    # owner 2026-10-27 (7.39): convenience of control, not a gameplay change → QoL (first: the row also says
-    # "Now requires", which is REWORK below)
-    "added an auto-cast":              "QoL",   # Quill Spray: "Right-click the ability to … cast it"
-    "no longer automatically rejoins": "QoL",   # Astral Spirit: now the duration or Return brings it back
-    # a click past max range used to blink only 75% of it — a penalty gone (owner 2026-10-27, 7.39 Blinks)
-    "no longer has an overshoot range": "BUFF",
-    # owner 2026-10-27 (7.39 Ringmaster): a Souvenir on death is a new grant, not a rework of the respawn one;
-    # "will no longer be granted … if he dies to a Neutral Creep or Roshan" takes a case away — DEL
-    "will be granted one upon death":   "NEW",
-    "will no longer be granted":        "DEL",
-    "starts with all":              "MISC",
-    "separate heal reduction":      "MISC",
-    "health restoration consolidat": "MISC",  # "consolidated Health Restoration" = structural
-    "now shares cooldown":          "MISC",
-    "now has a shared cooldown":    "MISC",
-    "now requires aghanim's":       "NERF",    # a capability now gated behind Aghs (checked before "now requires")
-    "now requires a single target tree": "NERF",  # 7.37 Nature's Call (Ironwood Treant): a new cast restriction
-    "now requires at least one other allied hero": "NEW",  # 7.38 Hookshot (Hookup): a new condition (owner 2026-11-02)
-    "now requires":                 "REWORK",  # "Now requires X instead of Y"
-    "instead of only higher":       "BUFF",    # scope widened ("…equal or higher level, instead of only higher"; audit 2026-10-03)
-    # 7.37e proofread (2026-10-28): the effect decides, not the phrase template
-    "stack per second instead of all stacks": "BUFF",   # Natural Order: enemies keep the debuff longer after leaving
-    "now also applies to units under":        "BUFF",   # Apex Predator: own bonus widened to controlled units
-    "will no longer follow":                  "DEL",    # Chain Frost: a bought-back hero is no longer chased
-    "buff is removed when":                   "NERF",   # Presence of the Dark Lord: a new way to lose the bonus
-    "turn rate bonus changed from flat":      "NERF",   # Rolling Thunder: +110 → +40% (results in +48)
-    "treant gold bounty rescaled":            "NERF",   # Nature's Call: the enemy gets more gold for a treant
-    "no longer explode":                      "DEL",    # Eldritch Summoning: imps killed by heroes do not blow up
-    "improved behavior":                      "QoL",    # Stroke of Fate at max cast range: handling, not power (owner)
-    # 7.37 proofread (2026-10-30)
-    "no longer an innate ability":            "REWORK", # the old innate becomes a basic ability ("is now an innate" = REWORK)
-    "charges, and depletes a charge every time": "REWORK",  # Philosopher's Stone: a stone that runs out (owner)
-    "no longer a levelable innate ability":   "REWORK", # Lina Fiery Soul
-    "now always drops roshan's banner":       "NEW",    # Roshan's second death
-    "now drops refresher shard and cheese during daytime": "REWORK",  # third death: by the time of day
-    "are now fully disabled by break":        "NERF",
-    "are now partially disabled by break":    "NERF",
-    "no longer always cast chain lightning":  "DEL",    # Harpy Stormcrafter pulled by lane creeps
-    "no longer requires the target to remain still": "BUFF",  # Shadow Amulet Fade: a restriction gone
-    "no longer refreshes its cooldown if cast on self": "DEL",
-    "now slows the target by":                "NEW",    # Fade
-    "cooldown no longer ticks down if":       "NERF",   # Trusty Shovel out of the neutral slot
-    "always digs up a water rune":            "NEW",
-    "returning as a tier":                    "NEW",    # a neutral item back in the pool
-    "now is a tier":                          "REWORK", # a neutral item's tier moved, as "Moved from Tier X to Y"
-    "can now change direction while flopping": "NEW",   # Ogre Seal Totem
-    "now stacks with other sources of":       "BUFF",   # Void Brawler status resistance
-    "can now target roshan and tormentors":   "NEW",
-    "is now applied on any kill made by":     "NEW",    # Earthshaker knockback, not only Enchant Totem
-    "no longer prevents damage for a short duration": "DEL",  # Time Walk (Chronosphere facet)
-    "touched by the ghostship receive a stronger": "NEW",  # Ghostship Scepter
-    "in addition, lifestealer gains permanent max hp": "NEW",  # Feast
-    "now also increases the attack distance threshold": "NEW",  # Spirit Bear
-    "spirit bear can no longer equip its own neutral items": "REWORK",  # copies Lone Druid's instead
-    "can no longer be activated. rotating glaives moved": "REWORK",  # Lucent Beam / Lunar Orbit split
-    "health gained from lifesteal now also heals": "NEW",  # Bodyguard
-    "new facet":                              "NEW",
-    "no longer a levelable ability, now has a base": "REWORK",  # Mana Shield
-    "now also increases duration by":         "NEW",    # Wukong's Command (facet)
-    "is no longer destroyed or goes on additional cooldown": "BUFF",  # Ofrenda: a penalty gone
-    "no longer scales with vendetta":         "DEL",    # as "no longer benefits from" (owner 2026-10-30: not REWORK)
-    "now scales with pierce the veil":        "BUFF",   # Ofrenda's attack speed grows with the ultimate
-    # owner 2026-10-30 ("Warpath почему-то rework … много где ещё такие же ситуации"): the effect decides
-    "instead of a 33% chance to do nothing, now has": "BUFF",  # Reality Rift (Irrationality): Silence instead of nothing
-    "lingering bonus movement speed is now determined by": "NERF",  # Charge of Darkness: the current speed, not the max
-    "no longer spell stealable":              "DEL",
-    "no longer procs magic stick":            "BUFF",   # the enemy no longer gets charges
-    "now procs magic stick":                  "NERF",   # the enemy now gets charges
-    "now shows a preview of":                 "QoL",
-    "now also lowers strike cooldown by":     "NEW",    # Storm Surge
-    "aghanim's shard pulses apply 1 stinger": "NEW",
-    "every hero kill increases max souls by 1 until": "NEW",   # the facet takes the old default
-    "hero kills no longer increase max souls": "DEL",
-    "debuff now grants that the next attack": "NEW",    # Electric Vortex (facet)
-    "no longer passively grants allies movement speed": "DEL",
-    "now increases active movement speed bonus by additional": "BUFF",
-    "now also grants 1 attack projectile speed": "NEW",
-    "can see roshan's respawn timer":         "NEW",
-    "are now applied when denying allies or traps": "NEW",
-    "traps no longer provide vision":         "DEL",
-    "traps now always take":                  "REWORK",
-    "now always teleports the target enemy to": "REWORK",
-    "damage no longer pierces magic resistance": "NERF",
-    "can now be put on alt-cast":             "NEW",
-    "can no longer be refreshed":             "NERF",
-    "aoe now equals to":                      "REWORK", # Focus Fire (Tailwind facet)
-    "now cannot be lower than the average":   "NEW",    # Mental Fortitude
-    "when in melee form, troll warlord has":  "REWORK", # Berserker's Rage, a basic ability by stance
-    # 7.37b proofread (2026-10-30): a new property is NEW even when it helps (owner's 7.37c/d rule)
-    "now refunds clockwerk":                  "NEW",    # Hookshot (Hookup): mana refund
-    "now also increases attack range for units under": "NEW",  # Enchant (Spellbound)
-    "now increases duration to":              "NEW",    # Scurry (Hunter facet): the facet takes over the old duration
-    "duration is no longer reduced":          "BUFF",   # Burning Spear (Incendiary): a penalty gone
-    "can now be cast during channeling":      "NEW",    # Quas / Wex / Exort / Invoke
-    "now stacks instead of refreshing":       "NEW",    # Magnus talent
-    "of bonus damage is converted to base damage": "BUFF",  # Illusory Armaments: Phantom Lancer 65% → 100%
-    "self bonus move speed when activated":   "NEW",    # Trample (Romp n' Stomp)
-    "stun duration now increases by":         "NEW",    # Snowball: +0.2s per ally
-    "now counts one debuff per unique":       "NERF",   # Septic Shock: Shiva's counts 1, not 3
-    "is now decreased by the illusion damage reduction": "NERF",  # Predator: illusions' bonus cut
-    "now has a primary and secondary target": "NEW",    # Death Ward (Cleft Death)
-    # 7.37c proofread (2026-10-29)
-    # owner 2026-10-29: these three are NEW (a new property), not BUFF
-    "no longer requires enchant totem to be leveled": "NEW",   # Slugger: active without Enchant Totem
-    "multicasts now prioritize":              "NEW",    # Fire Shield: a target order for multicasts
-    "is now applied during the rush":         "NEW",    # Phantom Rush: the agility during the rush too
-    # 7.38 re-read (2026-11-02), by the owner's rules: a new property is NEW even when it helps
-    "all sources of evasion are doubled":     "NEW",    # Scurry had no evasion in 7.37e
-    "now prioritizes heroes":                 "NEW",    # Gunslinger: a target order, as Fire Shield above
-    "kills a non-hero unit during":           "NEW",    # Exterminator: a new way to cut Tricks of the Trade's cooldown
-    "bonus experience for courier and ward":  "NEW",    # Contract Killer: a new source of experience
-    "spell lifesteal apply to reflected":     "NEW",    # Succubus (Bondage)
-    "can now be decreased by status resistance": "NEW", # Arcane Curse: both ways, Debuff Duration lengthens it
-    "all attribute bonus provides an additional": "NEW",  # Accumulation: +3 replaces the removed +100%
-    "improved glaive collision behavior":     "QoL",    # as "improved behavior" above (owner 2026-10-28)
-    "can now be put on autocast":             "QoL",    # as "added an auto-cast" above (Tar Bomb)
-    # the owner's own answers to the 7.38 re-read (2026-11-02)
-    "classified as reflection damage":        "REWORK", # Quill Spray, Strike Damage: the kind of damage changes
-    "no longer take increased":               "DEL",    # Winter's Curse: the amplification is gone
-    "now has the same effect for both":       "REWORK", # Arc Warden and his Double: values evened out both ways
-    # 7.37d proofread (2026-10-29)
-    "no longer doubles its bonuses":          "DEL",    # Bracer / Wraith Band / Null Talisman: the 25-minute doubling
-    "no longer makes caster or ally unslowable": "DEL", # Disperser Suppress (40% slow resistance comes instead, NEW)
-    "always gains a charge when the owner dies": "NEW", # Spirit Vessel: a new way to get charges (owner 2026-10-29)
-    "now triggers on death effects":          "NEW",    # Chen Martyrdom: sacrificed creeps' On Death effects (owner)
-    "are no longer pulled to the center":     "REWORK", # Power Cogs: caught heroes placed another way (owner)
-    "alt cast behavior now has":              "NERF",   # Drinking Buddies: alt cast at 50% of the cast range (owner)
-    "now heals creeps for":                   "NERF",   # Leech Seed: creeps were healed in full before (7.37c KV +
-                                                        # tooltip), now at 50% — creep_heal_reduction_pct (owner asked)
-    "now disables blink dagger":              "NERF",   # Mana Shield: absorbing damage now counts as taking it
-    "no longer allows to hit the same enemy": "DEL",    # Mirana Shard: secondary Starstorms no longer stack on one unit
-    "percentually change the base damage":    "NEW",    # Illusory Armaments: base-damage % effects now count the bonus
-    "toggling items no longer breaks invis":  "QoL",    # Riki: as 7.41 Burn toggling — handling, not power
-    "can no longer shoot arrows while":       "DEL",    # Whirlwind Focus Fire: no own attacks while channeling
-    "invisibility buff is now dispelled if":  "NERF",   # Windrun Scepter: a new way to lose the invisibility
-    # owner 2026-11-08 (7.38 "Now applies to Shrines of Wisdom instead of removed Wisdom Runes"): the same effect from
-    # what replaced the removed thing — nothing changed for the player; before "instead of" (first match wins)
-    "instead of removed":           "MISC",
-    "instead of":                   "REWORK",  # component/requirement swap
-    "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
-    "respawn time decreased":       "BUFF",
-    "no longer reduces cooldown":   "DEL",     # removal of a CD-reduction effect; lower-is-buff logic wrongly gives BUFF
-    "no longer reduces the cooldown": "DEL",   # same, "the cooldown" phrasing
-    "cycled out":                   "DEL",     # item removed from the pool
-    "moved from tier":              "REWORK",  # tier-change is a structural move, not a buff/nerf
-    "dormant curio increases":      "NEW",     # first-ever curio upgrade on an item = new capability
-    "destroys the target illusion": "NERF",    # Spectre Reality (7.40): the swapped illusion is lost (audit 2026-10-03)
-    # owner 2026-10-16 (7.41 review): the effect decides, not the phrase template
-    "when determining if mars is outnumbered": "BUFF",   # Dauntless: allies no longer offset enemies -> regen more often
-    "stolen spells now have their cooldown":   "NEW",    # Spell Steal: a new property in place of the debuff amp
-    "avatar duration changed from 9/8/7/6s":   "BUFF",   # BKB: the duration now stops at 7s, not 6s
-    "lifesteal don't apply to reflected damage": "REWORK",   # how reflected damage works now, not a lost effect
-    # owner 2026-10-17 (7.41): where a boss starts changes the game — REWORK, not MISC
-    "preference has switched":                 "REWORK",   # Tormentor's spawn / Roshan's pit preference
-    "no longer prevents camp-clearing madstone": "MISC",   # Hand of Midas Transmute on a camp's last creep
-    "toggling no longer breaks invisibility":  "QoL",      # Radiance Burn: toggling no longer reveals / interrupts
-    # owner 2026-11-08 (7.40 Telekinesis "Land sub-ability no longer cancels channeling or interrupts movement"): a
-    # sub-ability that stops cutting what the hero does is handling, not power
-    "no longer cancels channeling":            "QoL",
-    # owner 2026-10-24 (7.41): what a projectile stops on changes play — REWORK, not MISC
-    "treats creep heroes as creeps":           "REWORK",   # Sharpshooter: the arrow now flies through them
-}
+# Exact-substring overrides for rows the heuristics tag wrong: data/rules/tag_overrides.json (in order, first
+# match wins; each with the owner's reason). Add there when a generated scaffold gets the wrong tag.
+TAG_OVERRIDES = {e["text"]: e["tag"] for e in json.loads(
+    (Path(__file__).resolve().parents[2] / "data" / "rules" / "tag_overrides.json").read_text(encoding="utf-8")
+)["overrides"]}
 
 
 _OLD_HEAL_STATS = re.compile(r"\bHealing, Health Regen, Lifesteal,? and Spell Lifesteal\b", re.I)

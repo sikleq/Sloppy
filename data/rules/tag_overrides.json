@@ -1,0 +1,694 @@
+{
+ "_about": "Exact-substring tag overrides for rows the heuristics tag wrong (tools/patchgen/tags.py _guess_tag): checked first, in this order, the first substring found in the row (case-insensitive) wins. 'group': the note above a run of entries, 'why': the entry's own reason. Moved out of the code 2026-11-21 (Fable review: decisions are data, as hidden_rows.json).",
+ "overrides": [
+  {
+   "text": "only starts dealing damage to the surrounding enemies when attacked",
+   "tag": "REWORK",
+   "group": "owner 2026-11-05: the behaviour changed, neither side only loses (7.40 The Shining, 7.41 free movement uphill)"
+  },
+  {
+   "text": "units with free movement now can miss their attacks",
+   "tag": "REWORK"
+  },
+  {
+   "text": "added an auto-cast",
+   "tag": "QoL",
+   "group": "owner 2026-10-27 (7.39): convenience of control, not a gameplay change → QoL (first: the row also says \"Now requires\", which is REWORK below)",
+   "why": "Quill Spray: \"Right-click the ability to … cast it\""
+  },
+  {
+   "text": "no longer automatically rejoins",
+   "tag": "QoL",
+   "why": "Astral Spirit: now the duration or Return brings it back"
+  },
+  {
+   "text": "no longer has an overshoot range",
+   "tag": "BUFF",
+   "group": "a click past max range used to blink only 75% of it — a penalty gone (owner 2026-10-27, 7.39 Blinks)"
+  },
+  {
+   "text": "will be granted one upon death",
+   "tag": "NEW",
+   "group": "owner 2026-10-27 (7.39 Ringmaster): a Souvenir on death is a new grant, not a rework of the respawn one; \"will no longer be granted … if he dies to a Neutral Creep or Roshan\" takes a case away — DEL"
+  },
+  {
+   "text": "will no longer be granted",
+   "tag": "DEL"
+  },
+  {
+   "text": "starts with all",
+   "tag": "MISC"
+  },
+  {
+   "text": "separate heal reduction",
+   "tag": "MISC"
+  },
+  {
+   "text": "health restoration consolidat",
+   "tag": "MISC",
+   "why": "\"consolidated Health Restoration\" = structural"
+  },
+  {
+   "text": "now shares cooldown",
+   "tag": "MISC"
+  },
+  {
+   "text": "now has a shared cooldown",
+   "tag": "MISC"
+  },
+  {
+   "text": "now requires aghanim's",
+   "tag": "NERF",
+   "why": "a capability now gated behind Aghs (checked before \"now requires\")"
+  },
+  {
+   "text": "now requires a single target tree",
+   "tag": "NERF",
+   "why": "7.37 Nature's Call (Ironwood Treant): a new cast restriction"
+  },
+  {
+   "text": "now requires at least one other allied hero",
+   "tag": "NEW",
+   "why": "7.38 Hookshot (Hookup): a new condition (owner 2026-11-02)"
+  },
+  {
+   "text": "now requires",
+   "tag": "REWORK",
+   "why": "\"Now requires X instead of Y\""
+  },
+  {
+   "text": "instead of only higher",
+   "tag": "BUFF",
+   "why": "scope widened (\"…equal or higher level, instead of only higher\"; audit 2026-10-03)"
+  },
+  {
+   "text": "stack per second instead of all stacks",
+   "tag": "BUFF",
+   "group": "7.37e proofread (2026-10-28): the effect decides, not the phrase template",
+   "why": "Natural Order: enemies keep the debuff longer after leaving"
+  },
+  {
+   "text": "now also applies to units under",
+   "tag": "BUFF",
+   "why": "Apex Predator: own bonus widened to controlled units"
+  },
+  {
+   "text": "will no longer follow",
+   "tag": "DEL",
+   "why": "Chain Frost: a bought-back hero is no longer chased"
+  },
+  {
+   "text": "buff is removed when",
+   "tag": "NERF",
+   "why": "Presence of the Dark Lord: a new way to lose the bonus"
+  },
+  {
+   "text": "turn rate bonus changed from flat",
+   "tag": "NERF",
+   "why": "Rolling Thunder: +110 → +40% (results in +48)"
+  },
+  {
+   "text": "treant gold bounty rescaled",
+   "tag": "NERF",
+   "why": "Nature's Call: the enemy gets more gold for a treant"
+  },
+  {
+   "text": "no longer explode",
+   "tag": "DEL",
+   "why": "Eldritch Summoning: imps killed by heroes do not blow up"
+  },
+  {
+   "text": "improved behavior",
+   "tag": "QoL",
+   "why": "Stroke of Fate at max cast range: handling, not power (owner)"
+  },
+  {
+   "text": "no longer an innate ability",
+   "tag": "REWORK",
+   "group": "7.37 proofread (2026-10-30)",
+   "why": "the old innate becomes a basic ability (\"is now an innate\" = REWORK)"
+  },
+  {
+   "text": "charges, and depletes a charge every time",
+   "tag": "REWORK",
+   "why": "Philosopher's Stone: a stone that runs out (owner)"
+  },
+  {
+   "text": "no longer a levelable innate ability",
+   "tag": "REWORK",
+   "why": "Lina Fiery Soul"
+  },
+  {
+   "text": "now always drops roshan's banner",
+   "tag": "NEW",
+   "why": "Roshan's second death"
+  },
+  {
+   "text": "now drops refresher shard and cheese during daytime",
+   "tag": "REWORK",
+   "why": "third death: by the time of day"
+  },
+  {
+   "text": "are now fully disabled by break",
+   "tag": "NERF"
+  },
+  {
+   "text": "are now partially disabled by break",
+   "tag": "NERF"
+  },
+  {
+   "text": "no longer always cast chain lightning",
+   "tag": "DEL",
+   "why": "Harpy Stormcrafter pulled by lane creeps"
+  },
+  {
+   "text": "no longer requires the target to remain still",
+   "tag": "BUFF",
+   "why": "Shadow Amulet Fade: a restriction gone"
+  },
+  {
+   "text": "no longer refreshes its cooldown if cast on self",
+   "tag": "DEL"
+  },
+  {
+   "text": "now slows the target by",
+   "tag": "NEW",
+   "why": "Fade"
+  },
+  {
+   "text": "cooldown no longer ticks down if",
+   "tag": "NERF",
+   "why": "Trusty Shovel out of the neutral slot"
+  },
+  {
+   "text": "always digs up a water rune",
+   "tag": "NEW"
+  },
+  {
+   "text": "returning as a tier",
+   "tag": "NEW",
+   "why": "a neutral item back in the pool"
+  },
+  {
+   "text": "now is a tier",
+   "tag": "REWORK",
+   "why": "a neutral item's tier moved, as \"Moved from Tier X to Y\""
+  },
+  {
+   "text": "can now change direction while flopping",
+   "tag": "NEW",
+   "why": "Ogre Seal Totem"
+  },
+  {
+   "text": "now stacks with other sources of",
+   "tag": "BUFF",
+   "why": "Void Brawler status resistance"
+  },
+  {
+   "text": "can now target roshan and tormentors",
+   "tag": "NEW"
+  },
+  {
+   "text": "is now applied on any kill made by",
+   "tag": "NEW",
+   "why": "Earthshaker knockback, not only Enchant Totem"
+  },
+  {
+   "text": "no longer prevents damage for a short duration",
+   "tag": "DEL",
+   "why": "Time Walk (Chronosphere facet)"
+  },
+  {
+   "text": "touched by the ghostship receive a stronger",
+   "tag": "NEW",
+   "why": "Ghostship Scepter"
+  },
+  {
+   "text": "in addition, lifestealer gains permanent max hp",
+   "tag": "NEW",
+   "why": "Feast"
+  },
+  {
+   "text": "now also increases the attack distance threshold",
+   "tag": "NEW",
+   "why": "Spirit Bear"
+  },
+  {
+   "text": "spirit bear can no longer equip its own neutral items",
+   "tag": "REWORK",
+   "why": "copies Lone Druid's instead"
+  },
+  {
+   "text": "can no longer be activated. rotating glaives moved",
+   "tag": "REWORK",
+   "why": "Lucent Beam / Lunar Orbit split"
+  },
+  {
+   "text": "health gained from lifesteal now also heals",
+   "tag": "NEW",
+   "why": "Bodyguard"
+  },
+  {
+   "text": "new facet",
+   "tag": "NEW"
+  },
+  {
+   "text": "no longer a levelable ability, now has a base",
+   "tag": "REWORK",
+   "why": "Mana Shield"
+  },
+  {
+   "text": "now also increases duration by",
+   "tag": "NEW",
+   "why": "Wukong's Command (facet)"
+  },
+  {
+   "text": "is no longer destroyed or goes on additional cooldown",
+   "tag": "BUFF",
+   "why": "Ofrenda: a penalty gone"
+  },
+  {
+   "text": "no longer scales with vendetta",
+   "tag": "DEL",
+   "why": "as \"no longer benefits from\" (owner 2026-10-30: not REWORK)"
+  },
+  {
+   "text": "now scales with pierce the veil",
+   "tag": "BUFF",
+   "why": "Ofrenda's attack speed grows with the ultimate"
+  },
+  {
+   "text": "instead of a 33% chance to do nothing, now has",
+   "tag": "BUFF",
+   "group": "owner 2026-10-30 (\"Warpath почему-то rework … много где ещё такие же ситуации\"): the effect decides",
+   "why": "Reality Rift (Irrationality): Silence instead of nothing"
+  },
+  {
+   "text": "lingering bonus movement speed is now determined by",
+   "tag": "NERF",
+   "why": "Charge of Darkness: the current speed, not the max"
+  },
+  {
+   "text": "no longer spell stealable",
+   "tag": "DEL"
+  },
+  {
+   "text": "no longer procs magic stick",
+   "tag": "BUFF",
+   "why": "the enemy no longer gets charges"
+  },
+  {
+   "text": "now procs magic stick",
+   "tag": "NERF",
+   "why": "the enemy now gets charges"
+  },
+  {
+   "text": "now shows a preview of",
+   "tag": "QoL"
+  },
+  {
+   "text": "now also lowers strike cooldown by",
+   "tag": "NEW",
+   "why": "Storm Surge"
+  },
+  {
+   "text": "aghanim's shard pulses apply 1 stinger",
+   "tag": "NEW"
+  },
+  {
+   "text": "every hero kill increases max souls by 1 until",
+   "tag": "NEW",
+   "why": "the facet takes the old default"
+  },
+  {
+   "text": "hero kills no longer increase max souls",
+   "tag": "DEL"
+  },
+  {
+   "text": "debuff now grants that the next attack",
+   "tag": "NEW",
+   "why": "Electric Vortex (facet)"
+  },
+  {
+   "text": "no longer passively grants allies movement speed",
+   "tag": "DEL"
+  },
+  {
+   "text": "now increases active movement speed bonus by additional",
+   "tag": "BUFF"
+  },
+  {
+   "text": "now also grants 1 attack projectile speed",
+   "tag": "NEW"
+  },
+  {
+   "text": "can see roshan's respawn timer",
+   "tag": "NEW"
+  },
+  {
+   "text": "are now applied when denying allies or traps",
+   "tag": "NEW"
+  },
+  {
+   "text": "traps no longer provide vision",
+   "tag": "DEL"
+  },
+  {
+   "text": "traps now always take",
+   "tag": "REWORK"
+  },
+  {
+   "text": "now always teleports the target enemy to",
+   "tag": "REWORK"
+  },
+  {
+   "text": "damage no longer pierces magic resistance",
+   "tag": "NERF"
+  },
+  {
+   "text": "can now be put on alt-cast",
+   "tag": "NEW"
+  },
+  {
+   "text": "can no longer be refreshed",
+   "tag": "NERF"
+  },
+  {
+   "text": "aoe now equals to",
+   "tag": "REWORK",
+   "why": "Focus Fire (Tailwind facet)"
+  },
+  {
+   "text": "now cannot be lower than the average",
+   "tag": "NEW",
+   "why": "Mental Fortitude"
+  },
+  {
+   "text": "when in melee form, troll warlord has",
+   "tag": "REWORK",
+   "why": "Berserker's Rage, a basic ability by stance"
+  },
+  {
+   "text": "now refunds clockwerk",
+   "tag": "NEW",
+   "group": "7.37b proofread (2026-10-30): a new property is NEW even when it helps (owner's 7.37c/d rule)",
+   "why": "Hookshot (Hookup): mana refund"
+  },
+  {
+   "text": "now also increases attack range for units under",
+   "tag": "NEW",
+   "why": "Enchant (Spellbound)"
+  },
+  {
+   "text": "now increases duration to",
+   "tag": "NEW",
+   "why": "Scurry (Hunter facet): the facet takes over the old duration"
+  },
+  {
+   "text": "duration is no longer reduced",
+   "tag": "BUFF",
+   "why": "Burning Spear (Incendiary): a penalty gone"
+  },
+  {
+   "text": "can now be cast during channeling",
+   "tag": "NEW",
+   "why": "Quas / Wex / Exort / Invoke"
+  },
+  {
+   "text": "now stacks instead of refreshing",
+   "tag": "NEW",
+   "why": "Magnus talent"
+  },
+  {
+   "text": "of bonus damage is converted to base damage",
+   "tag": "BUFF",
+   "why": "Illusory Armaments: Phantom Lancer 65% → 100%"
+  },
+  {
+   "text": "self bonus move speed when activated",
+   "tag": "NEW",
+   "why": "Trample (Romp n' Stomp)"
+  },
+  {
+   "text": "stun duration now increases by",
+   "tag": "NEW",
+   "why": "Snowball: +0.2s per ally"
+  },
+  {
+   "text": "now counts one debuff per unique",
+   "tag": "NERF",
+   "why": "Septic Shock: Shiva's counts 1, not 3"
+  },
+  {
+   "text": "is now decreased by the illusion damage reduction",
+   "tag": "NERF",
+   "why": "Predator: illusions' bonus cut"
+  },
+  {
+   "text": "now has a primary and secondary target",
+   "tag": "NEW",
+   "why": "Death Ward (Cleft Death)"
+  },
+  {
+   "text": "no longer requires enchant totem to be leveled",
+   "tag": "NEW",
+   "group": "7.37c proofread (2026-10-29) owner 2026-10-29: these three are NEW (a new property), not BUFF",
+   "why": "Slugger: active without Enchant Totem"
+  },
+  {
+   "text": "multicasts now prioritize",
+   "tag": "NEW",
+   "why": "Fire Shield: a target order for multicasts"
+  },
+  {
+   "text": "is now applied during the rush",
+   "tag": "NEW",
+   "why": "Phantom Rush: the agility during the rush too"
+  },
+  {
+   "text": "all sources of evasion are doubled",
+   "tag": "NEW",
+   "group": "7.38 re-read (2026-11-02), by the owner's rules: a new property is NEW even when it helps",
+   "why": "Scurry had no evasion in 7.37e"
+  },
+  {
+   "text": "now prioritizes heroes",
+   "tag": "NEW",
+   "why": "Gunslinger: a target order, as Fire Shield above"
+  },
+  {
+   "text": "kills a non-hero unit during",
+   "tag": "NEW",
+   "why": "Exterminator: a new way to cut Tricks of the Trade's cooldown"
+  },
+  {
+   "text": "bonus experience for courier and ward",
+   "tag": "NEW",
+   "why": "Contract Killer: a new source of experience"
+  },
+  {
+   "text": "spell lifesteal apply to reflected",
+   "tag": "NEW",
+   "why": "Succubus (Bondage)"
+  },
+  {
+   "text": "can now be decreased by status resistance",
+   "tag": "NEW",
+   "why": "Arcane Curse: both ways, Debuff Duration lengthens it"
+  },
+  {
+   "text": "all attribute bonus provides an additional",
+   "tag": "NEW",
+   "why": "Accumulation: +3 replaces the removed +100%"
+  },
+  {
+   "text": "improved glaive collision behavior",
+   "tag": "QoL",
+   "why": "as \"improved behavior\" above (owner 2026-10-28)"
+  },
+  {
+   "text": "can now be put on autocast",
+   "tag": "QoL",
+   "why": "as \"added an auto-cast\" above (Tar Bomb)"
+  },
+  {
+   "text": "classified as reflection damage",
+   "tag": "REWORK",
+   "group": "the owner's own answers to the 7.38 re-read (2026-11-02)",
+   "why": "Quill Spray, Strike Damage: the kind of damage changes"
+  },
+  {
+   "text": "no longer take increased",
+   "tag": "DEL",
+   "why": "Winter's Curse: the amplification is gone"
+  },
+  {
+   "text": "now has the same effect for both",
+   "tag": "REWORK",
+   "why": "Arc Warden and his Double: values evened out both ways"
+  },
+  {
+   "text": "no longer doubles its bonuses",
+   "tag": "DEL",
+   "group": "7.37d proofread (2026-10-29)",
+   "why": "Bracer / Wraith Band / Null Talisman: the 25-minute doubling"
+  },
+  {
+   "text": "no longer makes caster or ally unslowable",
+   "tag": "DEL",
+   "why": "Disperser Suppress (40% slow resistance comes instead, NEW)"
+  },
+  {
+   "text": "always gains a charge when the owner dies",
+   "tag": "NEW",
+   "why": "Spirit Vessel: a new way to get charges (owner 2026-10-29)"
+  },
+  {
+   "text": "now triggers on death effects",
+   "tag": "NEW",
+   "why": "Chen Martyrdom: sacrificed creeps' On Death effects (owner)"
+  },
+  {
+   "text": "are no longer pulled to the center",
+   "tag": "REWORK",
+   "why": "Power Cogs: caught heroes placed another way (owner)"
+  },
+  {
+   "text": "alt cast behavior now has",
+   "tag": "NERF",
+   "why": "Drinking Buddies: alt cast at 50% of the cast range (owner)"
+  },
+  {
+   "text": "now heals creeps for",
+   "tag": "NERF",
+   "why": "Leech Seed: creeps were healed in full before (7.37c KV + tooltip), now at 50% — creep_heal_reduction_pct (owner asked)"
+  },
+  {
+   "text": "now disables blink dagger",
+   "tag": "NERF",
+   "why": "Mana Shield: absorbing damage now counts as taking it"
+  },
+  {
+   "text": "no longer allows to hit the same enemy",
+   "tag": "DEL",
+   "why": "Mirana Shard: secondary Starstorms no longer stack on one unit"
+  },
+  {
+   "text": "percentually change the base damage",
+   "tag": "NEW",
+   "why": "Illusory Armaments: base-damage % effects now count the bonus"
+  },
+  {
+   "text": "toggling items no longer breaks invis",
+   "tag": "QoL",
+   "why": "Riki: as 7.41 Burn toggling — handling, not power"
+  },
+  {
+   "text": "can no longer shoot arrows while",
+   "tag": "DEL",
+   "why": "Whirlwind Focus Fire: no own attacks while channeling"
+  },
+  {
+   "text": "invisibility buff is now dispelled if",
+   "tag": "NERF",
+   "why": "Windrun Scepter: a new way to lose the invisibility"
+  },
+  {
+   "text": "instead of removed",
+   "tag": "MISC",
+   "group": "owner 2026-11-08 (7.38 \"Now applies to Shrines of Wisdom instead of removed Wisdom Runes\"): the same effect from what replaced the removed thing — nothing changed for the player; before \"instead of\" (first match wins)"
+  },
+  {
+   "text": "instead of",
+   "tag": "REWORK",
+   "why": "component/requirement swap"
+  },
+  {
+   "text": "respawn time increased",
+   "tag": "NERF",
+   "why": "\"increased\" heuristic gives BUFF, but higher respawn = worse"
+  },
+  {
+   "text": "respawn time decreased",
+   "tag": "BUFF"
+  },
+  {
+   "text": "no longer reduces cooldown",
+   "tag": "DEL",
+   "why": "removal of a CD-reduction effect; lower-is-buff logic wrongly gives BUFF"
+  },
+  {
+   "text": "no longer reduces the cooldown",
+   "tag": "DEL",
+   "why": "same, \"the cooldown\" phrasing"
+  },
+  {
+   "text": "cycled out",
+   "tag": "DEL",
+   "why": "item removed from the pool"
+  },
+  {
+   "text": "moved from tier",
+   "tag": "REWORK",
+   "why": "tier-change is a structural move, not a buff/nerf"
+  },
+  {
+   "text": "dormant curio increases",
+   "tag": "NEW",
+   "why": "first-ever curio upgrade on an item = new capability"
+  },
+  {
+   "text": "destroys the target illusion",
+   "tag": "NERF",
+   "why": "Spectre Reality (7.40): the swapped illusion is lost (audit 2026-10-03)"
+  },
+  {
+   "text": "when determining if mars is outnumbered",
+   "tag": "BUFF",
+   "group": "owner 2026-10-16 (7.41 review): the effect decides, not the phrase template",
+   "why": "Dauntless: allies no longer offset enemies -> regen more often"
+  },
+  {
+   "text": "stolen spells now have their cooldown",
+   "tag": "NEW",
+   "why": "Spell Steal: a new property in place of the debuff amp"
+  },
+  {
+   "text": "avatar duration changed from 9/8/7/6s",
+   "tag": "BUFF",
+   "why": "BKB: the duration now stops at 7s, not 6s"
+  },
+  {
+   "text": "lifesteal don't apply to reflected damage",
+   "tag": "REWORK",
+   "why": "how reflected damage works now, not a lost effect"
+  },
+  {
+   "text": "preference has switched",
+   "tag": "REWORK",
+   "group": "owner 2026-10-17 (7.41): where a boss starts changes the game — REWORK, not MISC",
+   "why": "Tormentor's spawn / Roshan's pit preference"
+  },
+  {
+   "text": "no longer prevents camp-clearing madstone",
+   "tag": "MISC",
+   "why": "Hand of Midas Transmute on a camp's last creep"
+  },
+  {
+   "text": "toggling no longer breaks invisibility",
+   "tag": "QoL",
+   "why": "Radiance Burn: toggling no longer reveals / interrupts"
+  },
+  {
+   "text": "no longer cancels channeling",
+   "tag": "QoL",
+   "group": "owner 2026-11-08 (7.40 Telekinesis \"Land sub-ability no longer cancels channeling or interrupts movement\"): a sub-ability that stops cutting what the hero does is handling, not power"
+  },
+  {
+   "text": "treats creep heroes as creeps",
+   "tag": "REWORK",
+   "group": "owner 2026-10-24 (7.41): what a projectile stops on changes play — REWORK, not MISC",
+   "why": "Sharpshooter: the arrow now flies through them"
+  }
+ ]
+}
