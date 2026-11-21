@@ -285,17 +285,26 @@
 .ipot-sec { margin-top: 22px; }
 .ipot-title { font-family: var(--font-ui); color: var(--gold); font-size: 14px; letter-spacing: .4px;
   text-transform: uppercase; margin: 0 0 8px; text-align: left; }
-.ipot-rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
-.ipot-rule { padding: 10px 12px; border: 1px solid var(--line-soft); border-radius: 6px; background: rgba(255, 255, 255, 0.02); }
-.ipot-rule-h { color: var(--text-main); font-weight: 600; font-size: 13px; margin-bottom: 6px; }
-.ipot-rule .formula-expr { display: block; font-size: 13px; margin-bottom: 6px; }
-.ipot-rule-ex { font-size: 12px; color: var(--text-dim); }
+/* compact (design review 2026-11-21: the five cards pushed the table down): narrower, tighter; on a phone one row that
+   scrolls sideways instead of five tall cards one under another */
+.ipot-rules { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.ipot-rule { padding: 7px 10px; border: 1px solid var(--line-soft); border-radius: 6px; background: rgba(255, 255, 255, 0.02); }
+.ipot-rule-h { color: var(--text-main); font-weight: 600; font-size: 12.5px; margin-bottom: 4px; }
+.ipot-rule .formula-expr { display: block; font-size: 12.5px; margin-bottom: 4px; }
+.ipot-rule-ex { font-size: 11.5px; color: var(--text-dim); }
 .ipot-ex-old { color: var(--text-dim); }
 .ipot-ex-new { color: var(--gold); font-weight: 700; }
 .ipot-ex-what { margin-left: 8px; }
 .ipot-table { margin-bottom: 0; }
-table.mr-table.ipot-table { width: 100%; }
-table.mr-table.ipot-table td { text-align: left; vertical-align: middle; padding: 7px 12px; }
+table.mr-table.ipot-table { width: 100%; min-width: 0; }
+/* values and their names centred like every table of the site, the item's name with its icon left (ui-style.md "Любая
+   таблица", design review 2026-11-21) */
+table.mr-table.ipot-table td { text-align: center; vertical-align: middle; padding: 7px 12px; }
+table.mr-table.ipot-table td.ipot-name { text-align: left; }
+/* the illusions' part starts with a stronger line */
+table.mr-table.ipot-table .ipot-ill-first { border-left: 2px solid var(--line-soft); }
+/* the lower tables: the potency column as narrow as its chip */
+table.mr-table.ipot-sources td.ipot-v { width: 1%; }
 table.mr-table.ipot-table th { white-space: nowrap; }
 table.mr-table.ipot-table td.ipot-text { white-space: normal; }
 table.mr-table.ipot-table td.ipot-v { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -307,8 +316,8 @@ table.mr-table.ipot-table tr.ipot-gone td { opacity: 0.45; }
 /* items removed from the game: hidden till "Show removed", then grey (owner 2026-11-19) */
 table.mr-table.ipot-table tr.ipot-gone { display: none; }
 .ipot-page.ipot-with-gone table.mr-table.ipot-table tr.ipot-gone { display: table-row; }
-/* the "Removed" switch is the site's filter button (.hs-attack-filter, as Neutral Stats'): only its place here */
-.ipot-tools { display: flex; margin: 0 0 8px; }
+/* the "Removed" switch is the site's filter button in the site's filter card (as Neutral Stats'): only its place here */
+.ipot-tools { margin: 0 0 8px; justify-content: flex-start; }
 .ipot-name { white-space: nowrap; font-weight: 600; }
 .ipot-nm-wrap { display: inline-flex; align-items: center; gap: 10px; }
 .ipot-name img { border-radius: 3px; }
@@ -323,9 +332,7 @@ table.mr-table.ipot-table tr.ipot-gone { display: none; }
    uses the same table look */
 table.mr-table.ipot-table thead th { color: var(--text-dim); text-align: center; }
 table.mr-table.ipot-table thead th:first-child { color: var(--text-main); text-align: left; }
-table.mr-table.ipot-items thead th:nth-child(2), table.mr-table.ipot-items thead th:nth-child(3),
-table.mr-table.ipot-curio thead th:nth-child(2), table.mr-table.ipot-curio thead th:nth-child(3),
-table.mr-table.ipot-sources thead th:nth-child(2) { text-align: left; }
+table.mr-table.ipot-items thead th:nth-child(5) { border-left: 2px solid var(--line-soft); }
 table.mr-table.ipot-table td.ipot-p20 { color: rgba(214, 208, 196, 0.45); }
 table.mr-table.ipot-table td.ipot-p35 { color: rgba(214, 208, 196, 0.68); }
 table.mr-table.ipot-table td.ipot-p40 { color: rgba(214, 208, 196, 0.85); }
@@ -336,4 +343,13 @@ table.mr-table.ipot-table td.ipot-no-ill { color: rgba(214, 208, 196, 0.3); }
   .ipot-nm-wrap { align-items: flex-start; flex-wrap: wrap; gap: 4px; max-width: 100%; }
   .ipot-nm { min-width: 0; overflow-wrap: anywhere; }
   table.mr-table.ipot-table td { padding: 6px 8px; }
+  /* the items' table on a phone (design review 2026-11-21: "Hero" was off screen): the item as its icon, no ability
+     column (the value's name keeps the game's sentence on tap), the hero's value next to its name */
+  table.mr-table.ipot-items td.ipot-name { min-width: 0; width: 1%; }
+  table.mr-table.ipot-items td.ipot-name .ipot-nm { display: none; }
+  table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items thead th:nth-child(2) { display: none; }
+  table.mr-table.ipot-items td { padding: 6px 5px; }
+  .ipot-rules { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 78%; overflow-x: auto;
+    scroll-snap-type: x mandatory; padding-bottom: 4px; }
+  .ipot-rule { scroll-snap-align: start; }
 }

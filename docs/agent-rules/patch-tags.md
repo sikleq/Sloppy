@@ -1075,6 +1075,10 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   иллюзиях, а столбец есть»): `item_potency.no_illusions` читает примечания предмета (`…_Note0..7`: «does not grant
   Bash to … Illusions», «Chain Lightning does not trigger off of attacks from illusions», «Illusions do not apply
   Witch Blade, but can apply Magic Corruption», «Does not trigger on attacks from illusions» — весь предмет).
+  Вид таблицы (дизайн-проверка Sonnet 2026-11-21): все значения и шапки по центру, слева только предмет с иконкой;
+  способность — одна ячейка на свои строки; столбцы иллюзий отделены линией толще; кнопка «Removed» в карточке
+  фильтров `cal-toggle-bar` (как Neutral Stats); на телефоне предмет — одной иконкой, столбец способности скрыт,
+  значение героя видно сразу, карточки правил — одной полосой вбок.
 - Pip Health (`mech_abilities.pip_rows`): палочки по данным кода (`data/rules/pip_health.json`); над таблицей полоса —
   кнопки талант / Аганим / Шард / Марси у левого края, пояснения коротким текстом у правого («1 hit», «2 per melee
   hit», «Extra»).

@@ -29,6 +29,25 @@ def test_what_illusions_do_not_get_is_a_dash_not_a_share():
     assert "ipot-no-ill" not in skadi.split("</tr>")[0]
 
 
+def test_the_items_table_reads_like_the_sites_tables():
+    # design review 2026-11-21: the ability once per item, centred values, the illusions apart, the hero's value on a
+    # phone, the switch in the site's filter card
+    import pytest
+    import item_potency as ip
+    from patch import game_files
+    from patch.css_bundle import read_css
+    if not game_files.available():
+        pytest.skip("no game-files store")
+    rows = "".join(ip._items_rows(ip._versions()[-1], {"not_in_game": []}))
+    skadi = "".join(r for r in ip._items_rows(ip._versions()[-1], {"not_in_game": []}) if 'data-name="eye of skadi"' in r)
+    assert skadi.count('<td class="ipot-ab"') == 1 and '<td class="ipot-ab" rowspan=5>Cold Attack</td>' in skadi
+    assert "ipot-ill-first" in rows
+    assert ip.REMOVED_BUTTON.startswith('<div class="cal-toggle-bar inbox-bar ipot-tools"><div class="toolbar-panel">')
+    css = read_css()
+    assert "table.mr-table.ipot-table td { text-align: center;" in css
+    assert "table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items thead th:nth-child(2) { display: none; }" in css
+
+
 def test_the_page_lists_the_flagged_values_and_the_sources():
     import item_potency
     html = item_potency.render_html()

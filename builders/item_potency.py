@@ -40,8 +40,10 @@ ITEM_CDN = "icons/items/"
 ILLUSIONS = (("Illusion", 20), ("Manta", 35), ("Rune", 40))     # the usual potencies of an illusion
 # the site's "Removed" switch, as Neutral Stats' (builders/creeps.py; owner 2026-11-21: "Show removed кнопка не похожа на
 # те, что у нас на сайте с подобным функционалом")
-REMOVED_BUTTON = ('<div class="ipot-tools"><button type="button" class="hs-attack-filter ipot-show-gone" '
-                  'aria-pressed="false"><span>Removed</span></button></div>')
+# in the site's filter card, as Neutral Stats' toolbar (design review 2026-11-21)
+REMOVED_BUTTON = ('<div class="cal-toggle-bar inbox-bar ipot-tools"><div class="toolbar-panel">'
+                  '<button type="button" class="hs-attack-filter ipot-show-gone" '
+                  'aria-pressed="false"><span>Removed</span></button></div></div>')
 
 
 def _root(src):
@@ -190,14 +192,20 @@ def _items_rows(version, rules):
             v = _num(value)
             # the illusions' columns brighter as their potency grows (20 → 35 → 40%): how much of the hero's value is left
             note = no_ill.get(ab.lower()) or no_ill.get("*")
+            # the first illusions' column opens the illusions' part: a stronger line before it (design review 2026-11-21)
+            first = lambda i: " ipot-ill-first" if i == 0 else ""  # noqa: E731
             if note:     # illusions do not get it at all: a dash, the game's note on hover — not 20% of the value
                 tip = f' data-tooltip="{_esc(note)}"'
-                ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-no-ill"><span class="abil-ico-hint"{tip}>—</span></td>'
-                              for _ in ILLUSIONS)
+                ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-no-ill{first(i)}"><span class="abil-ico-hint"{tip}>—'
+                              f'</span></td>' for i, _ in enumerate(ILLUSIONS))
             else:
-                ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-p{p}">{_fmt(v * p / 100) if v is not None else "—"}</td>'
-                              for _, p in ILLUSIONS)
-            rows.append(f'<tr{cls} data-name="{_esc(name.lower())}">{head}<td class="ipot-ab">{_esc(ab)}</td>'
+                ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-p{p}{first(i)}">'
+                              f'{_fmt(v * p / 100) if v is not None else "—"}</td>' for i, (_, p) in enumerate(ILLUSIONS))
+            # the ability once for its rows (Eye of Skadi's Cold Attack five times, design review 2026-11-21)
+            run = 0 if k and vals[k - 1][0] == ab else next(
+                (j - k for j in range(k + 1, len(vals)) if vals[j][0] != ab), len(vals) - k)
+            ab_cell = (f'<td class="ipot-ab"{f" rowspan={run}" if run > 1 else ""}>{_esc(ab)}</td>' if run else "")
+            rows.append(f'<tr{cls} data-name="{_esc(name.lower())}">{head}{ab_cell}'
                         f'<td class="ipot-text">{prop}</td><td class="ipot-v ipot-v-hero">{_esc(value)}</td>{ill}</tr>')
     return rows
 
