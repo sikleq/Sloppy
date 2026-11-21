@@ -96,7 +96,7 @@ def test_the_filters_open_from_a_button_of_the_corner_stack():
     assert FILTER_FAB.startswith('<button class="filter-fab" id="filter-fab" type="button" aria-expanded="true"')
     page_src = (ROOT / "patch" / "page.py").read_text(encoding="utf-8")
     assert "'</button>' + FILTER_FAB +" in page_src and "FILTER_TOGGLE" not in page_src
-    assert html.count('<span class="fp-word">') == 8 and "Filters" not in html
+    assert html.count('<span class="fp-word">') == 9 and "Filters" not in html
     # look 6 of the mock, "галочки в рамке": a framed card, a box before each word, filled when ticked
     assert "fp-tile" not in html
     css = (ROOT / "src" / "css" / "pixel-skin.css").read_text(encoding="utf-8").replace("\r\n", "\n")
@@ -232,3 +232,16 @@ def test_filter_keeps_a_header_only_ability_apart_from_its_rows():
     # category filter was switched off
     js = read_js()
     assert "if (!ul) { headerOnly.push(block); return; }" in js
+
+
+def test_the_hidden_filter_shows_the_glowing_rows():
+    # owner 2026-11-21: "ещё один - Hidden, которые покажет строчки с error/hidden изменениями"
+    from patch.page import FILTER_TAGS, filter_pop_html
+    from patch.css_bundle import read_css
+    assert FILTER_TAGS[-1] == ("hidden", "hidden-filter", "Hidden")
+    assert 'data-filter="hidden"' in filter_pop_html()
+    js = read_js()
+    assert "const GLOW_SEL = '.hidden-change, .valve-error';" in js
+    assert "tags.some(t => activeFilters.has(t)) || glows(li)" in js          # a row
+    assert "some(hit) || glows(el)) return true;" in js                       # a card (7.42 Crimson Guard)
+    assert '.filter-btn[data-filter="hidden"] { --tm:' in read_css()

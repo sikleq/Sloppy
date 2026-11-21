@@ -487,6 +487,10 @@
   -webkit-mask: var(--tm) center / contain no-repeat; mask: var(--tm) center / contain no-repeat; }
 .filter-rail .legend-tags .badge.filter-btn[data-filter="rework"].active::after { left: 2px; top: 5px; width: 14px;
   height: 14px; }
+/* Hidden: the rows whose tag glows (owner 2026-11-21) — a gold box with the tags' gold glow, an eye when ticked */
+.filter-rail .legend-tags .badge.filter-btn.hidden-filter { color: #e3c46a; }
+.filter-rail .legend-tags .badge.filter-btn.hidden-filter::before { box-shadow: 0 0 6px 1px rgba(240, 205, 110, 0.75); }
+.filter-btn[data-filter="hidden"] { --tm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.2 7C3 3.8 5 2.8 7 2.8S11 3.8 12.8 7C11 10.2 9 11.2 7 11.2S3 10.2 1.2 7z'/%3E%3Ccircle cx='7' cy='7' r='1.8' fill='black'/%3E%3C/svg%3E"); }
 .filter-rail .fp-word {
   font-family: var(--font-j10); font-size: 18px; font-weight: 400; line-height: 1; letter-spacing: 0.3px;
   color: var(--px-text-soft); white-space: nowrap; }

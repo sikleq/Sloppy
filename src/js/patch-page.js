@@ -10,17 +10,16 @@
   document.querySelectorAll('[data-tag]').forEach(el => {
     (el.dataset.tag || '').split(' ').filter(Boolean).forEach(t => presentTags.add(t));
   });
-  // Recipe-changed items count as REWORK even if none of their explicit rows
-  // carry t("REWORK") — keep the filter button discoverable on those pages.
+  // Recipe-changed items count as REWORK even without a t("REWORK") row — keep the filter button discoverable.
   if (document.querySelector('.entity-block.is-changed')) presentTags.add('rework');
+  // Hidden filter: a tag's glow (patch/tag_glow.py) is a class, not a data-tag (owner 2026-11-21)
+  const GLOW_SEL = '.hidden-change, .valve-error';
+  if (document.querySelector(GLOW_SEL)) presentTags.add('hidden');
+  const glows = el => activeFilters.has('hidden') && !!el.querySelector(GLOW_SEL);
   document.querySelectorAll('.filter-btn').forEach(btn => {
-    if (!presentTags.has(btn.dataset.filter)) {
-      btn.style.display = 'none';
-    }
+    if (!presentTags.has(btn.dataset.filter)) btn.style.display = 'none';
   });
-  document.querySelectorAll('.legend-tags').forEach(bar => {
-    bar.style.visibility = 'visible';
-  });
+  document.querySelectorAll('.legend-tags').forEach(bar => { bar.style.visibility = 'visible'; });
 
   // ---- TAG FILTERING (multi-select, OR semantics) ----
   const buttons = document.querySelectorAll('.filter-btn');
@@ -38,7 +37,7 @@
   // row that matches: covered-cost -> the components card, covered-iab -> the abilities card.
   function panelMatches(el) {
     const hit = node => (node.dataset.tag || '').split(' ').some(t => activeFilters.has(t));
-    if (hit(el) || Array.from(el.querySelectorAll('[data-tag]')).some(hit)) return true;
+    if (hit(el) || Array.from(el.querySelectorAll('[data-tag]')).some(hit) || glows(el)) return true;
     const block = el.closest('.entity-block');
     const kind = el.classList.contains('iab-change') ? 'covered-iab'
       : el.classList.contains('components-change') ? 'covered-cost'
@@ -160,14 +159,14 @@
       // Items whose recipe changed (entity-block.is-changed) count as REWORK
       // so the REWORK filter keeps their rows visible too.
       if (li.closest('.entity-block.is-changed')) tags.push('rework');
-      const matches = tags.some(t => activeFilters.has(t));
+      const matches = tags.some(t => activeFilters.has(t)) || glows(li);
       if (!matches) li.classList.add('f-hide');
     });
     // Block-level swap visuals (ability_change) carry their own data-tag and
     // sit outside ul.changes — hide them when none of their tags is active.
     document.querySelectorAll('.ability-change[data-tag]').forEach(block => {
       const tags = (block.dataset.tag || '').split(' ').filter(Boolean);
-      if (!tags.some(t => activeFilters.has(t))) block.classList.add('f-hide');
+      if (!tags.some(t => activeFilters.has(t)) && !glows(block)) block.classList.add('f-hide');
     });
     refreshPatchFilterLayout();
   }

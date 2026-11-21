@@ -74,7 +74,10 @@ def patch_info_html(version, date):
 
 # the tags of the filter window: (data-filter, the badge's colour class, the word)
 FILTER_TAGS = (("buff", "buff-text", "BUFF"), ("nerf", "nerf-text", "NERF"), ("new", "new", "NEW"), ("del", "del", "DEL"),
-               ("rework", "rework", "REWORK"), ("swap", "swap", "SWAP"), ("misc", "misc", "MISC"), ("qol", "qol", "QoL"))
+               ("rework", "rework", "REWORK"), ("swap", "swap", "SWAP"), ("misc", "misc", "MISC"), ("qol", "qol", "QoL"),
+               # the rows whose tag glows: a hidden change or a mistake in Valve's notes (owner 2026-11-21: "ещё один -
+               # Hidden, которые покажет строчки с error/hidden изменениями"; src/js/patch-page.js GLOW_SEL)
+               ("hidden", "hidden-filter", "Hidden"))
 
 
 # the filters' switch: a round button of the corner stack, above the search, in its look (owner 2026-11-07: "иконку
