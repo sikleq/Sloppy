@@ -32,10 +32,13 @@ def test_hidden_rows_go_under_their_anchor_once():
     from patchgen.post_late import _postprocess_hidden_rows
     lines = ['    W(ability("Fiend\'s Gate", slug="abyssal_underlord_dark_portal"))', "    W(ul_open())",
              '    W(li("Cooldown rescaled", t("MISC")))', "    W(ul_close())",
-             '    W(li("Each camp unit now has a \\"home jungle\\", meaning …", t("REWORK")))']
+             '    W(li("Each camp unit now has a \\"home jungle\\", meaning …", t("REWORK")))',
+             '    W(ability("Burrowstrike", slug="sandking_burrowstrike"))', "    W(ul_open())", "    W(ul_close())"]
     out = _postprocess_hidden_rows(lines, "7.42")
     assert "portals now shoot" not in "".join(out) and out[3] == "    W(ul_close())"
     assert "never spawns the Vhoul camp" in out[5]
+    # kv_review part 4 (owner 2026-11-21): the new Scepter's +1000 burrow speed, not in Valve's Scepter text
+    assert "Burrowstrike travel speed increased from 2000 to 3000" in out[8] and out[9] == "    W(ul_close())"
     assert _postprocess_hidden_rows(out, "7.42") == out
 
 

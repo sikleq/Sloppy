@@ -5,6 +5,11 @@
       "anchor": "has a \\\"home jungle\\\"",
       "why": "map 7.42/-v2/-v3: [PR#]neutralcamp_evil_2 minspawntype 5, maxspawntype 6 (the other Dire camps 4-6); 0 of 186 Vhoul kills there in 13 tournament games (2026-11-21)",
       "row": "W(li(\"Dire's small camp by the top lane never spawns the Vhoul camp: only the Ghost and Harpy camps, in turn\", t(\"NERF\"), extra=inline_note(\"Its map spawner allows camp types 5-6 only; every other random Dire camp has 4-6 (Vhoul, Ghost, Harpy), and the small camp by the bottom lane spawns all three. Not in the patch notes: found in the game files\")))"
+    },
+    {
+      "anchor": "sandking_burrowstrike",
+      "why": "npc_dota_hero_sand_king sandking_burrowstrike burrow_speed special_bonus_scepter +1000 (new in 7.42, base 2000); Valve's Scepter text names cast range, spines, delay and Stinger damage only (kv_review part 4, owner 2026-11-21: 'исправь всё')",
+      "row": "W(li(\"With Aghanim's Scepter, Burrowstrike travel speed increased from 2000 to 3000\", b(2000, 3000), extra=inline_note(\"Not in the patch notes: found in the game files\")))"
     }
   ],
   "_not_in_game": [

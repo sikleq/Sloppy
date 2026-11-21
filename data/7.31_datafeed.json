@@ -4554,6 +4554,21 @@
     },
     {
       "hero_id": 88,
+      "hero_notes": [
+        {
+          "indent_level": 1,
+          "note": "Mana Burn Cooldown reduced from 28/20/12/4s to 20/15/10/5s"
+        },
+        {
+          "indent_level": 1,
+          "note": "Mana Burn Mana cost reduced from 100 to 70/80/90/100"
+        },
+        {
+          "indent_level": 1,
+          "note": "Mana Burn Intelligence damage multiplier reduced from 3.5/4/4.5/5x to 2.3/3.2/4.1/5x",
+          "icon": "intelligence"
+        }
+      ],
       "talent_notes": [
         {
           "indent_level": 1,
@@ -4571,23 +4586,6 @@
             {
               "indent_level": 1,
               "note": "Cooldown reduced from 14s to 17/16/15/14s"
-            }
-          ]
-        },
-        {
-          "ability_id": 1767,
-          "ability_notes": [
-            {
-              "indent_level": 1,
-              "note": "Cooldown reduced from 28/20/12/4s to 20/15/10/5s"
-            },
-            {
-              "indent_level": 1,
-              "note": "Mana cost reduced from 100 to 70/80/90/100"
-            },
-            {
-              "indent_level": 1,
-              "note": "Intelligence damage multiplier reduced from 3.5/4/4.5/5x to 2.3/3.2/4.1/5x"
             }
           ]
         },
@@ -7334,7 +7332,7 @@
     },
     {
       "name": "npc_dota_neutral_dark_troll",
-      "localized_name": "Hill Troll",
+      "localized_name": "Dark Troll Trapper",
       "neutral_creep_notes": [
         {
           "indent_level": 1,
@@ -7519,7 +7517,7 @@
       ]
     },
     {
-      "name": "npc_dota_neutral_big_thunder_lizard",
+      "name": "npc_dota_beastmaster_thunderhide",
       "localized_name": "Ancient Thunderhide",
       "neutral_creep_notes": [
         {
