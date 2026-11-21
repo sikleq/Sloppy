@@ -231,7 +231,11 @@ def test_filter_keeps_a_header_only_ability_apart_from_its_rows():
     # Brewmaster 7.41: Primal Split (rows live in the Brewling blocks under it) stayed hidden after the Heroes
     # category filter was switched off
     js = read_js()
-    assert "if (!ul) { headerOnly.push(block); return; }" in js
+    assert "if (!uls.length) { headerOnly.push(block); return; }" in js
+    # every list of an ability counts (Undying 7.42: a summary list, then the Shard rows — an empty header under BUFF),
+    # and an Aghanim's card without a tag goes with its ability's rows (owner 2026-11-21: empty heroes under Hidden)
+    assert "!uls.some(elementVisible) && !block.querySelector('.ability-change:not(.f-hide)')" in js
+    assert "document.querySelectorAll('.ability-change:not([data-tag])').forEach(card => {" in js
 
 
 def test_the_hidden_filter_shows_the_glowing_rows():

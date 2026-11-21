@@ -3765,7 +3765,6 @@ def build():
     W(li("Cooldown rescaled from 110/105/100s to 115/105/95s", b([110, 105, 100], [115, 105, 95], l=True)))
     W(li("Channel duration decreased from 3.5s to 3.5/3.25/3s", b(3.5, [3.5, 3.25, 3], l=True)))   # a shorter channel
     W(li("Aghanim Scepter upgrade now creates a Pit of Malice only at the end portal", t("NERF")))
-    W(li("With Aghanim's Scepter, the portals now shoot enemies within 1200 range, slowing them by 40% for 2.5s; no damage, once per 0.8s per target", t("NEW"), extra=inline_note("Not in the patch notes: found in the game files")))
     W(ul_close())
 
     # Undying

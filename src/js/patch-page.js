@@ -60,9 +60,9 @@
     const tagFiltering = activeFilters.size > 0;
     const headerOnly = [];
     document.querySelectorAll('.ability-block').forEach(block => {
-      const ul = block.querySelector('ul.changes');
-      if (!ul) { headerOnly.push(block); return; }
-      block.classList.toggle('f-hide', !elementVisible(ul));
+      const uls = Array.from(block.querySelectorAll('ul.changes'));   // all: a new ability's summary + its Shard rows (Undying 7.42)
+      if (!uls.length) { headerOnly.push(block); return; }
+      block.classList.toggle('f-hide', !uls.some(elementVisible) && !block.querySelector('.ability-change:not(.f-hide)'));
     });
     headerOnly.forEach(block => {
       const h = block.querySelector('h4.ability-title');
@@ -150,15 +150,10 @@
     const isActive = activeFilters.size > 0;
     document.body.classList.toggle('filter-active', isActive);
     document.querySelectorAll('.f-hide').forEach(el => el.classList.remove('f-hide'));
-    if (!isActive) {
-      refreshPatchFilterLayout();
-      return;
-    }
+    if (!isActive) { refreshPatchFilterLayout(); return; }
     document.querySelectorAll('ul.changes > li').forEach(li => {
       const tags = (li.dataset.tag || '').split(' ').filter(Boolean);
-      // Items whose recipe changed (entity-block.is-changed) count as REWORK
-      // so the REWORK filter keeps their rows visible too.
-      if (li.closest('.entity-block.is-changed')) tags.push('rework');
+      if (li.closest('.entity-block.is-changed')) tags.push('rework');   // a recipe change counts as REWORK
       const matches = tags.some(t => activeFilters.has(t)) || glows(li);
       if (!matches) li.classList.add('f-hide');
     });
@@ -167,6 +162,12 @@
     document.querySelectorAll('.ability-change[data-tag]').forEach(block => {
       const tags = (block.dataset.tag || '').split(' ').filter(Boolean);
       if (!tags.some(t => activeFilters.has(t)) && !glows(block)) block.classList.add('f-hide');
+    });
+    // An Aghanim's / granted ability's card has no tag of its own: it stays while a row of its ability (the one it
+    // took over, li.covered-card, too) matches — it kept an empty hero header under Hidden (owner 2026-11-21, Dazzle)
+    document.querySelectorAll('.ability-change:not([data-tag])').forEach(card => {
+      const ab = card.closest('.ability-block');
+      if (!(ab && ab.querySelector('ul.changes > li:not(.f-hide)')) && !glows(card)) card.classList.add('f-hide');
     });
     refreshPatchFilterLayout();
   }
