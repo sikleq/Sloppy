@@ -69,7 +69,8 @@
   border-bottom: none;
   box-shadow: inset 0 -1px 0 rgba(54, 53, 50, 0.5);
   white-space: normal;
-  text-align: left;   /* icons hug the left edge so they line up vertically */
+  /* centred like every table of the site (owner 2026-11-21 chose it over icons in a straight left column) */
+  text-align: center;
 }
 /* Elevate the whole cell when its ability icon is hovered — same pattern as
    dyn-cell-wrap:hover { z-index:7 }. The z-index on the TD's stacking context

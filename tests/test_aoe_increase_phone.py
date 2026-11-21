@@ -3,6 +3,13 @@ review 2026-11-21: the name took 60% of a 375 px screen and one ability column s
 from patch.css_bundle import read_css
 
 
+def test_the_values_are_centred():
+    # owner 2026-11-21: "Значения по центру" (they hugged the left edge so the icons stood in a column)
+    css = read_css()
+    cell = css.split(".mr-table.aoe-table td.aoe-cell {", 1)[1].split("}", 1)[0]
+    assert "text-align: center;" in cell and "text-align: left" not in cell
+
+
 def test_the_hero_is_its_icon_on_a_phone():
     css = read_css()
     block = css.split("td.aoe-name .mr-name-body { vertical-align: middle; }", 1)[1].split("}\n}", 1)[0]
