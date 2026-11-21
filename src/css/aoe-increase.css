@@ -330,6 +330,8 @@ table.mr-table.ipot-sources thead th:nth-child(2) { text-align: left; }
 table.mr-table.ipot-table td.ipot-p20 { color: rgba(214, 208, 196, 0.45); }
 table.mr-table.ipot-table td.ipot-p35 { color: rgba(214, 208, 196, 0.68); }
 table.mr-table.ipot-table td.ipot-p40 { color: rgba(214, 208, 196, 0.85); }
+/* illusions do not get it at all (the game's note on hover, owner 2026-11-21): a faint dash, not a number */
+table.mr-table.ipot-table td.ipot-no-ill { color: rgba(214, 208, 196, 0.3); }
 @media (max-width: 760px) {
   .ipot-name { white-space: normal; min-width: 130px; }
   .ipot-nm-wrap { align-items: flex-start; flex-wrap: wrap; gap: 4px; max-width: 100%; }

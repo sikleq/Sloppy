@@ -9,6 +9,26 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "builders"))
 
 
+def test_what_illusions_do_not_get_is_a_dash_not_a_share():
+    # owner 2026-11-21: "basher/abyssal не работает на иллюзиях, а столбец есть" — the game's notes say which
+    import pytest
+    import item_potency as ip
+    from patch import game_files
+    if not game_files.available():
+        pytest.skip("no game-files store")
+    v = ip._versions()[-1]
+    assert set(ip.no_illusions("item_basher", v)) == {"bash"}
+    assert set(ip.no_illusions("item_maelstrom", v)) == {"chain lightning"}
+    assert set(ip.no_illusions("item_devastator", v)) == {"witch blade"}          # Magic Corruption still applies
+    assert set(ip.no_illusions("item_orb_of_venom", v)) == {"*"}
+    assert ip.no_illusions("item_skadi", v) == {}
+    rows = "".join(ip._items_rows(v, {"not_in_game": []}))
+    basher = rows[rows.index('data-name="skull basher"'):]
+    assert basher.split("</tr>")[0].count("ipot-no-ill") == 3                    # Illusion, Manta, Rune
+    skadi = rows[rows.index('data-name="eye of skadi"'):]
+    assert "ipot-no-ill" not in skadi.split("</tr>")[0]
+
+
 def test_the_page_lists_the_flagged_values_and_the_sources():
     import item_potency
     html = item_potency.render_html()

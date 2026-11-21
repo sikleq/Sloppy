@@ -143,10 +143,40 @@ def _rules_cards(rules):
     return f'<div class="ipot-rules">{"".join(cards)}</div>'
 
 
+# the game's own notes on an item that its effect does not come from illusions (owner 2026-11-21: "basher/abyssal не
+# работает на иллюзиях, а столбец есть … надо учитывать"): "Does not grant Bash to Clones, Illusions…", "Chain Lightning
+# does not trigger off of attacks from illusions", "Illusions do not apply Witch Blade, but can apply Magic Corruption",
+# "Does not trigger on attacks from illusions" (the whole item)
+_NO_ILL = (
+    _re.compile(r"does not grant (?P<ab>[A-Z][\w' ]+?) to [^.]*\billusions", _re.I),
+    _re.compile(r"^(?P<ab>[A-Z][\w' ]+?) does not (?:trigger|proc|work)[^.]*\billusions", _re.I),
+    _re.compile(r"^Illusions do not (?:apply|trigger|proc) (?P<ab>[A-Z][\w' ]+?)(?:,|\.|$)", _re.I),
+    _re.compile(r"^Does not (?:trigger|proc|work)[^.]*\b(?:from|for|on) (?:attacks from )?illusions", _re.I),
+)
+
+
+def no_illusions(key, version):
+    """{ability name (lower) or "*" for the whole item: the game's note} — what illusions of the holder do not get."""
+    out = {}
+    for i in range(8):
+        note = tooltip(f"DOTA_Tooltip_ability_{key}_Note{i}", version) or tooltip(
+            f"DOTA_Tooltip_Ability_{key}_Note{i}", version)
+        if not note:
+            continue
+        for rx in _NO_ILL:
+            m = rx.search(note.strip())
+            if m:
+                ab = m.groupdict().get("ab")
+                out[ab.strip().lower() if ab else "*"] = note.strip()
+                break
+    return out
+
+
 def _items_rows(version, rules):
     gone = set(rules.get("not_in_game", []))
     rows = []
     for name, key, slug, vals in _scaled_values(version, "apply_effectiveness"):
+        no_ill = no_illusions(key, version)
         for k, (ab, label, value, sentence) in enumerate(vals):
             cls = ' class="ipot-gone"' if key in gone else ''
             # removed from the game: grey, hidden till "Show removed" (owner 2026-11-19: no "not in the game" words)
@@ -155,8 +185,14 @@ def _items_rows(version, rules):
             prop = f'<span class="{"iab-hint abil-ico-hint " if sentence else ""}ipot-prop"{hint}>{_esc(label)}</span>'
             v = _num(value)
             # the illusions' columns brighter as their potency grows (20 → 35 → 40%): how much of the hero's value is left
-            ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-p{p}">{_fmt(v * p / 100) if v is not None else "—"}</td>'
-                          for _, p in ILLUSIONS)
+            note = no_ill.get(ab.lower()) or no_ill.get("*")
+            if note:     # illusions do not get it at all: a dash, the game's note on hover — not 20% of the value
+                tip = f' data-tooltip="{_esc(note)}"'
+                ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-no-ill"><span class="abil-ico-hint"{tip}>—</span></td>'
+                              for _ in ILLUSIONS)
+            else:
+                ill = "".join(f'<td class="ipot-v ipot-v-ill ipot-p{p}">{_fmt(v * p / 100) if v is not None else "—"}</td>'
+                              for _, p in ILLUSIONS)
             rows.append(f'<tr{cls} data-name="{_esc(name.lower())}">{head}<td class="ipot-ab">{_esc(ab)}</td>'
                         f'<td class="ipot-text">{prop}</td><td class="ipot-v ipot-v-hero">{_esc(value)}</td>{ill}</tr>')
     return rows

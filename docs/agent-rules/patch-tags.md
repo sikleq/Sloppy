@@ -1070,7 +1070,11 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   предметов (значение, иллюзии 20% / Manta 35% / руна 40%), свои / добавленные / иллюзорные источники; удалённые из
   игры предметы спрятаны за кнопкой «Show removed», слов «not in the game» нет. Названия — из текстов игры; ключ с
   пометкой грамматики (`…item_riftshadow_prism:n`, 7.42) читается и без неё (`patch/loc_history._table`), иначе
-  вместо названия стояло внутреннее имя (владелец 2026-11-21).
+  вместо названия стояло внутреннее имя (владелец 2026-11-21). Что иллюзии не получают вовсе — прочерк в столбцах
+  иллюзий и примечание игры при наведении, а не 20% значения (владелец 2026-11-21: «basher/abyssal не работает на
+  иллюзиях, а столбец есть»): `item_potency.no_illusions` читает примечания предмета (`…_Note0..7`: «does not grant
+  Bash to … Illusions», «Chain Lightning does not trigger off of attacks from illusions», «Illusions do not apply
+  Witch Blade, but can apply Magic Corruption», «Does not trigger on attacks from illusions» — весь предмет).
 - Pip Health (`mech_abilities.pip_rows`): палочки по данным кода (`data/rules/pip_health.json`); над таблицей полоса —
   кнопки талант / Аганим / Шард / Марси у левого края, пояснения коротким текстом у правого («1 hit», «2 per melee
   hit», «Extra»).
