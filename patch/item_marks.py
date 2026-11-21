@@ -85,16 +85,35 @@ def ability_marks(slug, version):
 
 
 ILLUSION_POTENCY = 20     # an illusion's Item Potency unless its creator sets one (server.dll 6983, research 2026-11-19)
+ILLUSION_RUNE_POTENCY = 40     # 7.42 notes: "Illusions created by Illusion Rune now have 40% Item Potency"
 
 
-def _illusion_row(text):
-    """The same numbers on a default illusion: value × 20 / 100 (owner 2026-11-19, Diffusal Blade's Manabreak: "нет
-    строчки про то, как это работает на иллюзиях")."""
+def _illusion_sources(version):
+    """(name, Item Potency %) of the common illusions, the strongest first: Illusion Rune, Manta Style (its
+    "illusion_effectiveness" in that patch's items.txt, 35 in 7.42), a standard illusion (owner 2026-11-21: "можно
+    разделить на 3 строки")."""
+    av = (_items(version).get("item_manta") or {}).get("AbilityValues")
+    manta = av.get("illusion_effectiveness") if isinstance(av, dict) else None
+    manta = manta.get("value") if isinstance(manta, dict) else manta
+    out = [("Illusion Rune", ILLUSION_RUNE_POTENCY)]
+    try:
+        out.append(("Manta Style", float(manta)))
+    except (TypeError, ValueError):
+        pass
+    return out + [("Standard illusion", ILLUSION_POTENCY)]
+
+
+def _illusion_row(text, version):
+    """The same numbers on illusions, one row per source: value × potency / 100 (owner 2026-11-19, Diffusal Blade's
+    Manabreak: "нет строчки про то, как это работает на иллюзиях"; 2026-11-21: Rune, Manta, standard)."""
     nums = re.findall(r"<b>([-+]?\d+(?:\.\d+)?)(%?)</b>", text)
     if not nums:
         return ""
-    vals = " / ".join(f"<b>{round(float(v) * ILLUSION_POTENCY / 100, 2):g}{pct}</b>" for v, pct in nums)
-    return f'<span class="pop-li pop-sub"><span class="pop-t">Illusions: {vals}</span></span>'     # owner 2026-11-19
+    rows = []
+    for name, p in _illusion_sources(version):
+        vals = " / ".join(f"<b>{round(float(v) * p / 100, 2):g}{pct}</b>" for v, pct in nums)
+        rows.append(f'<span class="pop-li pop-sub"><span class="pop-t">{name} ({p:g}%) = {vals}</span></span>')
+    return "".join(rows)
 
 
 def _curio_pct(version):
@@ -139,7 +158,7 @@ def item_marks(name, version):
             head = f"With Dormant Curio (+{curio:g}%)"
             found = [(n, _curio_text(t, curio)) for n, t in found]
         rows = "".join(f'<span class="pop-li"><span class="pop-t">{f"{n}: " if n else ""}{t}</span></span>'
-                       + (_illusion_row(t) if kind == "potency" else "")
+                       + (_illusion_row(t, version) if kind == "potency" else "")
                        for n, t in found)
         src = icon or item_img("Dormant Curio")
         out += (f'<span class="info-tip item-mark item-mark-{kind}" tabindex="0"><img src="{src}" alt="">'

@@ -998,6 +998,9 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - **Значки на иконке предмета** (`patch/item_marks.py`, вариант 2 из макета): серая молния — значения, которые меняет
   Item Potency (`apply_effectiveness`), под ней значок Dormant Curio (`apply_curio_bonus`). При наведении — фразы из
   подсказки игры, нужное число жирным. Строки «… Item Potency» — серая полоса, «… Dormant Curio» — фиолетово-розовая.
+  Под фразами у Item Potency — те же числа на иллюзиях, строкой на источник, сильнее первым (владелец 2026-11-21):
+  «Illusion Rune (40%) = 16», «Manta Style (35%) = 14» (`illusion_effectiveness` из items.txt патча),
+  «Standard illusion (20%) = 8». Одна строка «Illusions: 8» не говорила, откуда 20%.
 - У строк нового юнита / предмета / способности нет точек слева («• New ability» — никогда).
 - «Active: X. Identical to … / Stronger version of …» (так пишет Valve) — полный текст способности из подсказки игры,
   фраза Valve — первой строкой под [?] (`post_items._postprocess_shorthand_ability`).

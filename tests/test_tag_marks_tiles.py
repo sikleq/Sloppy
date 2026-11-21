@@ -246,7 +246,10 @@ def test_abilities_that_set_attack_potency_carry_the_mark_from_742():
     assert ability_marks("pangolier_swashbuckle", "7.41f") == ""          # values known for 7.42 on
     assert ability_marks("pangolier_rolling_thunder", "7.42") == ""
     from patch.item_marks import item_marks
-    assert "Illusions: <b>8</b>" in item_marks("Diffusal Blade", "7.42")     # owner 2026-11-19: "просто Illusions: 8"
+    # owner 2026-11-21: one row per illusion source, the strongest first (Manta's 35 read from items.txt)
+    mark = item_marks("Diffusal Blade", "7.42")
+    rows = ["Illusion Rune (40%) = <b>16</b>", "Manta Style (35%) = <b>14</b>", "Standard illusion (20%) = <b>8</b>"]
+    assert all(r in mark for r in rows) and [mark.index(r) for r in rows] == sorted(mark.index(r) for r in rows)
 
 
 def test_a_new_ability_card_in_a_new_block_keeps_its_new_tile():
