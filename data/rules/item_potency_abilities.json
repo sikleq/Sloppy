@@ -3,7 +3,7 @@
   "since": "7.42",
   "abilities": {
     "mirana_celestial_quiver": "Quiver attacks: +20%",
-    "riki_innate_backstab": "Attacks from behind: +10%, +10% per 15 hero levels",
+    "riki_innate_backstab": "Attacks from behind (levels 1 / 15 / 30): +10/20/30%",
     "weaver_geminate_attack": "Geminate attacks: +15%",
     "sandking_scorpion_strike": "Attacks: 60%",
     "windrunner_focusfire": "Attacks during Focus Fire: 75%",
@@ -22,11 +22,11 @@
     "gyrocopter_flak_cannon": "Extra attacks: 50%",
     "gyrocopter_side_gunner_spawn_ability": "Attacks: 75%",
     "ember_spirit_sleight_of_fist": "Attacks: 80%",
-    "kez_falcon_rush": "Echo attacks: equal to their damage (30/35/40/45%)",
+    "kez_falcon_rush": "Echo attacks: 30/35/40/45%",
     "abaddon_death_coil": "Aghanim's Scepter attack: 80%",
     "sniper_assassinate": "Attack: 120/135/150%",
     "void_spirit_astral_step": "Attacks: 125%",
-    "luna_moon_glaive": "Bounces: 60% per bounce (60%, 36%, 21.6%…)"
+    "luna_moon_glaive": "Each bounce, of the one before: 60%"
   },
   "items": {
     "item_manta": "Illusions: 35%",

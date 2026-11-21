@@ -29,6 +29,17 @@ def test_what_illusions_do_not_get_is_a_dash_not_a_share():
     assert "ipot-no-ill" not in skadi.split("</tr>")[0]
 
 
+def test_every_potency_chip_is_a_number():
+    # owner 2026-11-21: Falcon Rush's chip read "equal to their damage (30/35/40/45%)" — the chip says the number, the
+    # words go to the "Attacks" column
+    import json
+    import re
+    rules = json.loads((ROOT / "data" / "rules" / "item_potency_abilities.json").read_text(encoding="utf-8"))
+    for slug, text in list(rules["abilities"].items()) + list(rules.get("items", {}).items()):
+        what, _, val = text.partition(": ")
+        assert val and re.fullmatch(r"[+\-−]?\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*%", val), (slug, text)
+
+
 def test_the_items_table_reads_like_the_sites_tables():
     # design review 2026-11-21: the ability once per item, centred values, the illusions apart, the hero's value on a
     # phone, the switch in the site's filter card
