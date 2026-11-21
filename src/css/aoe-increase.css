@@ -122,6 +122,14 @@
   margin-right: 16px;
 }
 .mr-table.aoe-table td.aoe-name .mr-name-body { vertical-align: middle; }
+/* a phone: the hero as its icon (design review 2026-11-21: the name took 60% of the screen, one ability column showed)
+   — the name stays for search and screen readers */
+@media (max-width: 760px) {
+  .mr-table.aoe-table td.aoe-name .mr-name-body, .mr-table.aoe-table thead th.aoe-name .th-label {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mr-table.aoe-table td.aoe-name .hs-ico { margin-right: 0; }
+  .mr-table.aoe-table td.aoe-name, .mr-table.aoe-table thead th.aoe-name { min-width: 0; width: 56px; padding: 4px 6px; }
+}
 .mr-table.aoe-table td.aoe-name {
   /* Override .mr-table .mr-name {display:grid} — grid on a <td> drops it out
      of the table's automatic row-height equalisation (same fix as td.hs-name). */
