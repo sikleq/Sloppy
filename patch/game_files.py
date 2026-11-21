@@ -7,8 +7,10 @@ scripts/npc/heroes/npc_dota_hero_axe.txt, resource/localization/abilities_englis
 Replaces the dotabuff/d2vpkr fetchers (which took "the last commit before the next patch" or "<= release + 4 days"
 and so often held a neighbouring patch's state) and the GitHub archives read directly.
 """
+import atexit
 import os
 import subprocess
+import threading
 from functools import lru_cache
 from pathlib import Path
 
@@ -26,9 +28,39 @@ def versions() -> frozenset:
     return frozenset(r.stdout.split()) if r.returncode == 0 else frozenset()
 
 
+_BATCH = None
+_BATCH_LOCK = threading.Lock()
+
+
+def _batch():
+    """One `git cat-file --batch` for the whole run: a build read ~2 700 files through `git show`, one process each —
+    half the build's time (Fable review 2026-11-21)."""
+    global _BATCH
+    if _BATCH is None or _BATCH.poll() is not None:
+        _BATCH = subprocess.Popen(["git", "-C", str(STORE), "cat-file", "--batch"], stdin=subprocess.PIPE,
+                                  stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        atexit.register(_BATCH.kill)
+    return _BATCH
+
+
 def read_bytes(version: str, rel: str) -> bytes | None:
-    r = subprocess.run(["git", "-C", str(STORE), "show", f"{version}:files/{rel}"], capture_output=True)
-    return r.stdout if r.returncode == 0 else None
+    spec = f"{version}:files/{rel}"
+    if "\n" in spec:
+        return None
+    with _BATCH_LOCK:
+        try:
+            p = _batch()
+            p.stdin.write(spec.encode("utf-8") + b"\n")
+            p.stdin.flush()
+            head = p.stdout.readline().split()
+            if len(head) != 3 or head[1] != b"blob":       # "<spec> missing" / a tree / an ambiguous name
+                return None
+            data = p.stdout.read(int(head[2]))
+            p.stdout.read(1)                                # the newline after the content
+            return data
+        except (OSError, ValueError):                       # the process died: one plain call, as before
+            r = subprocess.run(["git", "-C", str(STORE), "show", spec], capture_output=True)
+            return r.stdout if r.returncode == 0 else None
 
 
 @lru_cache(maxsize=512)
