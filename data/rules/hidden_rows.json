@@ -1,5 +1,5 @@
 {
-  "_about": "Rows Valve's notes leave out, found in the game files and checked in the game code; tools/patchgen/post_late._postprocess_hidden_rows puts each after the line holding its anchor (an ability's slug: at the end of that ability's rows). The page draws them as a Hidden change (patch/hidden_change.py) by the note's 'Not in the patch notes' (owner 2026-11-21: 'Да, сделай всё'). Only what works in the game: keys or code Valve left in as a draft (not reached in a match) are not a hidden change (owner 2026-11-21: 'этого нет в игре. Не путай заготовки с тем, что скрыто добавили').",
+  "_about": "Rows Valve's notes leave out, found in the game files and checked in the game code; tools/patchgen/post_notes._postprocess_hidden_rows puts each after the line holding its anchor (an ability's slug: at the end of that ability's rows). The page draws them as a Hidden change (patch/hidden_change.py) by the note's 'Not in the patch notes' (owner 2026-11-21: 'Да, сделай всё'). Only what works in the game: keys or code Valve left in as a draft (not reached in a match) are not a hidden change (owner 2026-11-21: 'этого нет в игре. Не путай заготовки с тем, что скрыто добавили').",
   "7.42": [
     {
       "anchor": "has a \\\"home jungle\\\"",

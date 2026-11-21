@@ -2,7 +2,7 @@
 2026-11-21, of the mock's variants "Свечение 3, при наведении показывает Hidden Change подсказку"; the [?] alone was
 not seen: "на твоих примерах не вижу, где тихие правки").
 
-Content marks such a row with an inline note starting "Not in the patch notes" (tools/patchgen: post_cards, post_late,
+Content marks such a row with an inline note starting "Not in the patch notes" (tools/patchgen: post_cards, post_notes,
 data/rules/hidden_rows.json). The stock sentence leaves the [?]; words of its own stay there ("It gave +35 Movement
 Speed before it was cycled out."). A row a card covers keeps its note (a mark there would never be seen).
 

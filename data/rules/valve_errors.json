@@ -1,5 +1,5 @@
 {
-  "_about": "Item stats cards whose 'from' number in Valve's notes is not what the previous patch's items.txt has (owner 2026-11-21: \"число «было» на карточке характеристик предмета сверяется с файлами прошлого патча\"). Only checked cases live here: tools/patchgen/post_late._postprocess_valve_card_errors puts the files' number on the card and a red-glowing tag with Valve's words on hover; tests/test_valve_error.py fails on any card mismatch not listed (scripts/audit/audit_card_values.py).",
+  "_about": "Item stats cards whose 'from' number in Valve's notes is not what the previous patch's items.txt has (owner 2026-11-21: \"число «было» на карточке характеристик предмета сверяется с файлами прошлого патча\"). Only checked cases live here: tools/patchgen/post_notes._postprocess_valve_card_errors puts the files' number on the card and a red-glowing tag with Valve's words on hover; tests/test_valve_error.py fails on any card mismatch not listed (scripts/audit/audit_card_values.py).",
   "7.42": [
     {
       "item": "Crimson Guard",

@@ -54,7 +54,7 @@ def test_every_item_cards_before_number_is_the_files_one():
 def test_a_card_with_valves_mistake_shows_the_files_number_and_a_red_tag():
     import sys
     sys.path.insert(0, "tools")
-    from patchgen.post_late import _postprocess_valve_card_errors
+    from patchgen.post_notes import _postprocess_valve_card_errors
     from patch.cards_item_stats import _prop_tag
     lines = ['    W(item_header("Crimson Guard", changed=True))',
              '    W(properties_change(old=[("BUFF", "+4 Armor")], new=[("", "+5 Armor", b(4, 5))]))']

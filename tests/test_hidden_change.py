@@ -29,7 +29,7 @@ def test_hidden_rows_go_under_their_anchor_once():
     # draft not in the game ("Не путай заготовки с тем, что скрыто добавили") and must not come back
     import sys
     sys.path.insert(0, "tools")
-    from patchgen.post_late import _postprocess_hidden_rows
+    from patchgen.post_notes import _postprocess_hidden_rows
     lines = ['    W(ability("Fiend\'s Gate", slug="abyssal_underlord_dark_portal"))', "    W(ul_open())",
              '    W(li("Cooldown rescaled", t("MISC")))', "    W(ul_close())",
              '    W(li("Each camp unit now has a \\"home jungle\\", meaning …", t("REWORK")))',
@@ -46,7 +46,7 @@ def test_pugnas_shard_cast_range_in_7_41d():
     # 7.41d (owner 2026-11-21: "Да, добавь"): Valve named the base 150 -> 175 only, the Shard's =350 -> =375 too
     import sys
     sys.path.insert(0, "tools")
-    from patchgen.post_late import _postprocess_hidden_rows
+    from patchgen.post_notes import _postprocess_hidden_rows
     lines = ['    W(ability("Nether Ward", slug="pugna_nether_ward"))', "    W(ul_open())",
              '    W(li("Cast Range increased from 150 to 175", b(150, 175)))', "    W(ul_close())"]
     out = _postprocess_hidden_rows(lines, "7.41d")

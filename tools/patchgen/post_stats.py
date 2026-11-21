@@ -3,7 +3,7 @@ import re
 
 from .entities import _AGHS_LINE_RE
 from .lines import _ENTITY_START_RE, _PROP_CHANGE_RE, _py_repr
-from .names import _py_str  # noqa: F401  (post_late, post_tables import it from here)
+from .names import _py_str  # noqa: F401  (post_innates, post_notes, post_tables import it from here)
 
 
 def _postprocess_aghs_merge(lines):

@@ -219,3 +219,100 @@ def _postprocess_renamed_facets(lines):
             out[i] = f'{head.group(1)}W(facet_header("{head.group(2)}", old_title="{row.group(2)}"))'
             out[j] = None
     return [x for x in out if x is not None]
+
+
+# ---- facet passes moved from post_late.py (Fable review 2026-11-21) ----
+_ROW_TO_VALUES_RE = re.compile(r'^\s*W\(li\("[^"]* (?:decreased|increased|rescaled) from [^"]* to ([^"]+)"')
+
+
+def _row_values_in_text(row, text):
+    """A "… from A to B" row whose every B is in the card's new text says what the card says (owner 2026-11-02: "Spell
+    Lifesteal decreased from 12-18% to 2-14%" goes in the new side of Succubus' card)."""
+    m = _ROW_TO_VALUES_RE.match(row)
+    values = set(re.findall(r"\d+(?:\.\d+)?", m.group(1))) if m else set()
+    return bool(values) and values <= set(re.findall(r"\d+(?:\.\d+)?", text))
+
+
+_FACET_IMPROVES_RE = re.compile(r'^(\s*)W\(li\("Now is a facet that improves ([^"]+)", t\("[A-Za-z]+"\)\)\)\s*$')
+
+
+def _postprocess_facet_improves_row(lines):
+    """"Now is a facet that improves Succubus" + "Succubus: Now also makes …" -> one row, tagged NEW (owner 2026-11-02)."""
+    out, i = [], 0
+    while i < len(lines):
+        m = _FACET_IMPROVES_RE.match(lines[i])
+        nxt = lines[i + 1] if i + 1 < len(lines) else ""
+        rest = m and re.match(r'^\s*W\(li\("' + re.escape(m.group(2)) + r': (?:Now )?(.)(.*)$', nxt)
+        if not rest:
+            out.append(lines[i])
+            i += 1
+            continue
+        tail = re.sub(r't\("[A-Za-z]+"\)', 't("NEW")', rest.group(2), count=1)
+        out.append(f'{m.group(1)}W(li("Now is a facet that improves {m.group(2)}: {rest.group(1).lower()}{tail}')
+        i += 2
+    return out
+
+
+_BLOCK_START_RE_LATE = re.compile(r'^\s*W\((ability|ability_change|ability_group|two_selves_change|new_ability|facet_header|facet_group|new_facet|facet_change)\(')
+_FACET_KINDS = ("facet_header", "facet_group", "new_facet", "facet_change")
+_HERO_END_RE = re.compile(r'^\s*(?:W\((?:hero_header|section|unit_header|item_header|plain_header|enchant_header)\(|write_footer\(|save_html\()')
+
+
+def _facets_first(span):
+    """One hero's lines with his facet blocks before his ability blocks, each kind in its order (entity-rendering.md). A
+    hero whose facets own the abilities that follow them (sub=True, 7.39 Invoker) stays as written."""
+    stop = next((k for k, ln in enumerate(span) if "W(subgroup(" in ln), None)
+    if stop is None:
+        stop = len(span)
+        while stop and (not span[stop - 1].strip() or span[stop - 1].lstrip().startswith("#")):
+            stop -= 1
+    starts = [k for k in range(stop) if _BLOCK_START_RE_LATE.match(span[k])]
+    if not starts or any("sub=True" in ln for ln in span[:stop]):
+        return span
+    blocks = [span[a:b] for a, b in zip(starts, starts[1:] + [stop])]
+    kinds = [_BLOCK_START_RE_LATE.match(b[0]).group(1) in _FACET_KINDS for b in blocks]
+    if kinds == sorted(kinds, reverse=True):
+        return span
+    facets = [b for b, f in zip(blocks, kinds) if f]
+    others = [b for b, f in zip(blocks, kinds) if not f]
+    return span[:starts[0]] + [ln for b in facets + others for ln in b] + span[stop:]
+
+
+def _postprocess_facets_first(lines):
+    """A hero's rows, his facets, then his abilities: an innate block written before the facets put a second run of
+    abilities after them (owner 2026-11-02, 7.38 Morphling: "сначала способность, потом фасеты, потом опять способности")."""
+    out, i = [], 0
+    while i < len(lines):
+        if not lines[i].lstrip().startswith("W(hero_header("):
+            out.append(lines[i])
+            i += 1
+            continue
+        end = next((k for k in range(i + 1, len(lines)) if _HERO_END_RE.match(lines[k])), len(lines))
+        out += [lines[i]] + _facets_first(lines[i + 1:end])
+        i = end
+    return out
+
+
+
+_FACET_LINE_RE = re.compile(r'^(\s*)W\(facet_header\("([^"]+)"\)\)\s*$')
+_NEW_FACET_ROW_RE = re.compile(r'^\s*W\(li\("New Facet"', re.I)
+_LI_TEXT_RE = re.compile(r'^\s*W\(li\("((?:[^"\\]|\\.)*)"')
+
+
+def _postprocess_new_facet_rows(lines):
+    """facet_header + a "New Facet" row + its description rows (7.37 Medusa: Valve wrote them as rows) → the new
+    facet card new_facet(slug, desc=[…]), as 7.38's new facets."""
+    out, i = [], 0
+    while i < len(lines):
+        m = _FACET_LINE_RE.match(lines[i])
+        if not (m and i + 2 < len(lines) and lines[i + 1].strip() == "W(ul_open())"
+                and _NEW_FACET_ROW_RE.match(lines[i + 2])):
+            out.append(lines[i])
+            i += 1
+            continue
+        end = next((k for k in range(i + 3, len(lines)) if lines[k].strip() == "W(ul_close())"), len(lines))
+        desc = [t.group(1) for t in (_LI_TEXT_RE.match(r) for r in lines[i + 3:end]) if t]
+        items = ", ".join(f'"{d}"' for d in desc)
+        out.append(f'{m.group(1)}W(new_facet("{m.group(2)}", desc=[{items}]))')
+        i = end + 1
+    return out

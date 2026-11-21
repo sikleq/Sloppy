@@ -61,23 +61,29 @@ from .post_items import (
     _postprocess_rework_marker,
     _postprocess_unstated_total_cost,
 )
-from .post_late import (
-    _merge_adjacent_lists,
-    _merge_no_longer_innate,
-    _postprocess_ability_level_formula,
+from .post_facets import (
     _postprocess_facet_improves_row,
     _postprocess_facets_first,
+    _postprocess_new_facet_rows,
+)
+from .post_innates import (
+    _merge_no_longer_innate,
     _postprocess_innate_cards,
     _postprocess_innate_level0,
-    _postprocess_mechanic_lists,
-    _postprocess_new_facet_rows,
     _postprocess_new_innate_cards,
+    _postprocess_stance_blocks,
+)
+from .post_late import (
+    _postprocess_ability_level_formula,
+)
+from .post_notes import (
+    _merge_adjacent_lists,
+    _postprocess_hidden_rows,
+    _postprocess_mechanic_lists,
     _postprocess_returning_rows,
     _postprocess_roshan_block,
-    _postprocess_hidden_rows,
-    _postprocess_valve_card_errors,
     _postprocess_row_notes,
-    _postprocess_stance_blocks,
+    _postprocess_valve_card_errors,
 )
 from .post_tables import (
     _postprocess_drop_table,

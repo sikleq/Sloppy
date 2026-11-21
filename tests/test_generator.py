@@ -1298,7 +1298,7 @@ def test_properties_card_puts_shared_stats_first():
 
 
 def test_nimble_742_row_says_the_penalty_did_not_work_before():
-    from tools.patchgen.post_late import ROW_NOTES
+    from tools.patchgen.post_notes import ROW_NOTES
     assert any("Health Regen penalty is now reflected" in k and "before 7.42" in v for k, v in ROW_NOTES.items())
 
 
@@ -1333,7 +1333,7 @@ def test_innates_are_found_in_ability_definitions():
 
 
 def test_removed_innate_rows_go_under_the_card():
-    from tools.patchgen.post_late import _drop_removed_block
+    from tools.patchgen.post_innates import _drop_removed_block
     out = ['W(hero_header("Lycan"))', "# TODO[innate-swap]: x", 'W(ability("Apex Predator", slug="lycan_apex_predator", innate=True))',
            "W(ul_open())", 'W(li("Removed Apex Predator innate ability", t("DEL")))', "W(ul_close())"]
     assert _drop_removed_block(out, "lycan_apex_predator") and out == ['W(hero_header("Lycan"))']
