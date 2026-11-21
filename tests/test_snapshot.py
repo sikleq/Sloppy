@@ -21,7 +21,7 @@ EXPECTED = {
     # abilities cards repeat their rows' % in the values' hover (2026-10-17); +8 / +12: Alert, Timeless, Titanic, Vital
     # got their tier tables, a changed cell's % on hover (2026-10-26); a "from A to B" value in a (?) has its % in its
     # own hover, not a badge (owner 2026-11-19: "как в карточках")
-    "badge_buff": 396,
+    "badge_buff": 398,   # +2: 7.41d Pugna's Shard cast range, a hidden change (2026-11-21)
     "badge_nerf": 203,
     "badge_new": 1,
     "badge_del": 5,

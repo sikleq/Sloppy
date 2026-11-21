@@ -9,6 +9,9 @@ For every hero ability the page names, the ability's KV of the patch before and 
      whose tag the files may contradict is marked "проверить тег" (the 7.37d Leech Seed case: "Now heals creeps for
      50% effectiveness" was tagged NEW, the files show a new creep heal reduction → a cut).
   3. Changes in the files of those abilities that no row of the page explains — this hero's hidden changes.
+  4–6. tools/kv_hidden.py: every hero ability (not only the ones the page names), hero stats, items, units (from the
+     game-files store when data/stats lacks them), Liquipedia's undocumented lines. Part 3 alone missed six 7.41
+     changes (owner 2026-11-21: "пойми, почему ты эти изменения не нашёл, улучши себя") — read parts 2–6, not only 3.
 
 The meaning stays with a person: the files say "0 → 50", not whether that is a nerf.
 
@@ -170,9 +173,23 @@ def _page_tags(version):
     return {re.sub(r"<[^>]+>", "", m.group(2)): m.group(3).lower() for m in _PAGE_ROW.finditer(text)}
 
 
+def _normalized(version):
+    """data/normalized/patches/<v>.json, or the same built from the stored datafeed (7.39e–7.41c had none, and the
+    review stopped there; owner 2026-11-21)."""
+    path = NORM / f"{version}.json"
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    feed = ROOT / "data" / f"{version}_datafeed.json"
+    if not feed.exists():
+        raise FileNotFoundError(f"{version}: neither {path.name} nor {feed.name}")
+    sys.path.insert(0, str(ROOT / "tools"))
+    from patchgen.normalize import normalize
+    return normalize(version, json.loads(feed.read_text(encoding="utf-8")))
+
+
 def review(version):
     prev = _prev_patch_version(version)
-    doc = json.loads((NORM / f"{version}.json").read_text(encoding="utf-8"))
+    doc = _normalized(version)
     tags = _page_tags(version)
     for ent in doc.get("entities", []):
         for ch in ent.get("changes", []):
@@ -250,6 +267,10 @@ def report(version):
     out += ["", f"## 3. Изменения в файлах, которых нет ни в одной строке: {len(hidden)} способностей"]
     for hero, slug, fields in hidden:
         out.append(f"- {hero} / {slug}: {_fields(fields)}")
+    # parts 3 missed what an ability with no row or with a word row changed, items, units and Liquipedia's list
+    # (7.41: Viper Strike, Kinetic Fence, Reactive Tazer, Guardian Angel, Giant's Maul, Tormentor; owner 2026-11-21)
+    from tools.kv_hidden import report_parts
+    out += report_parts(version, prev)
     return "\n".join(out)
 
 
