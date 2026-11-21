@@ -30,7 +30,7 @@
         },
         {
           "text": "Added UI icon that shows you which parameters increase with hero level and what is the current value",
-          "tag": "new",
+          "tag": "qol",
           "scope": "base",
           "info": "Pressing ALT key will show base value and increment of the ability"
         },
@@ -58,12 +58,12 @@
         },
         {
           "text": "First +1 siege creep timing decreased from 35:00 to 30:00",
-          "tag": "nerf",
+          "tag": "buff",
           "scope": "base"
         },
         {
           "text": "Second +1 siege creep timing now occurs at 60:00",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -101,7 +101,7 @@
       "changes": [
         {
           "text": "Tormentor's spawn preference has switched",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base",
           "info": "Now begins in the Bottom Chasm"
         },
@@ -142,7 +142,7 @@
         },
         {
           "text": "Reflect radius can now be seen by holding ALT key",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "base"
         },
         {
@@ -180,7 +180,7 @@
         },
         {
           "text": "Roshan's pit preference has switched",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base",
           "info": "Now begins in the Top Pit"
         },
@@ -203,27 +203,27 @@
       "changes": [
         {
           "text": "Tormentor spawns have been positioned closer towards Lotus Pools",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
           "text": "Tormentor spawn areas have been reduced to low ground relative to the lane's level",
-          "tag": "nerf",
+          "tag": "rework",
           "scope": "base"
         },
         {
           "text": "Lotus Pools have been moved slightly closer to their respective offlane tower",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
           "text": "Twin Gates slightly moved away from the stairs towards the map border",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
           "text": "The watcher between the safe lane tier 1 tower and the tormentor has been repositioned",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -248,52 +248,52 @@
         },
         {
           "text": "Ancient neutral camps near stream ends demoted to medium camps and moved slightly towards bases",
-          "tag": "misc",
-          "scope": "base"
-        },
-        {
-          "text": "Medium neutral camp near offlane defender's gate has been demoted to a small neutral camp",
-          "tag": "misc",
-          "scope": "base"
-        },
-        {
-          "text": "The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet",
-          "tag": "misc",
-          "scope": "base"
-        },
-        {
-          "text": "Radiant safe lane small camp has been slightly moved north away from the lane",
-          "tag": "misc",
-          "scope": "base"
-        },
-        {
-          "text": "Radiant safe lane hard camp's spawn box has been moved towards the offlane to remove a bad ward location",
-          "tag": "misc",
-          "scope": "base"
-        },
-        {
-          "text": "Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower",
-          "tag": "misc",
-          "scope": "base"
-        },
-        {
-          "text": "The ramp leading from the Radiant tier 1 tower to the stream has been decreased in width and moved away from the tower",
           "tag": "nerf",
           "scope": "base"
         },
         {
+          "text": "Medium neutral camp near offlane defender's gate has been demoted to a small neutral camp",
+          "tag": "nerf",
+          "scope": "base"
+        },
+        {
+          "text": "The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet",
+          "tag": "rework",
+          "scope": "base"
+        },
+        {
+          "text": "Radiant safe lane small camp has been slightly moved north away from the lane",
+          "tag": "rework",
+          "scope": "base"
+        },
+        {
+          "text": "Radiant safe lane hard camp's spawn box has been moved towards the offlane to remove a bad ward location",
+          "tag": "rework",
+          "scope": "base"
+        },
+        {
+          "text": "Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower",
+          "tag": "rework",
+          "scope": "base"
+        },
+        {
+          "text": "The ramp leading from the Radiant tier 1 tower to the stream has been decreased in width and moved away from the tower",
+          "tag": "rework",
+          "scope": "base"
+        },
+        {
           "text": "The medium flooded camp near the safe lane tier 2 towers moved closer to the middle of the stream (substantially more for Dire than for Radiant)",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
           "text": "The medium flooded camp near the safe lane tier 2 towers can now only evolve once into a hard camp, rather than into an Ancient Camp",
-          "tag": "misc",
+          "tag": "nerf",
           "scope": "base"
         },
         {
           "text": "The medium flooded camp near the bounty runes can now evolve twice into an Ancient Camp",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "base"
         },
         {
@@ -355,22 +355,22 @@
         },
         {
           "text": "Reflected damage cannot be reflected back",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         },
         {
           "text": "Lifesteal and Spell Lifesteal don't apply to reflected damage",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         },
         {
           "text": "Reflected damage doesn't affect Debuff Immune units",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         },
         {
           "text": "Units with free movement now can miss their attacks when attacking uphill targets",
-          "tag": "misc",
+          "tag": "nerf",
           "scope": "base",
           "info": "Affected units:* Batrider during Firefly* Dragon Knight during Elder Dragon Form with Aghanim's Scepter* Lina during Flame Cloak* Terrorblade's Reflection illusions"
         }
@@ -539,7 +539,7 @@
             110,
             125
           ],
-          "scope": "Seed Shot"
+          "scope": "base"
         }
       ]
     },
@@ -551,6 +551,7 @@
         {
           "text": "Arm of the Deep: After neutrals cast this ability, all copies of Arm of the Deep, Tendrils of the Deep, and Congregations of the Deep on other neutral Boglets, Croakers, and Ancient Croakers within 1200 range are put on 5s cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Arm of the Deep"
         }
       ]
@@ -563,6 +564,7 @@
         {
           "text": "Tendrils of the Deep: After neutrals cast this ability, all copies of Arm of the Deep, Tendrils of the Deep, and Congregations of the Deep on other neutral Boglets, Croakers, and Ancient Croakers within 1200 range are put on 5s cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Tendrils of the Deep"
         }
       ]
@@ -575,11 +577,12 @@
         {
           "text": "Congregations of the Deep: After neutrals cast this ability, all copies of Arm of the Deep, Tendrils of the Deep, and Congregations of the Deep on other neutral Boglets, Croakers, and Ancient Croakers within 1200 range are put on 5s cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Congregations of the Deep"
         },
         {
           "text": "Congregations of the Deep: Radius is now affected by Area of Effect bonuses",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Congregations of the Deep"
         }
       ]
@@ -591,7 +594,7 @@
       "changes": [
         {
           "text": "Water Bubble (Large): Radius is now affected by Area of Effect bonuses",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Water Bubble (Large)"
         }
       ]
@@ -693,7 +696,10 @@
       "changes": [
         {
           "text": "Cost decreased from 550g to 500g",
-          "tag": "nerf",
+          "tag": "buff",
+          "old": 550,
+          "new": 500,
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -705,7 +711,10 @@
       "changes": [
         {
           "text": "Cost increased from 800g to 900g",
-          "tag": "buff",
+          "tag": "nerf",
+          "old": 800,
+          "new": 900,
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -761,7 +770,7 @@
       "changes": [
         {
           "text": "Item moved back to Secret Shop from Miscellaneous Shop",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -773,7 +782,7 @@
       "changes": [
         {
           "text": "Item moved back to Secret Shop from Miscellaneous Shop",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -800,6 +809,7 @@
         {
           "text": "Requires Vitality Booster (1000), Shawl (450), Crown (450), and a recipe (700). Total cost: 2600g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -809,12 +819,13 @@
         },
         {
           "text": "Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whenever the wearer takes damage from a player-controlled unit or Roshan, all stacks are removed to create an all-damage barrier for 7s that absorbs 120 damage per removed stack (up to 360). If the wearer reached a max amount of stacks at least once in a game, regaining a stack provides a non-stacking buff that increases movespeed by 20% for 7s",
-          "tag": "del",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Has no damage threshold, but doesn't proc from Health Loss damage (like Heartstopper Aura)",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -832,6 +843,7 @@
         {
           "text": "Requires Ghost Scepter (1500), Soul Booster (3000), and a recipe (300). Total cost: 4800g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -841,7 +853,8 @@
         },
         {
           "text": "Active: Rite of Rumusque. The wearer enters ghost form for 4 seconds, becoming immune to physical damage, but is unable to attack and 30% more vulnerable to magic damage. Steals 5% movement speed from enemy heroes in a 900 radius every second. Movement speed steal lasts 1.5s. Bonuses stack and have duration refreshed on gaining new stacks. No Mana Cost. Cooldown: 20s",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -851,7 +864,7 @@
         },
         {
           "text": "Passive: Putrefaction Aura. Reduces health restoration of nearby enemy heroes by 30%. While Rite of Rumusque is active, the effect is increased to 75% and all of the lost Health Restoration is redirected to the wearer every second. Radius: 900",
-          "tag": "buff",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -864,6 +877,7 @@
         {
           "text": "Requires Urn of Shadows (825), Chainmail (500), Wizard Hat (250), and a recipe (200). Total cost: 1775g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -873,7 +887,8 @@
         },
         {
           "text": "Active: Soul Release. When cast on an ally, provides 40 health regeneration. If the ally is attacked by an enemy hero or Roshan, the effect is lost. When cast on an enemy, deals 25 damage per second, provides True Sight over them and shares their vision with the wearer's team. Both effects last 8 seconds. Can be cast on the ground to put a dormant effect that will latch to the first enemy hero that comes within 400 range from it. The effect waits for 15s and provides 400 vision until it disappears. Gains charges every time an enemy hero dies within 1500 units. Cast Range: 1000. No Mana Cost. Cooldown: 10s",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -896,6 +911,7 @@
         {
           "text": "Requires Blade of Alacrity (1000), Broadsword (1000), and a recipe (550). Total cost: 2550g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -905,7 +921,7 @@
         },
         {
           "text": "Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -938,6 +954,7 @@
         {
           "text": "Requires Specialist's Array (2550), Dragon Lance (1900), Orb of Venom (350) and a recipe (1100). Total cost: 5900g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -947,12 +964,12 @@
         },
         {
           "text": "Passive: Miasma. Attacks poison the target for 3 seconds, dealing magical damage equal to 2.5% of the target's max health every second. If the debuff is reapplied, the duration is refreshed. Can't be applied by illusions or to Roshan",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects except for Miasma. The primary attack deals 20 + full damage of a normal attack when the ability procs",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -1113,7 +1130,7 @@
         },
         {
           "text": "Guard base damage block rescaled from 70 for all units to 70 on melee heroes and buildings and 45 on ranged heroes",
-          "tag": "rework",
+          "tag": "nerf",
           "scope": "base"
         },
         {
@@ -1143,6 +1160,21 @@
         {
           "text": "Recipe cost unchanged at 1150. Total cost increased from 2800/3950/5100/6250/7400g to 3050/4200/5350/6500/7650g",
           "tag": "misc",
+          "old": [
+            2800,
+            3950,
+            5100,
+            6250,
+            7400
+          ],
+          "new": [
+            3050,
+            4200,
+            5350,
+            6500,
+            7650
+          ],
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1213,12 +1245,12 @@
         },
         {
           "text": "Energy Burst no longer instantly kills non-ancient creeps",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         },
         {
           "text": "Energy Burst no longer heals for 75% of damage dealt",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1302,12 +1334,13 @@
         },
         {
           "text": "Swiftness Aura now also provides +2.5 Health Regen",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Endurance now shares cooldown with Boots of Bearing",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -1324,12 +1357,13 @@
         },
         {
           "text": "Swiftness Aura now also provides +2.5 Health Regen",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Endurance now shares cooldown with Drum of Endurance",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -1455,11 +1489,13 @@
         {
           "text": "Now requires Talisman of Evasion (1300), Splintmail (950), Ring of Health (700), and a recipe (450). Total cost: 3400g",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
           "text": "Used to require Vanguard (1700), Crown (450) and a recipe (450). Total cost: 2600g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1602,7 +1638,10 @@
         },
         {
           "text": "Total cost increased from 2800g to 3100g (change is bigger due to Cloak cost increase)",
-          "tag": "buff",
+          "tag": "nerf",
+          "old": 2800,
+          "new": 3100,
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1652,7 +1691,7 @@
       "changes": [
         {
           "text": "Berserk now also grants 30% Slow Resistance for the duration",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -1735,7 +1774,10 @@
         },
         {
           "text": "Total cost decreased from 4375g to 4350g",
-          "tag": "nerf",
+          "tag": "buff",
+          "old": 4375,
+          "new": 4350,
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1959,6 +2001,7 @@
         {
           "text": "Recipe cost unchanged at 500. Total cost unchanged at 2575g (due to Pavise cost decrease)",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2010,7 +2053,10 @@
       "changes": [
         {
           "text": "Cost decreased from 1500g to 1450g (due to Chainmail cost decrease)",
-          "tag": "nerf",
+          "tag": "buff",
+          "old": 1500,
+          "new": 1450,
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -2055,6 +2101,7 @@
         {
           "text": "Barrier no longer affects units that have been affected by Barrier within Pipe of Insight's cooldown",
           "tag": "del",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2268,16 +2315,17 @@
         {
           "text": "Arctic Blast no longer increases damage taken from spells",
           "tag": "del",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
           "text": "Freezing Aura no longer reduces Health Restoration and Incoming Heal Amplification by 25%",
-          "tag": "buff",
+          "tag": "del",
           "scope": "base"
         },
         {
           "text": "Freezing Aura now pierces debuff immunity",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2302,7 +2350,8 @@
       "changes": [
         {
           "text": "Break now also goes on cooldown when the item is disassembled. Reassembling the item will remember the time remaining",
-          "tag": "misc",
+          "tag": "nerf",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -2320,11 +2369,13 @@
         {
           "text": "Now requires Voodoo Mask (650), Robe of the Magi (450), Fluffy Hat (250), and a recipe (350). Total cost: 1700g",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
           "text": "Used to require Ring of Health (700), Chainmail (550), Circlet (155), and a recipe (320). Total cost: 1725g",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2357,6 +2408,9 @@
         {
           "text": "Now requires Veil of Discord (1700) instead of Void Stone (700) and Voodoo Mask (650). Total cost increased from 4350g to 4700g",
           "tag": "new",
+          "old": 4350,
+          "new": 4700,
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2396,7 +2450,7 @@
         },
         {
           "text": "Bloodpact no longer has a 30s self debuff preventing repeated usage of Bloodpact",
-          "tag": "del",
+          "tag": "buff",
           "scope": "base"
         },
         {
@@ -2507,12 +2561,13 @@
       "changes": [
         {
           "text": "Returning as a Tier 1 Neutral Artifact",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Active: Imbrue. Increase attack damage by 25 for 8s. Health Cost: 100. Cooldown: 30s",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -2525,6 +2580,7 @@
         {
           "text": "When this item is off cooldown, the wearer can see trees that can be foraged. Standing next to one of those trees for 1s will give the wearer one of the following items. Cooldown: 60s. Tree reveal radius: 1200",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2566,12 +2622,12 @@
       "changes": [
         {
           "text": "Returning as a Tier 1 Neutral Artifact",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Passive: Lifesteal. Attacks heal for 5 health",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "This counts as lifesteal and is manipulated by Health Restoration"
         }
@@ -2585,6 +2641,7 @@
         {
           "text": "Toggle: Transmogrify. Activate to switch the contents of the satchel between Feathers or Rocks. No Mana Cost. Cooldown: 6s.",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -2657,12 +2714,13 @@
       "changes": [
         {
           "text": "Returning as a Tier 2 Neutral Artifact",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Active: Valor. If cast on an ally, increases their armor by 7 for 8s. If cast on an enemy, decreases their armor by 4 for 8s. Cannot be cast on self. Cast Range: 1000. Mana Cost: 30. Cooldown: 18s",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base",
           "info": "Dormant Curio increases duration from 8s to 10.4s"
         }
@@ -2683,9 +2741,10 @@
         },
         {
           "text": "Burn Through: Damage Threshold increased from 55 to 60",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 55,
           "new": 60,
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -2697,12 +2756,13 @@
       "changes": [
         {
           "text": "Returning as a Tier 2 Neutral Artifact",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Active: Verdurous Dale. Place a 400 unit circle on the ground for 8s that increases health regeneration of allies inside by 8 + 25% of the caster's health regeneration. Cast Range: 350. No Mana Cost. Cooldown: 35s",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base",
           "info": "Dormant Curio increases health regeneration from 8 to 10.4 and from 25% to 32.5%"
         }
@@ -2727,12 +2787,12 @@
       "changes": [
         {
           "text": "Returning as a Tier 3 Neutral Artifact",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Passive: Immolate. Burns enemy units in a 375 unit radius for 40 damage per second. Illusions deal 25 damage per second",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "Dormant Curio increases damage from 40 to 52 and illusion damage from 25 to 32.5"
         }
@@ -2780,7 +2840,7 @@
       "changes": [
         {
           "text": "Passive: Brand. Increases spell damage against player controlled units by 9%",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "Dormant Curio increases bonus spell damage from 9% to 11.7%"
         },
@@ -2813,7 +2873,8 @@
       "changes": [
         {
           "text": "Passive: Salvo. Whenever you cast a spell, 20% of the spell's mana cost is restored over 10s. Tick rate: 2s",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base",
           "info": "Dormant Curio increases mana restored from 20% to 26%"
         },
@@ -2831,12 +2892,12 @@
       "changes": [
         {
           "text": "Returning as a Tier 3 Neutral Artifact",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Passive: Bottled Lightning. Every 6s, zaps up to 2 enemies within 700 units, slowing them by 40% for 0.4s and dealing 70 magic damage",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "Dormant Curio increases damage from 70 to 91"
         }
@@ -2849,7 +2910,7 @@
       "changes": [
         {
           "text": "Passive: Spellover. Every 100 spell damage dealt to an enemy deals damage to their surrounding allies in a 300 unit radius. Hero targets deal 40 damage to their allies, other targets deal 15 damage",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "Dormant Curio increases hero damage from 40 to 52 and non-hero damage from 15 to 19.5"
         }
@@ -2862,12 +2923,13 @@
       "changes": [
         {
           "text": "Returning as a Tier 4 Neutral Artifact",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Passive: Magical Damage Block. Blocks 300 magic damage from instances over 75 damage. Cooldown: 12s",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base",
           "info": "Dormant Curio increases blocked damage from 300 to 390"
         }
@@ -2880,7 +2942,7 @@
       "changes": [
         {
           "text": "Passive: Enchant. Increases bonuses of the item's Neutral Enchantment by 15%. Every time you craft this item again the bonus is increased by 40%",
-          "tag": "buff",
+          "tag": "new",
           "scope": "base",
           "info": "Dormant Curio increases recraft stat bonus from 40% to 52%"
         },
@@ -2906,10 +2968,9 @@
         },
         {
           "text": "Pupate bonus magic resistance increased from 35% to 50%",
-          "tag": "nerf",
+          "tag": "buff",
           "old": 35,
           "new": 50,
-          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -2921,7 +2982,8 @@
       "changes": [
         {
           "text": "Passive: Linger. 30% of damage taken is delayed over 5 seconds. Damage Ticks every 1 second and is lethal",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base",
           "info": "Dormant Curio increases damage delayed from 30% to 39%"
         }
@@ -2934,9 +2996,10 @@
       "changes": [
         {
           "text": "Reverberate damage threshold increased from 180 to 220",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 180,
           "new": 220,
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -2948,7 +3011,7 @@
       "changes": [
         {
           "text": "Passive: Balance. Grants 5% mana cost reduction for every hero ability off cooldown and 6% spell amplification for every spell on cooldown",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "Dormant Curio increases mana cost reduction from 5% to 6.5% and spell amplification from 6% to 7.8%"
         },
@@ -2960,6 +3023,7 @@
         {
           "text": "The buff counts only current abilities that have cooldown, even if it's passive",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -3013,17 +3077,18 @@
       "changes": [
         {
           "text": "Returning as a Tier 5 Neutral Artifact",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
           "text": "Active: Cleanse. Apply basic dispel on all units in a 300 unit radius area. Cast Range: 500. Mana Cost: 150. Cooldown: 40s",
-          "tag": "misc",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         },
         {
           "text": "Passive: Subjugate. Your attacks deal bonus magical damage equal to 4% of target's Max Mana",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "Dormant Curio increases damage from 4% to 5.2%"
         }
@@ -3201,7 +3266,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tiers 1-4 option for all heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3230,7 +3295,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tiers 1-4 option for Strength and Agility heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3242,7 +3307,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tiers 1-4 option for Strength and Intelligence heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3254,7 +3319,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tiers 1-4 option for Agility and Universal heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -3283,7 +3348,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tiers 1-4 option for Intelligence and Universal heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -3294,6 +3359,7 @@
         {
           "text": "Now provides +15% Mana Cost/Mana Loss Reduction at Tier 4",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -3305,7 +3371,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed option for all heroes on Tiers 2-3",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3317,7 +3383,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed option for Strength heroes only",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -3362,7 +3428,6 @@
             12,
             16
           ],
-          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -3399,7 +3464,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed option for Intelligence heroes only",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -3461,7 +3526,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed option for Universal heroes only",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -3504,7 +3569,7 @@
         },
         {
           "text": "Now also provides -10/12/14% Attack Speed",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "base"
         }
       ]
@@ -3516,7 +3581,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tiers 4-5 option for all heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3528,7 +3593,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tier 5 option for all heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3540,7 +3605,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tier 5 option for all heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3552,7 +3617,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed option for all heroes",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -3619,7 +3684,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tier 5 option for Agility heroes only",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3631,7 +3696,7 @@
       "changes": [
         {
           "text": "Now is a guaranteed Tier 5 option for Intelligence heroes only",
-          "tag": "new",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -3649,6 +3714,7 @@
         {
           "text": "Provides -18% Base Attack Time, +20% Cast Speed, -20% Vision",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -3706,12 +3772,12 @@
         },
         {
           "text": "Level 10 Talent +10% Withering Mist Health Restoration Reduction replaced with +25 Curse of Avernus DPS",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +40 Curse of Avernus DPS replaced with -10s Borrowed Time Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -3723,7 +3789,7 @@
       "changes": [
         {
           "text": "Aghanim's Scepter now also increases Base Bonus Gold and Max Bonus Gold per kill by 6 per melted Aghanim's Scepter",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Greevil's Greed"
         },
         {
@@ -3776,7 +3842,7 @@
         },
         {
           "text": "Level 15 Talent Acid Spray grants armor to allies replaced with +1% Corrosive Weaponry Slow/Damage Reduction Per Stack",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -3841,7 +3907,8 @@
         },
         {
           "text": "Aghanim's Scepter no longer reduces mana cost",
-          "tag": "buff",
+          "tag": "del",
+          "lower_is_better": true,
           "scope": "Chilling Touch"
         },
         {
@@ -3851,7 +3918,7 @@
         },
         {
           "text": "Level 10 Talent +2 Cold Feet Death Rime Stacks replaced with +30 Cold Feet Damage Per Second",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -3863,7 +3930,7 @@
         },
         {
           "text": "Level 25 Talent +50% Death Rime Slow/Damage replaced with 450 AoE Cold Feet",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -3974,12 +4041,13 @@
         },
         {
           "text": "Aghanim's Scepter no longer decreases cooldown by 1s",
-          "tag": "buff",
+          "tag": "del",
+          "lower_is_better": true,
           "scope": "Blink"
         },
         {
           "text": "Magic Resistance decreased from 16/24/32/40% to 14/21/28/35%",
-          "tag": "buff",
+          "tag": "nerf",
           "old": [
             16,
             24,
@@ -3992,7 +4060,6 @@
             28,
             35
           ],
-          "lower_is_better": true,
           "scope": "Counterspell"
         },
         {
@@ -4038,17 +4105,17 @@
         },
         {
           "text": "Level 15 Talent +1% Max Mana Mana Burn replaced with +0.2 Mana Void Damage Multiplier",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +0.2 Mana Void Damage Multiplier replaced with +150 Blink Cast Range",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +200 Blink Cast Range replaced with -1s Blink Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -4146,17 +4213,17 @@
         },
         {
           "text": "Level 20 Talent +50% Spark Wraith Damage replaced with +200 Spark Wraith Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent -1.1s Spark Wraith Activation Delay replaced with +30s Spark Wraith Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent Tempest Double Has No Penalties replaced with +1.5 Runic Infusion All Attributes Bonus (applies retroactively)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -4173,7 +4240,7 @@
         },
         {
           "text": "Now Axe's innate ability",
-          "tag": "new",
+          "tag": "rework",
           "scope": "One Man Army"
         },
         {
@@ -4267,32 +4334,32 @@
         },
         {
           "text": "Level 10 Talent +50 Flamebreak Knockback Distance replaced with +1s Smoldering Resin Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 10 Talent +50 Sticky Napalm Radius replaced with +5% Firefly Max Movement Speed Bonus",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent -8s Flaming Lasso Cooldown replaced with +0.5% Sticky Napalm Movement Slow",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +20 Movement Speed replaced with +30 Firefly Damage Per Second",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +4s Smoldering Resin Duration replaced with Attacks apply 1 Stack of Sticky Napalm",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +10 Sticky Napalm Damage replaced with +0.75s Flaming Lasso Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -4309,7 +4376,7 @@
         },
         {
           "text": "Now an innate ability",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Inner Beast"
         },
         {
@@ -4484,12 +4551,12 @@
         },
         {
           "text": "Level 10 Talent -5s Call of the Wild Cooldown replaced with +5 Armor",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +15 Inner Beast Attack Speed replaced with +200 Primal Roar Cast Range",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -4507,12 +4574,12 @@
         },
         {
           "text": "Now a no target ability that affects only Bloodseeker",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Bloodrage"
         },
         {
           "text": "Pure damage based on target's max health with Aghanim's Shard now pierces Debuff Immunity",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Bloodrage"
         },
         {
@@ -4637,7 +4704,7 @@
         },
         {
           "text": "Level 10 Talent +1s Drunken Brawler Brewed Up / Extend Duration replaced with +2/1s Drunken Brawler Brewed Up / Extend Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -4673,7 +4740,8 @@
         },
         {
           "text": "Level 25 Talent +12% Spell Lifesteal replaced with -25 Bristleback Damage Threshold",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         }
       ]
@@ -4729,6 +4797,7 @@
         {
           "text": "Level 25 Talent -0.15s BAT during Insatiable Hunger now also affects Spiderlings within 800 range",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "talent"
         }
       ]
@@ -4839,7 +4908,7 @@
         },
         {
           "text": "Aghanim's Scepter now provides a passive component to this ability",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Phantasm"
         },
         {
@@ -4884,6 +4953,7 @@
         {
           "text": "This ability can be cast on a controlled unit to teleport it to Chen after a 6 second delay. Self-targeting will teleport all controlled units. Mana Cost: 50. Cooldown: 10s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Zealot"
         },
         {
@@ -4904,6 +4974,7 @@
         {
           "text": "Unsummoning a unit has a global cast range, costs no mana and sets ability to a 3s cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Holy Persuasion"
         },
         {
@@ -4919,12 +4990,12 @@
         },
         {
           "text": "Level 10 Talent +150 Convert Attack Speed replaced with +25% Zealot Health/Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +14 Holy Persuasion Damage replaced with +12% Holy Persuasion Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -5044,22 +5115,23 @@
         },
         {
           "text": "No longer decreases Rocket Flare cooldown to 3.5s",
-          "tag": "buff",
+          "tag": "del",
+          "lower_is_better": true,
           "scope": "Overclocking"
         },
         {
           "text": "Level 10 Talent +0.4s Rocket Flare Slow Duration replaced with +1.5 Mana Regen",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +2 Power Cogs Hits To Kill replaced with -10s Hookshot Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent Debuff Immunity Inside Power Cogs replaced with 3 Rocket Flare Charges",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -5096,7 +5168,7 @@
         },
         {
           "text": "Level 20 Talent +225 Attack Speed replaced with +20% Glacial Guard Mana Spent To Barrier",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -5125,7 +5197,7 @@
         },
         {
           "text": "Level 15 Talent Ion Shell Provides +250 Max Health replaced with -1.5s Surge Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -5235,12 +5307,12 @@
         },
         {
           "text": "Level 10 Talent +15% Celestial Hammer Slow replaced with Celestial Hammer Trail Grants Movement Speed to Allies",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 10 Talent +15% Break of Dawn Max Damage replaced with +25% Luminosity Critical Strike Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -5252,7 +5324,7 @@
         },
         {
           "text": "Level 15 Talent +40% Luminosity Critical Strike Damage replaced with +40% Celestial Hammer Trail/Hammer Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -5341,31 +5413,32 @@
           "tag": "buff",
           "old": 0.35,
           "new": 0.25,
+          "lower_is_better": true,
           "scope": "Exorcism"
         },
         {
           "text": "Level 10 Talent +12% Magic Resistance replaced with +200 Health",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 10 Talent +30 Attack Speed replaced with +75 Silence AoE",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +100 Silence AoE replaced with +50 Attack Speed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +400 Health replaced with +6 Exorcism Spirits",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +8 Exorcism Spirits replaced with Deaths During Exorcism Extend Duration by +8s (both allied and enemy heroes count)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -5404,7 +5477,7 @@
         },
         {
           "text": "Now granted by Aghanim's Shard",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Kinetic Fence"
         },
         {
@@ -5464,18 +5537,18 @@
         },
         {
           "text": "Level 20 Talent +150 Electromagnetic Repulsion Radius/Knockback replaced with +75 Static Storm Radius",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +150 Static Storm Radius replaced with +6 Thunder Strike Strikes (also decreases Strike Interval by 50%)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent",
           "info": "As a result, increases overall duration from 6s to 9s"
         },
         {
           "text": "Level 25 Talent -12s Glimpse Cooldown replaced with 2 Glimpse Charges",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -5492,12 +5565,13 @@
         },
         {
           "text": "When Doom attacks enemy heroes, he applies a curse upon them. After 2.5s, the cursed hero bursts with a pillar of fire, damaging itself and all enemy units in a 66 AoE for 15% of the damage taken from Doom (the hero) over this duration, including damage from the attack that applied the curse. If the cursed hero's level is a multiple of 6, the curse damage and radius will be increased by 66%",
-          "tag": "buff",
+          "tag": "nerf",
+          "lower_is_better": true,
           "scope": "Lvl ? Pain"
         },
         {
           "text": "Now the default cast gained on learning Devour is the one that grants abilities of devoured creeps, and alt-cast state keeps the ones that Doom currently has",
-          "tag": "new",
+          "tag": "qol",
           "scope": "Devour"
         },
         {
@@ -5516,6 +5590,7 @@
         {
           "text": "Replaces cooldown with 2 charges with 66s restore time. Allows to devour Ancient Neutral Creeps. Gained spells also have 20% bonus AoE and 40% Spell Amplification",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Devour"
         },
         {
@@ -5559,7 +5634,7 @@
         },
         {
           "text": "Aghanim's Scepter now also applies Break to affected enemies",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Doom"
         },
         {
@@ -5569,7 +5644,7 @@
         },
         {
           "text": "Level 15 Talent Devour Can Target Ancients replaced with +66 Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -5581,12 +5656,13 @@
         },
         {
           "text": "Level 20 Talent -10s Scorched Earth Cooldown replaced with -10s Doom Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent Doom applies Break replaced with Permanent Scorched Earth (ability becomes toggleable with no mana cost and a 2.5s cooldown between toggles)",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         }
       ]
@@ -5737,12 +5813,12 @@
         },
         {
           "text": "Level 20 Talent +60% Breathe Fire Damage/Cast Range replaced with +200 Breathe Fire Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +50% Wyrm's Wrath effect during Elder Dragon Form replaced with +50% Wyrm's Wrath Bonuses",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -5802,6 +5878,7 @@
         {
           "text": "Now allows Drow Ranger to move with a 35% penalty and use items while casting Multishot",
           "tag": "new",
+          "lower_is_better": true,
           "scope": "Multishot"
         },
         {
@@ -6011,17 +6088,17 @@
         },
         {
           "text": "Level 10 Talent +25 Attack Speed replaced with +150 Echo Stomp Wake Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +25 Astral Spirit Hero Attack replaced with 20% of Bonus Movement Speed as Attack Speed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +350 Echo Stomp Wake Damage replaced with +30 Astral Spirit Bonus Damage per Hero",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -6142,7 +6219,7 @@
         },
         {
           "text": "Added a tooltip to display the total max possible heal",
-          "tag": "new",
+          "tag": "qol",
           "scope": "Nature's Attendants"
         },
         {
@@ -6172,11 +6249,12 @@
         {
           "text": "Units in a 600 radius moving away from Enigma have a movespeed penalty equal to 4% + 1% per level",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Event Horizon"
         },
         {
           "text": "Level 15 Talent +60 Malefice Instance Damage replaced with +100 Event Horizon Radius",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -6193,7 +6271,7 @@
         },
         {
           "text": "Now only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Distortion Field"
         },
         {
@@ -6215,7 +6293,7 @@
         },
         {
           "text": "Aghanim's Scepter now also provides Reverse Time Walk sub-ability",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Time Walk"
         },
         {
@@ -6246,6 +6324,7 @@
         {
           "text": "9/10/11/12 Attack Speed + the same value per affected cooldown, 9/10/11/12% Movement Speed + the same value per affected cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Time Dilation"
         },
         {
@@ -6255,12 +6334,12 @@
         },
         {
           "text": "Now the default ultimate ability",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Chronosphere"
         },
         {
           "text": "Level 15 Talent +8% Time Dilation Slow per Cooldown replaced with +125 Time Walk Range",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -6287,7 +6366,7 @@
         },
         {
           "text": "Can now be put on alt-cast to send the stroke straight",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Stroke of Fate"
         }
       ]
@@ -6321,7 +6400,7 @@
         },
         {
           "text": "Aghanim's Scepter upgrade moved into a separate ability",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Flak Cannon"
         },
         {
@@ -6378,7 +6457,7 @@
         },
         {
           "text": "Now treats creep heroes as creeps",
-          "tag": "new",
+          "tag": "misc",
           "scope": "Sharpshooter"
         },
         {
@@ -6400,12 +6479,12 @@
         },
         {
           "text": "Level 15 Talent +1 Acorn Shot Bounce replaced with +10 Agility",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent -3 Armor Corruption replaced with +2 Acorn Shot Bounces",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -6464,6 +6543,7 @@
         {
           "text": "Health Cost changed from 4% of current health to 2% of max health",
           "tag": "rework",
+          "lower_is_better": true,
           "scope": "Burning Spear",
           "info": "Huskar can use this ability even if he has less health than the health cost requires"
         },
@@ -6480,6 +6560,7 @@
         {
           "text": "Can be activated for a health cost. Applies basic dispel to Huskar, then after a delay, heals for the amount of health consumed plus an additional bonus per debuff dispelled. Current HP Cost: 30%. Cooldown: 20s. Cauterize Delay: 3s. Max HP Heal per debuff: 3%",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Berserker's Blood"
         }
       ]
@@ -6528,17 +6609,17 @@
         },
         {
           "text": "Aghanim's Scepter no longer provides +1 level to all three orbs. Now it provides +1 level only to a single orb you choose",
-          "tag": "del",
+          "tag": "nerf",
           "scope": "Invoke"
         },
         {
           "text": "Level 15 Talent +1 Facet Orb Level replaced with +25 Alacrity Speed/Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +50 Alacrity Speed/Damage replaced with +1 Orb Levels",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -6598,27 +6679,33 @@
         },
         {
           "text": "Now has a 20 mana cost",
-          "tag": "new",
+          "tag": "nerf",
+          "lower_is_better": true,
           "scope": "Liquid Fire"
         },
         {
           "text": "Aghanim's Shard now also reduces mana cost to 0",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Liquid Fire"
         },
         {
           "text": "Now has a 20 mana cost",
-          "tag": "new",
+          "tag": "nerf",
+          "lower_is_better": true,
           "scope": "Liquid Frost"
         },
         {
           "text": "Aghanim's Shard now also reduces mana cost to 0",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Liquid Frost"
         },
         {
           "text": "Level 10 Talent Ice Path Damage increased +60 to +75",
           "tag": "buff",
+          "old": 60,
+          "new": 75,
           "scope": "talent"
         },
         {
@@ -6667,12 +6754,12 @@
         },
         {
           "text": "Level 10 Talent +4% Duelist Damage replaced with -1s Bladeform Stack Gain Interval",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +1% Healing Ward Heal replaced with -15s Omnislash Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -6691,7 +6778,7 @@
         },
         {
           "text": "Level 20 Talent +1 Healing Ward Hits to Destroy replaced with +15% Blade Dance Crit Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -6793,22 +6880,22 @@
         },
         {
           "text": "Level 15 Talent -5s Blinding Light Cooldown replaced with +90 Blinding Light Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent -2s Chakra Magic Cooldown replaced with +30% Spirit Form Bright Speed Bonus",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +200 Chakra Magic Mana replaced with +10% Solar Bind Magic Resistance Reduction",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +10% Spirit Form Movement Speed Bonus replaced with +15s Spirit Form Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -6835,6 +6922,7 @@
         {
           "text": "Cooldown changed from 7.75s - 0.25s per level up to 8s - 0.25s per level",
           "tag": "rework",
+          "lower_is_better": true,
           "scope": "Switch Discipline",
           "info": "Effective values are not changed"
         },
@@ -6846,6 +6934,7 @@
         {
           "text": "Aghanim's Scepter no longer restarts the alternate ability cooldown if it was already on cooldown",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Switch Discipline"
         },
         {
@@ -6920,7 +7009,7 @@
         },
         {
           "text": "Level 25 Talent +100% Shodo Sai Mark Critical Strike replaced with +80% Shodo Sai Critical Strike",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -6976,7 +7065,7 @@
         },
         {
           "text": "Level 10 Talent -15s Admiral's Rum Cooldown replaced with +1s Admiral's Rum Buff Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -6988,12 +7077,12 @@
         },
         {
           "text": "Level 20 Talent +15% Admiral's Rum Damage Delayed replaced with +80% Tidebringer Cleave",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +130% Tidebringer Cleave replaced with Tidebringer Ignores 25% Armor",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -7149,7 +7238,7 @@
         },
         {
           "text": "Now automatically triggers after taking 7/6/5/4 attacks",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Moment of Courage"
         },
         {
@@ -7202,22 +7291,23 @@
         },
         {
           "text": "Level 10 Talent +12% Press the Attack Movement Speed replaced with +1 Outfight Them! Armor",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +8% Moment of Courage Proc Chance replaced with -1 Moment of Courage Attacks To Trigger",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent 300 AoE Press The Attack replaced with +1s Duel Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent Press the Attack grants 1.5s Debuff Immunity replaced with Duel Refreshes Cooldown on Victory",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         }
       ]
@@ -7232,6 +7322,7 @@
           "tag": "buff",
           "old": 10,
           "new": 8,
+          "lower_is_better": true,
           "scope": "Diabolic Edict",
           "info": "Number of explosions (hence, total damage) is unchanged, explosion interval decreased from 0.25s to 0.225s"
         }
@@ -7269,11 +7360,13 @@
         {
           "text": "Lich can instantly kill an allied creep to gain mana relative to its current health and earn experience bounty for it. Health to Mana: 42% + 3% per level. Experience Bounty: 69% + 6% per level. Cast Range: 700. No Mana Cost. Cooldown: 120s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Sacrifice"
         },
         {
           "text": "This ability starts on extended cooldown and with no charges, making the first cast possible only at 2:00 mark",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Sacrifice"
         },
         {
@@ -7283,12 +7376,12 @@
         },
         {
           "text": "Level 20 Talent +4s Frost Shield Duration replaced with 2 Frost Shield Charges",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +100 Chain Frost Incremental Damage replaced with Chain Frost Unlimited Bounces",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -7368,7 +7461,7 @@
         },
         {
           "text": "Now is a basic ability",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Feast"
         },
         {
@@ -7440,17 +7533,17 @@
         },
         {
           "text": "Level 10 Talent +3% Ghoul Frenzy Movement Speed replaced with +20 Movement Speed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +15% Open Wounds Slow replaced with 50 Attack Speed on Open Wounds Target",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +50 Ghoul Frenzy Attack Speed replaced with +175 Infest Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -7550,12 +7643,12 @@
         },
         {
           "text": "Level 25 Talent +150% Crit On Targets Affected By Spells replaced with 150% Attack Crit on Targets Affected by Slow Burn",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +60% Combustion Overheat Damage replaced with +1s Slow Burn Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent",
           "info": "This increases additional damage from 64% to 80%"
         }
@@ -7628,7 +7721,8 @@
         },
         {
           "text": "Aghanim's Scepter no longer decreases cooldown",
-          "tag": "buff",
+          "tag": "del",
+          "lower_is_better": true,
           "scope": "Finger of Death"
         }
       ]
@@ -7681,7 +7775,7 @@
         },
         {
           "text": "Level 20 Talent -2s Lucent Beam Cooldown replaced with 1.5x Lunar Orbit Damage / Speed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -7705,9 +7799,9 @@
       "name": "Lycan",
       "changes": [
         {
-          "text": "Damage to neutrals changed from 2% per level to 18% + 2% per level",
+          "text": "Apex Predator: Damage to neutrals changed from 2% per level to 18% + 2% per level",
           "tag": "rework",
-          "scope": "Apex Predator"
+          "scope": "base"
         },
         {
           "text": "Aghanim's Shard upgrade reworked",
@@ -7726,7 +7820,8 @@
         },
         {
           "text": "Level 25 Talent +2 Wolves Summoned replaced with -25% Summon Wolves BAT",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent",
           "info": "Improves wolves' BAT from 1.2/1.1/1/0.9s to 0.9/0.825/0.75/0.675s"
         }
@@ -7789,7 +7884,7 @@
         },
         {
           "text": "Level 25 Talent +10% Empower Damage/Cleave replaced with Shockwave Returns to Magnus",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -7835,6 +7930,7 @@
         {
           "text": "Cast Range: 500. Mana Cost: 60/65/70/75. Cooldown: 20s. Cast Point: 0.2s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Bodyguard"
         },
         {
@@ -7849,7 +7945,7 @@
         },
         {
           "text": "Level 15 Talent +10% Rebound Movement Speed Bonus replaced with +12% Bodyguard Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -7861,7 +7957,7 @@
         },
         {
           "text": "Level 25 Talent +20% Bodyguard Damage replaced with Bodyguard Strong Dispels (Dispels both Marci and the target)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -7908,12 +8004,12 @@
         },
         {
           "text": "Level 10 Talent +20% Dauntless Regen Per Enemy replaced with +1.5 Mana Regen",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent -16s Arena Of Blood Cooldown replaced with +70 Arena of Blood Spear Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -7962,17 +8058,17 @@
         },
         {
           "text": "Level 15 Talent +8% Split Shot Outgoing Damage replaced with +1 Gorgon's Grasp Volley",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +1 Gorgon's Grasp Volley replaced with +12% Split Shot Outgoing Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +3 Mystic Snake Bounces replaced with +40% Mystic Snake Damage / Mana Gain",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -8079,6 +8175,7 @@
         {
           "text": "No longer has a penalty for Strength, Agility, or Intelligence gained from items",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "Divided We Stand"
         },
         {
@@ -8125,6 +8222,7 @@
         {
           "text": "Mirana consumes a charge to empower her next attack with bonus magic damage equal to 3 per Mirana's level. At the start she has 2 max charges but gains 1 more every 7 levels. Base Charge Restore Time: 6s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Celestial Quiver"
         },
         {
@@ -8150,7 +8248,7 @@
         },
         {
           "text": "Level 20 Talent +35 Base Damage replaced with +35 Celestial Quiver Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -8236,11 +8334,13 @@
         {
           "text": "While Wukong's Command is active, Monkey King gains a Changing of the Guard ability which allows him to transform into any one of his soldiers. Upon cast, Monkey King takes the place of the soldier closest to the target location for 1.5s, and leaves another one in his stead. While Transfigured, Monkey King is indistinguishable from other soldiers and invulnerable, but can't issue commands. Cast Point: 0.3s. No Mana Cost. Cooldown: 3s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Wukong's Command"
         },
         {
           "text": "Ability appears in place of Wukong's Command and starts on a 1s cooldown after casting Wukong's Command. Can't be cast while rooted and can't target soldiers created by Aghanim's Scepter effect. Monkey King disjoints projectiles upon transformation.",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Changing of the Guard"
         },
         {
@@ -8250,17 +8350,19 @@
         },
         {
           "text": "Level 10 Talent +90 Primal Spring Max Damage replaced with +350 Tree Dance Cast Range",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +450 Tree Dance Cast Range replaced with 0 Cooldown Primal Spring",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent 0 Cooldown Primal Spring replaced with Jingu Mastery Undispellable",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         }
       ]
@@ -8394,11 +8496,12 @@
         {
           "text": "Range: 500. Mana Cost: 75. Cooldown: 12s. Damage: 225. Slow: 30%. Knockback Distance: 250",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Spectral Slug"
         },
         {
           "text": "Level 15 Talent +55 Gunslinger Damage replaced with +15 Intelligence",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -8422,7 +8525,7 @@
         },
         {
           "text": "Now always a basic ability for Naga Siren",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Rip Tide"
         },
         {
@@ -8434,10 +8537,9 @@
         },
         {
           "text": "Level 15 Talent Mirror Image Illusion Damage Taken Reduction increased from 50% to 75%",
-          "tag": "nerf",
+          "tag": "buff",
           "old": 50,
           "new": 75,
-          "lower_is_better": true,
           "scope": "talent"
         },
         {
@@ -8607,12 +8709,12 @@
         },
         {
           "text": "Level 20 Talent +15% Ghost Shroud Self Restoration Amp replaced with +75 Spell AoE",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +0.5% Heartstopper Aura Damage replaced with +0.3 Reaper's Scythe Damage Per Missing HP",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -8629,7 +8731,7 @@
         },
         {
           "text": "Now an innate ability",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Hunter in the Night"
         },
         {
@@ -8704,6 +8806,7 @@
         {
           "text": "Can be cast at night to eat a non-ancient creep and restore 10/15/20/25% of Night Stalker's maximum health and 10/12/14/16% of his mana. Cast Range: 125. No Mana Cost. Cooldown: 39/36/33/30s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Midnight Feast"
         },
         {
@@ -8713,17 +8816,17 @@
         },
         {
           "text": "Level 10 Talent +5s Dark Ascension Duration replaced with +10 Crippling Fear DPS",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +40 Crippling Fear DPS replaced with +75 Crippling Fear Radius",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +100 Hunter in the Night Attack Speed replaced with +100 Midnight Feast Lifesteal",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -8739,19 +8842,19 @@
           "scope": "base"
         },
         {
-          "text": "New innate ability. Passive",
+          "text": "Mana Burn: New innate ability. Passive",
           "tag": "misc",
-          "scope": "Mana Burn"
+          "scope": "base"
         },
         {
           "text": "When Nyx Assassin deals damage with attacks or his abilities, he burns affected unit's mana equal to 12% of damage dealt",
           "tag": "misc",
-          "scope": "Mana Burn"
+          "scope": "base"
         },
         {
           "text": "Damage reflected with Spiked Carapace also counts",
           "tag": "misc",
-          "scope": "Mana Burn"
+          "scope": "base"
         },
         {
           "text": "Now burns 9/12/15/18% of the target's Max Mana",
@@ -8771,6 +8874,7 @@
         {
           "text": "Decreases cooldown by 10s. For the first 15s, Nyx Assassin is hasted and has unobstructed pathing",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Vendetta"
         }
       ]
@@ -8788,6 +8892,7 @@
         {
           "text": "Becomes Refined Fireblast, reducing its cooldown by 1s and increasing its cast speed by 25%",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Fireblast"
         },
         {
@@ -8805,7 +8910,7 @@
         },
         {
           "text": "Level 10 Talent -1s Fireblast Cooldown replaced with +2/0.01 Dumb Luck Mana / Mana Regen Per Strength",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -8817,17 +8922,17 @@
         },
         {
           "text": "Level 15 Talent +2/0.01 Dumb Luck Mana / Mana Regen Per Strength replaced with +20/35 Bloodlust / Self Attack Speed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +35 Bloodlust Attack Speed replaced with +175 Fireblast Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +220 Fireblast Damage replaced with +10% Multicast Chances (affects all types of multicast)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -8968,7 +9073,7 @@
         },
         {
           "text": "Now is a no-target ability. The effect is applied in an aura centered around Omniknight that follows him",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Guardian Angel"
         },
         {
@@ -9017,17 +9122,17 @@
         },
         {
           "text": "Level 10 Talent +1s Repel Duration replaced with +200 Repel Cast Range",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +5 Repel Strength/HP Regen Per Debuff replaced with -0.5s Hammer of Purity Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +2s Guardian Angel Duration replaced with +125 Degen Aura radius",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -9084,7 +9189,7 @@
         },
         {
           "text": "Level 15 Talent Fortune's End Heals/Damages for 80 Per Effect Dispelled replaced with +100 Fortune's End Radius",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -9114,7 +9219,7 @@
         },
         {
           "text": "Now an innate ability",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Essence Flux"
         },
         {
@@ -9159,6 +9264,7 @@
         {
           "text": "Can be activated to create an all damage barrier equal to 120/180/240/300 + 12% of Outworld Destroyer's max mana. Duration: 10s. Mana Cost: 250. Cooldown: 36/34/32/30s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Objurgation"
         },
         {
@@ -9214,17 +9320,17 @@
         },
         {
           "text": "Level 15 Talent +8% Astral Imprisonment Mana Capacity Steal replaced with +5% Essence Flux Mana Restored",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +0.15 Sanity's Eclipse Mana Difference Multiplier replaced with +10% Astral Imprisonment Mana Capacity Steal",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +450 Health replaced with -10s Objurgation Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -9308,6 +9414,7 @@
             400
           ],
           "new": 500,
+          "lower_is_better": true,
           "scope": "Blur"
         },
         {
@@ -9381,7 +9488,7 @@
         },
         {
           "text": "Level 10 Talent +0.5% Blinding Sun Miss Chance replaced with +1% Dying Light Missing Health as Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -9410,7 +9517,7 @@
         },
         {
           "text": "Level 25 Talent Cannot Be Slowed Or Rooted During Trample replaced with Colossal 2x Bonuses During Trample",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -9587,12 +9694,13 @@
         },
         {
           "text": "While Eye of the Storm is active, Storm Surge's strike chance is 2x as high, strike cooldown is decreased by 2s, and lightning strikes all enemies within Eye of the Storm's radius",
-          "tag": "nerf",
+          "tag": "buff",
+          "lower_is_better": true,
           "scope": "Storm Surge"
         },
         {
           "text": "Level 10 Talent +10% Spell Lifesteal replaced with +4 Armor",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -9678,7 +9786,7 @@
         },
         {
           "text": "Radius and Aghanim's Scepter's Explosion Radius now affected by AoE bonuses",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Escape Act"
         },
         {
@@ -9756,7 +9864,7 @@
         },
         {
           "text": "Level 10 Talent +85 Impalement Arts Impact Damage replaced with +1 Impalement Arts Charge",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -9836,43 +9944,45 @@
         },
         {
           "text": "Stolen spells now have their cooldown decreased by 10/20/30%",
-          "tag": "nerf",
+          "tag": "new",
+          "lower_is_better": true,
           "scope": "Spell Steal"
         },
         {
           "text": "Level 10 Talent +0.25% Might and Magus Damage/Resistance replaced with +200 Health",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 10 Talent +165 Telekinesis Landing Damage replaced with -2s Telekinesis Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +20% Fade Bolt Damage Reduction replaced with -3s Fade Bolt Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent -25% Stolen Spells Cooldown replaced with -50% Stolen Spells Mana Cost",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent -5s Telekinesis Cooldown replaced with Telekinesis Landing Deals 325 Damage (now this talent applies damage to the thrown enemy as well)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent",
           "info": "It used to deal damage only in AoE, leaving the thrown enemy unharmed. Doesn't deal damage to thrown allies or self"
         },
         {
           "text": "Level 20 Talent -5s Fade Bolt Cooldown replaced with +12% Fade Bolt Damage Reduction",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +400 Telekinesis Land Distance replaced with 2x Curiosity Bonuses",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -9946,18 +10056,23 @@
           "scope": "Burrowstrike"
         },
         {
+          "text": "Aghanim's Shard no longer increases Epicenter Pulse damage",
+          "tag": "del",
+          "scope": "Epicenter"
+        },
+        {
           "text": "Level 20 Talent +75/7 Base/Incremental Radius of Epicenter replaced with +6 Epicenter Pulses",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent 50% Sand Storm Slow replaced with 35% Sand Storm Slow and Blind",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +8 Epicenter Pulses replaced with +125 Stinger Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -9998,12 +10113,12 @@
         },
         {
           "text": "Level 20 Talent +150 Demonic Purge Damage replaced with -20s Demonic Purge Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent -30s Demonic Purge Cooldown replaced with Demonic Purge Applies Shadow Poison",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent",
           "info": "1 stack per second over the debuff duration"
         }
@@ -10067,7 +10182,7 @@
         },
         {
           "text": "Aghanim's Shard now also applies a stacking 12% slow debuff to enemies hit",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Shadowraze"
         },
         {
@@ -10122,22 +10237,23 @@
         },
         {
           "text": "Now can't use more than 20 souls per cast",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Requiem of Souls"
         },
         {
           "text": "Aghanim's Scepter no longer has a damage penalty on the returning Requiem of Souls",
           "tag": "buff",
+          "lower_is_better": true,
           "scope": "Requiem of Souls"
         },
         {
           "text": "Level 15 Talent +120 Shadowraze Damage replaced with +2 Feast of Souls Souls Collected Per Hero",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +2 Damage Per Soul replaced with +5 Necromastery Max Souls",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -10170,6 +10286,7 @@
         {
           "text": "Throws a jar at a location, dealing 275 damage to all enemies in a 225 radius and creating a Massive Serpent Ward that lasts for 15s. The ward has 4x health and damage of the normal Serpent Wards. Cooldown: 50s. Mana Cost: 115. Cast Range: 650",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Urnaconda"
         }
       ]
@@ -10241,7 +10358,7 @@
         },
         {
           "text": "Level 10 Talent +0.25 Arcane Curse Silenced Multiplier replaced with +7% Suffer In Silence Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -10253,7 +10370,7 @@
         },
         {
           "text": "Level 25 Talent 2 Arcane Curse charges replaced with +2s Global Silence Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -10280,7 +10397,7 @@
         },
         {
           "text": "Now considers Spirit Bear as a true hero for prioritization. Creep Heroes are now considered as secondary targets",
-          "tag": "new",
+          "tag": "misc",
           "scope": "Concussive Shot"
         }
       ]
@@ -10345,17 +10462,17 @@
         },
         {
           "text": "Level 10 Talent +14 Seaborn Sentinel Bonus Attack Damage replaced with +30 Bash of the Deep Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +40 Bash of the Deep Damage replaced with -3 Corrosive Haze Armor",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent -4 Corrosive Haze Armor replaced with +16% Seaborn Sentinel Bonus Attack Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -10561,7 +10678,7 @@
         },
         {
           "text": "Level 10 Talent +55 Take Aim Attack Range Bonus replaced with +50 Take Aim Passive Attack Range",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -10757,7 +10874,7 @@
         },
         {
           "text": "Now granted by Aghanim's Shard",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Planar Pocket"
         },
         {
@@ -10770,30 +10887,29 @@
         },
         {
           "text": "Self Magic Resistance decreased from 75% to 40%",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 75,
           "new": 40,
-          "lower_is_better": true,
           "scope": "Planar Pocket"
         },
         {
           "text": "Effect now ends if Spirit Breaker is more than 900 units away from the target",
-          "tag": "misc",
+          "tag": "nerf",
           "scope": "Planar Pocket"
         },
         {
           "text": "Now can be cast without cancelling Charge of Darkness",
-          "tag": "new",
+          "tag": "buff",
           "scope": "Planar Pocket"
         },
         {
           "text": "Level 15 Talent +45 Damage replaced with +60 Charge of Darkness Bonus Speed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent -0.3s Greater Bash Cooldown replaced with +8%/+2% Empowering Haste Movespeed Bonus",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -10871,12 +10987,13 @@
         },
         {
           "text": "Level 10 Talent +10% Vanquisher Bonus Damage replaced with +20% God's Strength Slow Resistance",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +20% God's Strength Slow Resistance replaced with -25% Storm Hammer Cooldown and Mana Cost",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         }
       ]
@@ -10909,6 +11026,7 @@
         {
           "text": "Increases mana to damage by 10%. Adds an active component. Techies plant the M.A.D. barrel, and detonate it later by using a sub-ability. The M.A.D. barrel is invisible and can be destroyed before the detonation process begins. Detonating the barrel makes it visible and immortal, and then it explodes after the same 1.5s delay. Only one M.A.D. can exist via the active cast at one time. Barrel Health: 200. Cast Range: 450. No Mana Cost. Cooldown: 30s. Cast Point: 1s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "M.A.D."
         },
         {
@@ -10930,7 +11048,8 @@
         },
         {
           "text": "Now deals its self damage before damaging enemies",
-          "tag": "new",
+          "tag": "misc",
+          "lower_is_better": true,
           "scope": "Blast Off!"
         },
         {
@@ -10945,12 +11064,12 @@
         },
         {
           "text": "Now only available with Aghanim's Scepter",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Minefield Sign"
         },
         {
           "text": "Level 15 Talent +3 Mana Regen replaced with +25% Reactive Tazer Buff and Disarm Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -11016,22 +11135,22 @@
         },
         {
           "text": "When activated, Traps now also silence enemies from 0.25s up to 3s depending on the trap charge",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Psionic Trap"
         },
         {
           "text": "Level 15 Talent +3 Meld Armor reduction replaced with +3 Psionic Traps",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent Refraction Can Be Cast While Disabled replaced with +225 Meld Attack Range",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +40 Refraction Damage replaced with +4 Meld Armor Reduction",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -11080,7 +11199,7 @@
         },
         {
           "text": "Level 15 Talent +15% Reflection Slow/Damage replaced with -25% Sunder Minimum HP Swap",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -11136,7 +11255,7 @@
         },
         {
           "text": "Level 20 Talent Blubber effect triggers Anchor Smash replaced with Kraken Shell Cleanse triggers Anchor Smash",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -11247,6 +11366,7 @@
         {
           "text": "Cast Range: 600. Mana Cost: 100/120/140/160. Cooldown: 24/22/20/18s. Cast Point: 0.1s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Deploy Turrets"
         },
         {
@@ -11287,17 +11407,17 @@
         },
         {
           "text": "Level 15 Talent +60 Defense Matrix Damage Barrier replaced with +100 Deploy Turrets Tinker Knockback",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +10% Defense Matrix Status Resistance replaced with +60 Deploy Turrets Missile Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent: +40 Intelligence replaced with -0.25s Time to Rearm",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -11481,6 +11601,7 @@
         {
           "text": "Cooldown changed from 35s - 1s per level up to 36s -1s per level",
           "tag": "rework",
+          "lower_is_better": true,
           "scope": "Nature's Guise",
           "info": "Effective values are not changed"
         },
@@ -11524,6 +11645,7 @@
             20
           ],
           "new": 20,
+          "lower_is_better": true,
           "scope": "Living Armor"
         },
         {
@@ -11567,17 +11689,17 @@
         },
         {
           "text": "Level 15 Talent +115 Whirling Axes Damage replaced with +1s Battle Trance Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +10 Berserker's Rage Armor replaced with +160 Whirling Axes Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +1.5s Battle Trance Duration replaced with Allies Receive Battle Trance Attack Speed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -11606,12 +11728,12 @@
         },
         {
           "text": "Now only affects enemy heroes",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Bitter Chill"
         },
         {
           "text": "Now always a basic ability for Tusk",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Tag Team"
         },
         {
@@ -11621,12 +11743,13 @@
         },
         {
           "text": "Now granted by Aghanim's Shard",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Drinking Buddies"
         },
         {
           "text": "Tusk reaches out to tag an allied unit, pulling them closer. Once tagged, both Tusk and his tagged ally gain 25% bonus movement speed and 10 bonus armor for 6s. Can be put on alt-cast to only pull Tusk towards his ally with 50% reduced cast range. Cast Range: 1000. Mana Cost: 80. Cooldown: 14s",
-          "tag": "nerf",
+          "tag": "buff",
+          "lower_is_better": true,
           "scope": "Drinking Buddies"
         },
         {
@@ -11636,12 +11759,12 @@
         },
         {
           "text": "Level 20 Talent -6s Ice Shards Cooldown replaced with -6s Snowball Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent -8s Snowball Cooldown replaced with Ice Shards Slow by 50% and Deal 110 DPS (only affects enemies trapped inside)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -11781,7 +11904,7 @@
         },
         {
           "text": "Now killer's icon is shown as a buff on Vengeful Spirit to know who to hate",
-          "tag": "new",
+          "tag": "qol",
           "scope": "Retribution"
         },
         {
@@ -11826,7 +11949,7 @@
         },
         {
           "text": "Now an innate ability",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Poison Sting"
         },
         {
@@ -11852,6 +11975,7 @@
         {
           "text": "Venomancer summons a Spawn of Aktok to sink its fangs into an enemy, dealing 40/60/80/100 magic damage and applying a deadly toxin which does 20/25/30/35 magical damage per second for 6 seconds. When the target attacks, they take the initial magic damage again. Cast Range: 600. Mana Cost: 70/80/90/100. Cooldown: 20/18/16/14s",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Snakebite"
         },
         {
@@ -11861,7 +11985,7 @@
         },
         {
           "text": "No longer has AoE effect, now affects only the host",
-          "tag": "del",
+          "tag": "nerf",
           "scope": "Noxious Plague"
         },
         {
@@ -11952,6 +12076,7 @@
         {
           "text": "Decreases cooldown by 35s. Reduces Magic Resistance of affected units by 20% and allows additional spreads to deal initial damage",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Noxious Plague"
         },
         {
@@ -11963,22 +12088,22 @@
         },
         {
           "text": "Level 15 Talent -1s Plague Ward Cooldown replaced with +75 Noxious Plague Spread Radius",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +50 Base Damage replaced with -2s Plague Ward Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +1% Noxious Plague Max HP Damage replaced with +40% Snakebite Damage (applies to both initial damage and damage per second)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent Noxious Plague Aura reduces 200 Attack Speed replaced with Snakebite Undispellable",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -12011,22 +12136,22 @@
         },
         {
           "text": "Aghanim's Scepter now also gradually increases Corrosive Skin's magic resistance and damage per second while he is in Nethertoxin, up to 50% increased effect after 4s",
-          "tag": "buff",
+          "tag": "new",
           "scope": "Corrosive Skin"
         },
         {
           "text": "Level 10 Talent +10% Poison Attack slow/damage replaced with +15 Corrosive Skin Damage Per Second",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +20 Corrosive Skin Damage Per Second replaced with +15% Poison Attack Slow / Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +30 Nethertoxin Min/Max Damage replaced with +20/40 Nethertoxin Min/Max Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -12050,7 +12175,7 @@
         },
         {
           "text": "Now innate ability. Active",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Silent as the Grave"
         },
         {
@@ -12082,6 +12207,7 @@
         {
           "text": "Increases bonus movement speed by 12%, bonus damage by 10%, bonus damage duration by 2s, and flight duration by 10s. While flight is active, Silent as the Grave grants invisibility to Visage and his familiars",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Silent as the Grave"
         },
         {
@@ -12122,12 +12248,12 @@
         },
         {
           "text": "Level 10 Talent +6 Visage and Familiars Attack Damage replaced with +6 Visage and Familiars Base Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 10 Talent +4 Lurker Max Stacks replaced with -1s Soul Assumption Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -12329,12 +12455,12 @@
         },
         {
           "text": "Level 10 Talent +60 Shukuchi Damage replaced with +50 Shukuchi Movement Speed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent +20 Mana Break replaced with +90 Shukuchi Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
@@ -12420,17 +12546,18 @@
         },
         {
           "text": "Level 10 Talent +4 All Attributes replaced with +0.75s Windrun Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 15 Talent -2s Windrun Cooldown replaced with +40 Tailwind Max Movespeed",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent Windrun Cannot be Dispelled replaced with Powershot Executes Enemy Heroes Under 15% Max HP (Execute Threshold ranges from 10-15% Max HP Based on channel time and reduces with each unit the arrow comes through)",
-          "tag": "rework",
+          "tag": "swap",
+          "lower_is_better": true,
           "scope": "talent"
         }
       ]
@@ -12458,11 +12585,12 @@
         {
           "text": "Level 5 values are automatically calculated by applying 50% of the difference in all values between levels 3 and 4, except for the mana cost. Mana cost is kept the same as level 4",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Eldwurm's Edda"
         },
         {
           "text": "No longer has a one debuff per cast restriction on enemy heroes",
-          "tag": "del",
+          "tag": "buff",
           "scope": "Arctic Burn"
         },
         {
@@ -12497,6 +12625,7 @@
         {
           "text": "Decreases cooldown by 4s. Allied units gain 60% bonus attack damage for 6s when emerging from the icy cocoon",
           "tag": "misc",
+          "lower_is_better": true,
           "scope": "Cold Embrace"
         },
         {
@@ -12568,17 +12697,17 @@
         },
         {
           "text": "Level 15 Talent +2 Paralyzing Cask bounces replaced with -3s Paralyzing Cask Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +75 Death Ward Attack Range replaced with Maledict bursts deal 75% damage in a 800 AoE (each burst sends projectiles that deal 75% of its damage at all enemy units within 800 range)",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent -6s Paralyzing Cask Cooldown replaced with +6 Paralyzing Cask Bounces",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -12649,7 +12778,7 @@
         },
         {
           "text": "Now always a basic ability for Wraith King",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Bone Guard"
         },
         {
@@ -12816,12 +12945,12 @@
         },
         {
           "text": "Level 15 Talent -0.4s Arc Lightning Cooldown replaced with -20% Arc Lightning Mana Cost/Cooldown",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +2% Static Field Damage replaced with 3 Heavenly Jump Charges",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]

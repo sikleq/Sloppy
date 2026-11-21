@@ -31,7 +31,7 @@
         },
         {
           "text": "Passive gold per minute no longer scales over game time",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base",
           "info": "Used to increase from 90 to 111 at 60:00. Now it's a constant 90 gold per minute"
         },
@@ -120,15 +120,16 @@
         },
         {
           "text": "All heroes now passively receive 50 experience per minute after the starting horn",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "Experience is gained even while dead"
         },
         {
           "text": "Total amount of experience needed to reach level 30 increased from 64400 to 66600",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 64400,
           "new": 66600,
+          "lower_is_better": true,
           "scope": "base",
           "info": "Level -- Old -- New -- Total Increase2 -- 240 -- 250 -- 103 -- 400 -- 400 -- 104 -- 520 -- 550 -- 405 -- 600 -- 800 -- 2406 -- 680 -- 850 -- 4107 -- 760 -- 925 -- 5758 -- 800 -- 1050 -- 8259 -- 900 -- 1150 -- 107510 -- 1000 -- 1225 -- 130011 -- 1100 -- 1300 -- 150012 -- 1200 -- 1375 -- 167513 -- 1300 -- 1450 -- 182514 -- 1400 -- 1525 -- 195015 -- 1500 -- 1600 -- 205016 -- 1600 -- 1675 -- 212517 -- 1700 -- 1750 -- 217518 -- 1800 -- 1825 -- 220019 -- 1900 -- 1900 -- 220020 -- 2000 -- 2000 -- 220021 -- 2200 -- 2200 -- 220022 -- 2400 -- 2400 -- 220023 -- 2600 -- 2600 -- 220024 -- 2800 -- 2800 -- 220025 -- 3000 -- 3000 -- 220026 -- 4000 -- 4000 -- 220027 -- 5000 -- 5000 -- 220028 -- 6000 -- 6000 -- 220029 -- 7000 -- 7000 -- 220030 -- 8000 -- 8000 -- 2200An easy way to approximate the xp needed per level is to use this formula: 0.000976484x^5 − 0.0159378x^4 − 0.247763x^3 + 1.81832x^2 + 132.642x + 147.113 where X is the current level of the hero"
         },
@@ -165,7 +166,7 @@
           "scope": "base"
         },
         {
-          "text": "Leashes that do not expressly pierce debuff immunity (such as Slark's Pounce) will no longer prevent movement-based abilities from being executed even if they are applied after the target becomes debuff immune",
+          "text": "Leashes that do not expressly pierce debuff immunity (such as Slark's Pounce) will no longer prevent movement-based abilities from being executed",
           "tag": "misc",
           "scope": "base"
         },
@@ -245,7 +246,7 @@
         },
         {
           "text": "Attacks from Pangolier’s Swashbuckle now have 60% Item Potency, so if he has a Desolator the strikes would reduce armor by 3.6",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base",
           "info": "6 * 60%"
         },
@@ -336,13 +337,13 @@
         },
         {
           "text": "Couriers now have fragile pip health",
-          "tag": "new",
+          "tag": "misc",
           "scope": "base",
           "info": "As a part of the comprehensive Pip Health Standardization"
         },
         {
           "text": "Lane creeps now move up to 25% slower if they are pulled out of lane",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base",
           "info": "Slow builds up over 10s"
         },
@@ -353,7 +354,7 @@
         },
         {
           "text": "Siege creeps no longer switch aggro to the towers that attack heroes",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -426,17 +427,17 @@
         },
         {
           "text": "Base respawn timer now decreases by 1 minute every time Roshan is defeated, to a minimum of 5 minutes",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
           "text": "Timer now visualizes the timer for the Aegis and who is carrying it",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "base"
         },
         {
           "text": "Outposts can now be captured while silenced",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "base"
         },
         {
@@ -456,7 +457,7 @@
         },
         {
           "text": "Illusions created by Illusion Rune now have 40% Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -539,7 +540,7 @@
         },
         {
           "text": "Y'ai 'ng'ngah, Shuggoth h'ee. Shuggoth fhtagn. Shuggoth ftaghu",
-          "tag": "misc",
+          "tag": "teaser",
           "scope": "base"
         },
         {
@@ -1243,7 +1244,7 @@
           "scope": "base"
         },
         {
-          "text": "Global Cast Range. No Mana Cost. No cooldown",
+          "text": "Global Cast Range. No Mana Cost. Cooldown: 30s",
           "tag": "misc",
           "lower_is_better": true,
           "scope": "base"
@@ -1306,7 +1307,7 @@
       "changes": [
         {
           "text": "No longer has reduced damage taken from allies on the first pip of health",
-          "tag": "del",
+          "tag": "qol",
           "lower_is_better": true,
           "scope": "base"
         },
@@ -1329,7 +1330,7 @@
         },
         {
           "text": "Lesser Corruption armor reduction is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -1346,7 +1347,7 @@
         },
         {
           "text": "Frost movement slow amount and health restoration reduction are now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -1363,7 +1364,7 @@
       "changes": [
         {
           "text": "Poison Attack now only triggers when attacking heroes",
-          "tag": "nerf",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -1375,12 +1376,12 @@
       "changes": [
         {
           "text": "Place Banner can now be used out of the backpack and has a visual effect denoting its radius when active",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "base"
         },
         {
           "text": "Now has fragile pip health",
-          "tag": "new",
+          "tag": "misc",
           "scope": "base",
           "info": "As a part of the comprehensive Pip Health Standardization"
         }
@@ -1393,7 +1394,7 @@
       "changes": [
         {
           "text": "No longer has reduced damage taken from allies on the first pip of health",
-          "tag": "del",
+          "tag": "qol",
           "lower_is_better": true,
           "scope": "base"
         },
@@ -1798,12 +1799,12 @@
       "changes": [
         {
           "text": "Unholy Strength can now be toggled without cancelling invisibility",
-          "tag": "buff",
+          "tag": "qol",
           "scope": "base"
         },
         {
           "text": "Unholy Strength health drain now affects the health regen value on the healthbar (allowing it to go negative)",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "base"
         }
       ]
@@ -2020,7 +2021,7 @@
         },
         {
           "text": "Corruption armor reduction is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2037,7 +2038,7 @@
         },
         {
           "text": "Manabreak burn amount is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2054,7 +2055,7 @@
         },
         {
           "text": "Manabreak burn amount is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2113,7 +2114,7 @@
         },
         {
           "text": "Bash chance is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2206,7 +2207,7 @@
         },
         {
           "text": "Cold Attack movement slow amount, attack slow amount, and health restoration loss are now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -2258,7 +2259,7 @@
       "changes": [
         {
           "text": "Regeneration Aura now only applies to player controlled units",
-          "tag": "nerf",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -2518,7 +2519,7 @@
         },
         {
           "text": "Chain Lightning chance is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2530,7 +2531,7 @@
       "changes": [
         {
           "text": "Chain Lightning chance is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2547,7 +2548,7 @@
         },
         {
           "text": "Mage Slayer spell damage reduction is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2634,7 +2635,7 @@
         },
         {
           "text": "Pierce chance is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2646,7 +2647,7 @@
       "changes": [
         {
           "text": "Nullify now also makes the target to be 60% less susceptible to forced movement effects applied by their allies",
-          "tag": "buff",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -2712,7 +2713,7 @@
         },
         {
           "text": "Corrosion movement slow amount and health restoration loss are now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -3010,7 +3011,7 @@
         },
         {
           "text": "Shadow Walk debuff duration is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -3052,7 +3053,7 @@
       "changes": [
         {
           "text": "Bash chance is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -3217,7 +3218,7 @@
         },
         {
           "text": "Witch Blade slow amount is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -3241,7 +3242,7 @@
         },
         {
           "text": "Witch Blade slow amount is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -3254,7 +3255,7 @@
         },
         {
           "text": "Magic Corruption now affects buildings",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -3264,7 +3265,7 @@
         },
         {
           "text": "Magic Corruption magic resistance reduction is now modified by Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -3364,7 +3365,7 @@
         },
         {
           "text": "Mirror Image illusions now have 35% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -4270,7 +4271,7 @@
         },
         {
           "text": "Gut 'Em chance is now affected by item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -4586,12 +4587,12 @@
         },
         {
           "text": "Refract now creates a strong illusion",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
           "text": "Refract illusion now has 100% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         },
         {
@@ -5327,7 +5328,7 @@
         },
         {
           "text": "Health Regen penalty is now reflected on the health regen bar value, but cannot put your health regeneration below zero",
-          "tag": "misc",
+          "tag": "qol",
           "lower_is_better": true,
           "scope": "base"
         }
@@ -5588,7 +5589,7 @@
       "changes": [
         {
           "text": "No longer has a separate health threshold at which it takes effect",
-          "tag": "misc",
+          "tag": "del",
           "scope": "Withering Mist"
         },
         {
@@ -5598,7 +5599,7 @@
         },
         {
           "text": "Now applies only from attack and ability damage",
-          "tag": "nerf",
+          "tag": "rework",
           "scope": "Withering Mist",
           "info": "Item Damage doesn't count"
         },
@@ -5609,7 +5610,7 @@
         },
         {
           "text": "The Self Damage portion of the ability has been replaced with a Health Cost. The value is unchanged",
-          "tag": "misc",
+          "tag": "rework",
           "lower_is_better": true,
           "scope": "Mist Coil"
         },
@@ -5768,7 +5769,7 @@
         },
         {
           "text": "Buff is now undispellable",
-          "tag": "buff",
+          "tag": "new",
           "scope": "Berserk Potion"
         }
       ]
@@ -5921,7 +5922,8 @@
       "changes": [
         {
           "text": "Bounty increased from 70 + 10 per level to 100 + 10 per level",
-          "tag": "buff",
+          "tag": "nerf",
+          "lower_is_better": true,
           "scope": "Tempest Double"
         },
         {
@@ -6569,7 +6571,13 @@
         },
         {
           "text": "Now has an internal 15s cooldown",
-          "tag": "new",
+          "tag": "nerf",
+          "lower_is_better": true,
+          "scope": "Liquid Courage"
+        },
+        {
+          "text": "Ability is added to the HUD to denote cooldown. When Aghanim's Shard is purchased, the debuff is used for the passive cooldown instead",
+          "tag": "misc",
           "lower_is_better": true,
           "scope": "Liquid Courage"
         },
@@ -6689,7 +6697,7 @@
           "scope": "Primal Split"
         },
         {
-          "text": "Fire Brewling grabs the target and pulls it 400/500/600/700 in the selected direction, while dealing 50/100/150/200 damage to it if it's an enemy. Pull Duration: 0.5s. Cast Range: 150. Mana Cost: 50. Cooldown: 8s",
+          "text": "Fire Brewling grabs the target and runs with it for 400/500/600/700 units in the selected direction, while dealing 50/100/150/200 damage to it if it's an enemy. Pull Duration: 0.5s. Cast Range: 150. Mana Cost: 50. Cooldown: 8s",
           "tag": "misc",
           "lower_is_better": true,
           "scope": "Primal Split"
@@ -7070,7 +7078,7 @@
         },
         {
           "text": "Aghanim's Shard illusion has 25% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Chaos Bolt"
         },
         {
@@ -7081,7 +7089,7 @@
         },
         {
           "text": "Phantasms have 100% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Phantasm"
         }
       ]
@@ -7176,12 +7184,12 @@
         },
         {
           "text": "Creep's min health is now set by Zealot innate ability",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Holy Persuasion"
         },
         {
           "text": "Chen may now target himself to teleport all his controlled creeps to himself after a 6/5/4/3 second delay. This places the ability on a 3s cooldown.",
-          "tag": "misc",
+          "tag": "new",
           "lower_is_better": true,
           "scope": "Holy Persuasion"
         },
@@ -7407,12 +7415,12 @@
         },
         {
           "text": "Replicas have 60% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Wall of Replica"
         },
         {
           "text": "Replica has 60% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Normal Punch"
         },
         {
@@ -7521,7 +7529,7 @@
         },
         {
           "text": "Now displays a number in the overhead effect indicating how much armor Weave is adding/removing",
-          "tag": "new",
+          "tag": "qol",
           "scope": "Weave"
         },
         {
@@ -7540,9 +7548,10 @@
         },
         {
           "text": "Soul Return Time decreased from 0.75s to 0.5s",
-          "tag": "nerf",
+          "tag": "buff",
           "old": 0.75,
           "new": 0.5,
+          "lower_is_better": true,
           "scope": "Nothl Projection"
         },
         {
@@ -8593,7 +8602,7 @@
         },
         {
           "text": "Illusion has 50% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Dark Portrait"
         },
         {
@@ -8617,7 +8626,7 @@
         },
         {
           "text": "The missile is no longer immune to damage from certain types of units",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Homing Missile",
           "info": "As a part of the comprehensive Pip Health Standardization"
         },
@@ -9011,12 +9020,12 @@
         },
         {
           "text": "Juggernaut is now fully disarmed during Blade Fury",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Blade Fury"
         },
         {
           "text": "Now applies Basic dispel at the end of the spell instead of a Strong one",
-          "tag": "new",
+          "tag": "rework",
           "scope": "Blade Fury"
         },
         {
@@ -9030,7 +9039,7 @@
           "scope": "Blade Fury"
         },
         {
-          "text": "Keeps attacking units even if the stop/hold command is issued and while stunned. Buildings are not automatically attacked",
+          "text": "Keeps attacking units even if the stop/hold command is issued. Buildings are not automatically attacked",
           "tag": "misc",
           "scope": "Blade Fury"
         },
@@ -9104,8 +9113,8 @@
           "scope": "Will-O-Wisp"
         },
         {
-          "text": "Ignis Faatus is no longer immune to damage from certain types of units",
-          "tag": "misc",
+          "text": "Ignis Fatuus is no longer immune to damage from certain types of units",
+          "tag": "rework",
           "scope": "Will-O-Wisp",
           "info": "As a part of the comprehensive Pip Health Standardization"
         },
@@ -9185,7 +9194,7 @@
           "scope": "Raptor Dance"
         },
         {
-          "text": "Base Damage increased from 40/70/100 to 40/80/120",
+          "text": "Base Damage increased from 40/70/100 to 50/100/150",
           "tag": "buff",
           "old": [
             40,
@@ -9193,9 +9202,9 @@
             100
           ],
           "new": [
-            40,
-            80,
-            120
+            50,
+            100,
+            150
           ],
           "scope": "Raptor Dance"
         },
@@ -9218,7 +9227,7 @@
           "scope": "Raptor Dance"
         },
         {
-          "text": "No longer lifesteals vs creeps",
+          "text": "Can no longer lifesteal from creeps",
           "tag": "misc",
           "scope": "Raptor Dance"
         }
@@ -9264,7 +9273,7 @@
         },
         {
           "text": "Aghanim's Scepter now also fires two cannons in the forward direction",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Ghostship"
         },
         {
@@ -9421,10 +9430,9 @@
         },
         {
           "text": "Level 25 Talent Duel Advances Cooldown on Victory decreased from 30s to 25s",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 30,
           "new": 25,
-          "lower_is_better": true,
           "scope": "talent"
         },
         {
@@ -9686,7 +9694,8 @@
         {
           "text": "Aghanim's Scepter can no longer target Debuff Immune enemies and no longer ignores spell reflection",
           "tag": "del",
-          "scope": "Infest"
+          "scope": "Infest",
+          "info": "Spell Reflection will act as a Spell Block without actually casting it back"
         }
       ]
     },
@@ -9841,7 +9850,7 @@
         },
         {
           "text": "Bounces are now full attacks with reduced damage. Lifesteal and Critical Strikes disabled on bounces",
-          "tag": "nerf",
+          "tag": "rework",
           "scope": "Moon Glaives"
         },
         {
@@ -10354,7 +10363,7 @@
       "changes": [
         {
           "text": "Attack now has +20% bonus Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Celestial Quiver"
         },
         {
@@ -10876,11 +10885,6 @@
       "name": "Nyx Assassin",
       "changes": [
         {
-          "text": "Base Health Regen decreased by 1.0",
-          "tag": "nerf",
-          "scope": "base"
-        },
-        {
           "text": "Removed Mana Burn Innate ability",
           "tag": "del",
           "scope": "base"
@@ -10939,23 +10943,6 @@
           "scope": "Mind Flare"
         },
         {
-          "text": "Max Mana as Damage decreased from 25/30/35/40% to 20/25/30/35%",
-          "tag": "nerf",
-          "old": [
-            25,
-            30,
-            35,
-            40
-          ],
-          "new": [
-            20,
-            25,
-            30,
-            35
-          ],
-          "scope": "Mind Flare"
-        },
-        {
           "text": "Mana Burn Percentage increased from 9/12/15/18% to 12.5/15/17.5/20%",
           "tag": "buff",
           "old": [
@@ -10973,21 +10960,6 @@
           "scope": "Mind Flare"
         },
         {
-          "text": "Bonus Damage decreased from 300/400/500 to 300/380/460",
-          "tag": "nerf",
-          "old": [
-            300,
-            400,
-            500
-          ],
-          "new": [
-            300,
-            380,
-            460
-          ],
-          "scope": "Vendetta"
-        },
-        {
           "text": "No longer provides 1% max health and 1% max mana restoration",
           "tag": "del",
           "scope": "Burrow"
@@ -10995,8 +10967,7 @@
         {
           "text": "Now provides 3x Scarab Metabolism bonuses that are not cancelled by taking damage",
           "tag": "new",
-          "scope": "Burrow",
-          "info": "Resulted value is unchanged"
+          "scope": "Burrow"
         },
         {
           "text": "Burrow Bonus Cast Range decreased from 500 to 400",
@@ -11191,8 +11162,8 @@
           "scope": "Fate's Edict"
         },
         {
-          "text": "Mana Сost decreased from 75 to 60/65/70/75",
-          "tag": "nerf",
+          "text": "Mana Cost decreased from 75 to 60/65/70/75",
+          "tag": "buff",
           "old": 75,
           "new": [
             60,
@@ -11200,11 +11171,12 @@
             70,
             75
           ],
+          "lower_is_better": true,
           "scope": "Purifying Flames"
         },
         {
-          "text": "Mana Сost increased from 100/150/200 to 125/175/225",
-          "tag": "buff",
+          "text": "Mana Cost increased from 100/150/200 to 125/175/225",
+          "tag": "nerf",
           "old": [
             100,
             150,
@@ -11215,6 +11187,7 @@
             175,
             225
           ],
+          "lower_is_better": true,
           "scope": "False Promise"
         }
       ]
@@ -11331,7 +11304,7 @@
         },
         {
           "text": "Slashes now have 60% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Swashbuckle"
         }
       ]
@@ -11559,7 +11532,7 @@
         },
         {
           "text": "The sun is no longer immune to damage from certain types of units",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Supernova",
           "info": "As a part of the comprehensive Pip Health Standardization"
         }
@@ -11835,7 +11808,7 @@
         },
         {
           "text": "Ward's radius can now be seen by selecting it",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "Nether Ward"
         },
         {
@@ -12103,7 +12076,7 @@
         },
         {
           "text": "Attacks from behind now also have bonus item potency of 10% + 10% per 15 hero levels",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Backstab"
         },
         {
@@ -12151,14 +12124,14 @@
       "changes": [
         {
           "text": "Resentment increased from 1 to 55",
-          "tag": "buff",
+          "tag": "teaser",
           "old": 1,
           "new": 55,
           "scope": "base"
         },
         {
           "text": "Proportion Distortion illusion has 25% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Funhouse Mirror"
         },
         {
@@ -12184,7 +12157,7 @@
         },
         {
           "text": "Daggers are being sharpened",
-          "tag": "misc",
+          "tag": "teaser",
           "scope": "Impalement Arts"
         },
         {
@@ -12238,7 +12211,7 @@
         },
         {
           "text": "Now burning brighter",
-          "tag": "new",
+          "tag": "teaser",
           "scope": "Spotlight"
         },
         {
@@ -12380,7 +12353,7 @@
       "changes": [
         {
           "text": "Created illusions now apply stacks of Menace with their attacks",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Disruption"
         },
         {
@@ -12494,7 +12467,7 @@
       "changes": [
         {
           "text": "Chickens are now more duplicitous",
-          "tag": "misc",
+          "tag": "teaser",
           "scope": "Fowl Play"
         },
         {
@@ -12723,7 +12696,7 @@
         },
         {
           "text": "Slark now has a subtle on-screen effect for when he is not seen by the enemy",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "Shadow Dance"
         },
         {
@@ -12834,7 +12807,7 @@
         },
         {
           "text": "Attack now has +20/35/50% bonus Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Assassinate"
         }
       ]
@@ -12846,12 +12819,12 @@
       "changes": [
         {
           "text": "Illusion has 25% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Shadow Step"
         },
         {
           "text": "Illusions have 40% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Haunt"
         },
         {
@@ -13163,7 +13136,7 @@
         },
         {
           "text": "Now traps have fragile pip health",
-          "tag": "new",
+          "tag": "misc",
           "scope": "Psionic Trap",
           "info": "As a part of the comprehensive Pip Health Standardization"
         }
@@ -13181,7 +13154,7 @@
         },
         {
           "text": "Illusions have 25% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Reflection"
         },
         {
@@ -13794,7 +13767,7 @@
         },
         {
           "text": "Aghanim's Scepter illusion has 100% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Vengeance Aura"
         }
       ]
@@ -13833,7 +13806,7 @@
         },
         {
           "text": "The effect on the initial target is now split into two separate debuffs for clarity",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "Noxious Plague"
         },
         {
@@ -13999,7 +13972,7 @@
         },
         {
           "text": "Attack now has +25% bonus Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Astral Step"
         }
       ]
@@ -14054,9 +14027,10 @@
         },
         {
           "text": "Thread establishing time decreased from 1.5s to 1.25s",
-          "tag": "nerf",
+          "tag": "buff",
           "old": 1.5,
           "new": 1.25,
+          "lower_is_better": true,
           "scope": "Threads of Fate"
         },
         {
@@ -14066,12 +14040,12 @@
         },
         {
           "text": "Additional Attacks now have +15% bonus Item Potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Geminate Attack"
         },
         {
           "text": "Aghanim's Scepter upgrade moved into a separate ability with shared cooldown",
-          "tag": "misc",
+          "tag": "rework",
           "lower_is_better": true,
           "scope": "Time Lapse"
         },
@@ -14101,7 +14075,7 @@
         },
         {
           "text": "Attacks now have 75% item potency",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Focus Fire"
         },
         {
@@ -14309,7 +14283,7 @@
         },
         {
           "text": "Now Nimbus has fragile pip health",
-          "tag": "new",
+          "tag": "misc",
           "scope": "Nimbus",
           "info": "As a part of the comprehensive Pip Health Standardization"
         },
