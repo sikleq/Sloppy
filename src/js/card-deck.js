@@ -35,9 +35,10 @@
     const h0 = deck.getBoundingClientRect().height;
     const r = hidden.getBoundingClientRect();
     deck.classList.toggle('deck-old', toOld);
-    // the ability's icon and its name follow the card on top (owner 2026-11-21), patch-ability-change.css
+    // the ability's icon and its name follow the card on top (owner 2026-11-21), patch-ability-change.css; only the
+    // ability's own card: an Aghanim's / granted card in the same block (7.38 Flux) leaves them alone
     const block = deck.closest('.ability-block');
-    if (block) block.classList.toggle('deck-old-shown', toOld);
+    if (block && !deck.matches('.aghs-change, .granted-change')) block.classList.toggle('deck-old-shown', toOld);
     shown.classList.remove('deck-hid');
     // the keyboard stays on the deck: the tab pressed goes away with its card, the other card's tab takes the focus
     const fromTab = hidden.contains(document.activeElement);

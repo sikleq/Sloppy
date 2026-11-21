@@ -673,7 +673,8 @@ def test_the_icon_and_the_name_follow_the_card_on_top():
     from patch.css_bundle import read_css
     from patch.js_bundle import read_js
     js, css = read_js(), read_css()
-    assert "if (block) block.classList.toggle('deck-old-shown', toOld);" in js
+    # an Aghanim's card in the same block (7.38 Flux) does not move the ability's icon
+    assert "if (block && !deck.matches('.aghs-change, .granted-change')) block.classList.toggle('deck-old-shown'" in js
     assert ".ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay > .ability-icon-old-underlay {" in css
     assert ".ability-block.deck-old-shown .ability-title-old { opacity: 1; }" in css
     assert ".ability-block.deck-old-shown .ability-title-new { opacity: 0.55; }" in css
