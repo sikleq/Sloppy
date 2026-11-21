@@ -442,6 +442,28 @@ def _postprocess_returning_rows(lines):
     return out
 
 
+def _postprocess_hidden_rows(lines, version):
+    """Rows the notes leave out (data/rules/hidden_rows.json): each after the line holding its anchor; an ability's
+    slug puts it at the end of that ability's rows. A row already there is not added twice (owner 2026-11-21)."""
+    import json
+    import os
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "rules", "hidden_rows.json")
+    with open(path, encoding="utf-8") as f:
+        rows = json.load(f).get(version or "", [])
+    out = list(lines)
+    for r in rows:
+        if any(ln.strip() == r["row"] for ln in out):
+            continue
+        at = next((i for i, ln in enumerate(out) if r["anchor"] in ln), None)
+        if at is None:
+            raise ValueError(f"hidden_rows.json {version}: no line holds the anchor {r['anchor']!r}")
+        ind = out[at][:len(out[at]) - len(out[at].lstrip())]
+        if f'slug="{r["anchor"]}"' in out[at]:              # an ability: before its ul_close
+            at = next(i for i in range(at, len(out)) if out[i].strip() == "W(ul_close())") - 1
+        out.insert(at + 1, ind + r["row"])
+    return out
+
+
 def _postprocess_row_notes(lines):
     out = []
     for ln in lines:

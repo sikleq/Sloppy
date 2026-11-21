@@ -1,0 +1,15 @@
+{
+  "_about": "Rows Valve's notes leave out, found in the game files and checked in the game code; tools/patchgen/post_late._postprocess_hidden_rows puts each after the line holding its anchor (an ability's slug: at the end of that ability's rows). The page draws them as a Hidden change (patch/hidden_change.py) by the note's 'Not in the patch notes' (owner 2026-11-21: 'Да, сделай всё').",
+  "7.42": [
+    {
+      "anchor": "abyssal_underlord_dark_portal",
+      "why": "server.dll 6978 0x120BF00 + new shot_* keys of abyssal_underlord_dark_portal (side-session research 2026-11-19)",
+      "row": "W(li(\"With Aghanim's Scepter, the portals now shoot enemies within 1200 range, slowing them by 40% for 2.5s; no damage, once per 0.8s per target\", t(\"NEW\"), extra=inline_note(\"Not in the patch notes: found in the game files\")))"
+    },
+    {
+      "anchor": "has a \\\"home jungle\\\"",
+      "why": "map 7.42/-v2/-v3: [PR#]neutralcamp_evil_2 minspawntype 5, maxspawntype 6 (the other Dire camps 4-6); 0 of 186 Vhoul kills there in 13 tournament games (2026-11-21)",
+      "row": "W(li(\"Dire's small camp by the top lane never spawns the Vhoul camp: only the Ghost and Harpy camps, in turn\", t(\"NERF\"), extra=inline_note(\"Its map spawner allows camp types 5-6 only; every other random Dire camp has 4-6 (Vhoul, Ghost, Harpy), and the small camp by the bottom lane spawns all three. Not in the patch notes: found in the game files\")))"
+    }
+  ]
+}

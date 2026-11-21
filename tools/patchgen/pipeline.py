@@ -74,6 +74,7 @@ from .post_late import (
     _postprocess_new_innate_cards,
     _postprocess_returning_rows,
     _postprocess_roshan_block,
+    _postprocess_hidden_rows,
     _postprocess_row_notes,
     _postprocess_stance_blocks,
 )
@@ -334,6 +335,7 @@ def generate(version):
     out = _postprocess_upgrade_row_notes(out, version)     # "Now upgraded with Aghanim's X": "?" minus the card (11-20)
     out = _postprocess_dash_lists(out)                 # "– Item - Ability" lines in a "?" -> a table of icons (11-20)             # Item Potency: page link, examples as a table (11-20)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)
+    out = _postprocess_hidden_rows(out, version)       # rows Valve left out, from data/rules/hidden_rows.json (11-21)
     out = _postprocess_returning_rows(out)             # a returning / new item's description rows are NEW (as 7.38)
     out = _postprocess_mechanic_lists(out)             # General subgroups of lists -> mechanic blocks, tables (10-30)
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
