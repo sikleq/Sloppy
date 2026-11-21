@@ -190,3 +190,13 @@ def test_a_selected_item_of_several_rows_is_framed_as_one():
     css = read_css()
     assert ".mr-table tbody tr.mr-row-selected.mr-sel-top > td:first-child" in css
     assert ".mr-table tbody tr.mr-row-selected.mr-sel-bottom > td:last-child" in css
+
+
+def test_rule_cards_and_the_filter_card_are_one_surface():
+    # owner 2026-11-21: "что кнопка, что панели. всё разношёрстное" — the rule cards wear the site's pixel frame and
+    # panel (pixel-skin.css), as the "Removed" filter card beside them; that card only as wide as its button
+    from patch.css_bundle import read_css
+    css = read_css()
+    assert ".toolbar-panel, .ipot-rule { background-color: var(--px-panel); border-image-source: var(--px-edge-dim); }" in css
+    assert "border-radius: 6px; background: rgba(255, 255, 255, 0.02)" not in css.split(".ipot-rule {", 1)[1][:200]
+    assert "justify-self: start; width: max-content; }" in css

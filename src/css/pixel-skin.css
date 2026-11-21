@@ -43,15 +43,15 @@
 /* one size for every control in a row: same font size, same 28px box, same text colour */
 .cal-toggle-bar .cal-mode-select, .cal-mode-select { height: 28px; }
 
-/* ---- framed surfaces: panels + popup menus ---- */
-.toolbar-panel,
+/* ---- framed surfaces: panels + popup menus (+ Item Potency's rule cards, beside its filter card: one look) ---- */
+.toolbar-panel, .ipot-rule,
 .nav-submenu, .hd-dd-menu, .search-results {
   border: 2px solid transparent;
   border-image: var(--px-edge) 2 stretch;
   border-radius: 0;
   background-clip: padding-box;
 }
-.toolbar-panel { background-color: var(--px-panel); border-image-source: var(--px-edge-dim); }
+.toolbar-panel, .ipot-rule { background-color: var(--px-panel); border-image-source: var(--px-edge-dim); }
 .toolbar-panel > *:not(:first-child)::before { background: var(--px-line); }
 .nav-submenu, .hd-dd-menu, .search-results {
   background-color: var(--px-menu);
