@@ -35,6 +35,9 @@
     const h0 = deck.getBoundingClientRect().height;
     const r = hidden.getBoundingClientRect();
     deck.classList.toggle('deck-old', toOld);
+    // the ability's icon and its name follow the card on top (owner 2026-11-21), patch-ability-change.css
+    const block = deck.closest('.ability-block');
+    if (block) block.classList.toggle('deck-old-shown', toOld);
     shown.classList.remove('deck-hid');
     // the keyboard stays on the deck: the tab pressed goes away with its card, the other card's tab takes the focus
     const fromTab = hidden.contains(document.activeElement);

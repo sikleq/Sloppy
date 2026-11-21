@@ -665,3 +665,15 @@ def test_a_change_by_a_number_takes_the_way_of_its_verb(no_names):
         "Damage": '<b class="iab-num">+10</b>', "Radius": '<b class="iab-num">+175</b>'}
     assert dict(_said(f"Increases damage reduction by {num('5%')}.")) == {
         "Damage reduction": '<b class="iab-num">+5%</b>'}
+
+
+def test_the_icon_and_the_name_follow_the_card_on_top():
+    # owner 2026-11-21 (7.42 Mana Burn -> Scarab Metabolism): the old card on top brings the old icon to the front and
+    # lights the old name, the new one dimmed
+    from patch.css_bundle import read_css
+    from patch.js_bundle import read_js
+    js, css = read_js(), read_css()
+    assert "if (block) block.classList.toggle('deck-old-shown', toOld);" in js
+    assert ".ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay > .ability-icon-old-underlay {" in css
+    assert ".ability-block.deck-old-shown .ability-title-old { opacity: 1; }" in css
+    assert ".ability-block.deck-old-shown .ability-title-new { opacity: 0.55; }" in css

@@ -147,6 +147,22 @@
 .ability-block > .ability-icon-wrap.has-old-underlay:hover > .innate-marker-old {
   opacity: 1;
 }
+/* The old card on top of the deck (src/js/card-deck.js, owner 2026-11-21: "иконка тоже должна меняться … подсвечиваться
+   серым та способность, карточкой которой мы выбрали"): the old icon and its marker in front, hover shows the new one;
+   the shown card's name bright, the other one dimmed */
+.ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay > .ability-icon-img {
+  transform: translateX(7px) rotate(6deg); z-index: 1; }
+.ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay > .ability-icon-old-underlay {
+  transform: translateX(-3px) rotate(-3deg); z-index: 3; }
+.ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay:hover > .ability-icon-img { transform: none; z-index: 2; }
+.ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay:hover > .ability-icon-old-underlay {
+  transform: none; z-index: 1; }
+.ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay > .innate-marker-new { opacity: 0; }
+.ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay > .innate-marker-old { opacity: 1; }
+.ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay:hover > .innate-marker-new { opacity: 1; }
+.ability-block.deck-old-shown > .ability-icon-wrap.has-old-underlay:hover > .innate-marker-old { opacity: 0; }
+.ability-block.deck-old-shown .ability-title-old { opacity: 1; }
+.ability-block.deck-old-shown .ability-title-new { opacity: 0.55; }
 /* In-place rework (same name + icon on both sides): right pane skips the
    header and only shows the description body — so the box should also be
    visually smaller and centered (vertically + horizontally) relative to
