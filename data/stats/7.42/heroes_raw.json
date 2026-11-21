@@ -1534,7 +1534,7 @@
 "AttributePrimary":"DOTA_ATTRIBUTE_ALL",
 "AttributeStrengthGain":"2.7",
 "MovementSpeed":"310",
-"StatusHealthRegen":"1.0"
+"StatusHealthRegen":"2.0"
 },
 "npc_dota_hero_obsidian_destroyer":{
 "ArmorPhysical":"0",
