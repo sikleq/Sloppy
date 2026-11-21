@@ -13,5 +13,12 @@
       "what": "Fiend's Gate: Aghanim's Scepter portals shooting enemies (shot_* keys of abyssal_underlord_dark_portal)",
       "why": "a draft: the keys and server.dll code are there, but the portals don't shoot in a match (owner 2026-11-21)"
     }
+  ],
+  "7.41d": [
+    {
+      "anchor": "pugna_nether_ward",
+      "why": "npc_abilities pugna_nether_ward AbilityCastRange special_bonus_shard =350 (7.41c) -> =375 (7.41d); Valve's row names the base 150 -> 175 only (owner 2026-11-21: 'Да, добавь')",
+      "row": "W(li(\"Aghanim's Shard Cast Range increased from 350 to 375\", b(350, 375), extra=inline_note(\"Not in the patch notes: found in the game files\")))"
+    }
   ]
 }

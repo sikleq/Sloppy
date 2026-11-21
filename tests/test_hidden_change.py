@@ -39,6 +39,18 @@ def test_hidden_rows_go_under_their_anchor_once():
     assert _postprocess_hidden_rows(out, "7.42") == out
 
 
+def test_pugnas_shard_cast_range_in_7_41d():
+    # 7.41d (owner 2026-11-21: "Да, добавь"): Valve named the base 150 -> 175 only, the Shard's =350 -> =375 too
+    import sys
+    sys.path.insert(0, "tools")
+    from patchgen.post_late import _postprocess_hidden_rows
+    lines = ['    W(ability("Nether Ward", slug="pugna_nether_ward"))', "    W(ul_open())",
+             '    W(li("Cast Range increased from 150 to 175", b(150, 175)))', "    W(ul_close())"]
+    out = _postprocess_hidden_rows(lines, "7.41d")
+    assert "Aghanim's Shard Cast Range increased from 350 to 375" in out[3] and "Not in the patch notes" in out[3]
+    assert _postprocess_hidden_rows(out, "7.41d") == out
+
+
 def test_other_rows_are_left_alone():
     row = _ROW.format(note="Dormant Curio increases min range to 260")
     assert hidden_change_tags(row) == row

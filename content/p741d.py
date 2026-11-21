@@ -646,6 +646,7 @@ def build():
     W(ability("Nether Ward", slug="pugna_nether_ward"))
     W(ul_open())
     W(li("Cast Range increased from 150 to 175", b(150, 175)))
+    W(li("Aghanim's Shard Cast Range increased from 350 to 375", b(350, 375), extra=inline_note("Not in the patch notes: found in the game files")))
     W(ul_close())
 
     # Razor
