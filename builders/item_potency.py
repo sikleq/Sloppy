@@ -116,8 +116,9 @@ _TEXT_HEADS = {"Ability", "Value", "Attacks", "Illusions"}      # word columns: 
 
 def _table(cls, head, rows):
     th = "".join(f'<th{" class=ipot-th-text" if h in _TEXT_HEADS and i else ""}>{h}</th>' for i, h in enumerate(head))
-    return (f'<table class="mr-table hs-table ipot-table {cls}"><thead><tr class="col-row">{th}</tr></thead>'
-            f'<tbody>{"".join(rows)}</tbody></table>')
+    # in the "card" frame (owner 2026-11-21 chose variant 4 of src mock _table_header_variants: tbl-card, aoe-increase.css)
+    return (f'<div class="tbl-card"><table class="mr-table hs-table ipot-table {cls}"><thead><tr class="col-row">{th}</tr>'
+            f'</thead><tbody>{"".join(rows)}</tbody></table></div>')
 
 
 def _name_cell(name, icon, owner="", span=1, wide=True):
@@ -209,11 +210,15 @@ def _melee_ranged(vals):
 def _items_rows(version, rules):
     gone = set(rules.get("not_in_game", []))
     rows = []
+    shown = 0                              # items in the game so far: every second one striped, all its rows (card look)
     for name, key, slug, vals in _scaled_values(version, "apply_effectiveness"):
         no_ill = no_illusions(key, version)
         vals = _melee_ranged(vals)
+        alt = key not in gone and shown % 2 == 1
+        shown += key not in gone
         for k, (ab, label, value, sentence) in enumerate(vals):
-            cls = ' class="ipot-gone"' if key in gone else ''
+            classes = " ".join(c for c in ("ipot-gone" if key in gone else "", "ipot-alt" if alt else "") if c)
+            cls = f' class="{classes}"' if classes else ''
             # removed from the game: grey, hidden till "Show removed" (owner 2026-11-19: no "not in the game" words)
             head = _name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals)) if k == 0 else ''
             hint = f' data-tooltip="{_esc(sentence)}"' if sentence else ''

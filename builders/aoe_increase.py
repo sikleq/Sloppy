@@ -975,7 +975,8 @@ def render_html() -> str:
         f'{subnav}'
         f'{blurb}'
         f'{_item_filter_bar(_resolve_items(latest))}'
-        f'{table}\n'
+        # the "card" frame (owner 2026-11-21, variant 4), as Item Potency's tables
+        f'<div class="tbl-card tbl-card-fit">{table}</div>\n'
         '</div>\n'
         '</div>\n'
         f'<script defer src="src/scripts-table.js?v={asset_version}"></script>\n'

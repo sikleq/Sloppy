@@ -52,7 +52,6 @@
 .mr-table.aoe-table thead th.aoe-slot-th {
   min-width: 84px;
   text-align: center;
-  color: var(--text-muted, #99958c);
 }
 .mr-table.aoe-table tbody td {
   vertical-align: middle;
@@ -315,7 +314,12 @@ table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table td.ipot-ab, ta
 table.mr-table.ipot-table thead th.ipot-th-text { text-align: left; }
 table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table thead th:first-child { width: 230px; min-width: 230px; }
 /* the illusions' part starts with a stronger line */
-table.mr-table.ipot-table .ipot-ill-first { border-left: 2px solid var(--line-soft); }
+/* every column's line drawn by its class, not by :first-child — after an item's name spanning its rows (rowspan) the
+   next row starts with the ability or the value, and the site's "first cell: no left line" rule cut the line there
+   (owner 2026-11-21, Parasma: "линия вертикальная не до конца, уже были такие проблемы") */
+table.mr-table.ipot-table td:not(.ipot-name) { border-left: 1px solid rgba(213, 207, 195, 0.12); }
+table.mr-table.ipot-table td.ipot-ill-first, table.mr-table.ipot-table .ipot-ill-first {
+  border-left: 2px solid var(--line-soft); }
 /* the lower tables: the potency column as narrow as its chip */
 table.mr-table.ipot-sources td.ipot-v { width: 1%; }
 table.mr-table.ipot-table th { white-space: nowrap; }
@@ -343,8 +347,8 @@ table.mr-table.ipot-table tr.ipot-gone { display: none; }
 /* design review 2026-11-19: headers as AoE Increase (the first bright, the others dim; text columns left), the
    illusions' values brighter with their potency, names wrapping on a phone; Dormant Curio's page (dormant_curio.py)
    uses the same table look */
-table.mr-table.ipot-table thead th { color: var(--text-dim); text-align: center; }
-table.mr-table.ipot-table thead th:first-child { color: var(--text-main); text-align: left; }
+table.mr-table.ipot-table thead th { text-align: center; }
+table.mr-table.ipot-table thead th:first-child { text-align: left; }
 table.mr-table.ipot-items thead th:nth-child(5) { border-left: 2px solid var(--line-soft); }
 table.mr-table.ipot-table td.ipot-p20 { color: rgba(214, 208, 196, 0.45); }
 table.mr-table.ipot-table td.ipot-p35 { color: rgba(214, 208, 196, 0.68); }
@@ -366,3 +370,18 @@ table.mr-table.ipot-table td.ipot-no-ill { color: rgba(214, 208, 196, 0.3); }
     scroll-snap-type: x mandatory; padding-bottom: 4px; }
   .ipot-rule { scroll-snap-align: start; }
 }
+
+/* TABLE AS A CARD (owner 2026-11-21: variant 4 of the header mock, tried on Item Potency and AoE Increase first, "там
+   решим потом стоит ли в другие места"): the table in the site's pixel frame, the header row in Jersey on a faint gold
+   tint — much fainter than the mock's ("фон заметно прозрачнее, а то названий заголовок не будет видно"), on an opaque
+   base so a sticky header hides the rows under it — and every second row (Item Potency: every second item) striped */
+.tbl-card { border: 2px solid #6d5c3a; box-shadow: 0 0 0 2px #0c0b09, inset 0 0 0 1px #2a241b; background: #1a1713;
+  margin-bottom: 4px; }
+.tbl-card.tbl-card-fit { width: max-content; max-width: 100%; }
+.tbl-card table.mr-table { margin: 0; }
+.tbl-card table.mr-table thead th {
+  font-family: var(--font-j10); font-weight: 400; font-size: 17px; letter-spacing: .3px; color: #f1e2b3;
+  background: linear-gradient(rgba(227, 196, 106, 0.05), rgba(227, 196, 106, 0.05)), #1a1713;
+  border-bottom: 2px solid #6d5c3a; }
+.tbl-card table.mr-table tbody tr.ipot-alt td,
+.tbl-card table.aoe-table tbody tr:nth-child(even) td:not(.aoe-name) { background-color: rgba(255, 255, 255, 0.025); }

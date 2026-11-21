@@ -67,6 +67,36 @@ def test_the_items_table_reads_like_the_sites_tables():
     assert "table.mr-table.ipot-items td.ipot-ab, table.mr-table.ipot-items thead th:nth-child(2) { display: none; }" in css
 
 
+def test_column_lines_run_through_the_rows_under_a_spanning_cell():
+    # owner 2026-11-21 (Parasma, two ability rows under one item): "линия вертикальная не до конца, уже были такие
+    # проблемы" — lines go by column class, so the 2nd row's first <td> (a later column) keeps its line
+    from patch.css_bundle import read_css
+    css = read_css()
+    assert "table.mr-table.ipot-table td:not(.ipot-name) { border-left: 1px solid" in css
+    assert "td:first-child { border-left: 0" not in css.split("ipot-table", 1)[1].split("@media", 1)[0]
+
+
+def test_both_pages_show_their_tables_as_cards():
+    # owner 2026-11-21: header mock variant 4 on Item Potency and AoE Increase first; the header tint "заметно
+    # прозрачнее", so the names stay readable; the header's colours live in the card rule, not per page
+    import pytest
+    import item_potency as ip
+    from patch import game_files
+    from patch.css_bundle import read_css
+    css = read_css()
+    assert ".tbl-card { border: 2px solid #6d5c3a;" in css
+    assert "rgba(227, 196, 106, 0.05)" in css and "rgba(227,196,106,.12)" not in css
+    assert "table.mr-table.ipot-table thead th { text-align: center; }" in css       # no colour of its own
+    assert ip._table("x", ["Item"], []).startswith('<div class="tbl-card"><table')
+    aoe = (ROOT / "builders" / "aoe_increase.py").read_text(encoding="utf-8")
+    assert '<div class="tbl-card tbl-card-fit">' in aoe
+    if game_files.available():
+        rows = ip._items_rows(ip._versions()[-1], {"not_in_game": []})
+        assert any("ipot-alt" in r for r in rows)
+    else:
+        pytest.skip("no game-files store")
+
+
 def test_the_page_lists_the_flagged_values_and_the_sources():
     import item_potency
     html = item_potency.render_html()
