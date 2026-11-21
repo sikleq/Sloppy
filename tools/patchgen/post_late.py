@@ -494,8 +494,8 @@ def _postprocess_valve_card_errors(lines, version):
             def fix(m):
                 new = float(m.group(2))
                 tag = "NERF" if new < real else "BUFF"
-                tip = (f"Error in the patch notes. Valve wrote {e['valve']} &rarr; {m.group(1)}{m.group(2)}{m.group(3)} "
-                       f"{vm.group(4)}; the game files had {e['real']}")
+                now = f"{m.group(1)}{m.group(2)}{m.group(3)} {vm.group(4)}"
+                tip = f"Patch notes state: {e['valve']} &rarr; {now}<br>Game files: {e['real']} &rarr; {now}"
                 return f'("{tag}|{tip}", "{m.group(1)}{m.group(2)}{m.group(3)} {vm.group(4)}", b({real:g}, {m.group(2)}))'
             ln, k = new_rx.subn(fix, ln)
             done += k

@@ -11,17 +11,17 @@ A row a card covers (class "covered", hidden under the card) keeps its note: a m
 """
 import re
 
-from .tag_glow import cut_note, each_row, has_tag, mark_tag
+from .tag_glow import cut_note, each_row, has_tag, mark_tag, tip_html
 
 HEAD = "Error in the patch notes"
 MARK = r"This (?:change|value) is wrongly stated|The patch text says"
 
 
 def tip_text(note):
-    """'This change is wrongly stated. The real change is 650 → 525' → 'Error in the patch notes. The real change is
-    650 → 525'; 'The patch text says "decreased", but …' stays whole after the head."""
+    """'This change is wrongly stated. The real change is 650 → 525' → the gold head 'Error in the patch notes', under it
+    'The real change is 650 → 525'; 'The patch text says "decreased", but …' stays whole after the head."""
     text = re.sub(r"^This (?:change|value) is wrongly stated\.?\s*", "", note).strip()
-    return f"{HEAD}. {text}" if text else HEAD
+    return tip_html(HEAD, text)      # the gold head, the words under it
 
 
 def _one(li):

@@ -276,8 +276,11 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
     wrongly stated» / «The patch text says»). Строка под карточкой (covered) свою поправку держит — пометку там не
     видно. Карточка характеристик предмета: «было» сверяется с items.txt прошлого патча
     (`scripts/audit/audit_card_values.py`, тест падает на расхождении); проверенный случай — в
-    `data/rules/valve_errors.json`, генератор ставит число из файлов и тег `"NERF|Error in the patch notes. …"`
+    `data/rules/valve_errors.json`, генератор ставит число из файлов и тег
+    `"NERF|Patch notes state: +4 Armor &rarr; +5 Armor<br>Game files: +6 Armor &rarr; +5 Armor"`
     (красный, `patch/cards_item_stats._prop_tag`). 7.42 Crimson Guard: у Valve «+4 → +5 Armor», в файлах 6 → 5.
+    Подсказка как у всех на сайте: золотой заголовок `.tip-head` («Error in the patch notes» / «Hidden change»),
+    под ним слова (`patch/tag_glow.tip_html`; владелец 2026-11-21: «почему тут не написано золотым»).
     В режиме для дальтоников кольцо синее (золото и красное там сливаются).
     Устаревшее «from» (Valve взяли число до прошлой правки: Kinetic Fence 7.41 «20/18/16/14s» — с 7.38 было
     20/17/14/11s; Wild Axes 7.41 «6/9/11/13» — 7.40b дал 7/9/11/13) — так же. Ищет такие строки

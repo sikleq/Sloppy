@@ -591,7 +591,7 @@ def build():
     W(ul_close())
     W(item_header("Crimson Guard", changed=True))
     W(auto_components_change("Crimson Guard", "7.42"))
-    W(properties_change(old=[("", "+6 Armor"), ("NERF", "+12 Health Regen")], new=[("NERF|Error in the patch notes. Valve wrote +4 Armor &rarr; +5 Armor; the game files had +6 Armor", "+5 Armor", b(6, 5)), ("", "+9 Health Regen", b(12, 9))]))
+    W(properties_change(old=[("", "+6 Armor"), ("NERF", "+12 Health Regen")], new=[("NERF|Patch notes state: +4 Armor &rarr; +5 Armor<br>Game files: +6 Armor &rarr; +5 Armor", "+5 Armor", b(6, 5)), ("", "+9 Health Regen", b(12, 9))]))
     # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Guard. For 7 seconds, grant nearby allied heroes and buildings a 100% chance to block damage equal to 70 plus 2% of the caster's max health value from each incoming attack. Radius: 1200. Cast Range: 1200. Mana Cost: 75. Cooldown: 40s",

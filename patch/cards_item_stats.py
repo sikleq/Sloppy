@@ -26,7 +26,9 @@ def _prop_tag(tag):
     overall = 'buff' if key in ('BUFF', 'NEW') else ('nerf' if key in ('NERF', 'DEL') else 'buff')
     if err:      # a mistake in Valve's notes: the tag glows red, the files' number on hover (patch/valve_error.py)
         import html as _html
-        return (f'<span data-tooltip="{_html.escape(err, quote=True)}" tabindex="0" class="tb-tip-target '
+        from .valve_error import HEAD
+        tip = f'<b class="tip-head">{HEAD}</b>{err}'      # the gold head; err is author-written HTML (&rarr;, <br>)
+        return (f'<span data-tooltip="{_html.escape(tip, quote=True)}" tabindex="0" class="tb-tip-target '
                 f'valve-error badge {cls}" data-tag="{key.lower()}" data-overall="{overall}">{key}</span>')
     return f'<span class="badge {cls}" data-tag="{key.lower()}" data-overall="{overall}">{key}</span>'
 

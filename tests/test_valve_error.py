@@ -8,7 +8,9 @@ _ROW = ('<li data-tag="nerf" class="li-bg"><span class="badge nerf-text" data-ta
 
 def test_the_note_moves_to_the_tags_hover():
     out = valve_error_tags(_ROW.format(note="This change is wrongly stated. The real change is 650 &rarr; 525"))
-    assert f'data-tooltip="{HEAD}. The real change is 650 → 525" tabindex="0" class="tb-tip-target valve-error badge' in out
+    # the gold head every tooltip has, the words under it (owner 2026-11-21)
+    assert (f'data-tooltip="&lt;b class=&quot;tip-head&quot;&gt;{HEAD}&lt;/b&gt;The real change is 650 → 525" '
+            'tabindex="0" class="tb-tip-target valve-error badge') in out
     assert "info-tip" not in out and "wrongly stated" not in out
     assert '<span class="wrong-word">575</span>' in out
 
@@ -57,9 +59,10 @@ def test_a_card_with_valves_mistake_shows_the_files_number_and_a_red_tag():
     lines = ['    W(item_header("Crimson Guard", changed=True))',
              '    W(properties_change(old=[("BUFF", "+4 Armor")], new=[("", "+5 Armor", b(4, 5))]))']
     out = _postprocess_valve_card_errors(lines, "7.42")[1]
-    assert '("", "+6 Armor")' in out and 'b(6, 5)' in out and '("NERF|Error in the patch notes. Valve wrote +4' in out
+    assert '("", "+6 Armor")' in out and 'b(6, 5)' in out and '("NERF|Patch notes state: +4 Armor &rarr; +5 Armor<br>Game files: +6 Armor' in out
     assert _postprocess_valve_card_errors([lines[0], out], "7.42")[1] == out          # once
-    tag = _prop_tag("NERF|Error in the patch notes. x")
+    tag = _prop_tag("NERF|Patch notes state: +4 Armor &rarr; +5 Armor")
+    assert '&lt;b class=&quot;tip-head&quot;&gt;Error in the patch notes&lt;/b&gt;Patch notes state: +4' in tag
     assert 'class="tb-tip-target valve-error badge' in tag and ">NERF<" in tag and 'tabindex="0"' in tag
 
 

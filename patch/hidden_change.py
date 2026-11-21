@@ -11,7 +11,7 @@ Speed before it was cycled out."). A row a card covers keeps its note (a mark th
 """
 import re
 
-from .tag_glow import cut_note, each_row, has_tag, mark_tag
+from .tag_glow import cut_note, each_row, has_tag, mark_tag, tip_html
 
 TIP = "Hidden change"
 MARK = r"Not in the patch notes"
@@ -29,7 +29,7 @@ def _one(li):
     if re.match(r'<li[^>]*class="[^"]*\bcovered', li) or not has_tag(li):
         return li
     li2, note = cut_note(li, MARK, keep=_rest)          # its own words stay in the [?]
-    return mark_tag(li2, "hidden-change", TIP) if note is not None else li
+    return mark_tag(li2, "hidden-change", tip_html(TIP)) if note is not None else li
 
 
 def hidden_change_tags(html):

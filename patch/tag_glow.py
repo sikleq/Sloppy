@@ -60,9 +60,17 @@ def cut_note(li, marker, keep=None):
     return li, None
 
 
+def tip_html(head, body=""):
+    """A tag's hover: the gold head every tooltip of the site has (.tip-head), the words under it (owner 2026-11-21:
+    "почему тут не написано золотым ... а уже внизу Patchnote states")."""
+    body = _html.escape(body, quote=False) if body else ""
+    return f'<b class="tip-head">{_html.escape(head, quote=False)}</b>{body}'
+
+
 def mark_tag(li, cls, tip):
     """The row's tag (the first span.badge with a data-tag — not a % badge) gets `cls`, a hover `tip` and focus (a
-    phone's tap, the keyboard); a tag already marked keeps its hover and gets this one after it."""
+    phone's tap, the keyboard); a tag already marked keeps its hover and gets this one after it. `tip` is HTML
+    (tip_html)."""
     m = _TAG.search(li) or _DIAMOND.search(li)
     if not m:
         return li
