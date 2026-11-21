@@ -45,7 +45,9 @@ def test_the_page_lists_the_flagged_values_and_the_sources():
     assert '<span class="ipot-chip ipot-buff">125%</span>' in html      # Astral Step: above 100% green
     assert '<span class="ipot-chip ipot-buff">+20%</span>' in html      # Evolved: a bonus green
     # removed items: grey, hidden till "Show removed", no words (owner 2026-11-19)
-    assert 'class="ipot-gone"' in html and "not in the game" not in html and 'class="ipot-show-gone"' in html
+    assert 'class="ipot-gone"' in html and "not in the game" not in html
+    # the site's "Removed" filter button, as Neutral Stats' (owner 2026-11-21)
+    assert 'class="hs-attack-filter ipot-show-gone" aria-pressed="false"><span>Removed</span></button>' in html
     assert "Pangolier" in html and "Illusion Rune" in html
 
 

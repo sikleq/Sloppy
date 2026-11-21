@@ -38,6 +38,10 @@ _esc = lambda s: _html.escape(str(s), quote=True)
 RULES = _HERE / "data" / "rules" / "item_potency_abilities.json"
 ITEM_CDN = "icons/items/"
 ILLUSIONS = (("Illusion", 20), ("Manta", 35), ("Rune", 40))     # the usual potencies of an illusion
+# the site's "Removed" switch, as Neutral Stats' (builders/creeps.py; owner 2026-11-21: "Show removed кнопка не похожа на
+# те, что у нас на сайте с подобным функционалом")
+REMOVED_BUTTON = ('<div class="ipot-tools"><button type="button" class="hs-attack-filter ipot-show-gone" '
+                  'aria-pressed="false"><span>Removed</span></button></div>')
 
 
 def _root(src):
@@ -226,7 +230,7 @@ def render_html() -> str:
     head_items = ["Item", "Ability", "Value", "Hero"] + [f"{n} {p}%" for n, p in ILLUSIONS]
     body = (
         _section("How Item Potency adds up", _rules_cards(rules))
-        + _section("Items", '<button type="button" class="ipot-show-gone" aria-pressed="false">Show removed</button>'
+        + _section("Items", REMOVED_BUTTON
                    + _table("ipot-items", head_items, _items_rows(version, rules)))
         + _section("Attacks with their own Item Potency", _table(
             "ipot-sources", ["Ability", "Attacks", "Item Potency"], _sources_rows(version, rules, names, "own")))
