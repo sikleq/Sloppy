@@ -331,9 +331,14 @@ def extract(vpk):
     data["npc_dota_filler"] = [_xy(e) for e in by.get("npc_dota_building", []) if "filler" in str(e.get("mapunitname"))]
     # shrines (7.00-7.22ish): buildings named "npc_dota_goodguys_healers", whatever their class
     data["npc_dota_healer"] = [_xy(e) for e in ents if "_healers" in str(e.get("mapunitname", ""))]
+    # minSpawnType / maxSpawnType: which camp make-ups of its size (1-based rows of server.dll's camp table) the
+    # spawner may roll — 7.42's "home jungle" is these ranges (Radiant 1-3, Dire 4-6, ancients 1-5 on both sides;
+    # owner 2026-11-22: the sides come from the game files, not a hand-kept list)
     data["npc_dota_neutral_spawner"] = [
         {**_xy(e), "triggerName": _name(e), "pullType": str(e.get("pulltype", "")),
-         "neutralType": str(e.get("neutraltype", ""))} for e in by.get("npc_dota_neutral_spawner", [])]
+         "neutralType": str(e.get("neutraltype", "")),
+         "minSpawnType": str(e.get("minspawntype", "")), "maxSpawnType": str(e.get("maxspawntype", ""))}
+        for e in by.get("npc_dota_neutral_spawner", [])]
     starts = {_name(e): e for e in by.get("info_player_start_dota", [])}
     # Roshan: the spawner entity plus the other pit (7.38+: "roshan_location_2"); Tormentors: both locations
     rosh = [_xy(e) for e in by.get("npc_dota_roshan_spawner", [])]

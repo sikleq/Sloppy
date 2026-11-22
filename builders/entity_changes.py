@@ -1172,17 +1172,19 @@ def _unit_groups(ents: list[dict]):
     return [(k, buckets[k]) for k in _UNIT_ORDER if buckets[k]]
 
 
-# 7.42 "home jungle": a non-amphibian, non-ancient neutral spawns only on its own side (content/p742.py, the camp table
-# under "Each non-amphibian and non-ancient Neutral camp unit now has a home jungle"). Unit Changes' Side switch shows
-# one side's creeps (owner 2026-11-22); lane creeps, ancients, amphibians and summons are on both sides and stay.
-_HOME_SIDE = {f"npc_dota_neutral_{n}": side for side, names in (
-    ("radiant", ("kobold", "kobold_tunneler", "kobold_taskmaster", "forest_troll_berserker", "forest_troll_high_priest",
-                 "giant_wolf", "alpha_wolf", "ogre_mauler", "ogre_magi", "radigull", "centaur_outrunner", "centaur_khan",
-                 "wildkin", "enraged_wildkin", "eimermole_foreman", "eimermole")),
-    ("dire", ("gnoll_assassin", "fel_beast", "ghost", "harpy_scout", "harpy_storm", "satyr_trickster",
-              "satyr_soulstealer", "mud_golem", "odobenus_frostmage", "odobenus_footman", "satyr_hellcaller",
-              "polar_furbolg_ursa_warrior", "polar_furbolg_champion", "dark_troll_warlord", "dark_troll")))
-    for n in names}
+# 7.42 "home jungle": a creep that spawns on one side only — from the game files (the map's spawn ranges + server.dll's
+# camp table, patch/camp_sides.py; owner 2026-11-22). Unit Changes' Side switch shows one side's creeps; lane creeps,
+# ancients, amphibians and summons are on both sides and stay.
+def _latest_home_side():
+    import json as _j
+    from patch.camp_sides import home_side
+    with open(_HERE / "data" / "map" / "patch_maps.json", encoding="utf-8") as f:
+        maps = list(_j.load(f)["patches"])
+    patch = maps[-1].split("-")[0]
+    return home_side(patch, maps[-1].replace(".", ""))
+
+
+_HOME_SIDE = _latest_home_side()
 # neither pressed = both sides (the neutral position); a press shows one side, a second press goes back to both
 SIDE_SWITCH = ('<span class="hs-attack-filter-group ec-side" aria-label="Side">'
                '<button type="button" class="hs-attack-filter" data-ec-side="radiant" aria-pressed="false">'
