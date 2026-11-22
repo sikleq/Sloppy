@@ -57,7 +57,9 @@ def test_the_items_table_reads_like_the_sites_tables():
     css = read_css()
     assert "table.mr-table.ipot-table td { text-align: center;" in css
     # the words left, one first-column width for every table (owner 2026-11-21: all centred "не очень")
-    assert "table.mr-table.ipot-table thead th.ipot-th-text { text-align: left; }" in css
+    # the cells' words left; the heads always centred (owner 2026-11-22)
+    assert "table.mr-table.ipot-table td.ipot-text { text-align: left; }" in css
+    assert "thead th.ipot-th-text { text-align: left; }" not in css
     assert "thead tr:first-child th:first-child { width: 230px;\n  min-width: 230px; }" in css
     # melee / ranged in one row (owner 2026-11-21: "через слеш, а не в 2 строки")
     basher = "".join(r for r in ip._items_rows(ip._versions()[-1], {"not_in_game": []}) if 'data-name="skull basher"' in r)
@@ -216,8 +218,14 @@ def test_the_heads_follow_one_rule_on_every_materials_table():
     css = read_css()
     assert ".mr-table thead th.sortable:hover { background: #292825; }" in css
     assert ".mr-table thead th:hover {" not in css
-    aoe_heads = css.split("/* every head stands where its column's content is", 1)[1].split("}", 1)[0]
-    assert "th.aoe-slot-th" in aoe_heads and "th.aoe-name" in aoe_heads and "text-align: left;" in aoe_heads
+    # every head centred, whatever its cells do (owner 2026-11-22: "всегда выравниваем по центру названия заголовков
+    # в таблицах") — the tables' thead and the mechanic tables' head row
+    aoe_heads = css.split("/* a table's head names stand centred, always", 1)[1].split("}", 1)[0]
+    assert "th.aoe-slot-th" in aoe_heads and "th.aoe-name" in aoe_heads and "text-align: center;" in aoe_heads
+    assert "thead tr:first-child th:first-child { text-align: left; }" not in css
+    assert ".mech-head > .mech-cell, .mech-head > .mech-cell.mech-label, .mech-abils.pip-table .mech-head > .mech-cell {\n" \
+           "  justify-content: center;\n  text-align: center;" in css
+    assert ".mech-cols-hero > .mech-abil-row:not(.mech-head) > .mech-cell { justify-content: flex-start;" in css
     curio = (ROOT / "builders" / "dormant_curio.py").read_text(encoding="utf-8")
     assert '("Value", 2)' not in curio                                      # "Value" over "Value" said twice
     # the shared sorter moves an item's rows together (a name cell spanning N rows)

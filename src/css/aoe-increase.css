@@ -49,13 +49,12 @@
 }
 
 /* ---- table cells: centered headers + content, narrow columns ---- */
-/* every head stands where its column's content is (owner 2026-11-22: "где-то по левому краю, где-то в центре"): the
-   icons and radii hug the left edge, so do their heads, the hero's and the "Abilities" group's; Item Potency the same —
-   words left, numbers centred, a group as its columns */
+/* a table's head names stand centred, always, whatever their column's cells do (owner 2026-11-22: "всегда
+   выравниваем по центру названия заголовков в таблицах") — the hero's, the slots', the "Abilities" group's */
 .mr-table.aoe-table thead th.aoe-slot-th, .mr-table.aoe-table thead th.aoe-name,
 .mr-table.aoe-table thead tr.cat-row th.cat-head {
   min-width: 84px;
-  text-align: left;
+  text-align: center;
 }
 .mr-table.aoe-table tbody td {
   vertical-align: middle;
@@ -318,8 +317,8 @@ table.mr-table.ipot-table { width: 100%; min-width: 0; }
 table.mr-table.ipot-table td { text-align: center; vertical-align: middle; padding: 7px 12px; }
 /* the words left, the numbers centred (owner 2026-11-21: all centred "не очень" — the tables of the page came out with
    different column widths); the first column one width in every table, so they line up under each other */
-table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table td.ipot-ab, table.mr-table.ipot-table td.ipot-text,
-table.mr-table.ipot-table thead th.ipot-th-text { text-align: left; }
+table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table td.ipot-ab,
+table.mr-table.ipot-table td.ipot-text { text-align: left; }
 table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table thead tr:first-child th:first-child { width: 230px;
   min-width: 230px; }
 /* the illusions' part starts with a stronger line */
@@ -378,8 +377,7 @@ table.mr-table.ipot-table td.ipot-name .mr-name-body { display: inline-flex; fle
 /* design review 2026-11-19: headers as AoE Increase (the first bright, the others dim; text columns left), the
    illusions' values brighter with their potency, names wrapping on a phone; Dormant Curio's page (dormant_curio.py)
    uses the same table look */
-table.mr-table.ipot-table thead th { text-align: center; }
-table.mr-table.ipot-table thead tr:first-child th:first-child { text-align: left; }
+table.mr-table.ipot-table thead th { text-align: center; }        /* every head centred (owner 2026-11-22) */
 table.mr-table.ipot-table td.ipot-p20 { color: rgba(214, 208, 196, 0.45); }
 table.mr-table.ipot-table td.ipot-p35 { color: rgba(214, 208, 196, 0.68); }
 table.mr-table.ipot-table td.ipot-p40 { color: rgba(214, 208, 196, 0.85); }

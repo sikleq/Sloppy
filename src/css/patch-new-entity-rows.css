@@ -377,7 +377,8 @@ h4.subgroup {
 .mech-abils.mech-cols-hero3 { grid-template-columns: fit-content(30%) fit-content(35%) minmax(0, 1fr); }/* a long list in two pairs of columns (owner 2026-10-30: "в 2 столбца можно, а то длинный список") */
 .mech-abils.mech-cols-hero4 { grid-template-columns: fit-content(25%) minmax(0, 1fr) fit-content(25%) minmax(0, 1fr); }
 .mech-cols-hero4 > .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(2) { border-right: 2px solid var(--line-soft); }
-.mech-cols-hero > .mech-abil-row > .mech-cell { justify-content: flex-start; text-align: left; min-width: 0; }
+.mech-cols-hero > .mech-abil-row > .mech-cell { min-width: 0; }
+.mech-cols-hero > .mech-abil-row:not(.mech-head) > .mech-cell { justify-content: flex-start; text-align: left; }
 /* the same list without a hero column: the abilities in 2-3 equal columns, the owner in the name's hover (owner
    2026-11-19: "убрать иконки героев"); a phone: two columns */
 .mech-abils.mech-cols-flat1 { grid-template-columns: minmax(0, 1fr); }
@@ -557,7 +558,11 @@ h4.subgroup {
 .mech-cell:last-child { border-right: 0; }
 .mech-cell.mech-label { justify-content: flex-start; text-align: left; column-gap: 5px; }
 /* the header row a shade darker than the table, to stand out from it (owner 2026-10-28) */
-.mech-head > .mech-cell {
+/* its names centred, always, as every table head of the site (owner 2026-11-22: "всегда выравниваем по центру названия
+   заголовков в таблицах"); the rows under it keep their own alignment */
+.mech-head > .mech-cell, .mech-head > .mech-cell.mech-label, .mech-abils.pip-table .mech-head > .mech-cell {
+  justify-content: center;
+  text-align: center;
   color: var(--text-dim, #969289);
   font-size: 12px;
   padding-top: 3px;
