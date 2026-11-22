@@ -211,7 +211,7 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
   font-size: 10.5px; font-weight: 600; line-height: 1.2; }
 .ts-table thead th img { display: block; margin: 0 auto 3px; width: 16px; height: 16px; }
 .ts-table thead th span { display: block; white-space: nowrap; }
-.ts-table tbody tr:hover td { background: rgba(227, 196, 106, 0.05); }
+.ts-table tbody tr:hover td { background: rgba(227, 196, 106, 0.08); }   /* as Neutral Stats (2026-11-22) */
 /* a clicked row: the gold frame round the whole row, like every table page (.mr-row-selected); click again to clear */
 .ts-table tbody tr { cursor: pointer; }
 .ts-table tbody tr.ts-row-selected > td {

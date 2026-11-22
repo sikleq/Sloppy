@@ -97,7 +97,8 @@ def test_both_pages_have_the_two_floor_header_of_hero_stats():
     assert "tbl-card" not in head
     assert ip._table("x", ["Item"], []).startswith('<table class="mr-table hs-table ipot-table x"><thead><tr class="col-row">')
     aoe = (ROOT / "builders" / "aoe_increase.py").read_text(encoding="utf-8")
-    assert 'hs-name aoe-name sortable th-tall" data-col="name" rowspan="2">' in aoe and ">Abilities</th>" in aoe
+    # the hero's head via the shared builders/mr_table.py: sortable, both floors
+    assert '_mt.th("Hero"' in aoe and "sortable=True, tall=True" in aoe and ">Abilities</th>" in aoe
     css = read_css()
     assert ".tbl-card" not in css
     assert ".mr-table.aoe-table thead tr.cat-row th.cat-head { box-shadow: inset 0 -1px 0 var(--line-soft); }" in css

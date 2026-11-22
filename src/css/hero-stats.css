@@ -97,7 +97,7 @@
 .mr-table.hs-table thead tr.cat-row th.cat-head:first-child {
   z-index: 53;
 }
-.mr-table.hs-table tbody tr:hover td.hs-name { background: #21201e; }
+.mr-table.hs-table tbody tr:hover td.hs-name { background: #1d1c1a; }   /* opaque, as Neutral Stats' sticky cell */
 /* Selected-row gold frame on the STICKY Hero cell.
    The generic `.mr-row-selected > td(:first-child)` frame is an inset box-shadow,
    and Chromium renders box-shadow OFFSET on `position:sticky` cells (the same

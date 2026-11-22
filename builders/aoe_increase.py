@@ -37,6 +37,7 @@ _sys.path.insert(0, str(_HERE))
 _sys.path.insert(0, str(_HERE / "builders"))
 
 import patch.site_common as _site
+import mr_table as _mt
 from patch.kv import hero_ability_blocks, parse_kv
 from patch.known_exceptions import KNOWN_INNATE_NO_CDN_ICON
 from heroes_stats import (
@@ -698,8 +699,8 @@ def render_html() -> str:
 
     # ---- header ---- (Hero column is the only sortable one)
     # the hero's head takes both floors of the header, its name in the middle (owner 2026-11-21)
-    hero_th = ('<th class="mr-th hs-th hs-name aoe-name sortable th-tall" data-col="name" rowspan="2">'
-               '<span class="th-label">Hero</span><span class="sort-ind"></span></th>')
+    hero_th = _mt.th("Hero", cls=("mr-th", "hs-th", "hs-name", "aoe-name"), sortable=True, tall=True,
+                     attrs=' data-col="name"')
     head = []
     for i in range(min(max_slots, 6)):              # Innate, #1-#4, one "Other"
         # Slot 0 = Innate; everything after restarts at #1.
@@ -713,15 +714,9 @@ def render_html() -> str:
     body = []
     for hero, slug, abilities in rows:
         name = _display_name(hero, names)
-        icon = (f'<img class="mr-ico hs-ico" src="icons/heroes/{slug}.png" '
-                f'alt="" loading="lazy" width="256" height="144">'
-                if (_HERE / "icons" / "heroes" / f"{slug}.png").exists()
-                else '<span class="mr-ico mr-ico-blank"></span>')
-        cells = [
-            f'<td class="mr-name hs-name aoe-name" data-sort="{_esc(name)}">'
-            f'{icon}<span class="mr-name-body">'
-            f'<span class="mr-name-text">{_esc(name)}</span></span></td>'
-        ]
+        src = f"icons/heroes/{slug}.png"
+        icon = _mt.icon(src if (_HERE / src).exists() else None, width=256, height=144, cls="hs-ico")
+        cells = [_mt.name_cell(name, icon, cls="aoe-name", sort_key=name)]   # the shared cell (builders/mr_table.py)
         for i in range(max_slots):
             ab = abilities[i] if i < len(abilities) else None
             if ab is None:

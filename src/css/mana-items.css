@@ -122,7 +122,7 @@
   text-align: center;
   color: var(--text-main);
 }
-.mr-table tbody tr:hover { background: rgba(54, 53, 50, 0.3); }
+.mr-table tbody tr:hover { background: rgba(227, 196, 106, 0.08); }   /* as Neutral Stats, the reference (2026-11-22) */
 /* Item-name cell: icon stays in a fixed-width left column so every icon
    lines up vertically. Name + dropdown arrow share the right region as
    an inline flex group — the arrow sits flush against the name so it

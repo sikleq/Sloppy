@@ -170,6 +170,10 @@ Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы ме
 - Ячейка имени одна для героя и предмета: `td.mr-name.hs-name` + `img.mr-ico` + `.mr-name-body > .mr-name-text`;
   иконка растёт при наведении. Значок способности — `abil-ico-hint` с подсказкой сайта, не `title` браузера.
 - «Было → стало» — одна клетка; новое значение пунктиром, при наведении его % (`.ench-tiers.ench-change`).
+- Общая деталь генератора — `builders/mr_table.py`: `th` (сортируемый со значком, `tall` на два этажа),
+  `group_th`, `thead` (один или два этажа), `table`, `icon`, `name_cell`. Новая таблица Materials строится ею.
+- Подсветка строки при наведении — как Neutral Stats: `rgba(227,196,106,.08)` на `tr`; липкая ячейка — непрозрачная
+  `#1d1c1a` (2026-11-22, было серое у `.mr-table`).
 - Подсветка строки и столбца при наведении (`tooltips.js`, с учётом rowspan): ячейке не задавать `background:`
   целиком — он стирает затемнение.
 - Выделение строки кликом — золотая рамка 2px вокруг всей группы строк одного имени (`mr-sel-top/mid/bottom`,
@@ -191,8 +195,8 @@ Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы ме
 - Горизонтальные линии: у Item Potency, Dormant Curio, AoE нижняя линия ячейки `td` = 0px, у остальных 1px —
   проверить на глаз, есть ли там линия между строками.
 - AoE на телефоне: липкая шапка с `top: 158px`, остальные Materials — `top: 0` своего прокручиваемого блока.
-- Подсветка строки при наведении: Neutral Stats — тёплое золото `rgba(227,196,106,.08)` на `tr`, `.mr-table`
-  (Mana Items, Hero Stats, Item Potency, AoE) — серое `rgba(54,53,50,.3)`; по эталону должно стать как в Neutral Stats.
+- Hero Stats и Mana Items строят шапку и ячейку имени ещё сами (у Hero Stats имя — ссылка, у Mana Items своя
+  ячейка); перевести на `builders/mr_table.py`, когда их будут трогать.
 - Terrain Stats: без сортировки и отступ 12px от блока над таблицей.
 
 ## Regen columns in stats tables

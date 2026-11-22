@@ -32,6 +32,7 @@ from patch.item_ability_text import _clean, _fill, _items, _values  # noqa: E402
 from patch.item_marks import _flagged, _sentences  # noqa: E402
 from patch.images import abil_img  # noqa: E402
 from patch.loc_history import tooltip  # noqa: E402
+import mr_table as _mt  # noqa: E402
 from heroes_stats import _display_name, _latest_href, _load_display_names, _versions  # noqa: E402
 
 _esc = lambda s: _html.escape(str(s), quote=True)
@@ -114,51 +115,40 @@ def _section(title, table):
 _TEXT_HEADS = {"Ability", "Value", "Attacks", "Illusions"}      # word columns: their heads left, as their cells
 
 
-def _th(h, i, extra=(), attrs=""):
+def _th(h, i, extra=(), tall=False):
     """The first column — the item's or the ability's name — sorts by name, with the site's sort mark, as AoE Increase's
     Hero (owner 2026-11-22: "в одной вкладке нажимаются и сортируются … в другой нет"); the others do not: one column
     holds values of different kinds (chance, armor, mana)."""
-    classes = [c for c in ("ipot-th-text" if h in _TEXT_HEADS and i else "", "ipot-th-ab" if h == "Ability" and i else "",
-                           "sortable" if i == 0 else "", *extra) if c]
-    cls = f' class="{" ".join(classes)}"' if classes else ""
-    label = f'<span class="th-label">{h}</span><span class="sort-ind"></span>' if i == 0 else h
-    return f'<th{cls}{attrs}>{label}</th>'
+    cls = ("ipot-th-text" if h in _TEXT_HEADS and i else "", "ipot-th-ab" if h == "Ability" and i else "", *extra)
+    return _mt.th(h, cls=cls, sortable=i == 0, tall=tall)
 
 
 def _table(cls, head, rows, groups=()):
     """`groups`: (label, columns) for a row of groups over the columns — the two-floor header of Hero Stats and Neutral
     Stats (owner 2026-11-21 chose variant 1 of the header mock: one system for the site's tables). A column with no
     group ("" label) takes both floors, its name in the middle ("hero можно в центр ячейке поставить"); the first
-    column of "Illusions" starts the illusions' 2px line, in both floors."""
+    column of "Illusions" starts the illusions' 2px line, in both floors. Built by the shared builders/mr_table.py."""
     if not groups:
-        th = "".join(_th(h, i) for i, h in enumerate(head))
-        return (f'<table class="mr-table hs-table ipot-table {cls}"><thead><tr class="col-row">{th}</tr></thead>'
-                f'<tbody>{"".join(rows)}</tbody></table>')
+        return _mt.table(f"ipot-table {cls}", _mt.thead([_th(h, i) for i, h in enumerate(head)]), rows)
     top, low, i = [], [], 0
     for label, n in groups:
         ill = ("ipot-ill-first",) if label == "Illusions" else ()
         if not label:
-            top += [_th(head[k], k, ("th-tall",), ' rowspan="2"') for k in range(i, i + n)]
+            top += [_th(head[k], k, tall=True) for k in range(i, i + n)]
         else:
-            top.append(f'<th class="{" ".join(("cat-head",) + ill)}" colspan="{n}">{label}</th>')
+            top.append(_mt.group_th(label, n, cls=ill))
             low += [_th(head[k], k, ill if k == i else ()) for k in range(i, i + n)]
         i += n
-    return (f'<table class="mr-table hs-table ipot-table {cls}"><thead><tr class="cat-row">{"".join(top)}</tr>'
-            f'<tr class="col-row">{"".join(low)}</tr></thead><tbody>{"".join(rows)}</tbody></table>')
+    return _mt.table(f"ipot-table {cls}", _mt.thead(top, low), rows)
 
 
 def _name_cell(name, icon, owner="", span=1, wide=True):
     w, h = (44, 32) if wide else (32, 32)
-    rs = f' rowspan="{span}"' if span > 1 else ''
     who = f'<span class="ipot-owner">{_esc(owner)}</span>' if owner else ''
-    # no file, no picture: a broken image showed its file name (design review 2026-11-19)
-    sq = '' if wide else ' ipot-ico-sq'
-    img = (f'<img class="mr-ico{sq}" src="{icon}" alt="" loading="lazy" width="{w}" height="{h}">'
-           if icon and (_HERE / icon).exists() else '<span class="mr-ico mr-ico-blank"></span>')
-    # the cell of AoE Increase's hero and Hero Stats' (owner 2026-11-21: "достичь единого формата в обеих вкладках"),
-    # so its icon grows on hover as on Mana Items
-    return (f'<td class="mr-name hs-name ipot-name"{rs} data-sort="{_esc(name.lower())}">{img}<span class="mr-name-body">'
-            f'<span class="mr-name-text">{_esc(name)}</span>{who}</span></td>')
+    img = _mt.icon(icon if icon and (_HERE / icon).exists() else None, width=w, height=h,
+                   cls="" if wide else "ipot-ico-sq")
+    # the cell of AoE Increase's hero and Hero Stats' (owner 2026-11-21: "достичь единого формата в обеих вкладках")
+    return _mt.name_cell(name, img, cls="ipot-name", span=span, after=who)
 
 
 def _chip(text):
