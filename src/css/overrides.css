@@ -412,7 +412,8 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .camp-jungle .camp-ref .camp-ref-name { align-self: stretch; display: flex; align-items: center; padding: 3px 10px;
   border-left: 1px solid rgba(213, 207, 195, 0.15); }
 /* the camp's name after its glyph column reads left, like a label */
-.mech-abils.camp-changes .mech-abil-row > .mech-cell:nth-child(2) { justify-content: flex-start; text-align: left; }
+.mech-abils.camp-changes .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(2) { justify-content: flex-start;
+  text-align: left; }
 /* 7.42 camps changed / removed (mech_table cls="camp-changes"): Camp / Before / Now across the block like the site's
    other tables (owner 2026-11-19: "все другие у нас по ширине"); a removed camp's portraits grey as a removed entity's
    icon (.entity-block.is-removed), not a red mark */
