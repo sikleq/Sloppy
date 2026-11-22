@@ -88,6 +88,23 @@ def _crop(full, rect, cx, cy, r, half):
     return full.crop(box).resize((half, half), Image.LANCZOS)
 
 
+def only_within(groups, circles):
+    """The changes inside any of the entry's `within` circles ([x, y, r] world units); a moved one counts if either end
+    is inside. Several notes about one area (7.42 mid: trees where the mid lanes meet, by the Radiant Tier 1, by the
+    Dire Tier 1) each outline their own objects, not all the changes the crop shows (owner 2026-11-22). No circles:
+    every change."""
+    if not circles:
+        return groups
+
+    def inside(p):
+        return any((p[0] - x) ** 2 + (p[1] - y) ** 2 <= rr * rr for x, y, rr in circles)
+    out = {}
+    for key, g in groups.items():
+        out[key] = {kind: [m for m in pts if (inside(m[0]) or inside(m[1]) if kind == "moved" else inside(m))]
+                    for kind, pts in g.items()}
+    return out
+
+
 def _outlines(img, cx, cy, r, groups, side, keys, half, width):
     """Draw one side's outlines of the given keys: old side = removed + moved (where it stood), new side = added +
     moved (where it stands); trees and camps as squares, the round entity markers as circles. Everything on the old
@@ -560,7 +577,8 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=T
             removed, added = diff.get("_cliffs", ([], []))
             _cliff_layer(img, cx, cy, r, removed if side == "old" else added, half,
                          COLOUR["removed" if side == "old" else "added"])
-        _outlines(img, cx, cy, r, groups, side, keys, half, width)
+        _outlines(img, cx, cy, r, only_within(groups, entry.get("within") if own else None), side, keys, half,
+                  width)
         ys = _marks(img, cx, cy, r, ver, entry.get("mark", []) if own else [], half, width,
                     entry.get("mark_kind", "camps"))
         _tiers(img, entry.get("tiers", {}).get(side) if own else None, half, ys)

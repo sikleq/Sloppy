@@ -1853,33 +1853,36 @@
       "match": "Added some trees to the sides of Mid lane",
       "spots": [
         [
-          -621,
-          -644
+          -350,
+          -350
         ]
       ],
-      "r": 2600,
+      "r": 1900,
+      "within": [[-1300, -100, 650], [200, -1300, 750], [-320, 900, 300], [700, -500, 350]],
       "phrase": "some trees"
     },
     {
       "match": "Added more trees to the north of Radiant Tier",
       "spots": [
         [
-          -1053,
-          -1091
+          -1450,
+          -1100
         ]
       ],
-      "r": 2584,
+      "r": 1400,
+      "within": [[-1234, -1232, 900], [-1900, -950, 500]],
       "phrase": "trees"
     },
     {
       "match": "Cleaned up the trees by Dire Mid Tier 1",
       "spots": [
         [
-          -478,
-          -347
+          650,
+          1150
         ]
       ],
-      "r": 2600,
+      "r": 1100,
+      "within": [[680, 1250, 450]],
       "phrase": "trees"
     },
     {
