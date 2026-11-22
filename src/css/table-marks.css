@@ -128,7 +128,8 @@
   vertical-align: middle;
 }
 .creeps-table th.sortable .sort-ind,
-.mr-table thead th.sortable .sort-ind {
+.mr-table thead th.sortable .sort-ind,
+.ts-table thead th.sortable .sort-ind {
   margin-left: 4px;
   display: inline-block;
   vertical-align: middle;
@@ -145,26 +146,33 @@
   mask: url('icons/sort/sort.png') center / contain no-repeat;
 }
 .creeps-table th.sortable .sort-ind::after,
-.mr-table thead th.sortable .sort-ind::after { content: none; }
+.mr-table thead th.sortable .sort-ind::after,
+.ts-table thead th.sortable .sort-ind::after { content: none; }
 .creeps-table th.sort-desc .sort-ind,
 .creeps-table th.sort-asc .sort-ind,
 .mr-table thead th.sort-desc .sort-ind,
-.mr-table thead th.sort-asc .sort-ind {
+.mr-table thead th.sort-asc .sort-ind,
+.ts-table thead th.sort-desc .sort-ind,
+.ts-table thead th.sort-asc .sort-ind {
   background-color: var(--gold);
 }
 .creeps-table th.sort-desc .th-label,
 .creeps-table th.sort-asc .th-label,
 .mr-table thead th.sort-desc .th-label,
-.mr-table thead th.sort-asc .th-label {
+.mr-table thead th.sort-asc .th-label,
+.ts-table thead th.sort-desc .th-label,
+.ts-table thead th.sort-asc .th-label {
   color: var(--gold);
 }
 .creeps-table th.sort-desc .sort-ind,
-.mr-table thead th.sort-desc .sort-ind {
+.mr-table thead th.sort-desc .sort-ind,
+.ts-table thead th.sort-desc .sort-ind {
   -webkit-mask-image: url('icons/sort/sort-down.png');
   mask-image: url('icons/sort/sort-down.png');
 }
 .creeps-table th.sort-asc .sort-ind,
-.mr-table thead th.sort-asc .sort-ind {
+.mr-table thead th.sort-asc .sort-ind,
+.ts-table thead th.sort-asc .sort-ind {
   -webkit-mask-image: url('icons/sort/sort-up.png');
   mask-image: url('icons/sort/sort-up.png');
 }
@@ -343,7 +351,7 @@
 }
 .creeps-table tbody td {
   padding: 5px 8px;
-  border-bottom: 1px solid rgba(150, 146, 137, 0.12);
+  border-bottom: 1px solid var(--tbl-row-line);
   /* Single-line cells: every value is short (numbers, %, "Ближняя (100)",
      ability dnames like "Envenomed Weapon"). nowrap lets table-layout:
      auto size each column to the widest single-line content, so the

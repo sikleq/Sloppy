@@ -41,8 +41,8 @@ def thead(top: list[str], low: list[str] | None = None) -> str:
     return f'<thead><tr class="cat-row">{"".join(top)}</tr><tr class="col-row">{"".join(low)}</tr></thead>'
 
 
-def table(cls: str, head: str, rows: list[str]) -> str:
-    return f'<table class="mr-table hs-table {cls}">{head}<tbody>{"".join(rows)}</tbody></table>'
+def table(cls: str, head: str, rows: list[str], attrs: str = "") -> str:
+    return f'<table class="mr-table hs-table {cls}"{attrs}>{head}<tbody>{"".join(rows)}</tbody></table>'
 
 
 def icon(src: str | None, *, width: int, height: int, cls: str = "") -> str:
@@ -89,12 +89,12 @@ def name_text(name: str, href: str | None = None, cls: str = "mr-name-text") -> 
 
 
 def name_cell(name: str, img: str, *, cls: str = "", span: int = 1, sort_key: str | None = None,
-              after: str = "", href: str | None = None) -> str:
+              after: str = "", href: str | None = None, attrs: str = "") -> str:
     """The name cell of every table: picture, then the name (and `after`, e.g. the owner of an item's ability). Its
     icon grows on hover (`.mr-ico:hover`); `span` > 1 for an item of several rows — they sort and select together.
     `href`: the name links to its own page."""
     extra = f" {cls}" if cls else ""
     rs = f' rowspan="{span}"' if span > 1 else ""
     key = _esc(sort_key if sort_key is not None else name.lower())
-    return (f'<td class="mr-name hs-name{extra}"{rs} data-sort="{key}">{img}<span class="mr-name-body">'
+    return (f'<td class="mr-name hs-name{extra}"{rs}{attrs} data-sort="{key}">{img}<span class="mr-name-body">'
             f'{name_text(name, href)}{after}</span></td>')

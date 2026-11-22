@@ -220,17 +220,24 @@ def _cell(f, prev, key):
     v = f["n"].get(key)
     change = _change(f, prev, key)
     count = "" if v is None else str(v)
+    # the count to sort by: the cell's text also holds its change ("2107" + "4 moved" read as 21074)
+    key = f' data-sort="{count}"' if count else ""
     if not change:
-        return f"<td>{count}</td>"
-    return f'<td class="ts-changed">{count}<span class="ts-delta">{change}</span></td>'
+        return f"<td{key}>{count}</td>"
+    return f'<td class="ts-changed"{key}>{count}<span class="ts-delta">{change}</span></td>'
 
 
 def table_html(files, pages):
-    head = ('<th class="ts-file"><span>Map version</span></th><th><span>Date</span></th>'
-            + "".join(f'<th>{_icon(icon)}<span>{_esc(label)}</span></th>' for _k, label, icon in COLUMNS)
+    # every column sorts, with the site's mark (owner 2026-11-22: the rules of Neutral Stats on every table); the
+    # version by its place in time, the date by its day
+    mark = '<span class="sort-ind"></span>'
+    head = (f'<th class="ts-file sortable"><span class="th-label">Map version</span>{mark}</th>'
+            f'<th class="sortable"><span class="th-label">Date</span>{mark}</th>'
+            + "".join(f'<th class="sortable">{_icon(icon)}<span class="th-label">{_esc(label)}</span>{mark}</th>'
+                      for _k, label, icon in COLUMNS)
             + '<th><span>Map</span></th>')
     rows, prev = [], None
-    for f in group(files):
+    for order, f in enumerate(group(files)):
         ver = f["patch"]
         link = (f'<a href="{terrain_index._terrain_filename(ver)}">{_esc(ver)}</a>' if ver in pages else _esc(ver))
         # the versions it covers as a range, first – last (the owner: "7.35 – 7.37e is easier than listing them")
@@ -239,7 +246,9 @@ def table_html(files, pages):
         thumb = (f'<a class="ts-thumb" href="{OG_PAGES}{_esc(ver)}/map.webp" aria-label="The {_esc(ver)} map">'
                  f'<img src="icons/maps/thumbs/{_esc(f["sha8"])}.webp" alt="" width="28" height="28" loading="lazy" '
                  f'decoding="async"></a>')
-        rows.append(f'<tr><td class="ts-file">{link}{also}</td><td class="ts-date">{short_date(f["date"])}</td>'
+        day = (f["date"] or "").replace("-", "")
+        rows.append(f'<tr><td class="ts-file" data-sort="{order}">{link}{also}</td>'
+                    f'<td class="ts-date" data-sort="{day}">{short_date(f["date"])}</td>'
                     f'{cells}<td>{thumb}</td></tr>')
         prev = f["n"]
     return ('<div class="ts-table-wrap"><table class="ts-table"><thead><tr>' + head + '</tr></thead><tbody>'

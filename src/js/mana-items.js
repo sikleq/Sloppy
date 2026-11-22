@@ -4,7 +4,8 @@
 // collapse / ability merging — the table is flat, so the existing creeps
 // sort would over-engineer it.
 (function() {
-  const tables = document.querySelectorAll('.mr-table');
+  // every Materials table sorts with this one (owner 2026-11-22: Terrain Stats had no sorting)
+  const tables = document.querySelectorAll('.mr-table, .ts-table');
   tables.forEach(table => {
     const tbody = table.querySelector('tbody');
     const headers = [...table.querySelectorAll('thead th.sortable')];

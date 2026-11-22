@@ -201,11 +201,11 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 @media (max-width: 760px) {
   .terrain-stats-page .ts-wrap { display: contents; }
   .terrain-stats-page .ts-wrap > :not(.ts-table-wrap) { position: sticky; left: 0; }
-  .terrain-stats-page .ts-table-wrap { padding: 4px 0 40px; }
+  .terrain-stats-page .ts-table-wrap { padding: 0 0 40px; }   /* a section title 8px over its table, as everywhere */
 }
 .ts-table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
 .ts-table th, .ts-table td { padding: 5px 4px; text-align: center; vertical-align: middle;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07); border-right: 1px solid rgba(255, 255, 255, 0.04); }
+  border-bottom: 1px solid var(--tbl-row-line); border-right: 1px solid var(--tbl-col-line); }
 .ts-table th:last-child, .ts-table td:last-child { border-right: 0; }
 .ts-table thead th { position: sticky; top: 0; z-index: 1; background: #17140f; color: var(--text-dim);
   font-size: 10.5px; font-weight: 600; line-height: 1.2; }

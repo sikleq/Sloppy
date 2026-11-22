@@ -14,6 +14,9 @@
   background: var(--bg-panel);
   box-shadow: 0 1px 0 var(--line);
 }
+/* a phone: the toolbar wraps to ~160px — pinned, it took a fifth of the screen above the table's head. It scrolls
+   away there, as on every other table tab, and the head pins at the top (aoe-increase.js reads the position) */
+@media (max-width: 760px) { .aoe-toolbar.inbox-bar { position: static; } }
 
 /* Item filter buttons reuse the .hs-attr-filter shell but are rectangular so
    the (wide) item icon fills its box rather than being cropped to a circle. */
@@ -67,9 +70,9 @@
   position: relative;
   vertical-align: middle;
   padding: 6px 10px;
-  border-left: 1px solid rgba(213, 207, 195, 0.12);
+  border-left: 1px solid var(--tbl-col-line);
   border-bottom: none;
-  box-shadow: inset 0 -1px 0 rgba(54, 53, 50, 0.5);
+  box-shadow: inset 0 -1px 0 var(--tbl-row-line);
   white-space: normal;
   /* icons hug the left edge so they line up vertically (centred was tried 2026-11-21: "ужасно смотрятся") */
   text-align: left;
@@ -145,7 +148,7 @@ table.mr-table.ipot-table td.ipot-name .mr-name-body { vertical-align: middle; }
   border-bottom: none;
   background: var(--bg-panel-2);
   box-shadow:
-    inset 0 -1px 0 rgba(54, 53, 50, 0.5),
+    inset 0 -1px 0 var(--tbl-row-line),
     inset 0 0 0 9999px var(--bg-panel-2);
 }
 /* Row-selection gold frame: Chromium renders box-shadow OFFSET incorrectly on
@@ -325,7 +328,7 @@ table.mr-table.ipot-table td.ipot-name, table.mr-table.ipot-table thead tr:first
 /* every column's line drawn by its class, not by :first-child — after an item's name spanning its rows (rowspan) the
    next row starts with the ability or the value, and the site's "first cell: no left line" rule cut the line there
    (owner 2026-11-21, Parasma: "линия вертикальная не до конца, уже были такие проблемы") */
-table.mr-table.ipot-table td:not(.ipot-name) { border-left: 1px solid rgba(213, 207, 195, 0.12); }
+table.mr-table.ipot-table td:not(.ipot-name) { border-left: 1px solid var(--tbl-col-line); }
 table.mr-table.ipot-table td.ipot-ill-first, table.mr-table.ipot-table .ipot-ill-first {
   border-left: 2px solid var(--line-soft); }
 /* the lower tables: the potency column as narrow as its chip */
@@ -361,7 +364,7 @@ table.mr-table.ipot-table thead tr.cat-row th.th-tall,
    сделаны"): 1px between all heads of both floors; only the illusions' line is 2px, from the top of the header down */
 table.mr-table.ipot-table thead tr.cat-row th + th, table.mr-table.ipot-table thead tr.cat-row + tr.col-row th,
 .mr-table.aoe-table thead tr.cat-row th + th, .mr-table.aoe-table thead tr.cat-row + tr.col-row th {
-  border-left: 1px solid rgba(213, 207, 195, 0.12); }
+  border-left: 1px solid var(--tbl-col-line); }
 table.mr-table.ipot-table thead tr.cat-row th + th.ipot-ill-first,
 table.mr-table.ipot-table thead tr.cat-row + tr.col-row th.ipot-ill-first { border-left: 2px solid var(--line-soft); }
 /* an ability's square icon in the items' 36 px slot, the hero's name under the ability's */

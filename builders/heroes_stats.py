@@ -46,6 +46,8 @@ _HERE = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_HERE))
 
 import patch.site_common as _site
+_sys.path.insert(0, str(_HERE / "builders"))
+import mr_table as _mt  # noqa: E402  (the shared table part: heads, name cell, links)
 from patch.html_util import strip_tags      # noqa: E402
 
 STATS_DIR = _HERE / "data" / "stats"
@@ -1489,8 +1491,7 @@ def render_html() -> str:
 
     # ---- header ----
     head = [
-        '<th class="mr-th hs-th hs-name sortable" data-col="name" data-cat="basic">'
-        '<span class="th-label">Hero</span><span class="sort-ind"></span></th>',
+        _mt.th("Hero", cls=("mr-th", "hs-th", "hs-name"), sortable=True, attrs=' data-col="name" data-cat="basic"'),
         f'<th class="mr-th hs-th hs-col-attr sortable has-history" data-col="attr" data-cat="basic"{_attr_hist("attr")}>'
         '<span class="th-label">Attr</span><span class="sort-ind"></span></th>',
     ]
@@ -1524,17 +1525,13 @@ def render_html() -> str:
         name = _display_name(hero, names)
         has_stat_innate = _has_stat_innate(slug, latest)
         attack_type = _attack_type(latest, hero, raw)
-        icon = (f'<img class="mr-ico hs-ico" src="icons/heroes/{slug}.png" '
-                f'alt="" loading="lazy" width="256" height="144">'
-                if (_HERE / "icons" / "heroes" / f"{slug}.png").exists()
-                else '<span class="mr-ico mr-ico-blank"></span>')
-        cells = [
-            f'<td class="mr-name hs-name" data-cat="basic" data-sort="{_esc(name)}">'
-            f'{icon}<span class="mr-name-body">'
-            f'<a class="mr-name-text ec-name-link" href="heroes/{_changes_slug(name)}.html">{_esc(name)}</a>'
-            f'<img class="hs-innate-mini{" is-hidden" if not has_stat_innate else ""}" src="icons/misc/innate_icon.png" alt="" '
-            f'loading="lazy" aria-hidden="true"></span></td>'
-        ]
+        src = f"icons/heroes/{slug}.png"
+        icon = _mt.icon(src if (_HERE / src).exists() else None, width=256, height=144, cls="hs-ico")
+        innate = (f'<img class="hs-innate-mini{" is-hidden" if not has_stat_innate else ""}" '
+                  f'src="icons/misc/innate_icon.png" alt="" loading="lazy" aria-hidden="true">')
+        # the shared name cell (builders/mr_table.py), its name a link to the hero's page
+        cells = [_mt.name_cell(name, icon, sort_key=name, href=f"heroes/{_changes_slug(name)}.html", after=innate,
+                               attrs=' data-cat="basic"')]
         meta = _attr_of(cur, hero) or ("uni", "Universal", "universal.webp", 3)
         ah = _attr_history(snaps, versions, dates, hero)
         attr_attrs = (f' class="hs-attr-cell has-history" data-hist="{_esc(ah)}"'
@@ -1591,11 +1588,7 @@ def render_html() -> str:
         # data-patch lets scripts.js gate per-patch innate formulas (e.g.
         # Medusa's Mana Shield damage_per_mana: 2.4 @ 7.37 → 2.2 @ 7.38 →
         # 2.0 @ 7.39e → 2+0.1·level @ 7.41a+; values from KV files).
-        f'<table class="mr-table hs-table sortable-table" data-patch="{_CTX_VERSION[0]}">'
-        f'<thead><tr class="cat-row">{cat_row}</tr>'
-        f'<tr class="col-row">{thead}</tr></thead>'
-        f'<tbody>{"".join(body)}</tbody>'
-        '</table>'
+        _mt.table("sortable-table", _mt.thead([cat_row], [thead]), body, attrs=f' data-patch="{_CTX_VERSION[0]}"')
     )
 
     blurb = ''                     # page descriptions removed 2026-09-25 (user)

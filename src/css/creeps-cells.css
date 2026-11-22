@@ -11,7 +11,7 @@
    Abilities). The heavier col-sep dividers (set on category starts) stay
    visible over this lighter base. */
 .creeps-table th,
-.creeps-table td { border-left: 1px solid rgba(213, 207, 195, 0.12); }
+.creeps-table td { border-left: 1px solid var(--tbl-col-line); }
 .creeps-table th:first-child,
 .creeps-table td:first-child { border-left: none; }
 /* Unit Abilities page table — reuses .creeps-table sticky/scroll machinery. */

@@ -809,15 +809,10 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
     # Server-side default sort lives on "regen" (descending). Mark that
     # header with `sort-desc` so the indicator already reflects the visual
     # order on first paint, before any click handlers run.
-    thead = ''.join(
-        f'<th class="mr-th mr-col-{k} sortable'
-        f'{" sort-desc" if k == "regen" else ""}" '
-        f'data-col="{k}"'
-        f'{f" data-direction={dr}" if dr else ""}>'
-        f'<span class="th-label">{label}</span>'
-        f'<span class="sort-ind"></span></th>'
-        for k, label, dr in head_cells
-    )
+    # the shared head cell (builders/mr_table.py): every column sorts here, each holds one kind of value
+    thead = [_mt.th(label, cls=("mr-th", f"mr-col-{k}", "sort-desc" if k == "regen" else ""), sortable=True,
+                    attrs=f' data-col="{k}"' + (f' data-direction={dr}' if dr else ''))
+             for k, label, dr in head_cells]
 
     body_rows = []
     for r in rows:
@@ -859,7 +854,7 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
 
     table = (
         '<table class="mr-table sortable-table">'
-        f'<thead><tr>{thead}</tr></thead>'
+        f'{_mt.thead(thead)}'
         f'<tbody>{"".join(body_rows)}</tbody>'
         '</table>'
     )

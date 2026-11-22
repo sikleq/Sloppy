@@ -47,7 +47,7 @@
 .mr-table tbody td {
   /* Faint vertical separator on the left edge — matches Neutral Creeps /
      Unit Abilities table convention. Skipped on the first column below. */
-  border-left: 1px solid rgba(213, 207, 195, 0.12);
+  border-left: 1px solid var(--tbl-col-line);
 }
 .mr-table thead th:first-child,
 .mr-table tbody td:first-child {
@@ -105,7 +105,7 @@
 /* OPAQUE hover background — a translucent one let table rows scrolling
    beneath the sticky header bleed through. This is the var(--bg-panel-3) base blended
    with the old rgba(48,54,61,0.5) tint, fully opaque. */
-.mr-table thead th.sortable:hover { background: #292825; }
+.mr-table thead th.sortable:hover, .ts-table thead th.sortable:hover { background: #292825; cursor: pointer; }
 /* Sort indicator — identical glyph + dim/active logic to the creeps-table
    convention: ↕ (neutral, dim), ↓ (desc, active), ↑ (asc, active). */
 /* (sort-ind centering is defined once in the shared rule above.) */
@@ -118,7 +118,7 @@
 /* sort-ind look (mask + colour) is defined once in the shared rule above. */
 .mr-table tbody td {
   padding: 6px 10px;
-  border-bottom: 1px solid rgba(54, 53, 50, 0.5);
+  border-bottom: 1px solid var(--tbl-row-line);
   text-align: center;
   color: var(--text-main);
 }

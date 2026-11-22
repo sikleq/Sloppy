@@ -198,7 +198,9 @@
   if (toolbar) {
     const catRow = table.querySelector('thead tr.cat-row');
     const offsetHead = () => {
-      const h = Math.round(toolbar.getBoundingClientRect().height);
+      // not pinned (a phone, aoe-increase.css): nothing above the head
+      const pinned = getComputedStyle(toolbar).position === 'sticky';
+      const h = pinned ? Math.round(toolbar.getBoundingClientRect().height) : 0;
       // two floors: the groups under the toolbar, the columns under the groups. No 2px pull-up: the hero's head spans
       // both floors and its gold line would sit 2px below the columns' (floor() alone leaves no seam)
       const cat = catRow ? Math.floor(catRow.getBoundingClientRect().height) : 0;

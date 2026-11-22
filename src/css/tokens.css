@@ -3,6 +3,11 @@
    ========================================================================== */
 
 :root {
+  /* Table lines, the same on every table (owner 2026-11-22: Neutral Stats is the reference): between columns and
+     between rows. Use these, never a hex of your own (Mana Items / Hero Stats / Item Potency / AoE / Terrain Stats
+     each had their own shade). The one 2px line (a boundary with a meaning, Item Potency's illusions) is --line-soft. */
+  --tbl-col-line: rgba(213, 207, 195, 0.12);
+  --tbl-row-line: rgba(150, 146, 137, 0.12);
   /* Site attribute palette (the Hero Changes column titles): attribute names and labels
      everywhere use these — not the harsher in-game hexes. Universal is purple. */
   --attr-str: #d9534f;

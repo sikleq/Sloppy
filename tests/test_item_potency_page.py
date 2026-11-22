@@ -104,7 +104,7 @@ def test_both_pages_have_the_two_floor_header_of_hero_stats():
     assert ".mr-table.aoe-table thead tr.cat-row th.cat-head { box-shadow: inset 0 -1px 0 var(--line-soft); }" in css
     # one strength of line in both floors and the body (owner 2026-11-21: "где-то чуть тоньше, где-то толще")
     assert ".mr-table.aoe-table thead tr.cat-row th + th, .mr-table.aoe-table thead tr.cat-row + tr.col-row th {\n" \
-           "  border-left: 1px solid rgba(213, 207, 195, 0.12); }" in css
+           "  border-left: 1px solid var(--tbl-col-line); }" in css
     assert "rgba(255, 255, 255, 0.04)" not in css.split(".mr-table.aoe-table tbody td", 1)[1][:600]
     # AoE's script freezes widths by the column row and hands them to <col>s: a fixed table reads its first row
     js = (ROOT / "src" / "js" / "aoe-increase.js").read_text(encoding="utf-8")
@@ -217,7 +217,7 @@ def test_the_heads_follow_one_rule_on_every_materials_table():
     assert head.count('class="sortable"') == 1 and '<span class="th-label">Ability</span><span class="sort-ind">' in head
     assert 'data-sort="skadi"' in ip._name_cell("Skadi", "")
     css = read_css()
-    assert ".mr-table thead th.sortable:hover { background: #292825; }" in css
+    assert ".mr-table thead th.sortable:hover, .ts-table thead th.sortable:hover { background: #292825;" in css
     assert ".mr-table thead th:hover {" not in css
     # every head centred, whatever its cells do (owner 2026-11-22: "всегда выравниваем по центру названия заголовков
     # в таблицах") — the tables' thead and the mechanic tables' head row
