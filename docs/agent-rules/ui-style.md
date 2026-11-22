@@ -136,7 +136,8 @@ Gorgon's Grasp. На телефоне таблица под текстом. Чт
 ## Таблицы — единые правила (свод владельца 2026-10-01 … 2026-11-22)
 
 Одинаково на всех таблицах сайта: Materials (Hero Stats, Neutral Stats/Abilities, Unit Abilities, Mana Items,
-Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы механик/формул на патч-страницах. Новых тестов
+Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы механик/формул на патч-страницах. **Эталон — Neutral Stats** (`neutral_stats.html`, `builders/creeps.py`,
+владелец 2026-11-22: «эталон для оформления таблиц, делай везде так, оттуда правила»). Новых тестов
 на это не заводим (владелец 2026-11-22): правило держится тем, что записано здесь и в `AGENTS.md`, и общими классами.
 Перед отчётом — один скрипт в браузере по всем страницам (заголовки, линии, зазоры), не тест.
 
@@ -171,6 +172,9 @@ Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы ме
 - «Было → стало» — одна клетка; новое значение пунктиром, при наведении его % (`.ench-tiers.ench-change`).
 - Подсветка строки и столбца при наведении (`tooltips.js`, с учётом rowspan): ячейке не задавать `background:`
   целиком — он стирает затемнение.
+- Выделение строки кликом — золотая рамка 2px вокруг всей группы строк одного имени (`mr-sel-top/mid/bottom`,
+  `mana-items.js`); ячейка с rowspan в первой строке группы получает и нижнюю линию, иначе в рамке разрыв
+  (Orb of Frost, 2026-11-22).
 - Radiant / Dire — зелёным / красным в любой таблице.
 
 **Рядом с таблицей**
@@ -187,6 +191,8 @@ Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы ме
 - Горизонтальные линии: у Item Potency, Dormant Curio, AoE нижняя линия ячейки `td` = 0px, у остальных 1px —
   проверить на глаз, есть ли там линия между строками.
 - AoE на телефоне: липкая шапка с `top: 158px`, остальные Materials — `top: 0` своего прокручиваемого блока.
+- Подсветка строки при наведении: Neutral Stats — тёплое золото `rgba(227,196,106,.08)` на `tr`, `.mr-table`
+  (Mana Items, Hero Stats, Item Potency, AoE) — серое `rgba(54,53,50,.3)`; по эталону должно стать как в Neutral Stats.
 - Terrain Stats: без сортировки и отступ 12px от блока над таблицей.
 
 ## Regen columns in stats tables
