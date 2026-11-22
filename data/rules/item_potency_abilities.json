@@ -37,6 +37,10 @@
     "Illusion Rune": "Illusions: 40%",
     "Any other illusion": "20%"
   },
+  "other_icons": {
+    "Illusion Rune": "icons/runes/illusion.png",
+    "Any other illusion": "icons/facets/illusion.png"
+  },
   "groups": {
     "own": [
       "pangolier_swashbuckle",

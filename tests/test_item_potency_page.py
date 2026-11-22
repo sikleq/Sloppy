@@ -231,3 +231,17 @@ def test_the_heads_follow_one_rule_on_every_materials_table():
     # the shared sorter moves an item's rows together (a name cell spanning N rows)
     js = (ROOT / "src" / "js" / "mana-items.js").read_text(encoding="utf-8")
     assert "c.rowSpan" in js and "blocks.forEach(g => g.forEach(r => tbody.appendChild(r)));" in js
+
+
+def test_every_row_of_the_page_has_its_icon():
+    # owner 2026-11-22 (Illusion Rune, Any other illusion: empty squares): "без иконок" — no row may fall back to the
+    # blank square; the two rows that are no ability nor item take their icons from the rules file (other_icons)
+    import pytest
+    import item_potency as ip
+    from patch import game_files
+    if not game_files.available():
+        pytest.skip("no game-files store")
+    page = ip.render_html()
+    assert "mr-ico-blank" not in page
+    for title, icon in (("Illusion Rune", "icons/runes/illusion.png"), ("Any other illusion", "icons/facets/illusion.png")):
+        assert f'<img class="mr-ico ipot-ico-sq" src="{icon}"' in page.split(f">{title}<", 1)[0][-400:]
