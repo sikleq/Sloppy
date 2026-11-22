@@ -399,7 +399,11 @@ table.mr-table.ipot-table td.ipot-no-ill { color: rgba(214, 208, 196, 0.3); }
     width: 0; min-width: 0; max-width: 0; padding: 0; border: 0; overflow: hidden; font-size: 0; }
   table.mr-table.ipot-items td { padding: 6px 5px; }
   .ipot-rules { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 78%; overflow-x: auto;
-    scroll-snap-type: x mandatory; padding-bottom: 4px; }
+    scroll-snap-type: x mandatory; padding-bottom: 4px; align-items: start; }
+  /* the cards row sat 22px + a stretched card's empty bottom above ITEMS; on a phone the other tabs put the table
+     right under their toolbar (owner 2026-11-22) */
+  .ipot-sec { margin-top: 10px; }
+  .ipot-rules > .ipot-tools { align-self: start; }
   .ipot-rule { scroll-snap-align: start; }
   .ipot-rules > .ipot-tools { order: -1; }          /* the row scrolls sideways on a phone: the switch first, in view */
 }
