@@ -17,13 +17,15 @@ from item_potency import (ITEM_CDN, _esc, _fmt, _name_cell, _num, _rules_cards, 
                           _section, _table, page_shell)
 from heroes_stats import _versions  # noqa: E402
 from patch.item_marks import _curio_pct  # noqa: E402
+import mr_table as _mt  # noqa: E402
 
 
 def _rows(version, pct):
     rows = []
     for name, _key, slug, vals in _scaled_values(version, "apply_curio_bonus"):
         for k, (ab, label, value, sentence) in enumerate(vals):
-            head = _name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals)) if k == 0 else ''
+            head = (_name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals), href=_mt.item_href(name, key=slug))
+                    if k == 0 else '')
             hint = f' data-tooltip="{_esc(sentence)}"' if sentence else ''
             prop = f'<span class="{"iab-hint abil-ico-hint " if sentence else ""}ipot-prop"{hint}>{_esc(label)}</span>'
             v = _num(value)

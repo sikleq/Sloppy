@@ -716,7 +716,7 @@ def render_html() -> str:
         name = _display_name(hero, names)
         src = f"icons/heroes/{slug}.png"
         icon = _mt.icon(src if (_HERE / src).exists() else None, width=256, height=144, cls="hs-ico")
-        cells = [_mt.name_cell(name, icon, cls="aoe-name", sort_key=name)]   # the shared cell (builders/mr_table.py)
+        cells = [_mt.name_cell(name, icon, cls="aoe-name", sort_key=name, href=_mt.hero_href(name))]   # the shared cell (builders/mr_table.py)
         for i in range(max_slots):
             ab = abilities[i] if i < len(abilities) else None
             if ab is None:
