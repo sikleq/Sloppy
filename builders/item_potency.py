@@ -105,6 +105,11 @@ def _hero_of(ability, version, names):
         if isinstance(blk, dict) and ability in {v for k, v in blk.items()
                                                  if k.startswith("Ability") and isinstance(v, str)}:
             return _display_name(npc, names)
+    # an ability outside the hero's slots (Ringmaster's souvenir Funhouse Mirror, owner 2026-11-22: "ведёт к
+    # Ringmaster, это его способность"): the hero its name starts with
+    for npc in heroes:
+        if ability.startswith(npc.removeprefix("npc_dota_hero_") + "_"):
+            return _display_name(npc, names)
     return ""
 
 
