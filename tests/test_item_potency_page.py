@@ -245,3 +245,11 @@ def test_every_row_of_the_page_has_its_icon():
     assert "mr-ico-blank" not in page
     for title, icon in (("Illusion Rune", "icons/runes/illusion.png"), ("Any other illusion", "icons/facets/illusion.png")):
         assert f'<img class="mr-ico ipot-ico-sq" src="{icon}"' in page.split(f">{title}<", 1)[0][-400:]
+
+
+def test_a_one_floor_table_pins_its_head_with_no_gap():
+    # owner 2026-11-22: the lower tables' heads stuck a group row's height below the site header
+    from patch.css_bundle import read_css
+    css = read_css()
+    assert ".mr-table.hs-table thead tr.col-row:first-child th { top: 0; }" in css
+    assert ".mr-table.hs-table thead tr.col-row:not(:first-child) th {" in css
