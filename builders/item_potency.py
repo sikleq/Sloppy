@@ -287,9 +287,15 @@ def _sources_rows(version, rules, names, group):
         rows.append(f'<tr data-name="{_esc(title.lower())}">{cell}<td class="ipot-text">{_esc(what)}</td>'
                     f'<td class="ipot-v">{_chip(val or what)}</td></tr>')
     if group == "illusions":
+        # a row that is no ability nor item still has its icon (owner 2026-11-22: "без иконок"): the rune's, and the
+        # game's own illusion mark (its facet glyph) for every other illusion — from the rules file, beside the rows
+        icons = rules.get("other_icons", {})
         for title, text in rules.get("other", {}).items():
             what, _, val = text.partition(": ")
-            rows.append(f'<tr>{_name_cell(title, "")}<td class="ipot-text">{_esc(what if val else "")}</td>'
+            icon = icons.get(title, "")
+            if not icon or not (_HERE / icon).exists():
+                raise RuntimeError(f"item_potency.html: no icon for the Illusions row {title!r} (other_icons)")
+            rows.append(f'<tr>{_name_cell(title, icon, wide=False)}<td class="ipot-text">{_esc(what if val else "")}</td>'
                         f'<td class="ipot-v">{_chip(val or what)}</td></tr>')
     return rows
 
