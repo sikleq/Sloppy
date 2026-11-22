@@ -448,6 +448,15 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .camp-table .camp-side-radiant, .side-word.side-radiant { color: #7fd08c; }
 .camp-table .camp-side-dire, .side-word.side-dire { color: #cf828d; }
 .side-word { font-weight: 600; }
+/* Unit Changes' Side switch: the word in the middle (the filter button's padding leaves room for an icon on the left),
+   and a pressed side a soft tint of its own colour with the gold edge — the filter's bright "on" fill hid the green /
+   red word (owner 2026-11-22: "слишком ярко выделяется, текст не виден + текст не ровно в центре") */
+.ec-side .hs-attack-filter { padding: 0 9px 2px; justify-content: center; }
+.ec-side .hs-attack-filter .side-word { line-height: 1; }
+.ec-side .hs-attack-filter[aria-pressed="true"] { border-image-source: var(--px-edge-gold);
+  box-shadow: inset 0 -3px 0 var(--px-press); }
+.ec-side .hs-attack-filter[data-ec-side="radiant"][aria-pressed="true"] { background-color: rgba(127, 208, 140, 0.16); }
+.ec-side .hs-attack-filter[data-ec-side="dire"][aria-pressed="true"] { background-color: rgba(207, 130, 141, 0.16); }
 .camp-table .camp-num { justify-content: center; font-variant-numeric: tabular-nums; font-weight: 700; }
 .camp-table .camp-head { color: var(--text-dim, #969289); font-size: 12px; font-weight: 400; }
 
