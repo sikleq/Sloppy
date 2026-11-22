@@ -32,6 +32,7 @@ from patch.item_ability_text import _clean, _fill, _items, _values  # noqa: E402
 from patch.item_marks import _flagged, _sentences  # noqa: E402
 from patch.images import abil_img  # noqa: E402
 from patch.loc_history import tooltip  # noqa: E402
+from patch.rosters import items_in_game, items_removed  # noqa: E402
 import mr_table as _mt  # noqa: E402
 from heroes_stats import _display_name, _latest_href, _load_display_names, _versions  # noqa: E402
 
@@ -75,11 +76,15 @@ def _label(key, ability):
     return f"{text} ({side[0]})" if side else text
 
 
-def _scaled_values(version, flag):
+def _scaled_values(version, flag, with_removed=False):
     """[(item name, item key, slug, [(ability, label, value, sentence)])] of every item with a value flagged so."""
     out = []
+    # not the never-added / cycled-out ones items.txt keeps (owner 2026-11-22); `with_removed` adds the removed ones
+    in_game = items_in_game(version) | (items_removed(version) if with_removed else frozenset())
     for key, blk in _items(version).items():
         if not (isinstance(blk, dict) and key.startswith("item_") and not key.startswith("item_recipe")):
+            continue
+        if key not in in_game:
             continue
         keys = _flagged(blk, flag)
         if not keys:
@@ -230,9 +235,10 @@ def _melee_ranged(vals):
 
 
 def _items_rows(version, rules):
-    gone = set(rules.get("not_in_game", []))
+    del rules                                    # the removed ones come from patch.rosters, not a hand list (2026-11-22)
+    gone = items_removed(version)
     rows = []
-    for name, key, slug, vals in _scaled_values(version, "apply_effectiveness"):
+    for name, key, slug, vals in _scaled_values(version, "apply_effectiveness", with_removed=True):
         no_ill = no_illusions(key, version)
         vals = _melee_ranged(vals)
         for k, (ab, label, value, sentence) in enumerate(vals):

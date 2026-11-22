@@ -254,3 +254,26 @@ def test_a_one_floor_table_pins_its_head_with_no_gap():
     css = read_css()
     assert ".mr-table.hs-table thead tr.col-row:first-child th { top: 0; }" in css
     assert ".mr-table.hs-table thead tr.col-row:not(:first-child) th {" in css
+
+
+def test_tables_list_only_items_that_are_in_the_game():
+    # owner 2026-11-22: "Nothl Sigil в dormant_curio.html это не введённый предмет … Helm of the Undying вроде вообще
+    # удалён" — items.txt keeps never-added and cycled-out items; patch.rosters.items_in_game is the one list
+    import pytest
+    from patch import game_files
+    if not game_files.available():
+        pytest.skip("no game-files store")
+    import dormant_curio
+    import item_potency as ip
+    from patch.rosters import items_in_game, items_removed
+    v = ip._versions()[-1]
+    live = items_in_game(v)
+    if v == "7.42":
+        assert {"item_nothl_sigil", "item_helm_of_the_undying", "item_javelin"}.isdisjoint(live)
+        assert {"item_dormant_curio", "item_blink", "item_skadi"} <= live
+        assert {"item_helm_of_the_undying", "item_javelin"} <= items_removed(v)          # behind "Removed"
+        assert "item_nothl_sigil" not in items_removed(v)                                # never in the game
+    for flag in ("apply_curio_bonus", "apply_effectiveness"):
+        assert all(key in live for _n, key, _s, _rows in ip._scaled_values(v, flag)), flag
+    html = dormant_curio.render_html()
+    assert "Nothl Sigil" not in html and "Helm of the Undying" not in html

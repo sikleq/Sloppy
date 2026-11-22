@@ -77,11 +77,6 @@
       "item_riftshadow_prism"
     ]
   },
-  "not_in_game": [
-    "item_javelin",
-    "item_stygian_desolator",
-    "item_misericorde"
-  ],
   "rules": [
     [
       "A scaled value",

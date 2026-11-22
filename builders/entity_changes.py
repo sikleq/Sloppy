@@ -1395,7 +1395,7 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
             '<span class="search-box hd-search">'
             f'<input type="text" data-ec-search placeholder="Search {plural} — comma-separate for several" '
             'autocomplete="off" spellcheck="false"></span>'
-            + (f'<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Show deleted ({n_old})</span>'
+            + (f'<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Removed ({n_old})</span>'
                '<input type="checkbox" id="ec-show-old" class="ua-switch-input">'
                '<span class="ua-switch" aria-hidden="true"></span></label>' if n_old else '')
             + '</div></div>' + grid + '</div>\n</div>\n</div>\n'

@@ -347,7 +347,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     # nerf): OFF by default → items removed from the game are hidden; ON reveals
     # them (their post-removal columns are blanked anyway).
     current_block = _switch(
-        'hd-show-deleted', 'Deleted',
+        'hd-show-deleted', 'Removed',          # one name for the switch on every page (owner 2026-11-22)
         'Show items no longer in the game — removed or cycled out of the pool '
         '(hidden by default)', False
     ) if current_toggle else ''

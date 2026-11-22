@@ -357,6 +357,37 @@ def _load_full_game_items(latest_stats_ver, neutral_slugs, obsolete_slugs, prese
     return out
 
 
+_IN_GAME, _REMOVED = {}, {}
+
+
+def items_removed(version):
+    """Game slugs of items that were in the game and are not any more (cycled-out neutrals, obsolete shop items) —
+    the rows a table hides behind its "Removed" switch. A never-added item (Nothl Sigil 7.42) is in neither list."""
+    items_in_game(version)
+    return _REMOVED[version]
+
+
+def items_in_game(version):
+    """Game slugs (item_*) a player can have in `version`: shop items still sold, neutrals in the drop pool,
+    enchantments. Not the ones items.txt keeps but the game does not use — never added yet (Nothl Sigil 7.42), cycled
+    out (Helm of the Undying 7.40), obsolete (Javelin). One source for every table that lists items (owner 2026-11-22:
+    "мы должны всегда знать, какие предметы в игре, а каких нет")."""
+    if version not in _IN_GAME:
+        neutral, obsolete, present = _load_item_classes(version)
+        cycled = _load_neutral_cycled_versions()
+        cycled.update(_NEUTRAL_REMOVED_MANUAL)
+        items = _load_full_game_items(version, neutral, obsolete, present, _load_neutral_pool_current(),
+                                      _load_neutral_tier_map(), cycled)
+        if not items:
+            raise RuntimeError(f"items_in_game: no items read for {version} (data/stats/{version}/items.txt)")
+        _IN_GAME[version] = frozenset(d["_gslug"] for d in items if d["current"])
+        # a shop item not sold any more is a removed one even with no version known (Javelin, obsolete); a neutral
+        # with no version was never in the pool (Nothl Sigil, Berserker's Hood 7.42)
+        _REMOVED[version] = frozenset(d["_gslug"] for d in items
+                                      if not d["current"] and (d["removed"] or d["class"] == "regular"))
+    return _IN_GAME[version]
+
+
 # Module-level pre-computations (needed by build_rosters)
 _SHOP_CATEGORIES = _load_shop_categories()
 
