@@ -7,13 +7,17 @@
   const showOld = document.getElementById('ec-show-old');     // items only: removed / cycled-out
   const classBtns = [...document.querySelectorAll('[data-ec-class]')];   // Shop / Neutral / Enchantments
   const classes = new Set();
+  // units only: Side — neither pressed = both sides; Radiant / Dire = that side's home-jungle creeps (owner 2026-11-22)
+  const sideBtns = [...document.querySelectorAll('[data-ec-side]')];
+  let side = '';
   const apply = () => {
     const terms = input.value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
     cards.forEach(c => {
       const n = c.dataset.name || '';
       const old = c.dataset.current === '0' && !(showOld && showOld.checked);
       const wrongClass = classes.size > 0 && !classes.has(c.dataset.class || '');
-      c.hidden = old || wrongClass || (terms.length > 0 && !terms.some(t => n.includes(t)));
+      const wrongSide = side !== '' && c.dataset.side !== undefined && c.dataset.side !== side;
+      c.hidden = old || wrongClass || wrongSide || (terms.length > 0 && !terms.some(t => n.includes(t)));
     });
     // a shop category / neutral tier / attribute column with nothing left collapses
     document.querySelectorAll('.ec-igroup, .ec-hcol').forEach(g => {
@@ -30,6 +34,11 @@
     if (classes.has(k)) classes.delete(k); else classes.add(k);
     b.classList.toggle('active', classes.has(k));
     b.setAttribute('aria-pressed', classes.has(k) ? 'true' : 'false');
+    apply();
+  }));
+  sideBtns.forEach(b => b.addEventListener('click', () => {
+    side = side === b.dataset.ecSide ? '' : b.dataset.ecSide;
+    sideBtns.forEach(x => x.setAttribute('aria-pressed', x.dataset.ecSide === side ? 'true' : 'false'));
     apply();
   }));
   // once at load too: "Removed neutrals" showed its heading over cards hidden from the start (audit 2026-11-08)

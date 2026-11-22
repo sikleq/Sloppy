@@ -610,6 +610,9 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
    the text, and there they grow */
 .acr-fold:not(.is-open) .acr-fold-body .ability-chip:hover > img { transform: none; box-shadow: none; }
 .acr-fold:not(.is-open) .acr-fold-body .ac-sub:hover > .ac-sub-ico { transform: none; box-shadow: none; }
+/* an Aghanim's card's lead icon stays put: grown, it covers the ability's name and the card's text (owner 2026-11-22:
+   "в таких карточках не надо при наведении на иконку выдвигать её", 7.42 Blade Fury) */
+.aghs-change .ac-sub:hover > .ac-sub-ico { transform: none; box-shadow: none; }
 .acr-fold:not(.is-open) .acr-fold-body .ability-chip[data-tooltip]::after,
 .acr-fold:not(.is-open) .acr-fold-body .ability-chip[data-tooltip]::before { display: none; }
 @media (prefers-reduced-motion: reduce) { .ability-chip > img { transition: none; } .ac-sub > .ac-sub-ico { transition: none; } }

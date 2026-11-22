@@ -1172,14 +1172,35 @@ def _unit_groups(ents: list[dict]):
     return [(k, buckets[k]) for k in _UNIT_ORDER if buckets[k]]
 
 
+# 7.42 "home jungle": a non-amphibian, non-ancient neutral spawns only on its own side (content/p742.py, the camp table
+# under "Each non-amphibian and non-ancient Neutral camp unit now has a home jungle"). Unit Changes' Side switch shows
+# one side's creeps (owner 2026-11-22); lane creeps, ancients, amphibians and summons are on both sides and stay.
+_HOME_SIDE = {f"npc_dota_neutral_{n}": side for side, names in (
+    ("radiant", ("kobold", "kobold_tunneler", "kobold_taskmaster", "forest_troll_berserker", "forest_troll_high_priest",
+                 "giant_wolf", "alpha_wolf", "ogre_mauler", "ogre_magi", "radigull", "centaur_outrunner", "centaur_khan",
+                 "wildkin", "enraged_wildkin", "eimermole_foreman", "eimermole")),
+    ("dire", ("gnoll_assassin", "fel_beast", "ghost", "harpy_scout", "harpy_storm", "satyr_trickster",
+              "satyr_soulstealer", "mud_golem", "odobenus_frostmage", "odobenus_footman", "satyr_hellcaller",
+              "polar_furbolg_ursa_warrior", "polar_furbolg_champion", "dark_troll_warlord", "dark_troll")))
+    for n in names}
+# neither pressed = both sides (the neutral position); a press shows one side, a second press goes back to both
+SIDE_SWITCH = ('<span class="hs-attack-filter-group ec-side" aria-label="Side">'
+               '<button type="button" class="hs-attack-filter" data-ec-side="radiant" aria-pressed="false">'
+               '<span class="side-word side-radiant">Radiant</span></button>'
+               '<button type="button" class="hs-attack-filter" data-ec-side="dire" aria-pressed="false">'
+               '<span class="side-word side-dire">Dire</span></button></span>')
+
+
 def _unit_card(e: dict) -> str:
     cur = e.get("_current", True)
     nop = e.get("_nopage")
     static = e.get("_static")                          # full-colour, non-clickable (catalogue)
     cls = ("ec-card ec-card-unit" + ("" if cur else " ec-old")
            + (" ec-nopage" if nop and not static else "") + (" ec-static" if static else ""))
+    side = _HOME_SIDE.get(e.get("_npc") or "")
     attrs = (f'class="{cls}" data-current="{1 if cur else 0}"{"" if cur else " hidden"} '
-             f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}"')
+             f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}"'
+             + (f' data-side="{side}"' if side else ''))
     img = f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" title="{_esc(e["name"])}" loading="lazy">'
     if static or nop:                                  # no change page — shown, not clickable
         return f'<span {attrs}>{img}</span>'
@@ -1398,6 +1419,7 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
             + (f'<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Removed ({n_old})</span>'
                '<input type="checkbox" id="ec-show-old" class="ua-switch-input">'
                '<span class="ua-switch" aria-hidden="true"></span></label>' if n_old else '')
+            + (SIDE_SWITCH if kind == "unit" else '')
             + '</div></div>' + grid + '</div>\n</div>\n</div>\n'
             f'<script defer src="src/scripts-changes.js?v={asset}"></script>\n</body>\n</html>\n')
 
