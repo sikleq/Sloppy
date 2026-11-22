@@ -28,7 +28,10 @@
   cursor: default;
   user-select: none;
 }
-.mr-table.hs-table thead tr.col-row th {
+/* a table with no group row (Item Potency's lower tables) pins its column row at the top: the page-wide --cat-row-h
+   belongs to the two-floor tables and left a gap under the site header (owner 2026-11-22) */
+.mr-table.hs-table thead tr.col-row:first-child th { top: 0; }
+.mr-table.hs-table thead tr.col-row:not(:first-child) th {
   top: calc(var(--cat-row-h, 0px) - 2px);
   z-index: 50;
   border-bottom: none;
