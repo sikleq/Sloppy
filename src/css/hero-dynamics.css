@@ -81,7 +81,7 @@
 .hd-hero-name { font-weight: 600; color: var(--text-bright); }
 /* matrix / Hero Stats row names link to the entity's Changes page */
 a.ec-name-link { color: inherit; text-decoration: none; }
-a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underline-offset: 3px; }
+a.ec-name-link:hover { color: #e3c46a; text-decoration: underline; text-underline-offset: 3px; }   /* as Neutral Stats' names */
 /* main-attribute change row (attr_change): the attribute names in the row's own font,
    bold, in the site attribute palette (--attr-*) */
 .attr-chip { font-weight: 700; }

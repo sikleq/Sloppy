@@ -67,6 +67,8 @@ def _minify_assets(dist: Path):
 STEPS = [
     ("patch",   "builders/build_patches.py",       "Patch pages (index + calendar + changelogs)"),
     ("silent",  "builders/silent.py",       "Silent changes pages"),
+    # the Hero / Item / Unit pages before the tables: a table links each name to its page only if it exists
+    ("echg",    "builders/entity_changes.py", "Hero / Item Changes pages"),
     ("creeps",  "builders/creeps.py",       "Neutral Stats / Abilities tables"),
     ("mana",    "builders/mana_items.py",   "Mana Items table"),
     ("stats",   "builders/heroes_stats.py", "Hero Stats table"),
@@ -78,7 +80,6 @@ STEPS = [
     ("idyn",    "builders/items_dyn.py",    "Item Dynamics matrix"),
     ("terrain", "builders/terrain.py",      "Terrain comparison"),
     ("tstats",  "builders/terrain_stats.py", "Terrain Stats (map history)"),
-    ("echg",    "builders/entity_changes.py", "Hero / Item Changes pages"),
     # every build checks the Aghanim's texts its cards are made of (owner 2026-10-25: "генератор должен уметь");
     # CI checks all 118 patches
     ("aghs",    "scripts/audit/check_aghs_texts.py --site", "Aghanim's Scepter / Shard texts audit"),

@@ -9,7 +9,9 @@ Rules in words: docs/agent-rules/ui-style.md, "Таблицы — единые �
 """
 from __future__ import annotations
 
+import re
 from html import escape
+from pathlib import Path
 
 
 def _esc(s) -> str:
@@ -51,12 +53,48 @@ def icon(src: str | None, *, width: int, height: int, cls: str = "") -> str:
     return f'<img class="mr-ico{extra}" src="{src}" alt="" loading="lazy" width="{width}" height="{height}">'
 
 
+def slugify(name: str) -> str:
+    """The file name of a hero's or a unit's own page, from its name (as patch.elements._slugify)."""
+    s = name.lower().replace("'", "").replace("’", "")
+    return re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+
+
+# every name in a table leads to its own page (owner 2026-11-22: "во всех таблицах сделать ссылки-переходы").
+# The pages are named by the display name ("Battle Fury" -> items/battle-fury.html, not the key "bfury") and written by
+# builders/entity_changes.py, which build_site.py runs before the tables; a name with no page (an item new in a patch
+# not annotated yet) stays plain text rather than a dead link.
+_DIST = Path(__file__).resolve().parent.parent / "dist"
+
+
+def _href(folder: str, name: str, prefix: str) -> str | None:
+    rel = f"{folder}/{slugify(name)}.html"
+    return f"{prefix}{rel}" if (_DIST / rel).exists() else None
+
+
+def hero_href(name: str, prefix: str = "") -> str | None:
+    return _href("heroes", name, prefix)
+
+
+def item_href(name: str, prefix: str = "", key: str | None = None) -> str | None:
+    """`name` — the item's display name ("Eye of Skadi"); `key` — its items.txt key ("item_robe"), for the few pages
+    named by the key (Robe of the Magi -> items/robe.html, Mantle of Intelligence -> items/mantle.html)."""
+    return _href("items", name, prefix) or (_href("items", key.removeprefix("item_"), prefix) if key else None)
+
+
+def name_text(name: str, href: str | None = None, cls: str = "mr-name-text") -> str:
+    """The name, a link to its page when `href` is given (`a.ec-name-link`, as Hero Stats)."""
+    if href:
+        return f'<a class="{cls} ec-name-link" href="{_esc(href)}">{_esc(name)}</a>'
+    return f'<span class="{cls}">{_esc(name)}</span>'
+
+
 def name_cell(name: str, img: str, *, cls: str = "", span: int = 1, sort_key: str | None = None,
-              after: str = "") -> str:
+              after: str = "", href: str | None = None) -> str:
     """The name cell of every table: picture, then the name (and `after`, e.g. the owner of an item's ability). Its
-    icon grows on hover (`.mr-ico:hover`); `span` > 1 for an item of several rows — they sort and select together."""
+    icon grows on hover (`.mr-ico:hover`); `span` > 1 for an item of several rows — they sort and select together.
+    `href`: the name links to its own page."""
     extra = f" {cls}" if cls else ""
     rs = f' rowspan="{span}"' if span > 1 else ""
     key = _esc(sort_key if sort_key is not None else name.lower())
     return (f'<td class="mr-name hs-name{extra}"{rs} data-sort="{key}">{img}<span class="mr-name-body">'
-            f'<span class="mr-name-text">{_esc(name)}</span>{after}</span></td>')
+            f'{name_text(name, href)}{after}</span></td>')

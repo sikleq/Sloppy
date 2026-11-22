@@ -142,13 +142,13 @@ def _table(cls, head, rows, groups=()):
     return _mt.table(f"ipot-table {cls}", _mt.thead(top, low), rows)
 
 
-def _name_cell(name, icon, owner="", span=1, wide=True):
+def _name_cell(name, icon, owner="", span=1, wide=True, href=None):
     w, h = (44, 32) if wide else (32, 32)
     who = f'<span class="ipot-owner">{_esc(owner)}</span>' if owner else ''
     img = _mt.icon(icon if icon and (_HERE / icon).exists() else None, width=w, height=h,
                    cls="" if wide else "ipot-ico-sq")
     # the cell of AoE Increase's hero and Hero Stats' (owner 2026-11-21: "достичь единого формата в обеих вкладках")
-    return _mt.name_cell(name, img, cls="ipot-name", span=span, after=who)
+    return _mt.name_cell(name, img, cls="ipot-name", span=span, after=who, href=href)
 
 
 def _chip(text):
@@ -238,7 +238,8 @@ def _items_rows(version, rules):
         for k, (ab, label, value, sentence) in enumerate(vals):
             cls = ' class="ipot-gone"' if key in gone else ''
             # removed from the game: grey, hidden till "Show removed" (owner 2026-11-19: no "not in the game" words)
-            head = _name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals)) if k == 0 else ''
+            head = (_name_cell(name, f"{ITEM_CDN}{slug}.png", span=len(vals), href=_mt.item_href(name, key=slug))
+                    if k == 0 else '')
             hint = f' data-tooltip="{_esc(sentence)}"' if sentence else ''
             prop = f'<span class="{"iab-hint abil-ico-hint " if sentence else ""}ipot-prop"{hint}>{_esc(label)}</span>'
             sides = [_num(x) for x in str(value).split(" / ")]
@@ -270,10 +271,12 @@ def _sources_rows(version, rules, names, group):
         what, _, val = text.partition(": ")
         if slug.startswith("item_"):
             title = tooltip(f"DOTA_Tooltip_Ability_{slug}", version) or slug
-            cell = _name_cell(title, f"{ITEM_CDN}{slug[len('item_'):]}.png")
+            cell = _name_cell(title, f"{ITEM_CDN}{slug[len('item_'):]}.png", href=_mt.item_href(title, key=slug))
         else:
             title = tooltip(f"DOTA_Tooltip_ability_{slug}", version) or slug
-            cell = _name_cell(title, _root(abil_img(slug)), _hero_of(slug, version, names), wide=False)
+            owner = _hero_of(slug, version, names)       # a hero's ability leads to his page
+            cell = _name_cell(title, _root(abil_img(slug)), owner, wide=False,
+                              href=_mt.hero_href(owner) if owner else None)
         rows.append(f'<tr data-name="{_esc(title.lower())}">{cell}<td class="ipot-text">{_esc(what)}</td>'
                     f'<td class="ipot-v">{_chip(val or what)}</td></tr>')
     if group == "illusions":

@@ -30,6 +30,8 @@ _HERE = Path(_os.path.dirname(_os.path.abspath(__file__))).parent
 _sys.path.insert(0, str(_HERE))
 
 import patch.site_common as _site
+_sys.path.insert(0, str(_HERE / "builders"))
+import mr_table as _mt  # noqa: E402  (the shared table part: names link to their pages)
 ASSET_VERSION = _site.compute_asset_version()
 
 # ── Engine constants ───────────────────────────────────────────────────────
@@ -842,7 +844,8 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
         body_rows.append(
             f'<tr id="mr-{r["slug"]}"{row_cls}{row_attrs}>'
             f'<td class="mr-name">{_icon_html(r["slug"].replace("__active", ""))}'
-            f'<span class="mr-name-text">{_esc(r["name"])}</span></td>'
+            # the name leads to the item's page, as on every table (owner 2026-11-22)
+            f'{_mt.name_text(r["name"], _mt.item_href(re.sub(r" [(].*[)]$", "", r["name"]), key=r["slug"].split("__")[0]))}</td>'
             f'{_cost_cell(r, cost_hist)}'
             f'{_metric_cell(r, "intel", r["intel"], _short(r["intel"]), intel_hist)}'
             f'{_metric_cell(r, "mana", r["max_mana"], _short(r["max_mana"]), mana_hist)}'
