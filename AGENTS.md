@@ -40,7 +40,7 @@
 - Телефон: таблица листается внутри своего блока, лишний столбец сжимать до нуля, не `display:none`.
 - Выделенная по клику строка — сплошная золотая рамка вокруг всей группы строк одного имени, без разрывов у ячеек с rowspan.
 - Новые стили не писать с нуля: брать классы Hero Stats / `.mr-table`. Шапку и ячейку имени новой таблицы строить
-  общей деталью `builders/mr_table.py` (`th`, `group_th`, `thead`, `name_cell`, `icon`) — на ней Item Potency,
+  общей деталью `builders/mr_table.py` (`th`, `group_th`, `thead`, `name_cell`, `icon`) — на ней Hero Stats, Mana Items (`grid=True`), Item Potency,
   Dormant Curio, AoE Increase.
 
 ## Карта правил агента (`docs/agent-rules/`)

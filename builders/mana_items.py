@@ -838,9 +838,8 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
 
         body_rows.append(
             f'<tr id="mr-{r["slug"]}"{row_cls}{row_attrs}>'
-            f'<td class="mr-name">{_icon_html(r["slug"].replace("__active", ""))}'
-            # the name leads to the item's page, as on every table (owner 2026-11-22)
-            f'{_mt.name_text(r["name"], _mt.item_href(re.sub(r" [(].*[)]$", "", r["name"]), key=r["slug"].split("__")[0]))}</td>'
+            # the shared name cell (builders/mr_table.py) in its grid layout; the name leads to the item's page
+            f'{_mt.name_cell(r["name"], _icon_html(r["slug"].replace("__active", "")), grid=True, href=_mt.item_href(re.sub(r" [(].*[)]$", "", r["name"]), key=r["slug"].split("__")[0]))}'
             f'{_cost_cell(r, cost_hist)}'
             f'{_metric_cell(r, "intel", r["intel"], _short(r["intel"]), intel_hist)}'
             f'{_metric_cell(r, "mana", r["max_mana"], _short(r["max_mana"]), mana_hist)}'
