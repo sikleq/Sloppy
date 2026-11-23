@@ -428,3 +428,12 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   padding: 0 4px;
   line-height: 1.4;
 }
+
+/* Upgrade N (neutral_upgrade, owner 2026-11-23): a number box like the View select, the game time beside it;
+   a cell that the upgrade changed is gold */
+.upg-group { display: inline-flex; align-items: center; gap: 8px; }
+.upg-input { width: 58px; height: 28px; background: var(--bg-panel-3); border: 1px solid var(--line); border-radius: 5px;
+  color: var(--text-main); font: inherit; font-size: 12.5px; text-align: center; font-variant-numeric: tabular-nums; }
+.upg-input:hover, .upg-input:focus-visible { border-color: var(--gold); outline: none; }
+.upg-time { color: var(--text-dim); font-size: 12px; font-variant-numeric: tabular-nums; min-width: 44px; }
+.creeps-table td.upg-on { color: var(--gold); }

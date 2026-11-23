@@ -1099,6 +1099,11 @@ _STATS_TOOLBAR = (
     # creeps whose camp left the game (REMOVED_CREEPS): hidden until pressed
     '<button type="button" class="hs-attack-filter" id="removed-toggle" aria-pressed="false">'
     '<span>Removed</span></button>'
+    # neutral_upgrade: every 7:30 from the horn, up to 30 steps (src/js/creeps-upgrade.js; owner 2026-11-23)
+    '<label class="view-group upg-group"><strong>Upgrade</strong>'
+    '<input type="number" id="upgrade-step" class="upg-input" min="0" max="30" step="1" value="0" '
+    'aria-label="Neutral upgrade number, 0 to 30">'
+    '<span class="upg-time" id="upgrade-time">0:00</span></label>'
     '</div></div>\n'
 )
 

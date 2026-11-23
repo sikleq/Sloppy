@@ -15,7 +15,7 @@ JS_DIR = Path(__file__).resolve().parent.parent / "src" / "js"
 # listener (mana-items) before its toggle (mana-items-heatmap).
 JS_PARTS = (
     "nav-subnav", "back-arrow", "patch-reanchor", "back-to-top", "version-dropdown", "patch-page", "fold-small", "card-deck", "patch-dynamics", "talent-tree", "dyn-lens", "creeps-table", "unit-abilities-upgrades",
-    "creeps-changelog", "creeps-scroll-size", "creeps-pinned", "tooltips", "nav-height", "mana-items",
+    "creeps-changelog", "creeps-scroll-size", "creeps-pinned", "creeps-upgrade", "tooltips", "nav-height", "mana-items",
     "terrain-stats-rows", "mana-items-filters", "hero-stats", "changes-filters", "changes-item-slots", "changes-index",
     "hero-lab", "hero-stats-divider", "mana-items-heatmap", "index-wall", "index-tiles", "formula-calculator", "terrain",
     "terrain-lightbox", "info-pop-placement", "aoe-increase", "dyn-offscreen", "creeps-scroll-guard", "search-layout",
@@ -27,6 +27,7 @@ PART_MARKERS = {
     "creeps-table": r"creeps-table|creep-copy",
     "creeps-changelog": r"<td[^>]*data-(?:hist|name)=",
     "creeps-pinned": r"creeps-table",
+    "creeps-upgrade": r"upgrade-step",
     "unit-abilities-upgrades": r"unit-abilities-table",
     "dyn-lens": r"heroes-dyn-table",
     "dyn-offscreen": r"heroes-dyn-table",
@@ -51,7 +52,7 @@ JS_PAGES = {
     "base": (),
     "entity": ("changes-filters", "changes-item-slots"),
     "changes": ("changes-filters", "changes-item-slots", "changes-index", "index-wall"),
-    "table": ("creeps-table", "creeps-changelog", "creeps-pinned", "unit-abilities-upgrades", "dyn-lens", "dyn-offscreen", "mana-items",
+    "table": ("creeps-table", "creeps-changelog", "creeps-pinned", "creeps-upgrade", "unit-abilities-upgrades", "dyn-lens", "dyn-offscreen", "mana-items",
               "mana-items-filters", "mana-items-heatmap", "hero-stats", "hero-stats-divider", "terrain-stats-rows", "aoe-increase"),
     "lab": ("hero-stats", "changes-item-slots", "hero-lab"),
     "home": ("index-wall", "index-tiles"),
