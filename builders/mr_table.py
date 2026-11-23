@@ -89,12 +89,16 @@ def name_text(name: str, href: str | None = None, cls: str = "mr-name-text") -> 
 
 
 def name_cell(name: str, img: str, *, cls: str = "", span: int = 1, sort_key: str | None = None,
-              after: str = "", href: str | None = None, attrs: str = "") -> str:
+              after: str = "", href: str | None = None, attrs: str = "", grid: bool = False) -> str:
     """The name cell of every table: picture, then the name (and `after`, e.g. the owner of an item's ability). Its
     icon grows on hover (`.mr-ico:hover`); `span` > 1 for an item of several rows — they sort and select together.
     `href`: the name links to its own page."""
     extra = f" {cls}" if cls else ""
     rs = f' rowspan="{span}"' if span > 1 else ""
     key = _esc(sort_key if sort_key is not None else name.lower())
+    if grid:
+        # Mana Items' layout: the icon in a fixed-width column of the cell's grid, the name beside it
+        # (`.mr-table .mr-name { display: grid }` in mana-items.css), sorted by its text; same parts, its own frame
+        return f'<td class="mr-name{extra}"{rs}{attrs}>{img}{name_text(name, href)}{after}</td>'
     return (f'<td class="mr-name hs-name{extra}"{rs}{attrs} data-sort="{key}">{img}<span class="mr-name-body">'
             f'{name_text(name, href)}{after}</span></td>')
