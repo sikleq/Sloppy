@@ -276,6 +276,7 @@
 .stat-hist-tip .stat-pct.up   { color: #7fb88c; }
 .stat-hist-tip .stat-pct.down { color: #cf8b8b; }
 .stat-hist-tip .stat-pct.flat { color: var(--text-dim); }
+.stat-hist-tip .stat-pct.mixed { color: var(--gold, #e3c46a); white-space: nowrap; }   /* levels moved both ways, mean flat */
 /* Per-column value tints. */
 .creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
 .creeps-table td.col-mp_regen { color: #6fc3ec; }   /* light blue (голубоватый) */

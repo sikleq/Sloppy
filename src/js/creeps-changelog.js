@@ -34,6 +34,20 @@
     // Divide by |o| so a negative baseline keeps the real direction:
     // armor -1 → 0 is a +100% gain (a buff), not -100%.
     const pct = (n - o) / Math.abs(o) * 100;
+    // the mean did not move but the levels did (7.42 Shockwave 140/160/180/200 → 110/150/190/230): the per-level
+    // range, not a "0%" that reads as no change (owner 2026-11-23)
+    if (pct === 0) {
+      const lv = s => String(s).split(/[\/\s]+/).map(x => parseFloat(x.replace(',', '.'))).filter(isFinite);
+      const a = lv(ov), b = lv(nv);
+      if (a.length > 1 && a.length === b.length && a.every(x => x !== 0)) {
+        const each = a.map((x, i) => (b[i] - x) / Math.abs(x) * 100);
+        const lo = Math.min(...each), hi = Math.max(...each);
+        if (lo < 0 && hi > 0) {
+          const f = v => (v > 0 ? '+' : '−') + Math.abs(Math.round(v));
+          return ' <span class="stat-pct mixed">' + f(lo) + '…' + f(hi) + '%</span>';
+        }
+      }
+    }
     const good = lowerBetter ? pct < 0 : pct > 0;
     const cls = pct === 0 ? 'flat' : (good ? 'up' : 'down');
     const sign = pct > 0 ? '+' : '';
