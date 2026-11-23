@@ -21,19 +21,9 @@
   };
   const BASIC_SECTIONS = ['Consumables', 'Attributes', 'Equipment', 'Miscellaneous', 'Secret Shop'];
   const UPGRADE_SECTIONS = ['Accessories', 'Support', 'Magical', 'Armor', 'Weapons', 'Armaments'];
-  var SHOP_ORDER = {
-    Consumables: ['clarity','tango','flask','bottle','enchanted_mango','faerie_fire','smoke_of_deceit','ward_sentry','dust','infused_raindrop','blood_grenade'],
-    Attributes: ['branches','gauntlets','slippers','mantle','circlet','crown','boots_of_elves','belt_of_strength','ogre_axe','blade_of_alacrity','staff_of_wizardry','robe','ghost','diadem'],
-    Equipment: ['blades_of_attack','broadsword','claymore','javelin','mithril_hammer','orb_of_venom','blight_stone','orb_of_frost','quelling_blade','ring_of_protection','splintmill','chainmail','helm_of_iron_will','blitz_knuckles','gloves','splintmail'],
-    Miscellaneous: ['magic_stick','wind_lace','ring_of_regen','sobi_mask','boots','cloak','fluffy_hat','gem','blink','shadow_amulet','lifesteal','shawl','voodoo_mask','wizard_hat','chasm_stone'],
-    'Secret Shop': ['ring_of_health','void_stone','energy_booster','vitality_booster','point_booster','platemail','talisman_of_evasion','hyperstone','ultimate_orb','demon_edge','mystic_staff','reaver','eagle','relic','tiara_of_selemene','ring_of_tarrasque'],
-    Accessories: ['magic_wand','null_talisman','wraith_band','bracer','soul_ring','orb_of_corrosion','falcon_blade','power_treads','phase_boots','oblivion_staff','pers','mask_of_madness','hand_of_midas','travel_boots','moon_shard','soul_booster'],
-    Support: ['ring_of_basilius','headdress','buckler','urn_of_shadows','tranquil_boots','arcane_boots','pavise','mekansm','spirit_vessel','ancient_janggo','glimmer_cape','holy_locket','solar_crest','pipe','guardian_greaves','boots_of_bearing','essence_distiller'],
-    Magical: ['veil_of_discord','aether_lens','force_staff','rod_of_atos','cyclone','meteor_hammer','ultimate_scepter','orchid','dagon','phylactery','ethereal_blade','octarine_core','refresher','sheepstick','gungir','wind_waker','bloodstone','bloodthorn','angels_demise','crellas_crozier'],
-    Armor: ['buckler','blade_mail','vanguard','helm_of_the_dominator','vladmir','armlet','crimson_guard','black_king_bar','consecrated_wraps','lotus_orb','aeon_disk','shivas_guard','assault','heart','helm_of_the_overlord','sphere'],
-    Weapons: ['lesser_crit','maelstrom','invis_sword','desolator','basher','mage_slayer','bfury','monkey_king_bar','manta','heavens_halberd','radiance','greater_crit','butterfly','silver_edge','satanic','abyssal_blade','mjollnir','rapier','revenants_brooch','nullifier'],
-    Armaments: ['sange','yasha','kaya','witch_blade','diffusal_blade','dragon_lance','echo_sabre','devastator','sange_and_yasha','kaya_and_sange','yasha_and_kaya','harpoon','hurricane_pike','disperser','specialists_array','hydras_breath','skadi','arcane_blink','swift_blink','overwhelming_blink'],
-  };
+  // the in-game shop order, from the game's shops.txt (builders/hero_lab.py, patch/shop_layout.py; owner 2026-11-23)
+  var SHOP_ORDER = data.shopOrder || {};
+  var NEUTRAL_ORDER = data.neutralOrder || {};
   // Attribute constants from the page (builders/hero_lab.py embeds
   // patch/game_constants.for_js()) — one source for Python and JS.
   const C = data.constants || {};
@@ -85,11 +75,19 @@
       return ai - bi;
     });
   }
+  function neutralSort(list, tier) {          // a tier's items in its pools' order (neutral_items.txt)
+    var order = NEUTRAL_ORDER[String(tier)];
+    if (!order) return list;
+    return list.slice().sort(function(a, b) {
+      var ai = order.indexOf(a.slug), bi = order.indexOf(b.slug);
+      return (ai === -1 ? 9999 : ai) - (bi === -1 ? 9999 : bi);
+    });
+  }
   const itemGroups = {
     basics: BASIC_SECTIONS.map(name => [name, shopSort(items.filter(i => i.class === 'regular' && i.category === name && i.id !== 'item_tpscroll' && i.slug !== 'aghanims_shard'), name)]),
     upgrades: UPGRADE_SECTIONS.map(name => [name, shopSort(items.filter(i => i.class === 'regular' && i.category === name && i.id !== 'item_tpscroll'), name)]),
     neutrals: {
-      tiers: [0, 1, 2, 3, 4].map(tier => [tier, items.filter(i => i.class === 'neutral' && i.tier === tier)]),
+      tiers: [0, 1, 2, 3, 4].map(tier => [tier, neutralSort(items.filter(i => i.class === 'neutral' && i.tier === tier), tier)]),
       enchants: items.filter(i => i.class === 'enchant'),
     },
   };

@@ -26,7 +26,6 @@ _sys.path.insert(0, str(_HERE / "builders"))
 
 import patch.site_common as _site          # noqa: E402
 from patch.html_util import strip_tags      # noqa: E402
-from patch.js_bundle import read_js
 from patch.meta import PATCHES, RELEASE_HISTORY        # noqa: E402
 
 DIST = _HERE / "dist"
@@ -802,14 +801,10 @@ def _hero_groups(ents):
 
 
 def _shop_order() -> dict[str, list[str]]:
-    """Item order of the Hero Lab picker (src/js/hero-lab.js SHOP_ORDER) — the in-game shop order."""
-    js = read_js()
-    m = _re.search(r"var SHOP_ORDER = \{(.*?)\n  \};", js, _re.S)
-    out = {}
-    if m:
-        for key, arr in _re.findall(r"(?m)^\s*'?([A-Za-z ]+)'?:\s*\[(.*?)\],?\s*$", m.group(1)):
-            out[key.strip()] = _re.findall(r"'([a-z0-9_]+)'", arr)
-    return out
+    """The in-game shop order of every category, from the game's shops.txt (patch/shop_layout.py; owner 2026-11-23:
+    the hand-kept list had drifted from the game)."""
+    from patch.shop_layout import shop_order
+    return shop_order()
 
 
 def _item_groups(ents, dyn):
@@ -852,10 +847,15 @@ def _item_groups(ents, dyn):
              + sorted(g for g in buckets if g not in order and not g.startswith("Neutral") and g != "Enchantments"))
 
     kv = _kv_rank()
+    from patch.shop_layout import neutral_tiers
+    tiers = neutral_tiers()
 
     def key(g):
         rank = {s: i for i, s in enumerate(shop.get(g, []))}
-        if g.startswith("Neutral") or g == "Enchantments":            # the game lists these in KV order
+        t = _re.fullmatch(r"Neutral · Tier (\d)", g)
+        if t and int(t.group(1)) in tiers:                             # the tier's pools, in the game's order
+            rank = {s: i for i, s in enumerate(tiers[int(t.group(1))]["items"])}
+        elif g.startswith("Neutral") or g == "Enchantments":           # the game lists these in KV order
             rank = kv
         return lambda e: (0 if e["_current"] else 1, rank.get(e["_icon_slug"], 10_000), e["name"].lower())
     return [(g, None, sorted(buckets[g], key=key(g))) for g in names]
@@ -870,7 +870,20 @@ _SHOP_PANELS = [
     ("Basics",   ["Consumables", "Attributes", "Equipment", "Miscellaneous", "Secret Shop", "Other"]),
     ("Upgrades", ["Accessories", "Support", "Magical", "Armor", "Weapons", "Armaments"]),
 ]
-_TIER_TIME = {1: "0:00+", 2: "15:00+", 3: "25:00+", 4: "35:00+", 5: "60:00+"}
+def _tier_times():
+    """{tier: "30:00+"} from the game's neutral_items.txt (owner 2026-11-23: 25:00 / 35:00 had been written by hand,
+    the game says 30:00 / 50:00)"""
+    from patch.shop_layout import neutral_tiers
+    return {t: v["time"] + "+" for t, v in neutral_tiers().items()}
+
+
+class _TierTime(dict):
+    def __missing__(self, t):
+        self.update(_tier_times())
+        return dict.get(self, t, "")
+
+
+_TIER_TIME = _TierTime()
 
 
 def _kv_rank() -> dict[str, int]:

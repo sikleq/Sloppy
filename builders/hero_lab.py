@@ -1384,9 +1384,12 @@ def render_html() -> str:
     items = _load_items(version)
     innate_rules = _innate_rules.load().get("heroes", {})     # JSON + history from newer game files
     from patch.game_constants import for_js as _game_constants
+    from patch.shop_layout import neutral_tiers, shop_order
+    # the picker's order comes from the game's shop files (owner 2026-11-23), not a list in hero-lab.js
     data = _json.dumps(
         {"patch": version, "heroes": heroes, "items": items, "innateRules": innate_rules,
-         "constants": _game_constants()},
+         "constants": _game_constants(), "shopOrder": shop_order(),
+         "neutralOrder": {str(t - 1): v["items"] for t, v in neutral_tiers().items()}},
         separators=(",", ":"),
     )
     data_script = data.replace("<", "\\u003c")

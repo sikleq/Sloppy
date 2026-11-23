@@ -20,6 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]  # scripts/fetch/ -> repo root (parents[1] wrote to scripts/data/)
 OUT = ROOT / "data" / "shops.txt"
+NEUTRAL_OUT = ROOT / "data" / "neutral_items.txt"
 DEFAULT_DOTA = r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota"
 
 
@@ -74,6 +75,22 @@ def main() -> int:
     print(f"-> {src}  ->  {OUT.relative_to(ROOT)}")
     print(f"   {len(sections)} sections, {len(items)} item entries. "
           f"Now run:  python build_site.py patch")
+    # the neutral tiers as the game has them: unlock times and each tier's items in their pools' order
+    # (owner 2026-11-23: the Hero Lab picker had 25:00 / 35:00 written by hand, the game says 30:00 / 50:00)
+    src = "scripts/npc/neutral_items.txt"
+    if src not in all_paths:
+        print(f"X {src} not in the VPK — Valve moved it; data/neutral_items.txt stays as it was")
+        return 1
+    f = pak.get_file(src)
+    text = decode_valve_text(f.read())
+    f.close()
+    if "neutral_tiers" not in text:
+        print(f"X {src} has no neutral_tiers block — data/neutral_items.txt stays as it was")
+        return 1
+    tmp = NEUTRAL_OUT.with_suffix(".part")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, NEUTRAL_OUT)
+    print(f"-> {src}  ->  {NEUTRAL_OUT.relative_to(ROOT)}")
     return 0
 
 

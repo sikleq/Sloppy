@@ -277,7 +277,11 @@ def test_neutral_tier_times_follow_the_patch_notes():
             if tier not in latest or _vkey(ver) >= _vkey(latest[tier][0]):
                 latest[tier] = (ver, minutes)
     assert latest, "no neutral tier timing line found in patchnotes_english.txt"
-    for tier, (ver, minutes) in latest.items():
+    from patch.shop_layout import neutral_tiers
+    live = neutral_tiers()                        # since 2026-11-23 the times come from the game: a tier it dropped
+    for tier, (ver, minutes) in latest.items():   # (Tier 5, gone in 7.42) has none
+        if tier not in live:
+            continue
         assert ec._TIER_TIME[tier] == f"{minutes}:00+", \
             f"{ver} patch notes: tier {tier} at {minutes}:00, entity_changes._TIER_TIME says {ec._TIER_TIME[tier]}"
 
