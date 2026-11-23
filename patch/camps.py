@@ -80,6 +80,70 @@ def camp_glyph(size):
     return f'<span class="camp-type">{_img(glyph)}</span>' if glyph else ""
 
 
+_NAMES = {}
+
+
+def _creep_names():
+    """the site's creep names (CREEP_DISPLAY_NAMES of builders/creeps.py), read as a literal: patch/ imports nothing
+    from builders/ (tests/test_layers.py), and builders/entity_changes.py reads that dict the same way"""
+    if not _NAMES:
+        import ast
+        import os as _os
+        path = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "builders", "creeps.py")
+        with open(path, encoding="utf-8") as f:
+            tree = ast.parse(f.read())
+        node = next(n for n in tree.body if isinstance(n, ast.Assign)
+                    and any(getattr(t, "id", "") == "CREEP_DISPLAY_NAMES" for t in n.targets))
+        _NAMES.update(ast.literal_eval(node.value))
+    return _NAMES
+
+
+def _crew(row):
+    """[(count, display name, icon)] of a make-up's npc list, in the order the game lists them"""
+    from .images import NEUTRAL_CDN
+    CREEP_DISPLAY_NAMES = _creep_names()
+    counts = {}
+    for npc in row:
+        counts[npc] = counts.get(npc, 0) + 1
+    return [(n, CREEP_DISPLAY_NAMES[npc], NEUTRAL_CDN + npc[len("npc_dota_neutral_"):] + ".png")
+            for npc, n in counts.items()]
+
+
+def home_jungle_table(patch, map_code):
+    """The "home jungle" table (7.42) built from the game: the make-ups each side's small / medium / large spawners may
+    roll (patch/camp_sides.py: the map's spawn ranges + server.dll's camp table), their creeps as portraits and the
+    camp's name from data/rules/camp_names.json (owner 2026-11-22: "научи автоматически"). A make-up the patch before
+    did not have is a new camp (gold name). Flooded camps (make-up 7) and ancients (both sides) are left out."""
+    import json as _json
+    import os as _os
+    from .camp_sides import camp_table as _table, spawners
+    from .mech_abilities import mech_table
+    root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+    with open(_os.path.join(root, "data", "rules", "camp_names.json"), encoding="utf-8") as f:
+        names = _json.load(f)["names"]
+    with open(_os.path.join(root, "data", "rules", "camp_table.json"), encoding="utf-8") as f:
+        versions = [v for v in _json.load(f) if not v.startswith("_")]
+    k = versions.index(patch)
+    # new = none of its creeps was in a camp before (7.42 Radigull, Eimermole, Odobenus); a camp whose make-up changed
+    # (Kobold 3 -> 2, Large Satyr's Banisher -> Mindstealer) is not new
+    old = ({n for rows in _table(versions[k - 1]).values() for r in rows for n in r} if k else None)
+    table = _table(patch)
+    rolls = {}
+    for side, size, first, last in spawners(map_code):
+        if size < 3 and (first, last) != (7, 7):
+            rolls.setdefault((side, size), set()).update(range(first, last + 1))
+
+    def camp(row):
+        key = "|".join(sorted(row))
+        if key not in names:
+            raise KeyError(f"data/rules/camp_names.json: no name for the camp {key}")
+        return camp_ref(names[key], _crew(row), new=old is not None and not old & set(row))
+    rows = [[side.title()] + ["".join(camp(table[size][i - 1]) for i in sorted(rolls.get((side, size), ())))
+                              for size in range(3)] for side in ("radiant", "dire")]
+    return mech_table(["Side", camp_glyph("small") + "Small camps", camp_glyph("medium") + "Medium camps",
+                       camp_glyph("large") + "Large camps"], rows, cls="camp-jungle")
+
+
 def camp_kind(n, icon, name="", tip=""):
     """one kind of a camp's creeps: its portrait once per creep, no "2x" (owner 2026-11-20: "вместо x2 повторяющиеся
     иконки"); with a name only where the camps are new (Added N new neutral camps). tip: the creep's name in gold on

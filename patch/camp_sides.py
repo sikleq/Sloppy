@@ -61,6 +61,27 @@ def creep_sides(patch, map_code):
     return sides
 
 
+def growth(patch, map_code):
+    """[(trigger, side, [make-up per stage])] of every camp that grows (the flooded ones: map key maxUpgradeCount);
+    a stage reads the same make-up one size up (server.dll's spawner). 7.42: a small camp of 3 Pollywogs -> one
+    size up; a medium Marshmage Apprentice camp -> Marshmage + Croakers -> (two camps) Ancient Marshmage + Croakers."""
+    table = camp_table(patch)
+    md = _load(os.path.join(_ROOT, "data", "map", f"mapdata_{map_code}.json"))
+    out = []
+    for c in md["data"]["npc_dota_neutral_spawner"]:
+        up = int(c.get("maxUpgradeCount") or 0)
+        if not up:
+            continue
+        size, first, last = int(c["neutralType"]), int(c["minSpawnType"]), int(c["maxSpawnType"])
+        if first != last:
+            raise ValueError(f"{c['triggerName']}: a growing camp with several make-ups ({first}-{last})")
+        stages = [table[s][first - 1] for s in range(size, min(size + up, 3) + 1)]
+        if not all(stages):
+            raise ValueError(f"{patch}: {c['triggerName']} grows into an empty make-up")
+        out.append((c["triggerName"], _SIDE[c["triggerName"].split("_")[1]], stages))
+    return sorted(out)
+
+
 def home_side(patch, map_code):
     """{npc: "radiant" | "dire"} — only the creeps that spawn on one side (a creep of both sides is not in it)."""
     return {npc: next(iter(s)) for npc, s in creep_sides(patch, map_code).items() if len(s) == 1}

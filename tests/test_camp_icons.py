@@ -58,14 +58,19 @@ def test_camp_ref_puts_the_portraits_before_the_name_without_the_type_glyph():
 
 
 def test_742_home_jungle_names_all_18_camps_with_their_portraits():
-    src = (ROOT / "content" / "p742.py").read_text(encoding="utf-8")
-    line = next(s for s in src.splitlines() if "home jungle" in s)
-    assert line.count("camp_ref(") == 18 and 'cls="camp-jungle"' in line
-    assert "<br>" not in line                          # one camp a line comes from the cell's column, not a <br>
+    # built from the game files since 2026-11-22 (patch/camps.py home_jungle_table, tests/test_camp_sides.py)
+    import re
+    from patch.camps import home_jungle_table
+    html = home_jungle_table("7.42", "742-v3")
+    assert html.count('class="camp-ref"') == 18 and "camp-jungle" in html
+    assert "<br>" not in html                          # one camp a line comes from the cell's column, not a <br>
     # new camps in gold, not Valve's "(new!)"; the first column says the side (owner 2026-11-19)
-    assert "(new!)" not in line and line.count("new=True") == 3 and 'mech_table(["Side", ' in line
-    # make-up read from server.dll 6984: Kobold camp lost a Kobold (3 -> 2, Valve's note), Vhoul is 3 Assassins
-    assert 'camp_ref("Kobold camp", [(2, "Kobold"' in line and 'camp_ref("Vhoul camp", [(3, "Vhoul Assassin"' in line
+    assert "(new!)" not in html and html.count("camp-ref-new") == 3 and ">Side<" in html
+    # Kobold camp lost a Kobold (3 -> 2, Valve's note), Vhoul is 3 Assassins
+    kobold = html.split(">Kobold camp<")[0].rsplit('class="camp-ref"', 1)[1]
+    assert len(re.findall(r'neutral_kobold\.png', kobold)) == 2
+    vhoul = html.split(">Vhoul camp<")[0].rsplit('class="camp-ref"', 1)[1]
+    assert len(re.findall(r'neutral_gnoll_assassin\.png', vhoul)) == 3
 
 
 def test_742_camp_changes_are_one_table_valves_rows_covered():

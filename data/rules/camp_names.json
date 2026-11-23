@@ -1,0 +1,23 @@
+{
+ "_doc": "A camp's name on the site, by its make-up (npc names sorted, joined with |). The make-ups and their sides come from the game (patch/camp_sides.py); a make-up the game gains needs its name here — patch/camps.py home_jungle_table stops on a missing one.",
+ "names": {
+  "npc_dota_neutral_kobold|npc_dota_neutral_kobold|npc_dota_neutral_kobold_taskmaster|npc_dota_neutral_kobold_tunneler": "Kobold camp",
+  "npc_dota_neutral_forest_troll_berserker|npc_dota_neutral_forest_troll_berserker|npc_dota_neutral_kobold_taskmaster": "Hill Troll Berserker and Kobold camp",
+  "npc_dota_neutral_forest_troll_berserker|npc_dota_neutral_forest_troll_berserker|npc_dota_neutral_forest_troll_high_priest": "Hill Troll camp",
+  "npc_dota_neutral_alpha_wolf|npc_dota_neutral_giant_wolf|npc_dota_neutral_giant_wolf": "Wolf camp",
+  "npc_dota_neutral_ogre_magi|npc_dota_neutral_ogre_mauler|npc_dota_neutral_ogre_mauler": "Ogre camp",
+  "npc_dota_neutral_radigull|npc_dota_neutral_radigull": "Radigull camp",
+  "npc_dota_neutral_centaur_khan|npc_dota_neutral_centaur_outrunner|npc_dota_neutral_centaur_outrunner": "Centaur camp",
+  "npc_dota_neutral_enraged_wildkin|npc_dota_neutral_wildkin|npc_dota_neutral_wildkin": "Wildwing camp",
+  "npc_dota_neutral_eimermole|npc_dota_neutral_eimermole_foreman": "Eimermole camp",
+  "npc_dota_neutral_gnoll_assassin|npc_dota_neutral_gnoll_assassin|npc_dota_neutral_gnoll_assassin": "Vhoul camp",
+  "npc_dota_neutral_fel_beast|npc_dota_neutral_fel_beast|npc_dota_neutral_ghost": "Ghost camp",
+  "npc_dota_neutral_harpy_scout|npc_dota_neutral_harpy_scout|npc_dota_neutral_harpy_storm": "Harpy camp",
+  "npc_dota_neutral_satyr_soulstealer|npc_dota_neutral_satyr_soulstealer|npc_dota_neutral_satyr_trickster|npc_dota_neutral_satyr_trickster": "Satyr camp",
+  "npc_dota_neutral_mud_golem|npc_dota_neutral_mud_golem": "Golem camp",
+  "npc_dota_neutral_odobenus_footman|npc_dota_neutral_odobenus_footman|npc_dota_neutral_odobenus_frostmage": "Odobenus camp",
+  "npc_dota_neutral_satyr_hellcaller|npc_dota_neutral_satyr_soulstealer|npc_dota_neutral_satyr_soulstealer": "Large Satyr camp",
+  "npc_dota_neutral_polar_furbolg_champion|npc_dota_neutral_polar_furbolg_ursa_warrior": "Hellbear camp",
+  "npc_dota_neutral_dark_troll|npc_dota_neutral_dark_troll|npc_dota_neutral_dark_troll_warlord": "Dark Troll camp"
+ }
+}

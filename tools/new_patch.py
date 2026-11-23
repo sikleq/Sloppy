@@ -208,6 +208,10 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
         Step("itemlist", "data/itemlist.json from Valve's datafeed", [PY, "scripts/fetch/fetch_itemlist.py"]),
         Step("shops", "data/shops.txt from the game", [PY, "scripts/fetch/extract_shops.py", dota_path],
              skip=None if local_game else "no local game: data/shops.txt stays — rerun on the owner's PC"),
+        # which creeps a camp spawner may roll (owner 2026-11-22: sides and frog growth from the game, not by hand)
+        Step("camp_table", f"data/rules/camp_table.json[{version}] from the game's server.dll",
+             [PY, "scripts/gen/camp_table.py", version],
+             skip=None if local_game else "no local game: rerun scripts/gen/camp_table.py on the owner's PC"),
         Step("abilities_slim", "data/abilities_slim.json from the new snapshot", [PY, "tools/build_abilities_slim.py"]),
         Step("herolist", "data/herolist.json from the new snapshot", [PY, "tools/build_herolist.py"]),
         Step("innate_history", "data/rules/innate_history.json (which ability is each hero's innate)",

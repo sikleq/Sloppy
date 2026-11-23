@@ -337,7 +337,9 @@ def extract(vpk):
     data["npc_dota_neutral_spawner"] = [
         {**_xy(e), "triggerName": _name(e), "pullType": str(e.get("pulltype", "")),
          "neutralType": str(e.get("neutraltype", "")),
-         "minSpawnType": str(e.get("minspawntype", "")), "maxSpawnType": str(e.get("maxspawntype", ""))}
+         "minSpawnType": str(e.get("minspawntype", "")), "maxSpawnType": str(e.get("maxspawntype", "")),
+         # a flooded camp grows this many sizes up (7.42: 1 or 2 — Croakers, then Ancient Croakers)
+         "maxUpgradeCount": str(e.get("maxupgradecount", ""))}
         for e in by.get("npc_dota_neutral_spawner", [])]
     starts = {_name(e): e for e in by.get("info_player_start_dota", [])}
     # Roshan: the spawner entity plus the other pit (7.38+: "roshan_location_2"); Tormentors: both locations
