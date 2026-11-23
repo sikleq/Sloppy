@@ -8,7 +8,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_the_toolbar_has_the_upgrade_box():
     from builders import creeps
-    assert 'id="upgrade-step"' in creeps._STATS_TOOLBAR and 'max="30"' in creeps._STATS_TOOLBAR
+    assert 'id="upgrade-step"' in creeps._STATS_TOOLBAR
+    # owner 2026-11-23: no spin arrows on the site — a text box with a numeric keyboard, its value centred
+    assert 'type="number"' not in creeps._STATS_TOOLBAR and 'inputmode="numeric"' in creeps._STATS_TOOLBAR
+    css = (ROOT / "src" / "css" / "creeps-table.css").read_text(encoding="utf-8")
+    assert "padding: 0" in css.split(".upg-input {")[1].split("}")[0] and "text-align: center" in css
 
 
 def test_the_steps_match_the_games_values():

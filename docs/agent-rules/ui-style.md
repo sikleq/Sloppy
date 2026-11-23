@@ -203,6 +203,9 @@ Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы ме
   (`width:0; padding:0; font-size:0`), не `display:none` (строка групп его считает). Ряд карточек листается вбок.
 
 **Грабли, на которых уже спотыкались (не повторять)**
+- `<input type="number">` рисует стрелки вверх-вниз и сдвигает число влево — на сайте таких нет (2026-11-23, поле
+  Upgrade). Поле числа: `type="text" inputmode="numeric"`, `padding:0`, `text-align:center` — значение строго по центру;
+  ограничение диапазона — в скрипте. Время рядом — чип с часами (`.upg-time`), не голый серый текст.
 - Цвет линии своим hex: у пяти таблиц было пять оттенков (2026-11-22). Только `var(--tbl-col-line)` /
   `var(--tbl-row-line)` из `tokens.css`; линия может быть `border` или `box-shadow: inset 0 -1px 0` (у ячеек
   со sticky/rowspan), но цвет — переменная.
