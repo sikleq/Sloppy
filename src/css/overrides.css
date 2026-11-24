@@ -92,6 +92,19 @@ body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head { padding: 0; margin: 0; }
 body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { padding: 0; margin: 0; }
 .ec-head-panel .entity { margin: 0; align-items: center; gap: 18px; }
+/* strength curve under the name (owner 2026-11-24, src/js/entity-curve.js) */
+.ec-curve { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--tbl-row-line); }
+.ec-curve-svg { display: block; }
+.ec-curve-axis { stroke: var(--tbl-col-line); stroke-width: 1; }
+.ec-curve-line { fill: none; stroke: var(--gold); stroke-width: 2; }
+.ec-curve-area { fill: var(--gold-14); }
+.ec-curve-hit { fill: transparent; cursor: pointer; }
+.ec-curve-dot { fill: rgb(150, 146, 137); stroke: var(--bg-panel); stroke-width: 1.5; transition: r .12s; }
+.ec-curve-pt.is-buff .ec-curve-dot { fill: rgb(93, 177, 78); }
+.ec-curve-pt.is-nerf .ec-curve-dot { fill: rgb(190, 79, 79); }
+.ec-curve-pt:hover .ec-curve-dot, .ec-curve-pt.is-cur .ec-curve-dot { r: 6; stroke: var(--gold-strong); }
+.ec-curve-lbl { font-family: var(--font-j10); font-size: 13px; fill: var(--text-dimmer); text-anchor: middle; cursor: pointer; }
+.ec-curve-pt:hover .ec-curve-lbl, .ec-curve-pt.is-cur .ec-curve-lbl { fill: var(--gold); }
 .ec-head-panel .entity-icon { display: flex; align-items: center; }
 .ec-head-panel .entity-icon img { display: block; border-radius: 4px; box-shadow: 0 2px 10px var(--shadow-55); }
 .ec-head-panel .hero-icon img { width: 128px; height: auto; }

@@ -16,7 +16,7 @@ JS_DIR = Path(__file__).resolve().parent.parent / "src" / "js"
 JS_PARTS = (
     "nav-subnav", "back-arrow", "patch-reanchor", "back-to-top", "version-dropdown", "patch-page", "fold-small", "card-deck", "patch-dynamics", "talent-tree", "dyn-lens", "creeps-table", "unit-abilities-upgrades",
     "creeps-changelog", "creeps-scroll-size", "creeps-pinned", "creeps-upgrade", "tooltips", "nav-height", "mana-items",
-    "terrain-stats-rows", "mana-items-filters", "hero-stats", "changes-filters", "changes-item-slots", "changes-index",
+    "terrain-stats-rows", "mana-items-filters", "hero-stats", "changes-filters", "changes-item-slots", "entity-curve", "changes-index",
     "hero-lab", "hero-stats-divider", "mana-items-heatmap", "index-wall", "index-tiles", "formula-calculator", "terrain",
     "terrain-lightbox", "info-pop-placement", "aoe-increase", "dyn-offscreen", "creeps-scroll-guard", "search-layout",
     "search-fab", "filter-fab", "colorblind", "calendar-builds",
@@ -40,6 +40,7 @@ PART_MARKERS = {
     "aoe-increase": r"aoe-table",
     "changes-filters": r"ec-scope-btn|ec-ab-btn",
     "changes-item-slots": r"ec-islots",
+    "entity-curve": r"ec-curve",
     "changes-index": r"data-ec-search",
     "index-wall": r"inv-signatures",
     "index-tiles": r"inv-book|inv-cell-",
@@ -50,7 +51,7 @@ PART_MARKERS = {
 # The kinds of page and their parts beyond the common ones. hero-lab reads innateDpm of hero-stats and ecShopMarkup of changes-item-slots.
 JS_PAGES = {
     "base": (),
-    "entity": ("changes-filters", "changes-item-slots"),
+    "entity": ("changes-filters", "changes-item-slots", "entity-curve"),
     "changes": ("changes-filters", "changes-item-slots", "changes-index", "index-wall"),
     "table": ("creeps-table", "creeps-changelog", "creeps-pinned", "creeps-upgrade", "unit-abilities-upgrades", "dyn-lens", "dyn-offscreen", "mana-items",
               "mana-items-filters", "mana-items-heatmap", "hero-stats", "hero-stats-divider", "terrain-stats-rows", "aoe-increase"),

@@ -530,6 +530,20 @@ def _tag_talent_rows(body: str, names: list[str], hero_slug: str | None = None) 
     return "".join(out)
 
 
+# owner 2026-11-24 (variant A, layout 1): the strength curve - a running sum of the patches' weights - under the name in
+# the header. Hidden below 3 changed patches (one or two points say nothing). Drawn by src/js/entity-curve.js.
+CURVE_MIN_PATCHES = 3
+
+
+def _curve_box(rec: dict, dyn: dict) -> str:
+    mine = rec.get("patches", {})
+    order = [p["version"] for p in reversed(dyn.get("patches", [])) if p["version"] in mine]
+    if len(order) < CURVE_MIN_PATCHES:
+        return ""
+    pts = [[v, round(float(mine[v].get("w", 0) or 0), 3)] for v in order]
+    return f'<div class="ec-curve" data-curve="{_esc(_json.dumps(pts, separators=(",", ":")))}"></div>'
+
+
 def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     folder, label, key, _ = KINDS[e["kind"]]
     nav = _site.render_top_nav("materials", f"../patches/{latest}.html", patch_context=True, subtabs_active=key)
@@ -634,7 +648,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
            '<section class="cat-panel ec-head-panel"><div class="entity-block ec-head">'
            f'<div class="entity {ent_cls}-entity" id="{eid}">'
            f'<div class="entity-icon {icon_cls}"><img src="{_esc(e["icon"])}" alt="{_esc(e["name"])}"></div>'
-           f'{_name_block(e)}</div></div></section>\n']
+           f'{_name_block(e)}</div>{_curve_box(rec, dyn)}</div></section>\n']
     if not e["patches"]:
         # name the annotated patches: "since 7.08" read as "unchanged since 7.08", but 7.09-7.37 have no pages
         # (owner 2026-10-06, Kobold Foreman: Liquipedia lists 14 changes, the site's patches hold one)
