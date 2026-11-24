@@ -95,7 +95,7 @@ def test_the_filters_open_from_a_button_of_the_corner_stack():
     from patch.page import FILTER_FAB
     assert FILTER_FAB.startswith('<button class="filter-fab" id="filter-fab" type="button" aria-expanded="true"')
     page_src = (ROOT / "patch" / "page.py").read_text(encoding="utf-8")
-    assert "'</button>' + FILTER_FAB +" in page_src and "FILTER_TOGGLE" not in page_src
+    assert "'</button>' + FILTER_FAB + SEARCH_FAB +" in page_src and "FILTER_TOGGLE" not in page_src
     assert html.count('<span class="fp-word">') == 9 and "Filters" not in html
     # look 6 of the mock, "галочки в рамке": a framed card, a box before each word, filled when ticked
     assert "fp-tile" not in html
@@ -114,7 +114,7 @@ def test_the_filters_open_from_a_button_of_the_corner_stack():
     dock = page_src[page_src.index("W('<div class=\"corner-dock\">'"):]
     # "top" shows no colour until the script knows where the page is: neither a gold flash at the top ("при ctrl+f5
     # кнопка «наверх» на секунду золотая") nor a grey one lower down ("на секунду серая, потом уже золотая")
-    order = [dock.index(k) for k in ('class="back-to-top at-top btt-wait"', "FILTER_FAB", 'class="search-fab"',
+    order = [dock.index(k) for k in ('class="back-to-top at-top btt-wait"', "FILTER_FAB", "SEARCH_FAB",
                                      'class="dyn-w-fab"')]
     assert order == sorted(order)
     js = (ROOT / "src" / "js" / "filter-fab.js").read_text(encoding="utf-8")

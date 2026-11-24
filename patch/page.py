@@ -85,6 +85,13 @@ FILTER_TAGS = (("buff", "buff-text", "BUFF"), ("nerf", "nerf-text", "NERF"), ("n
 # tools/pixel_icons/filter_icon.py)
 FILTER_FAB = ('<button class="filter-fab" id="filter-fab" type="button" aria-expanded="true" aria-controls="filter-pop" '
               'aria-label="Filters"></button>')
+# the search: a loupe in the corner stack and its field above it; hero / item pages use them too (owner 2026-11-24)
+SEARCH_FAB = ('<button class="search-fab" id="search-fab" type="button" aria-label="Search heroes, items, abilities" '
+              'aria-expanded="false" aria-controls="search-pop" title="Search (\\ or /)" aria-keyshortcuts="Backslash Slash">'
+              '</button>')
+SEARCH_POP = ('<div class="search-pop" id="search-pop" hidden><div class="search-box">'
+              '<input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" '
+              'spellcheck="false"><div class="search-results" id="search-results"></div></div></div>')
 
 
 def filter_pop_html():
@@ -117,17 +124,13 @@ def write_footer():
     # "Top" jumps at once, no ride up ("чтобы телепортировало наверх, а не везло").
     W('<div class="corner-dock">'
       '<button class="back-to-top at-top btt-wait" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:\'instant\'})">'
-      '</button>' + FILTER_FAB +
-      '<button class="search-fab" id="search-fab" type="button" aria-label="Search heroes, items, abilities" '
-      'aria-expanded="false" aria-controls="search-pop" title="Search (\\ or /)" aria-keyshortcuts="Backslash Slash">'
-      '</button><button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>'
+      '</button>' + FILTER_FAB + SEARCH_FAB +
+      '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>'
       # (no button dimming the old cards: removed 2026-11-09, "фильтр блюра … удалить, как и функцию" — the old
       # ability card lies under the new one instead, patch/card_deck.py)
       '</div>')
     # the search field opens above the panel ("/" opens it, Esc closes)
-    W('<div class="search-pop" id="search-pop" hidden><div class="search-box">'
-      '<input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">'
-      '<div class="search-results" id="search-results"></div></div></div>')
+    W(SEARCH_POP)
     # the filters' card at the right edge, middle of the screen; the panel's filter button hides it
     W(filter_pop_html())
     W(f'<script defer src="../src/scripts-base.js?v={_ASSET_VERSION}"></script>')

@@ -670,12 +670,13 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
                    f'<span class="ec-date">{_esc(p["date"])}</span>{label}{score}</h2>\n{body}\n</section>\n')
     # no hover tips on the corner buttons, as on the patch pages (owner 2026-09-28)
     # the corner buttons in one framed panel as on the patch pages: top, filters (when there are any), weights
-    from patch.page import FILTER_FAB
+    from patch.page import FILTER_FAB, SEARCH_FAB, SEARCH_POP
     out.append('<div class="corner-dock"><button class="back-to-top at-top btt-wait" aria-label="Back to top" '
                'onclick="window.scrollTo({top:0, behavior:\'instant\'})"></button>'
-               + (FILTER_FAB if e["patches"] else "")
+               + (FILTER_FAB + SEARCH_FAB if e["patches"] else "")
                + '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button></div>'
-               f'<script defer src="../src/scripts-entity.js?v={asset}"></script>\n</div></body></html>\n')
+               + (SEARCH_POP if e["patches"] else "")
+               + f'<script defer src="../src/scripts-entity.js?v={asset}"></script>\n</div></body></html>\n')
     return "".join(out)
 
 

@@ -186,8 +186,7 @@
   });
 
   // ---- CATEGORIES FILTER ----
-  // Tag every element between adjacent <h2 class="section"> headers with the
-  // preceding section's slug so the buttons can hide non-matching siblings.
+  // Tag every element between adjacent <h2 class="section"> headers with the preceding section's slug (buttons hide the rest).
   (function indexSections() {
     const headers = document.querySelectorAll('h2.section[data-section]');
     headers.forEach(h => {
@@ -350,8 +349,7 @@
     }, isFacet && !head.querySelector('.ability-chip') ? facetLook(block.querySelector(':scope > .facet-icon-wrap')) : null));
   });
 
-  // An ability or facet says whose it is: 7.38 has Riverborn Aura on four creeps (owner 2026-11-07: "в поиске тоже
-  // непонятно, какая к чему")
+  // An ability or facet says whose it is: 7.38 has Riverborn Aura on four creeps ("непонятно, какая к чему", 2026-11-07)
   entities.forEach(e => {
     if (e.kind !== 'ability' && e.kind !== 'facet') return;
     const eb = e.element.closest('.entity-block');
@@ -365,6 +363,8 @@
     const own = e.owner + "'s ";
     if (e.name.startsWith(own)) e.name = e.name.slice(own.length);
   });
+  // A hero / item page has an ability once per patch: one result per name, the newest (owner 2026-11-24)
+  for (let i = 0, k, seenNames = new Set(); document.body.classList.contains('entity-page') && i < entities.length; i++) if (seenNames.has(k = entities[i].kind + '|' + entities[i].name.toLowerCase())) entities.splice(i--, 1); else seenNames.add(k);
 
   function escapeHtml(s) { return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
   function highlight(name, q) {
