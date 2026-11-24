@@ -36,39 +36,26 @@
   transform: none;                                             /* a chart segment must not pop out */
   box-shadow: none;
 }
+/* the row's wave (one SVG in the first visible cell) draws the zero line itself */
 .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
-.heroes-dyn-table.w-mode td.he::after { width: 100%; }
-/* line chart pieces */
-.dyn-wl .seg { stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.heroes-dyn-table.w-mode td.he::after { display: none; }
+.heroes-dyn-table.w-mode td.he { padding: 0; }
+.heroes-dyn-table.w-mode td.dyn-wl-host { position: relative; }
+.heroes-dyn-table svg.dyn-wl {
+  position: absolute; left: 0; top: 50%; margin-top: -14px;
+  overflow: visible; pointer-events: none; z-index: 2;
+}
+/* wave pieces: colour = that patch's change, quiet stretches neutral */
+.dyn-wl .quiet { fill: none; stroke: rgba(205, 199, 187, 0.6); stroke-width: 1.5; stroke-linecap: round; }
+.dyn-wl .seg { stroke-width: 2; stroke-linecap: round; }
 .dyn-wl .seg.up, .dyn-wl .pt.up { stroke: rgb(62, 178, 96); fill: rgb(62, 178, 96); }
 .dyn-wl .seg.down, .dyn-wl .pt.down { stroke: rgb(188, 92, 120); fill: rgb(188, 92, 120); }
-.dyn-wl .seg.flat, .dyn-wl .pt.flat { stroke: rgb(170, 165, 155); fill: rgb(170, 165, 155); }
-/* untouched cell that carries the tail of a neighbour's segment */
-.heroes-dyn-table.w-mode td.he { padding: 0; }
-.heroes-dyn-table.w-mode td.he.he-seg::after { display: none; }
-.heroes-dyn-table.w-mode td.he.he-seg > svg.dyn-wl { display: block; width: 100%; height: 28px; }
-.dyn-wl polyline { vector-effect: non-scaling-stroke; }
+.dyn-wl path.seg { fill: none !important; }
+.dyn-wl .area { stroke: none; }
+.dyn-wl .area.up { fill: rgba(62, 178, 96, 0.25); }
+.dyn-wl .area.down { fill: rgba(188, 92, 120, 0.25); }
 .hs-attr-filter.hd-weights-btn img { width: 18px; height: 16px; display: block; image-rendering: pixelated; }
 .hd-weights-group { margin-left: 2px; }
-.heroes-dyn-table .dyn-cell-wrap.w-line .dyn-wl {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.dyn-wl .axis { stroke: rgba(205, 199, 187, 0.35); stroke-width: 1; }
-.dyn-wl polyline { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.dyn-wl.up polyline, .dyn-wl.up circle { stroke: rgb(62, 178, 96); fill: rgb(62, 178, 96); }
-.dyn-wl.down polyline, .dyn-wl.down circle { stroke: rgb(188, 92, 120); fill: rgb(188, 92, 120); }
-.dyn-wl.flat polyline, .dyn-wl.flat circle { stroke: rgb(170, 165, 155); fill: rgb(170, 165, 155); }
-.dyn-wl polyline { fill: none !important; }
-.heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
-.heroes-dyn-table.w-mode td.he::after {
-  height: 1px;
-  border-radius: 0;
-  background: rgba(205, 199, 187, 0.35);
-  vertical-align: middle;
-}
 /* Tooltip header: version on the left, weighted score on the right. */
 .dyn-tip-header.has-score {
   display: flex;

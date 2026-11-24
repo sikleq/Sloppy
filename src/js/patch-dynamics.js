@@ -363,70 +363,76 @@
       td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut, wMode));
     });
     if (wMode) dynDrawRowLines(table);
-    else table.querySelectorAll('td.he-seg').forEach(td => { td.classList.remove('he-seg'); td.querySelector('svg.dyn-wl')?.remove(); });
+    else table.querySelectorAll('svg.dyn-wl').forEach(x => x.remove());
   }
 
-  // Weights mode on the matrices: every row is ONE step line of the per-patch net
-  // score, the row itself is the zero axis.
-  //  - STEP line: a touched patch is a flat plateau across its whole cell (the value
-  //    belongs to the patch, nothing is interpolated between patches); vertical
-  //    risers at the cell edges join it to the neighbour (0 for an untouched patch).
-  //  - Colour follows the SIDE of the axis, not the cell: everything above the axis
-  //    is green, below is red; a riser that crosses the axis is split at the axis.
-  //  - LINEAR scale per row, computed over the VISIBLE columns only ("Hide old"
-  //    hides the rest), floor 1.5: a 2.0 is exactly twice as high as a 1.0.
+  // Weights mode on the matrices: every row is ONE smooth wave of the per-patch net
+  // score (owner 2026-11-24, variant "B"), drawn as a single SVG over the row.
+  //  - The row's middle is zero. A changed patch is a smooth hump up (buff) or dip down
+  //    (nerf) through its cell centre; a quiet patch sits on the zero line, so the line
+  //    never breaks.
+  //  - Colour = the change of THAT patch, never the side of the axis: the hump of a buff
+  //    is green, of a nerf red, quiet stretches a neutral grey line without fill. The
+  //    coloured piece runs down to the zero line at a quiet neighbour's centre, or meets
+  //    a changed neighbour half way.
+  //  - LINEAR scale per row over the VISIBLE columns only ("Hide old"), floor 1.5.
   // Idempotent: called after every refill AND after every layout pass.
   const DYN_W_MIN_SCALE = 1.5;
+  function dynSmoothPath(pts) {      // Catmull-Rom through the points, as cubic Beziers
+    const f = n => n.toFixed(1);
+    let d = `M${f(pts[0][0])},${f(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(i - 1, 0)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(i + 2, pts.length - 1)];
+      d += ` C${f(p1[0] + (p2[0] - p0[0]) / 6)},${f(p1[1] + (p2[1] - p0[1]) / 6)}`
+         + ` ${f(p2[0] - (p3[0] - p1[0]) / 6)},${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])},${f(p2[1])}`;
+    }
+    return d;
+  }
   function dynDrawRowLines(table) {
     const NS = 'http://www.w3.org/2000/svg';
-    const W = 40, H = 28, mid = H / 2, amp = mid - 2.5;
+    const H = 28, mid = H / 2, amp = mid - 2.5;
     const mk = (tag, attrs) => {
       const el = document.createElementNS(NS, tag);
       for (const k in attrs) el.setAttribute(k, attrs[k]);
       return el;
     };
-    table.querySelectorAll('tbody tr').forEach(tr => {
-      const all = [...tr.children];
-      const tds = all.filter(td => td.matches('td.hd-cell, td.he, td.ha') && !td.classList.contains('hd-spacer'));
-      tds.forEach(td => {
-        td.querySelectorAll('svg.dyn-wl').forEach(x => x.remove());
-        td.classList.remove('he-seg');
-      });
-      const vis = tds.map(td => td.getClientRects().length > 0);
+    table.querySelectorAll('svg.dyn-wl').forEach(x => x.remove());
+    table.querySelectorAll('td.dyn-wl-host').forEach(td => td.classList.remove('dyn-wl-host'));
+    table.querySelectorAll('tbody tr').forEach((tr, rowIdx) => {
+      if (!tr.getClientRects().length) return;
+      const tds = [...tr.children].filter(td => td.matches('td.hd-cell, td.he, td.ha')
+        && !td.classList.contains('hd-spacer') && td.getClientRects().length > 0);
+      if (!tds.length) return;
       const vals = tds.map(td => {
         const c = td.querySelector('.w-line .dyn-cell');
         return c ? (parseFloat(c.dataset.w) || 0) : 0;
       });
-      const scale = Math.max(DYN_W_MIN_SCALE, ...vals.filter((_, i) => vis[i]).map(Math.abs));
+      const host = tds[0], left = host.getBoundingClientRect().left;
+      const xs = tds.map(td => { const r = td.getBoundingClientRect(); return r.left - left + r.width / 2; });
+      const width = tds[tds.length - 1].getBoundingClientRect().right - left;
+      const half = xs.length > 1 ? (xs[1] - xs[0]) / 2 : width / 2;
+      const scale = Math.max(DYN_W_MIN_SCALE, ...vals.map(Math.abs));
       const yOf = v => mid - Math.max(-1, Math.min(1, v / scale)) * amp;
-      // a hidden ("Hide old") neighbour counts as the axis: its value is outside the row scale,
-      // so the first visible cell must not start with a riser from an invisible, clipped level
-      const at = j => (j < 0 || j >= vals.length || !vis[j]) ? 0 : vals[j];
-      const cls = y => (y < mid - 0.05 ? 'up' : (y > mid + 0.05 ? 'down' : 'flat'));
-      tds.forEach((td, i) => {
-        if (!vis[i]) return;
-        const v = vals[i], prev = at(i - 1);
-        const c = td.querySelector('.w-line .dyn-cell');
-        if (!c && (td.matches('td.ha') || (!v && !prev))) return;   // plain axis from CSS
-        const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none', class: 'dyn-wl' });
-        svg.appendChild(mk('line', { x1: 0, x2: W, y1: mid, y2: mid, class: 'axis' }));
-        const yv = yOf(v), yp = yOf(prev);
-        // riser at the LEFT edge, from the previous patch's level to this one, split at the axis
-        if (yp !== yv) {
-          const seg = (y1, y2) => svg.appendChild(mk('line', {
-            x1: 0, x2: 0, y1: y1.toFixed(1), y2: y2.toFixed(1), class: 'seg ' + cls((y1 + y2) / 2) }));
-          if ((yp - mid) * (yv - mid) < 0) { seg(yp, mid); seg(mid, yv); } else seg(yp, yv);
-        }
-        // plateau across the whole cell
-        if (v) svg.appendChild(mk('line', { x1: 0, x2: W, y1: yv.toFixed(1), y2: yv.toFixed(1), class: 'seg ' + cls(yv) }));
-        if (c) {
-          svg.appendChild(mk('circle', { cx: W / 2, cy: yv.toFixed(1), r: 2.4, class: 'pt ' + cls(yv) }));
-          c.appendChild(svg);
-        } else {
-          td.classList.add('he-seg');
-          td.appendChild(svg);
-        }
+      const path = dynSmoothPath([[0, mid], ...vals.map((v, i) => [xs[i], yOf(v)]), [width, mid]]);
+      const area = `${path} L${width.toFixed(1)},${mid} L0,${mid} Z`;
+      const svg = mk('svg', { class: 'dyn-wl', width: width.toFixed(0), height: H,
+        viewBox: `0 0 ${width.toFixed(0)} ${H}`, 'aria-hidden': 'true' });
+      svg.appendChild(mk('path', { d: path, class: 'quiet' }));
+      vals.forEach((v, i) => {
+        if (!v) return;
+        const side = v > 0 ? 'up' : 'down';
+        const x0 = i === 0 ? 0 : (vals[i - 1] ? xs[i] - half : xs[i - 1]);
+        const x1 = i === vals.length - 1 ? width : (vals[i + 1] ? xs[i] + half : xs[i + 1]);
+        const id = `dyn-wl-${rowIdx}-${i}`;
+        const cp = mk('clipPath', { id });
+        cp.appendChild(mk('rect', { x: x0.toFixed(1), y: -4, width: (x1 - x0).toFixed(1), height: H + 8 }));
+        svg.appendChild(cp);
+        svg.appendChild(mk('path', { d: area, class: 'area ' + side, 'clip-path': `url(#${id})` }));
+        svg.appendChild(mk('path', { d: path, class: 'seg ' + side, 'clip-path': `url(#${id})` }));
+        svg.appendChild(mk('circle', { cx: xs[i].toFixed(1), cy: yOf(v).toFixed(1), r: 2.4, class: 'pt ' + side }));
       });
+      host.classList.add('dyn-wl-host');
+      host.appendChild(svg);
     });
   }
 

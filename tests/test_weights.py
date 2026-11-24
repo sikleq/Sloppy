@@ -176,12 +176,24 @@ def test_ability_and_facet_cards_add_volume(v741):
 
 # ---- matrix JS -----------------------------------------------------------------------------
 
-def test_matrix_line_ignores_hidden_neighbour():
-    """"Hide old": the first visible cell drew a riser from the hidden column's (clipped) level."""
+def _row_lines_body():
     js = read_js()
     body = js[js.index("function dynDrawRowLines"):]
-    body = body[:body.index("\n  }\n")]
-    assert re.search(r"const at = j => \([^)]*!vis\[j\]\)", body)
+    return body[:body.index("\n  }\n")]
+
+
+def test_matrix_line_ignores_hidden_neighbour():
+    """"Hide old": hidden columns must not feed the wave or its scale."""
+    assert re.search(r"tds = \[\.\.\.tr\.children\]\.filter\([^;]*getClientRects\(\)\.length > 0", _row_lines_body(), re.S)
+
+
+def test_matrix_wave_colour_is_the_patch_change_and_never_breaks():
+    """Owner 2026-11-24: colour = that patch's buff / nerf (not the side of the axis);
+    one continuous line per row, quiet patches a neutral line."""
+    body = _row_lines_body()
+    assert "const side = v > 0 ? 'up' : 'down'" in body
+    assert "class: 'quiet'" in body
+    assert "dynSmoothPath([[0, mid]" in body
 
 
 def test_pull_strength_is_not_the_strength_attribute():

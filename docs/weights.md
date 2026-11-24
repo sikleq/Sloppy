@@ -546,12 +546,15 @@ tiers yet (run `tools/refresh_weights_data.py`).
 
 ## Matrix chart (heroes_dyn / items_dyn)
 
-One **step line** per row, the row is the zero axis: a touched patch is a flat plateau across its cell
-(nothing is interpolated between patches), vertical risers at cell edges join neighbours (0 for an untouched
-patch; the riser back to the axis is drawn in the next untouched cell). Colour follows the side of the axis
-(above = green, below = red; a riser crossing the axis is split). **Linear per-row scale over the VISIBLE
-columns only** (row max |w|, at least 1.5, = half cell): 2.0 is exactly twice as high as 1.0. Redrawn after
-every layout pass ("Hide old", resize). History of rejected variants: bars v1, sqrt line, cumulative line, bars v2 with a volume band.
+One **smooth wave** per row (owner 2026-11-24, "variant B"), one SVG over the whole row, the row's middle
+is zero: a changed patch is a hump up (buff) or dip down (nerf) through its cell centre, a quiet patch sits on
+the zero line, so the line never breaks. **Colour = that patch's change**, never the side of the axis (owner:
+colours by side made Abaddon look different in every variant): the coloured piece runs down to zero at a
+quiet neighbour's centre or meets a changed neighbour half way; quiet stretches are a neutral grey line, no
+fill. **Linear per-row scale over the VISIBLE columns only** (row max |w|, at least 1.5, = half cell): 2.0 is
+exactly twice as high as 1.0. Redrawn after every layout pass ("Hide old", resize). History of rejected
+variants: bars v1, sqrt line, cumulative line (twice, last 2026-11-24), bars v2 with a volume band, step line
+(broke at every quiet patch). Mock-ups: `docs/research/dyn_variants/`.
 
 ## Open / next
 1. ~~Items in gold~~ done; every stat priced 2026-09-25 (section "Item prices").

@@ -42,8 +42,8 @@ html.cb-mode .badge.buff-text { background: rgba(117, 194, 237, 0.15); color: #2
 html.cb-mode .badge.nerf-text { background: rgba(238, 135, 57, 0.15); color: #eb7115; border: 1px solid rgba(238, 135, 57, 0.42); }
 html.cb-mode .dyn-wl .seg.up, html.cb-mode .dyn-wl .pt.up { stroke: rgb(73, 174, 231); fill: rgb(73, 174, 231); }
 html.cb-mode .dyn-wl .seg.down, html.cb-mode .dyn-wl .pt.down { stroke: rgb(236, 123, 39); fill: rgb(236, 123, 39); }
-html.cb-mode .dyn-wl.up polyline, html.cb-mode .dyn-wl.up circle { stroke: rgb(73, 174, 231); fill: rgb(73, 174, 231); }
-html.cb-mode .dyn-wl.down polyline, html.cb-mode .dyn-wl.down circle { stroke: rgb(236, 123, 39); fill: rgb(236, 123, 39); }
+html.cb-mode .dyn-wl .area.up { fill: rgba(73, 174, 231, 0.38); }
+html.cb-mode .dyn-wl .area.down { fill: rgba(236, 123, 39, 0.38); }
 html.cb-mode .ec-score.pos { color: rgb(96, 184, 234); }
 html.cb-mode .ec-score.neg { color: rgb(244, 179, 131); }
 html.cb-mode .badge.new { color: #f3da36; background: rgba(245, 225, 90, 0.15); border-color: rgba(245, 225, 90, 0.57); }
