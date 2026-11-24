@@ -10,6 +10,10 @@
 .ec-ab-btn.ec-ab-icon.ec-ab-old { border-style: dashed; opacity: 1; }
 .ec-ab-btn.ec-ab-icon.ec-ab-old img { filter: grayscale(1) brightness(0.8); opacity: 0.45; }
 .ec-ab-btn.ec-ab-icon.ec-ab-old:hover img, .ec-ab-btn.ec-ab-icon.ec-ab-old.active img { opacity: 0.8; }
+/* a chosen ability must be plain to see (owner 2026-11-24: "почти не видно, когда выбрана"): a 2px gold ring + glow */
+.ec-ab-btn.ec-ab-icon.active { outline: 2px solid var(--gold); outline-offset: 1px; box-shadow: 0 0 8px 1px rgba(227, 196, 106, 0.75); z-index: 1; }
+/* picked items on a hero page can be hidden without removing them (owner 2026-11-24) */
+body.ec-items-off .ec-item-inject, body.ec-items-off section.ec-item-only, .ec-items-btn[hidden] { display: none; }
 /* Shard / Scepter chips: the Aghanim blue (owner 2026-09-26 — tried gold, asked for the blue back) */
 .ec-scope-btn.ec-aghs-btn {
   color: #8fc3ff; background: rgba(80, 150, 235, 0.14); border-color: rgba(110, 170, 240, 0.5);

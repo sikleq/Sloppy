@@ -178,5 +178,29 @@ function ecShopMarkup(panels) {
     }
     openPicker(i).catch(err => console.error('item picker:', err));
   }));
+  // "Items" in the filter row: hides the picked items' changes without removing the picks (owner 2026-11-24).
+  // Lit = shown. Only while something is picked; remembered per hero like the picks.
+  const OFF_KEY = KEY + ':off';
+  const itemsBtn = document.createElement('button');
+  itemsBtn.type = 'button';
+  itemsBtn.className = 'badge ec-scope-btn ec-items-btn';
+  itemsBtn.textContent = 'Items';
+  const scopesNow = document.querySelectorAll('.ec-filters .ec-scope-btn');
+  if (scopesNow.length) scopesNow[scopesNow.length - 1].after(itemsBtn);
+  else (document.querySelector('.ec-filters') || box).appendChild(itemsBtn);
+  const setOff = off => {
+    document.body.classList.toggle('ec-items-off', off);
+    itemsBtn.classList.toggle('active', !off);
+    try { off ? localStorage.setItem(OFF_KEY, '1') : localStorage.removeItem(OFF_KEY); } catch (e) {}
+  };
+  let off = false;
+  try { off = localStorage.getItem(OFF_KEY) === '1'; } catch (e) {}
+  setOff(off);
+  itemsBtn.addEventListener('click', () => setOff(!document.body.classList.contains('ec-items-off')));
+  const showBtn = () => { itemsBtn.hidden = !picks.some(Boolean); };
+  showBtn();
   if (picks.some(Boolean)) apply().catch(err => console.error('item slots:', err));
+  // keep the button in step with the picks
+  box.addEventListener('click', () => setTimeout(showBtn, 0));
+  overlay.addEventListener('click', () => setTimeout(showBtn, 0));
 })();

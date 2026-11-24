@@ -1,0 +1,4 @@
+{
+  "_doc": "Abilities the game hands out from its code, not from a slot or another KV line: their block sits in the hero's KV file with nothing naming it, so builders/entity_changes.py would call them removed. Hero npc short name -> ability slugs. Chen 7.42: the anointed Zealot gets Martyrdom (owner 2026-11-24).",
+  "chen": ["chen_martyrdom"]
+}

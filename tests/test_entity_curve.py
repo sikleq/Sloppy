@@ -17,3 +17,17 @@ def test_the_curve_lists_patches_old_to_new_with_their_weights():
 def test_no_curve_below_three_changed_patches():
     assert ec._curve_box({"patches": {"7.42": {"w": 1}, "7.39": {"w": 1}}}, DYN) == ""
     assert ec._curve_box({}, DYN) == ""
+
+
+def test_martyrdom_is_a_current_chen_ability():
+    # owner 2026-11-24: the Zealot gets Martyrdom from the game's code, it is not removed
+    from patch.meta import latest_stats_version
+    if not (ec._HERE / "data" / "stats" / latest_stats_version() / "heroes" / "npc_dota_hero_chen.txt").exists():
+        return
+    assert "Martyrdom" in ec._hero_kit("chen")
+
+
+def test_picked_items_can_be_hidden():
+    js = (ec._HERE / "src" / "js" / "changes-item-slots.js").read_text(encoding="utf-8")
+    css = (ec._HERE / "src" / "css" / "pixel-skin-filters.css").read_text(encoding="utf-8")
+    assert "ec-items-off" in js and "body.ec-items-off .ec-item-inject" in css

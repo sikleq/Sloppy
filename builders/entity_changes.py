@@ -332,6 +332,7 @@ def _hero_kit(npc: str) -> list[str]:
     _KIT_BASIC[npc] = set(basics)
     innates = [(slim.get(d) or {}).get("dname") for d in (slotted + list(defs)) if (slim.get(d) or {}).get("is_innate")]
     live = _live_abilities(txt, defs, slotted) if kv.exists() else set()
+    live |= {d for d in _granted_in_code().get(npc, []) if d in defs}
     _KIT_CACHE[npc] = [n for n in basics + ults + aghs if n in {(slim.get(d) or {}).get("dname") for d in live}]
     _KIT_EXTRA[npc] = ([n for n in dict.fromkeys(innates) if n], live, set(slim))
     # abilities whose block is still in the KV but which the hero no longer has (Tar Bomb)
@@ -409,6 +410,12 @@ def _drop_deprecated(code: str) -> str:
             out += lines[i:i + 2] + [_drop_deprecated("\n".join(lines[i + 2:j]))] + lines[j:j + 1]
         i = j + 1
     return "\n".join(out)
+
+
+def _granted_in_code() -> dict:
+    """Hero -> abilities the game gives from its code (Chen's Zealot gets Martyrdom): data/rules/abilities_granted_in_code.json."""
+    p = _HERE / "data" / "rules" / "abilities_granted_in_code.json"
+    return {k: v for k, v in _json.loads(p.read_text(encoding="utf-8")).items() if not k.startswith("_")}
 
 
 def _live_abilities(txt: str, defs: dict, slotted: list) -> set:
