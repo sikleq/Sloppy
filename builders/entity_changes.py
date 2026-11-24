@@ -173,24 +173,20 @@ def _head(title: str, asset: str, prefix: str, body_cls: str) -> str:
             f'<link rel="stylesheet" href="{prefix}styles.css?v={asset}">\n</head>\n<body class="{body_cls}"')
 
 
-_TOOLBAR = '''<div class="toolbar">
-  <div class="toolbar-inner">
-    <div class="legend-stack">
-      <div class="legend-tags ec-filters">
-        <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
-        <button class="badge nerf-text filter-btn" data-filter="nerf">NERF</button>
-        <button class="badge new filter-btn" data-filter="new">NEW</button>
-        <button class="badge del filter-btn" data-filter="del">DEL</button>
-        <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
-        <button class="badge swap filter-btn" data-filter="swap">SWAP</button>
-        <button class="badge misc filter-btn" data-filter="misc">MISC</button>
-        <button class="badge qol filter-btn" data-filter="qol">QoL</button>
-        {scopes}{abilities}
-      </div>
-    </div>
-{info}  </div>
-</div>
-'''
+def _rail(scopes: str, abilities: str) -> str:
+    """The filters as the patch pages' framed card at the right edge (owner 2026-11-24: "сделай теги, как на странице
+    патчей"): tags in two columns, then the sections with a square box each (Shard / Scepter too, without the word
+    Aghanim), then the abilities as a grid of their icons, the removed ones under their own line."""
+    from patch.page import FILTER_TAGS
+    tags = "".join(f'<button class="badge {cls} filter-btn" data-filter="{key}" type="button">'
+                   f'<span class="fp-word">{word}</span></button>' for key, cls, word in FILTER_TAGS)
+    return ('<div class="filter-pop ec-rail" id="filter-pop"><div class="filter-rail ec-filters">'
+            f'<div class="legend-tags">{tags}</div><div class="legend-categories">{scopes}</div>{abilities}</div></div>\n')
+
+
+def _scope_btn(key: str, label: str) -> str:
+    return (f'<button type="button" class="cat-filter-btn ec-scope-btn" data-ec-scope="{key}">'
+            f'<span class="fp-word">{label}</span></button>')
 
 
 _SUBGROUP_RE = _re.compile(r'<h4 class="subgroup(?: subgroup-named)?">([^<]+)</h4>')
@@ -203,16 +199,6 @@ _INNATE_TITLE_RE = _re.compile(r'<div class="ability-block[^"]*is-innate[^"]*">'
                                r'(?:(?!<div class="ability-block).)*?<h4 class="ability-title">(.*?)</h4>', _re.S)
 _AB_ICON_RE = _re.compile(r'<div class="ability-icon-wrap[^"]*"><img[^>]*?src="([^"]+)"[^>]*></div>'
                          r'<h4 class="ability-title">([^<]+)</h4>')
-_AGHS = {"shard": ("Aghanim's Shard", "../icons/stats/aghs_shard_icon.png"),
-         "scepter": ("Aghanim's Scepter", "../icons/stats/aghs_scepter_icon.png")}
-
-
-def _aghs_btn(kind):
-    """Shard / Scepter filter (owner 2026-09-26): the rows an Aghanim upgrade changes in abilities,
-    talents and facets. The item itself (stats, price) is the item slots' job."""
-    name, icon = _AGHS[kind]
-    return (f'<button type="button" class="badge ec-scope-btn ec-aghs-btn" data-ec-scope="{kind}" '
-            f'data-tooltip="{name}" aria-label="{name}"><img src="{icon}" alt=""></button>')
 
 
 def _scope_key(title: str) -> str:
@@ -558,7 +544,6 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     eid = f'dyn-{e["kind"]}-{e["slug"]}'
     icon_cls = "item-icon" if e["kind"] in ("item", "enchant") else "hero-icon"
     ent_cls = "hero" if e["kind"] == "hero" else ("item" if e["kind"] in ("item", "enchant") else "unit")
-    info = ""
     seen = []
     for p in e["patches"]:
         body, sc, tt, _ = _wrap_scopes(p["body"])
@@ -568,12 +553,10 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     scopes_html = ""
     if len(seen) > 1:
         has_innate = any('class="ability-block is-innate' in p["_body"] or "is-innate" in p["_body"] for p in e["patches"])
-        scopes_html = ('<span class="ec-vsep" aria-hidden="true"></span>' + "".join(
-            f'<button type="button" class="badge ec-scope-btn" data-ec-scope="{s}">{_SCOPE_LABEL[s]}</button>'
-            for s in _SCOPE_ORDER if s in seen)
-            + ('<button type="button" class="badge ec-scope-btn" data-ec-scope="innate">Innate</button>' if has_innate else "")
-            + "".join(_aghs_btn(k) for k in ("shard", "scepter")
-                      if any(f"aghanim-{k}" in p["_body"] for p in e["patches"])))
+        scopes_html = ("".join(_scope_btn(s, _SCOPE_LABEL[s]) for s in _SCOPE_ORDER if s in seen)
+                       + (_scope_btn("innate", "Innate") if has_innate else "")
+                       + "".join(_scope_btn(k, k.title()) for k in ("shard", "scepter")
+                                 if any(f"aghanim-{k}" in p["_body"] for p in e["patches"])))
     # every ability that was ever changed (most often changed first) -> one-click filter
     ab_count: dict[str, int] = {}
     for p in e["patches"]:
@@ -639,10 +622,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
                     f'data-tooltip="{_esc(t)}{" (removed)" if is_old else ""}" aria-label="{_esc(t)}">'
                     f'<img src="{_esc(src)}" alt="" loading="lazy" decoding="async"></button>')
         # removed abilities after their own separator, on the right (owner 2026-09-26)
-        ability_chips = ("".join(chip(t) for t in current)
-                         + ('<span class="ec-vsep ec-old-sep" aria-hidden="true"></span>'
-                            + "".join(chip(t, True) for t in old) if old else ""))
-        abilities_html = '<span class="ec-vsep" aria-hidden="true"></span>' + ability_chips
+        abilities_html = ('<div class="ec-ab-grid">' + "".join(chip(t) for t in current) + '</div>'
+                          + ('<div class="ec-ab-old-label">Removed</div><div class="ec-ab-grid">'
+                             + "".join(chip(t, True) for t in old) + '</div>' if old else ""))
     _from_kind = {"hero": "hero", "item": "item", "enchant": "item"}.get(e["kind"], "unit")
     from_tok = f'{_from_kind}:{_file_slug(e)}'
     # tag-marks: the rows' tags as tiles, as on the patch pages (owner 2026-11-19, Melee Creep's page: "тут на
@@ -650,7 +632,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     out = [_head(e["name"], asset, "../", "patch-page entity-page tag-marks"),
            f' data-dyn-prefix="../patches/" data-dyn-from="{from_tok}" data-ec-eid="{eid}">\n\n', nav,
            f'\n<a class="nav-back-arrow visible" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
-           (_TOOLBAR.format(info=info, scopes=scopes_html, abilities=abilities_html) if e["patches"] else ""),
+           (_rail(scopes_html, abilities_html) if e["patches"] else ""),
            '<div class="container">\n',
            '<section class="cat-panel ec-head-panel"><div class="entity-block ec-head">'
            f'<div class="entity {ent_cls}-entity" id="{eid}">'
@@ -687,9 +669,12 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
                    f'title="Open {_esc(e["name"])} in patch {_esc(p["version"])}">Patch {_esc(p["version"])}</a>'
                    f'<span class="ec-date">{_esc(p["date"])}</span>{label}{score}</h2>\n{body}\n</section>\n')
     # no hover tips on the corner buttons, as on the patch pages (owner 2026-09-28)
-    out.append('<button class="back-to-top" aria-label="Back to top" '
+    # the corner buttons in one framed panel as on the patch pages: top, filters (when there are any), weights
+    from patch.page import FILTER_FAB
+    out.append('<div class="corner-dock"><button class="back-to-top at-top btt-wait" aria-label="Back to top" '
                'onclick="window.scrollTo({top:0, behavior:\'instant\'})"></button>'
-               '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>'
+               + (FILTER_FAB if e["patches"] else "")
+               + '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button></div>'
                f'<script defer src="../src/scripts-entity.js?v={asset}"></script>\n</div></body></html>\n')
     return "".join(out)
 

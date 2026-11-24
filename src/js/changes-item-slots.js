@@ -183,11 +183,10 @@ function ecShopMarkup(panels) {
   const OFF_KEY = KEY + ':off';
   const itemsBtn = document.createElement('button');
   itemsBtn.type = 'button';
-  itemsBtn.className = 'badge ec-scope-btn ec-items-btn';
-  itemsBtn.textContent = 'Items';
-  const scopesNow = document.querySelectorAll('.ec-filters .ec-scope-btn');
-  if (scopesNow.length) scopesNow[scopesNow.length - 1].after(itemsBtn);
-  else (document.querySelector('.ec-filters') || box).appendChild(itemsBtn);
+  itemsBtn.className = 'cat-filter-btn ec-items-btn';
+  itemsBtn.innerHTML = '<span class="fp-word">Items</span>';
+  const cats = document.querySelector('.ec-filters .legend-categories');
+  if (cats) cats.appendChild(itemsBtn); else box.after(itemsBtn);
   const setOff = off => {
     document.body.classList.toggle('ec-items-off', off);
     itemsBtn.classList.toggle('active', !off);

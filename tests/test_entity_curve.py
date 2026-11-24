@@ -31,3 +31,11 @@ def test_picked_items_can_be_hidden():
     js = (ec._HERE / "src" / "js" / "changes-item-slots.js").read_text(encoding="utf-8")
     css = (ec._HERE / "src" / "css" / "pixel-skin-filters.css").read_text(encoding="utf-8")
     assert "ec-items-off" in js and "body.ec-items-off .ec-item-inject" in css
+
+
+def test_hero_filters_sit_in_the_right_rail():
+    # owner 2026-11-24: the patch pages' filter card; Shard / Scepter as plain boxes, abilities as an icon grid
+    rail = ec._rail(ec._scope_btn("shard", "Shard"), '<div class="ec-ab-grid"></div>')
+    assert 'class="filter-pop ec-rail" id="filter-pop"' in rail and 'data-filter="hidden"' in rail
+    assert 'class="cat-filter-btn ec-scope-btn" data-ec-scope="shard"><span class="fp-word">Shard<' in rail
+    assert "Aghanim" not in rail

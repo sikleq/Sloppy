@@ -448,6 +448,8 @@
 }
 /* at the page's top "top" has nothing to do: grey and dim ("тусклой/серой, если я наверху страницы уже") */
 .corner-dock > .back-to-top.at-top { filter: grayscale(1); opacity: 0.4; cursor: default; }
+/* ...and hovering it changes nothing (owner 2026-11-24: "подсвечивается немного, хотя не активна") */
+.corner-dock > .back-to-top.at-top:hover { filter: grayscale(1); transform: none; box-shadow: none; background-color: transparent; }
 /* until the script knows where the page is (a reload puts it back only after load), no colour at all */
 .corner-dock > .back-to-top.btt-wait { visibility: hidden; }
 .corner-dock ~ .search-pop { right: 10px; bottom: 112px; }   /* over the panel's two rows */

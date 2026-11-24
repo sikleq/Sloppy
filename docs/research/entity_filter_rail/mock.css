@@ -1,0 +1,24 @@
+/* Mock-up only. */
+.mock-rail { width: 200px; max-height: calc(100vh - 140px); top: calc(50% + 40px); }
+.mock-rail .filter-rail { max-height: calc(100vh - 140px); overflow-y: auto; scrollbar-width: none; }
+.mock-rail .filter-rail .legend-tags { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6px; }
+.mock-rail .filter-rail .fp-word { font-size: 16px; }
+.mock-rail .cat-filter-btn .mock-ico { width: 14px; height: 14px; margin: 0 -24px 0 -24px; position: relative; left: 2px; }
+.mock-rail .cat-filter-btn.mock-aghs { color: #8fc3ff; }
+.mock-abs { gap: 2px !important; }
+.mock-ab { display: flex; align-items: center; gap: 8px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer;
+  text-align: left; width: 100%; }
+.mock-ab img, .mock-ab i { flex: none; width: 20px; height: 20px; border: 2px solid #5a4b30; box-sizing: content-box; display: block;
+  filter: grayscale(.55) brightness(.75); }
+.mock-ab .fp-word { font-size: 15px !important; overflow: hidden; text-overflow: ellipsis; }
+.mock-ab:hover img { filter: none; }
+.mock-ab.active img { filter: none; border-color: var(--gold); box-shadow: 0 0 7px 1px rgba(227, 196, 106, .75); }
+.mock-ab.active .fp-word { color: var(--px-hi); }
+.mock-ab.is-old img { border-style: dashed; filter: grayscale(1) brightness(.6); }
+.mock-sep { font: 12px var(--font-j10); color: var(--px-text-soft); opacity: .7; margin: 6px 0 2px; border-top: 1px dashed var(--px-line); padding-top: 6px; }
+.mock-grid .mock-abs { display: grid !important; grid-template-columns: repeat(5, 1fr); gap: 6px !important; }
+.mock-grid .mock-ab { height: auto; justify-content: center; }
+.mock-grid .mock-sep { grid-column: 1 / -1; }
+.mock-rail .filter-btn { visibility: visible !important; }
+.mock-rail .cat-filter-btn.mock-aghs::before { display: none; }
+.mock-rail .cat-filter-btn .mock-ico { margin: 0; left: 0; width: 18px; height: 18px; flex: none; }

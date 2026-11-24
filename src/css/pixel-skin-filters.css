@@ -10,6 +10,24 @@
 .ec-ab-btn.ec-ab-icon.ec-ab-old { border-style: dashed; opacity: 1; }
 .ec-ab-btn.ec-ab-icon.ec-ab-old img { filter: grayscale(1) brightness(0.8); opacity: 0.45; }
 .ec-ab-btn.ec-ab-icon.ec-ab-old:hover img, .ec-ab-btn.ec-ab-icon.ec-ab-old.active img { opacity: 0.8; }
+/* Hero / item pages: the filters in the patch pages' card at the right edge (owner 2026-11-24, mock "сетка значков"):
+   tags in two columns, the abilities as a grid of icons, 5 a row; the name is the tip, to the left of the icon */
+/* under the site's header rather than mid-height: a long ability grid (Invoker) reached the corner buttons and the
+   card started put away */
+.filter-pop.ec-rail { top: 130px; right: 6px; transform: none; }   /* 6px: at 1440 wide it clears the 1080 column */
+.ec-rail .filter-rail .legend-tags { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6px; }
+.ec-rail .filter-rail .legend-tags .fp-word, .ec-rail .filter-rail .cat-filter-btn .fp-word { font-size: 16px; }
+.ec-rail .filter-rail .legend-tags .badge.filter-btn { gap: 7px; }
+.ec-rail .filter-rail .ec-scope-btn.active { background: none; border: 0; }
+.ec-ab-grid { display: grid; grid-template-columns: repeat(5, 24px); gap: 4px; justify-content: space-between;
+  border-top: 1px dashed var(--px-line); margin-top: 8px; padding-top: 10px; }
+.ec-ab-old-label { font: 12px var(--font-j10); color: var(--px-text-soft); margin-top: 8px; }
+.ec-ab-old-label + .ec-ab-grid { border-top: 0; margin-top: 2px; padding-top: 4px; }
+.ec-ab-grid .ec-ab-btn.ec-ab-icon { width: 24px; height: 24px; border: 1px solid #5a4b30; box-sizing: border-box; }
+.ec-ab-grid .ec-ab-btn.ec-ab-icon img { filter: grayscale(.45) brightness(.8); }
+.ec-ab-grid .ec-ab-btn.ec-ab-icon:hover img, .ec-ab-grid .ec-ab-btn.ec-ab-icon.active img { filter: none; }
+.ec-ab-grid .ec-ab-btn:not(.ec-ab-icon) { grid-column: 1 / -1; justify-self: stretch; }
+.ec-ab-grid .ec-ab-icon[data-tooltip]::after { top: 50%; left: auto; right: calc(100% + 8px); transform: translateY(-50%); }
 /* a chosen ability must be plain to see (owner 2026-11-24: "почти не видно, когда выбрана"): a 2px gold ring + glow */
 .ec-ab-btn.ec-ab-icon.active { outline: 2px solid var(--gold); outline-offset: 1px; box-shadow: 0 0 8px 1px rgba(227, 196, 106, 0.75); z-index: 1; }
 /* picked items on a hero page can be hidden without removing them (owner 2026-11-24) */

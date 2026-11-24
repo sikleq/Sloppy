@@ -269,9 +269,10 @@
 }
 .nav-back-arrow {
   left: 22px;
-  /* Solid pixel triangle (same chunky style as the patch-picker prev arrow). */
+  /* Solid pixel triangle (same chunky style as the patch-picker prev arrow). viewBox from x=2: the triangle's weight
+     sits at its base, so the plain box put it right of the middle (owner 2026-11-24: "не в центре, ближе к правому") */
   background-image:
-    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="10" y="0" width="2" height="2"/><rect x="8" y="2" width="4" height="2"/><rect x="6" y="4" width="6" height="2"/><rect x="4" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="4" y="10" width="8" height="2"/><rect x="6" y="12" width="6" height="2"/><rect x="8" y="14" width="4" height="2"/><rect x="10" y="16" width="2" height="2"/></g></svg>'),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="10" y="0" width="2" height="2"/><rect x="8" y="2" width="4" height="2"/><rect x="6" y="4" width="6" height="2"/><rect x="4" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="4" y="10" width="8" height="2"/><rect x="6" y="12" width="6" height="2"/><rect x="8" y="14" width="4" height="2"/><rect x="10" y="16" width="2" height="2"/></g></svg>'),
     linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
   background-size: auto 18px, cover;
 }
