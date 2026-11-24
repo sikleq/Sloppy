@@ -129,7 +129,7 @@
     body.cm-on .heroes-dyn-table svg.dyn-wl:not(.cm-curve){visibility:hidden}
     td.cm-host{position:relative}
     svg.cm-curve{position:absolute;left:0;top:50%;margin-top:-${MID}px;pointer-events:none;overflow:visible;z-index:2}
-    .cm-quiet{fill:none;stroke:rgba(205,199,187,.3);stroke-width:1}
+    .cm-quiet{fill:none;stroke:rgba(205,199,187,.6);stroke-width:1.5;stroke-linecap:round}
     body.cm-on .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
     body.cm-on .heroes-dyn-table.w-mode td.he::after{display:none}
     .cm-dot.up{fill:rgb(62,178,96)} .cm-dot.down{fill:rgb(188,92,120)}
