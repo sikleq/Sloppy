@@ -70,8 +70,13 @@
       if (!c.touched || !c.w) return;
       const side = c.w > 0 ? 'up' : 'down';
       // A: the rise / drop INTO this patch; B: the hump around this patch
-      const x0 = variant === 'B' ? xs[i] - half : (i ? xs[i - 1] : 0);
-      const x1 = variant === 'B' ? xs[i] + half : xs[i];
+      // B: a changed neighbour shares the border at the midpoint; a quiet neighbour lets the
+      // coloured curve run all the way down to the axis at its centre, so nothing hangs in the air
+      const busy = j => j >= 0 && j < cells.length && cells[j].touched && cells[j].w;
+      const bx0 = i === 0 ? 0 : (busy(i - 1) ? xs[i] - half : xs[i - 1]);
+      const bx1 = i === cells.length - 1 ? width : (busy(i + 1) ? xs[i] + half : xs[i + 1]);
+      const x0 = variant === 'B' ? bx0 : (i ? xs[i - 1] : 0);
+      const x1 = variant === 'B' ? bx1 : xs[i];
       const cp = mk('clipPath', { id: `${id}k${i}` });
       cp.appendChild(mk('rect', { x: x0.toFixed(1), y: -4, width: (x1 - x0).toFixed(1), height: H + 8 }));
       svg.appendChild(cp);
@@ -124,7 +129,7 @@
     body.cm-on .heroes-dyn-table svg.dyn-wl:not(.cm-curve){visibility:hidden}
     td.cm-host{position:relative}
     svg.cm-curve{position:absolute;left:0;top:50%;margin-top:-${MID}px;pointer-events:none;overflow:visible;z-index:2}
-    .cm-quiet{fill:none;stroke:rgba(205,199,187,.16);stroke-width:1}
+    .cm-quiet{fill:none;stroke:rgba(205,199,187,.3);stroke-width:1}
     body.cm-on .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
     body.cm-on .heroes-dyn-table.w-mode td.he::after{display:none}
     .cm-dot.up{fill:rgb(62,178,96)} .cm-dot.down{fill:rgb(188,92,120)}
