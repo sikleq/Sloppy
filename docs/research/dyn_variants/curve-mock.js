@@ -6,7 +6,6 @@
   const VARIANTS = {
     A: 'Cumulative',   // running total since the first visible patch
     B: 'Wave',         // per-patch value, smooth through zero between patches
-    C: 'Cumulative + strength dots',
   };
   let variant = (new URLSearchParams(location.search).get('v') || 'A').toUpperCase();
   if (!VARIANTS[variant]) variant = 'A';
@@ -63,22 +62,23 @@
     const path = smooth(pts);
     const id = 'cm' + idx;
     const svg = mk('svg', { class: 'cm-curve', width: width.toFixed(0), height: H, viewBox: `0 0 ${width.toFixed(0)} ${H}` });
-    const area = `${path} L${width},${MID} L0,${MID} Z`;
-    svg.append(
-      mk('clipPath', { id: id + 'u' }), mk('clipPath', { id: id + 'd' }));
-    svg.querySelector('#' + id + 'u').appendChild(mk('rect', { width, height: MID }));
-    svg.querySelector('#' + id + 'd').appendChild(mk('rect', { y: MID, width, height: MID }));
-    svg.appendChild(mk('line', { x1: 0, x2: width, y1: MID, y2: MID, class: 'cm-axis' }));
-    svg.appendChild(mk('path', { d: area, class: 'cm-fill up', 'clip-path': `url(#${id}u)` }));
-    svg.appendChild(mk('path', { d: area, class: 'cm-fill down', 'clip-path': `url(#${id}d)` }));
-    svg.appendChild(mk('path', { d: path, class: 'cm-line up', 'clip-path': `url(#${id}u)` }));
-    svg.appendChild(mk('path', { d: path, class: 'cm-line down', 'clip-path': `url(#${id}d)` }));
+    // ONE colour rule for every variant: colour = the change of THAT patch (green buff, red nerf).
+    // Quiet stretches (no change) are a dim neutral line, no fill.
+    svg.appendChild(mk('path', { d: path, class: 'cm-quiet' }));
+    const half = cells.length > 1 ? (xs[1] - xs[0]) / 2 : 20;
     cells.forEach((c, i) => {
       if (!c.touched || !c.w) return;
+      const side = c.w > 0 ? 'up' : 'down';
+      // A: the rise / drop INTO this patch; B: the hump around this patch
+      const x0 = variant === 'B' ? xs[i] - half : (i ? xs[i - 1] : 0);
+      const x1 = variant === 'B' ? xs[i] + half : xs[i];
+      const cp = mk('clipPath', { id: `${id}k${i}` });
+      cp.appendChild(mk('rect', { x: x0.toFixed(1), y: -4, width: (x1 - x0).toFixed(1), height: H + 8 }));
+      svg.appendChild(cp);
+      if (variant === 'B') svg.appendChild(mk('path', { d: `${path} L${width},${MID} L0,${MID} Z`, class: 'cm-fill ' + side, 'clip-path': `url(#${id}k${i})` }));
+      svg.appendChild(mk('path', { d: path, class: 'cm-line ' + side, 'clip-path': `url(#${id}k${i})` }));
       const yy = variant === 'B' ? y(c.w) : y(vals[i]);
-      const r = variant === 'C' ? 1.6 + Math.min(1, Math.sqrt(Math.abs(c.w) / 3)) * 3 : 2.4;
-      svg.appendChild(mk('circle', { cx: xs[i].toFixed(1), cy: yy.toFixed(1), r: r.toFixed(1),
-        fill: variant === 'C' ? tint(c.w) : (yy < MID ? 'rgb(62,178,96)' : 'rgb(188,92,120)'), class: 'cm-dot' }));
+      svg.appendChild(mk('circle', { cx: xs[i].toFixed(1), cy: yy.toFixed(1), r: 2.4, class: 'cm-dot ' + side }));
     });
     first.classList.add('cm-host');
     first.appendChild(svg);
@@ -124,7 +124,8 @@
     body.cm-on .heroes-dyn-table svg.dyn-wl:not(.cm-curve){visibility:hidden}
     td.cm-host{position:relative}
     svg.cm-curve{position:absolute;left:0;top:50%;margin-top:-${MID}px;pointer-events:none;overflow:visible;z-index:2}
-    .cm-axis{stroke:rgba(205,199,187,.35);stroke-width:1}
+    .cm-quiet{fill:none;stroke:rgba(205,199,187,.5);stroke-width:1.2}
+    .cm-dot.up{fill:rgb(62,178,96)} .cm-dot.down{fill:rgb(188,92,120)}
     .cm-fill.up{fill:rgba(62,178,96,.22)} .cm-fill.down{fill:rgba(188,92,120,.22)}
     .cm-line{fill:none;stroke-width:2;stroke-linecap:round}
     .cm-line.up{stroke:rgb(62,178,96)} .cm-line.down{stroke:rgb(188,92,120)}`;
