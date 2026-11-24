@@ -124,7 +124,9 @@
     body.cm-on .heroes-dyn-table svg.dyn-wl:not(.cm-curve){visibility:hidden}
     td.cm-host{position:relative}
     svg.cm-curve{position:absolute;left:0;top:50%;margin-top:-${MID}px;pointer-events:none;overflow:visible;z-index:2}
-    .cm-quiet{fill:none;stroke:rgba(205,199,187,.5);stroke-width:1.2}
+    .cm-quiet{fill:none;stroke:rgba(205,199,187,.16);stroke-width:1}
+    body.cm-on .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
+    body.cm-on .heroes-dyn-table.w-mode td.he::after{display:none}
     .cm-dot.up{fill:rgb(62,178,96)} .cm-dot.down{fill:rgb(188,92,120)}
     .cm-fill.up{fill:rgba(62,178,96,.22)} .cm-fill.down{fill:rgba(188,92,120,.22)}
     .cm-line{fill:none;stroke-width:2;stroke-linecap:round}
