@@ -14,6 +14,7 @@ import patch.site_common as _site
 # как лучше"; patch/branch_builds.release_time, tests/test_patch_release_time.py) — 21 dates moved by a day then.
 RELEASE_HISTORY = [
     # 7.42 cycle
+    {"version": "7.42a", "date": "24.11.2026", "filename": "patches/7.42a.html"},
     {"version": "7.42",  "date": "18.11.2026", "filename": "patches/7.42.html"},
     # 7.41 cycle
     {"version": "7.41f", "date": "15.09.2026", "filename": "patches/7.41f.html"},

@@ -190,7 +190,11 @@ CANONICAL_TAGS = [
     (re.compile(r"^[A-Z][\w' ]* now has an? \d+(?:\.\d+)?s cooldown$"), 'REWORK'),
     (re.compile(r'\bnow has (?:a |an )?\d[\d./]*\s?(?:s|seconds?)? ?(?:cast point|cast time|internal cooldown|break distance|cooldown|mana cost|delay|health cost)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:ends|expires|dies?|breaks?|is (?:cancell?ed|interrupted|removed)) (?:if|when|once|after)\b', re.I), 'NERF'),
-    (re.compile(r'\b(?:may|can) only (?:trigger|proc|be cast|be used|target|affect|stack)\b', re.I), 'NERF'),
+    (re.compile(r'\b(?:may|can) only (?:trigger|proc|be cast|be used|be applied|target|affect|stack)\b', re.I), 'NERF'),
+    # 7.42a: Chaos Knight "Now can be used only once per Phantasm cast", Lycan "Now marks can only be applied by …"
+    (re.compile(r'\bcan be (?:used|cast) only once\b', re.I), 'NERF'),
+    (re.compile(r'\bnow is refreshed (?:on|by|when)\b', re.I), 'BUFF'),   # 7.42a Chaos Knight: refreshed on Phantasm cast
+    (re.compile(r'\bnow correctly states\b', re.I), 'QoL'),               # 7.42a Greater Horn of Battle: a tooltip fix
     (re.compile(r'\bnow disabled by\b', re.I),                      'NERF'),
     (re.compile(r'\bdoes not affect .* in (?:the )?fountain\b', re.I), 'NERF'),
     # ── 2026-10-03 audit of 7.40 / 7.41 (7 reviewers vs the datafeeds): more "a limit is added" phrasings ──

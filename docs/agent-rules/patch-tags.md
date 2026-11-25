@@ -1225,3 +1225,22 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   не проверены). Шапка карточки — «scales with game time», на значении «2/3/4/5» — подсказка-таблица, когда какое
   (`ability_props time_scaled`, `card_sections.time_levels_hint`; владелец 2026-11-20, Odobenus Blight).
 - Таланты в подсказке-таблице переезда: слова, отличающиеся только регистром («Per Hero» / «per Hero»), — тот же талант.
+
+## Вычитка 7.42a (2026-11-25)
+
+Черновик генератора правлен в 11 строках; правило → почему:
+- «Now is refreshed on X cast» → BUFF, «can be used only once» / «can only be applied by» → NERF (Chaos Knight,
+  Lycan): добавлено ограничение или сброс в пользу героя; эвристика читала «Now …» как NEW. В `tools/patchgen/tags.py`.
+- «Now correctly states …» (Greater Horn of Battle) → QoL: исправлена подсказка, как «tooltip now shows».
+- Задержка взрыва Eggstremism (Radigull) 2 → 2.5s → `l=True`: яйцо взрывается позже, увернуться легче — нерф крипа.
+- Safety Bubble: урон по барьеру иллюзий теперь усиливается их входящим уроном → NERF.
+- Morphling «no longer triggers additional casts», «no longer allows Multicast» → DEL (поведение убрано).
+- Timbersaw: промахи по нему теперь дают стаки Reactive Armor → BUFF.
+- Исключение линтера (оставлено): Lone Druid «Now drops Everlasting items before his spirit is stored» → NERF,
+  закрыта лазейка; эвристика говорит NEW.
+- Ложная тревога `kv_review` раздел 1: «Thunderhide Base Magic Resistance from 35%» — число в `npc_units.txt`
+  (юнит), а не в файле способности; в игре было 35.
+- Silent Changes не видела `AbilityHealthCost` (Bloodslinger 75 → 100) — поле добавлено в `builders/silent.py`.
+- Слепок 7.42a = сборка 6995 (в 6993 заметок 7.42a ещё нет; GameTracking). Архив DOTA2_CLIENT на новом ПК лежит в
+  `E:/Program Files/GitHub/DOTA2_CLIENT` без прав на `git fetch`: шаг client_version запускался с
+  `DOTA2_CLIENT_DIR` = клон GameTracking.

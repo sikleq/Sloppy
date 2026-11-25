@@ -1201,7 +1201,10 @@ def _latest_home_side():
     with open(_HERE / "data" / "map" / "patch_maps.json", encoding="utf-8") as f:
         maps = list(_j.load(f)["patches"])
     patch = maps[-1].split("-")[0]
-    return home_side(patch, maps[-1].replace(".", ""))
+    # the newest map that has its own data: a letter patch on an unchanged map (7.42a = 7.42-v3) has none
+    code = next(m.replace(".", "") for m in reversed(maps)
+                if (_HERE / "data" / "map" / f"mapdata_{m.replace('.', '')}.json").exists())
+    return home_side(patch, code)
 
 
 _HOME_SIDE = _latest_home_side()

@@ -42,7 +42,8 @@ UNCHECKABLE = {("7.39c", "kunkka_tidal_wave"), ("7.40", "clinkz_wind_walk"), ("7
                ("7.37", "unstable_wand"),     # active_movespeed_pct first a KV key in 7.37 (15); 7.36c had none
                ("7.37", "beastmaster"),       # melee damage block chance vs creeps: no hero KV key (code)
                ("7.40", "furion_force_of_nature"),
-               ("7.42", "broodmother_spawn_spiderlings")}   # Valve's 14/17/20 = the spiderling's base + 0/3/6 bonus    # Valve gave the average of treant_damage_min / _max
+               ("7.42", "broodmother_spawn_spiderlings"),
+               ("7.42a", "beastmaster_summon_thunderhide")}   # Thunderhide's 35 -> 30% magic resistance is the unit's (npc_units.txt)   # Valve's 14/17/20 = the spiderling's base + 0/3/6 bonus    # Valve gave the average of treant_damage_min / _max
 # npc_dota_hero_base values a hero's own record leaves out: 100 attack speed, 0 health / mana regen
 HERO_DEFAULTS = {(100.0,), (0.0,)}
 _ICON = re.compile(r'src="[^"]*/(?:heroes|items)/([a-z0-9_]+)\.(?:webp|png)"')

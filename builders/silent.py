@@ -55,7 +55,7 @@ NOISE_PATTERNS = (
 # Set the env var SC_FULL_DIFF=1 to bypass the whitelist for debugging.
 INTERESTING_FIELDS = {
     "AbilityBehavior", "AbilityCastRange", "AbilityCastPoint", "AbilityCooldown",
-    "AbilityManaCost", "AbilityDamage", "AbilityDuration",
+    "AbilityManaCost", "AbilityHealthCost", "AbilityDamage", "AbilityDuration",   # health cost: 7.42a Bloodslinger 75 -> 100
     "AbilityCharges", "AbilityChargeRestoreTime",
     "AbilityUnitTargetTeam", "AbilityUnitTargetType", "AbilityUnitTargetFlags",
     "AbilityUnitDamageType", "SpellImmunityType", "SpellDispellableType",

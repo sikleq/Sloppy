@@ -1359,3 +1359,12 @@ def test_new_ability_ids_get_their_names_from_the_snapshot():
     assert ids, "the newest snapshot's ability_ids.json gives names"
     assert all(not name.startswith("ability_") for name, _slug in ids.values())
     assert all(aid in data.ABILS for aid in ids)
+
+
+def test_742a_only_once_refreshed_and_tooltip_fix():
+    # 7.42a: "can only be applied" / "can be used only once" add a limit -> NERF; "is refreshed on" -> BUFF;
+    # "Now correctly states" is a tooltip fix -> QoL
+    assert _guess_tag("Now marks can only be applied by Lycan's units within 1200 units of him") == "NERF"
+    assert _guess_tag("Now can be used only once per Phantasm cast") == "NERF"
+    assert _guess_tag("Now is refreshed on Phantasm cast") == "BUFF"
+    assert _guess_tag("Now correctly states that it summons Super Creeps when used") == "QoL"

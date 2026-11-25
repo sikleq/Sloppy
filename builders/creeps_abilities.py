@@ -237,7 +237,7 @@ def _dmg_qhint(text: str, tip: str) -> str:
 # files of this patch. tests/test_roster_guards.py compares the KV blocks of
 # every neutral-creep ability between this patch and the latest one and fails
 # with the changed keys — re-check those cells, then set this to the latest.
-ABIL_MANUAL_CHECKED = "7.42"
+ABIL_MANUAL_CHECKED = "7.42a"   # 7.42a: only Radigull's fuse_duration changed, no hand-written cell reads it
 
 ABIL_MANUAL = {
     'enraged_wildkin_tornado': {

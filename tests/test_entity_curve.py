@@ -39,3 +39,8 @@ def test_hero_filters_sit_in_the_right_rail():
     assert 'class="filter-pop ec-rail" id="filter-pop"' in rail and 'data-filter="hidden"' in rail
     assert 'class="cat-filter-btn ec-scope-btn" data-ec-scope="shard"><span class="fp-word">Shard<' in rail
     assert "Aghanim" not in rail
+
+
+def test_home_side_on_a_letter_patch_with_an_unchanged_map():
+    # 7.42a shipped 7.42-v3's map: no mapdata_742a.json, the home jungle still comes from the newest map data
+    assert ec._latest_home_side()

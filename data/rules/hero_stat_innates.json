@@ -2,7 +2,7 @@
   "_version": 1,
   "_doc": "Declarative source of truth for hero innate stat bonuses. Used by builders/heroes_stats.py (level-1 seeding) and src/scripts.js (per-level recompute on the heroes-stats table). Stage 1 of innate centralization — do not edit without verifying against KV files in data/stats/<patch>/heroes/.",
   "_constants_doc": "HPREG_PER_STR, ARMOR_PER_AGI and the other attribute constants named below live in patch/game_constants.py (one source for Python and scripts.js).",
-  "_checked_version": "7.42",
+  "_checked_version": "7.42a",
   "_checked_doc": "Every rule below was verified against the game files up to this patch. An effect with a \"kv\" map ({entry field: [AbilityValues key, value|hero_levelup, scale]}) follows the game by itself for newer patches (builders/innate_rules.py adds the history entries). For the rest tests/test_innate_rules_kv.py fails when a newer patch changes the innate: re-check, update the rule, then set this to the newest patch.",
   "_formula_types": {
     "attr_factor": "bonus = attrs[source] * factor",
@@ -615,7 +615,7 @@
               1
             ]
           },
-          "note": "7.41: own evasion 4.9% + 0.1% per level (before only per other Naga); 7.41b: 4% + 0.1%.",
+          "note": "7.41: own evasion 4.9% + 0.1% per level (before only per other Naga); 7.41b: 4% + 0.1%; 7.42a: 5% + 0.1% (the radius 900 -> 1200 counts other Nagas only).",
           "history": [
             {
               "since": "7.41",
@@ -625,7 +625,13 @@
             },
             {
               "since": "7.41b",
+              "until": "7.42",
               "base": 4.0,
+              "per_level": 0.1
+            },
+            {
+              "since": "7.42a",
+              "base": 5.0,
               "per_level": 0.1
             }
           ]
@@ -711,8 +717,8 @@
           "target": "dmg",
           "formula": "attr_pct_per_level",
           "source": "str",
-          "base_pct": 0.08,
-          "per_level_pct": 0.02,
+          "base_pct": 0.15,
+          "per_level_pct": 0.01,
           "kv": {
             "base_pct": [
               "bonus_damage_per_str",
@@ -725,8 +731,21 @@
               1
             ]
           },
-          "note": "KV value=0.08, hero_levelup=0.02. Handled in JS innateDmg(); not yet in Python _innate_bonus(). Note: sven_vanquisher (value=20) is a separate innate for Great Cleave — not a stat modifier.",
-          "since": "7.41"
+          "note": "KV value=0.15, hero_levelup=0.01 (7.42a; 0.08 + 0.02 in 7.41-7.42). Handled in JS innateDmg(); not yet in Python _innate_bonus(). Note: sven_vanquisher (value=20) is a separate innate for Great Cleave — not a stat modifier.",
+          "since": "7.41",
+          "history": [
+            {
+              "since": "7.41",
+              "until": "7.42",
+              "base_pct": 0.08,
+              "per_level_pct": 0.02
+            },
+            {
+              "since": "7.42a",
+              "base_pct": 0.15,
+              "per_level_pct": 0.01
+            }
+          ]
         }
       ],
       "since_note": "Wrath of God: the innate since 7.41 (patch notes 7.41: \"New innate ability\")."
@@ -1221,7 +1240,7 @@
           "formula": "hp_threshold",
           "since": "7.41a",
           "base": 10,
-          "per_threshold": 1,
+          "per_threshold": 0.75,
           "threshold": 100,
           "kv": {
             "base": [
@@ -1240,7 +1259,22 @@
               1
             ]
           },
-          "note": "KV base_slow_resist=10, slow_resistance_per_threshold=1, hp_per_threshold=100 (per 100 Max Health). Pre-7.41 Colossal only gave building damage. Hero Lab only."
+          "note": "KV base_slow_resist=10, slow_resistance_per_threshold=0.75 (7.42a; 1 before), hp_per_threshold=100 (per 100 Max Health). Pre-7.41 Colossal only gave building damage. Hero Lab only.",
+          "history": [
+            {
+              "since": "7.41a",
+              "until": "7.42",
+              "base": 10,
+              "per_threshold": 1,
+              "threshold": 100
+            },
+            {
+              "since": "7.42a",
+              "base": 10,
+              "per_threshold": 0.75,
+              "threshold": 100
+            }
+          ]
         }
       ]
     }
