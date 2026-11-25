@@ -1232,7 +1232,10 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - «Now is refreshed on X cast» → BUFF, «can be used only once» / «can only be applied by» → NERF (Chaos Knight,
   Lycan): добавлено ограничение или сброс в пользу героя; эвристика читала «Now …» как NEW. В `tools/patchgen/tags.py`.
 - «Now correctly states …» (Greater Horn of Battle) → QoL: исправлена подсказка, как «tooltip now shows».
-- Задержка взрыва Eggstremism (Radigull) 2 → 2.5s → `l=True`: яйцо взрывается позже, увернуться легче — нерф крипа.
+- Задержка взрыва Eggstremism (Radigull) 2 → 2.5s → `l=True`: яйцо взрывается позже, увернуться легче — нерф крипа
+  («fuse duration» в `LOWER_IS_BUFF`). Строка крипа стояла без блока способности: `scripts/gen/build_creep_abilities.py`
+  после переезда в `scripts/gen` искал `scripts/data/stats` и тихо выходил «Not found» — `creep_abilities.json` не знал
+  ни одного нового крипа 7.42. Путь исправлен, пустой ввод теперь ошибка.
 - Safety Bubble: урон по барьеру иллюзий теперь усиливается их входящим уроном → NERF.
 - Morphling «no longer triggers additional casts», «no longer allows Multicast» → DEL (поведение убрано).
 - Timbersaw: промахи по нему теперь дают стаки Reactive Armor → BUFF.

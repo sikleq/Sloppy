@@ -21,7 +21,7 @@ import os
 import re
 import sys
 
-HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+HERE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))   # scripts/gen/ -> the repo
 STATS_DIR = os.path.join(HERE, 'data', 'stats')
 OUT_PATH = os.path.join(HERE, 'data', 'creep_abilities.json')
 
@@ -46,14 +46,14 @@ def _latest_patch():
 def build(patch=None):
     if patch is None:
         patch = _latest_patch()
+    # nothing to read is an error, not a quiet exit (2026-11-25: after the move to scripts/gen the path pointed at
+    # scripts/data, every new_patch run "passed" and creep_abilities.json stayed at 49 creeps without 7.42's new ones)
     if patch is None:
-        print('No patch folders found under data/stats/')
-        return
+        raise SystemExit('No patch folders found under data/stats/')
 
     kv_path = os.path.join(STATS_DIR, patch, 'npc_units.txt')
     if not os.path.exists(kv_path):
-        print(f'Not found: {kv_path}')
-        return
+        raise SystemExit(f'Not found: {kv_path}')
 
     print(f'Reading {kv_path} ...')
     kv_lines = open(kv_path, encoding='utf-8').read().splitlines()

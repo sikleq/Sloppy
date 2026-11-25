@@ -422,6 +422,7 @@ LOWER_IS_BUFF = re.compile(
     r'|recharge\s+(?:time|cooldown)'
     r'|channel\s+time'
     r'|activation\s+time'
+    r'|fuse\s+duration'                       # 7.42a Radigull: the egg blows up later, easier to dodge
     r'|restore\s+time'
     r'|respawn\s+time'
     # 2026-09-18 proofread: self-penalties, owner-side timers and thresholds

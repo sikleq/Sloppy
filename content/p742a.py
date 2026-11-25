@@ -17,6 +17,7 @@ def build():
 
     # Radigull
     W(unit_header("Radigull", NEUTRAL_CDN + "radigull.png"))
+    W(ability("Eggstremism", icon_url="../icons/abilities/radigull_eggstremism.png"))
     W(ul_open())
     W(li("Eggstremism Fuse Duration increased from 2s to 2.5s", b(2, 2.5, l=True)))
     W(ul_close())

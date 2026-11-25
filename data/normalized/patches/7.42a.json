@@ -26,10 +26,11 @@
       "changes": [
         {
           "text": "Eggstremism Fuse Duration increased from 2s to 2.5s",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 2,
           "new": 2.5,
-          "scope": "base"
+          "lower_is_better": true,
+          "scope": "Eggstremism"
         }
       ]
     },
@@ -69,7 +70,7 @@
       "changes": [
         {
           "text": "Now correctly states that it summons Super Creeps when used, and Mega Creeps when all enemy barracks are destroyed",
-          "tag": "new",
+          "tag": "qol",
           "scope": "base"
         }
       ]
@@ -271,12 +272,12 @@
       "changes": [
         {
           "text": "Now is refreshed on Phantasm cast",
-          "tag": "new",
+          "tag": "buff",
           "scope": "Ahead, Armageddon"
         },
         {
           "text": "Now can be used only once per Phantasm cast",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Ahead, Armageddon"
         }
       ]
@@ -595,7 +596,7 @@
       "changes": [
         {
           "text": "Now marks can only be applied by Lycan's units within 1200 units of him",
-          "tag": "new",
+          "tag": "nerf",
           "scope": "Pack Hunter"
         },
         {

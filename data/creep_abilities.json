@@ -29,8 +29,11 @@
     "warpine_raider_seed_shot"
   ],
   "npc_dota_neutral_mud_golem": [
-    "mud_golem_hurl_boulder",
+    "mud_golem_hurl_big_boulder",
     "mud_golem_rock_destroy"
+  ],
+  "npc_dota_neutral_radigull": [
+    "radigull_eggstremism"
   ],
   "npc_dota_neutral_mud_golem_split": [
     "mud_golem_hurl_boulder"
@@ -75,6 +78,18 @@
     "spawnlord_master_stomp",
     "spawnlord_master_freeze"
   ],
+  "npc_dota_neutral_eimermole": [
+    "eimermole_miners_aura"
+  ],
+  "npc_dota_neutral_eimermole_foreman": [
+    "eimermole_miners_slam"
+  ],
+  "npc_dota_neutral_odobenus_footman": [
+    "odobenus_blight"
+  ],
+  "npc_dota_neutral_odobenus_frostmage": [
+    "warpine_raider_seed_shot"
+  ],
   "npc_dota_neutral_rock_golem": [
     "ancient_rock_golem_weakening_aura"
   ],
@@ -90,6 +105,12 @@
   "npc_dota_neutral_big_thunder_lizard": [
     "big_thunder_lizard_slam",
     "big_thunder_lizard_frenzy"
+  ],
+  "npc_dota_neutral_ogre_seal": [
+    "ogre_seal_flop"
+  ],
+  "npc_dota_neutral_ogre_seal_pup": [
+    "ogre_seal_pup_disapproval_aura"
   ],
   "npc_dota_neutral_small_thunder_lizard": [
     "big_thunder_lizard_wardrums_aura"
@@ -109,9 +130,7 @@
   "npc_dota_neutral_satyr_trickster": [
     "satyr_trickster_purge"
   ],
-  "npc_dota_neutral_forest_troll_berserker": [
-    "berserker_troll_break"
-  ],
+  "npc_dota_neutral_forest_troll_berserker": [],
   "npc_dota_neutral_forest_troll_high_priest": [
     "forest_troll_high_priest_heal",
     "forest_troll_high_priest_heal_amp_aura"
@@ -159,5 +178,34 @@
   "npc_dota_neutral_ancient_frog_mage": [
     "frogmen_water_bubble_large",
     "frogmen_riverborn_aura"
+  ],
+  "npc_dota_neutral_default": [],
+  "npc_dota_neutral_kobold_tunneler_gold": [
+    "kobold_disarm",
+    "neutral_gold_upgrade_ability"
+  ],
+  "npc_dota_neutral_gnoll_assassin_gold": [
+    "gnoll_assassin_envenomed_weapon",
+    "neutral_gold_upgrade_ability"
+  ],
+  "npc_dota_neutral_alpha_wolf_gold": [
+    "alpha_wolf_critical_strike",
+    "alpha_wolf_command_aura",
+    "neutral_gold_upgrade_ability"
+  ],
+  "npc_dota_neutral_mud_golem_gold": [
+    "mud_golem_hurl_big_boulder",
+    "mud_golem_rock_destroy",
+    "neutral_gold_upgrade_ability"
+  ],
+  "npc_dota_neutral_enraged_wildkin_gold": [
+    "enraged_wildkin_hurricane",
+    "enraged_wildkin_toughness_aura",
+    "neutral_gold_upgrade_ability"
+  ],
+  "npc_dota_neutral_polar_furbolg_champion_gold": [
+    "centaur_khan_endurance_aura",
+    "furbolg_enrage_attack_speed",
+    "neutral_gold_upgrade_ability"
   ]
 }

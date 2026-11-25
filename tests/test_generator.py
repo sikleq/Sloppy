@@ -1368,3 +1368,4 @@ def test_742a_only_once_refreshed_and_tooltip_fix():
     assert _guess_tag("Now can be used only once per Phantasm cast") == "NERF"
     assert _guess_tag("Now is refreshed on Phantasm cast") == "BUFF"
     assert _guess_tag("Now correctly states that it summons Super Creeps when used") == "QoL"
+    assert LOWER_IS_BUFF.search("Eggstremism Fuse Duration increased from 2s to 2.5s")
