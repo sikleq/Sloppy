@@ -1238,7 +1238,11 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
   ни одного нового крипа 7.42. Путь исправлен, пустой ввод теперь ошибка.
 - Safety Bubble: урон по барьеру иллюзий теперь усиливается их входящим уроном → NERF.
 - Morphling «no longer triggers additional casts», «no longer allows Multicast» → DEL (поведение убрано).
-- Timbersaw: промахи по нему теперь дают стаки Reactive Armor → BUFF.
+- Timbersaw: промахи по нему теперь дают стаки Reactive Armor → BUFF (владелец 2026-11-25 подтвердил: чистый выигрыш).
+- Владелец 2026-11-25: Smoke «damaging neutrals makes them flee» и обе строки Chaos Knight («refreshed on Phantasm
+  cast», «only once per Phantasm cast») → REWORK — поменялся принцип, не число. Lycan «marks only within 1200» остаётся
+  NERF: чистое ограничение. REWORK — когда есть и плюс, и минус или сменился принцип.
+- Список «Hero's Ability» под [?] вне General → таблица значков (`hero_ability_rows(possessive=True)`), как 7.42.
 - Исключение линтера (оставлено): Lone Druid «Now drops Everlasting items before his spirit is stored» → NERF,
   закрыта лазейка; эвристика говорит NEW.
 - Ложная тревога `kv_review` раздел 1: «Thunderhide Base Magic Resistance from 35%» — число в `npc_units.txt`
