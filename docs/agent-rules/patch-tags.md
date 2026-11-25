@@ -1248,6 +1248,6 @@ Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `fa
 - Ложная тревога `kv_review` раздел 1: «Thunderhide Base Magic Resistance from 35%» — число в `npc_units.txt`
   (юнит), а не в файле способности; в игре было 35.
 - Silent Changes не видела `AbilityHealthCost` (Bloodslinger 75 → 100) — поле добавлено в `builders/silent.py`.
-- Слепок 7.42a = сборка 6995 (в 6993 заметок 7.42a ещё нет; GameTracking). Архив DOTA2_CLIENT на новом ПК лежит в
-  `E:/Program Files/GitHub/DOTA2_CLIENT` без прав на `git fetch`: шаг client_version запускался с
-  `DOTA2_CLIENT_DIR` = клон GameTracking.
+- Слепок 7.42a = сборка 6995 (в 6993 заметок 7.42a ещё нет; оба архива согласны). Архив DOTA2_CLIENT на новом ПК —
+  `E:/Program Files/GitHub/DOTA2_CLIENT` (права выданы `sikle\sikle` 2026-11-25), пути по умолчанию в
+  `dota-patch-files/tools/builds.py` переведены на E:.
