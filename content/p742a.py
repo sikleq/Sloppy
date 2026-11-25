@@ -9,7 +9,7 @@ def build():
     W(plain_header("Global Mechanics"))
     W(ul_open())
     W(li("Vector-targeted abilities that are reflected will now reflect in the opposite direction of the initial cast (Walrus Kick, Nightmare, and Rebound. Dead Shot already did this)", t("MISC")))
-    W(li("Damaging neutral creeps while under the effect of Smoke of Deceit will now make them attempt to flee", t("MISC")))
+    W(li("Damaging neutral creeps while under the effect of Smoke of Deceit will now make them attempt to flee", t("REWORK")))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====
@@ -108,8 +108,8 @@ def build():
     W(hero_header("Chaos Knight"))
     W(ability("Ahead, Armageddon", slug="chaos_knight_armageddon", innate=True))
     W(ul_open())
-    W(li("Now is refreshed on Phantasm cast", t("BUFF")))
-    W(li("Now can be used only once per Phantasm cast", t("NERF")))
+    W(li("Now is refreshed on Phantasm cast", t("REWORK")))
+    W(li("Now can be used only once per Phantasm cast", t("REWORK")))
     W(ul_close())
 
     # Dazzle
@@ -256,7 +256,7 @@ def build():
     # Morphling
     W(hero_header("Morphling"))
     W(ul_open())
-    W(li("Aghanim's Scepter no longer triggers additional casts on certain abilities", t("DEL"), extra=inline_note("Chen's Holy Persuasion<br>Enchantress' Enchant<br>Phantom Assassin's Phantom Strike<br>Snapfire's Gobble Up<br>Spirit Breaker's Charge of Darkness<br>Spirit Breaker's Planar Pocket<br>Underlord’s Fiend’s Gate Portal")))
+    W(li("Aghanim's Scepter no longer triggers additional casts on certain abilities", t("DEL"), extra=inline_list("Chen's Holy Persuasion<br>Enchantress' Enchant<br>Phantom Assassin's Phantom Strike<br>Snapfire's Gobble Up<br>Spirit Breaker's Charge of Darkness<br>Spirit Breaker's Planar Pocket<br>Underlord’s Fiend’s Gate Portal")))
     W(ul_close())
     W(ability("Morph", slug="morphling_replicate"))
     W(ul_open())

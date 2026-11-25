@@ -1365,7 +1365,7 @@ def test_742a_only_once_refreshed_and_tooltip_fix():
     # 7.42a: "can only be applied" / "can be used only once" add a limit -> NERF; "is refreshed on" -> BUFF;
     # "Now correctly states" is a tooltip fix -> QoL
     assert _guess_tag("Now marks can only be applied by Lycan's units within 1200 units of him") == "NERF"
-    assert _guess_tag("Now can be used only once per Phantasm cast") == "NERF"
-    assert _guess_tag("Now is refreshed on Phantasm cast") == "BUFF"
+    assert _guess_tag("Now can be used only once per Phantasm cast") == "REWORK"   # owner 2026-11-25
+    assert _guess_tag("Now is refreshed on Phantasm cast") == "REWORK"
     assert _guess_tag("Now correctly states that it summons Super Creeps when used") == "QoL"
     assert LOWER_IS_BUFF.search("Eggstremism Fuse Duration increased from 2s to 2.5s")

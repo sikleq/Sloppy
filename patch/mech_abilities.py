@@ -110,7 +110,9 @@ _ICON_ALIASES = {("warlock", "Golem"): "warlock_rain_of_chaos",
                  # a summon named by its unit, not its ability (7.42 Pip Health list)
                  ("clinkz", "Skeleton Archers"): "clinkz_burning_army",
                  ("techies", "M.A.D."): "techies_mutually_assured_destruction",
-                 ("undying", "Tombstone Zombies"): "undying_tombstone"}
+                 ("undying", "Tombstone Zombies"): "undying_tombstone",
+                 # Fiend's Gate is dark_portal in the files; Valve names its portal unit (7.42a Morphling list)
+                 ("abyssal_underlord", "Fiend's Gate Portal"): "abyssal_underlord_dark_portal"}
 # a map unit that is neither a hero nor a neutral creep: its abilities' prefix (7.41 "Tormentor's Reflect")
 _UNIT_PREFIXES = {"Tormentor": "miniboss"}
 
@@ -869,13 +871,24 @@ def mech_pair(main, side):
 
 
 _HERO_LINE_RE = re.compile(r"^([A-Z][\w'.\- ]+?): (\S.*)$")
+
+
+def _possessive_as_colon(line, heroes):
+    """"Spirit Breaker's Planar Pocket", "Enchantress' Enchant", "Underlord’s Fiend’s Gate Portal" -> "Hero: Ability"
+    (7.42a Morphling's list of Scepter casts; owner 2026-11-25: "способности под [?] иконками в таблице")."""
+    norm = line.replace("’", "'")
+    for hero in sorted(heroes, key=len, reverse=True):
+        for mark in ("'s ", "' "):
+            if norm.startswith(hero + mark):
+                return f"{hero}: {norm[len(hero) + len(mark):]}"
+    return line
 TWO_PAIRS_FROM = 12           # a list this long reads in two pairs of columns (hero | ability, hero | ability)
 
 
 _re_tags = re.compile(r"<[^>]+>")
 
 
-def hero_ability_rows(raw, least=1, row_text=""):
+def hero_ability_rows(raw, least=1, row_text="", possessive=False):
     """Valve's 7.37 lists "Hero: Ability (how)" as a table (owner 2026-10-30): the row's own text is its first line
     ("The following are considered a Teleport:" — "встроить внутри таблицы … как начало предложения"); the items and
     map objects of the list ("Town Portal Scroll", "Twin Gates") one line of their own — they are not heroes; then the
@@ -902,6 +915,8 @@ def hero_ability_rows(raw, least=1, row_text=""):
         if m:
             leads.append(m.group(1))
             continue
+        if possessive:
+            line = _possessive_as_colon(line, HERO_SLUG)
         h = _HERO_LINE_RE.match(line)
         if h and h.group(1) in HERO_SLUG:
             parsed = _parse_line(line)

@@ -192,8 +192,10 @@ CANONICAL_TAGS = [
     (re.compile(r'\bnow (?:ends|expires|dies?|breaks?|is (?:cancell?ed|interrupted|removed)) (?:if|when|once|after)\b', re.I), 'NERF'),
     (re.compile(r'\b(?:may|can) only (?:trigger|proc|be cast|be used|be applied|target|affect|stack)\b', re.I), 'NERF'),
     # 7.42a: Chaos Knight "Now can be used only once per Phantasm cast", Lycan "Now marks can only be applied by …"
-    (re.compile(r'\bcan be (?:used|cast) only once\b', re.I), 'NERF'),
-    (re.compile(r'\bnow is refreshed (?:on|by|when)\b', re.I), 'BUFF'),   # 7.42a Chaos Knight: refreshed on Phantasm cast
+    # ... but Chaos Knight's pair "Now is refreshed on Phantasm cast" + "can be used only once per Phantasm cast" is how
+    # the innate now works, one REWORK each (owner 2026-11-25)
+    (re.compile(r'\bcan be (?:used|cast) only once per\b', re.I), 'REWORK'),
+    (re.compile(r'\bnow is refreshed (?:on|by|when)\b', re.I), 'REWORK'),
     (re.compile(r'\bnow correctly states\b', re.I), 'QoL'),               # 7.42a Greater Horn of Battle: a tooltip fix
     (re.compile(r'\bnow disabled by\b', re.I),                      'NERF'),
     (re.compile(r'\bdoes not affect .* in (?:the )?fountain\b', re.I), 'NERF'),

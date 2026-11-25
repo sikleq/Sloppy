@@ -1217,7 +1217,9 @@ def _list_tip_as_table(tip):
     if tip.strip() not in LIST_TIPS:
         return tip
     raw = TIP_RAW.get(tip.strip())
-    found = raw and hero_ability_rows(raw, least=2)
+    # "Spirit Breaker's Planar Pocket" lines read as "Hero: Ability" here only (7.42a Morphling); General's lists keep
+    # their own reading (ability_list_rows)
+    found = raw and hero_ability_rows(raw, least=2, possessive=True)
     if not found:
         return tip
     return (f'<!--TIP--><span class="info-tip" tabindex="0">?<span class="info-pop info-pop-table">{found[0]}</span>'

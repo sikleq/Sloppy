@@ -44,3 +44,11 @@ def test_hero_filters_sit_in_the_right_rail():
 def test_home_side_on_a_letter_patch_with_an_unchanged_map():
     # 7.42a shipped 7.42-v3's map: no mapdata_742a.json, the home jungle still comes from the newest map data
     assert ec._latest_home_side()
+
+
+def test_possessive_list_becomes_an_icon_table():
+    # 7.42a Morphling: "Spirit Breaker's Planar Pocket", "Underlord’s Fiend’s Gate Portal" under [?] -> a table of icons
+    from patch.mech_abilities import hero_ability_rows
+    raw = "<br>".join(["Chen's Holy Persuasion", "Enchantress' Enchant", "Spirit Breaker's Planar Pocket",
+                       "Underlord’s Fiend’s Gate Portal"])
+    assert hero_ability_rows(raw, least=2, possessive=True)
