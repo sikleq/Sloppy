@@ -8,7 +8,6 @@
   const table = document.querySelector('.creeps-table');
   const input = document.getElementById('upgrade-step');
   if (!table || !input) return;
-  const time = document.getElementById('upgrade-time');
   const MAX = 30, STEP_S = 450;
   const num = s => parseFloat(String(s).replace(/\s/g, '').replace(',', '.'));
   const fmt = (v, d) => {
@@ -37,7 +36,8 @@
     if (L > MAX) L = MAX;
     if (String(L) !== input.value) input.value = L;
     const s = L * STEP_S;
-    time.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    // the step's game time: the box's hover hint (site tooltip, tooltips.js .tb-tip-target)
+    input.setAttribute('data-tooltip', Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'));
     table.querySelectorAll('tbody tr').forEach(tr => {
       if (!cell(tr, 'hp')) return;
       const r = rule(tr, L);

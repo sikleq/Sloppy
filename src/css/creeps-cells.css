@@ -372,6 +372,10 @@
 /* Standard view hides Expanded-only columns. Super-category headers span all
    their columns; the colspan shrinks automatically as hidden cells collapse. */
 .creeps-table.mode-standard .col-exp { display: none; }
+/* Timeline view (Unit Stats): the Basic columns + the per-step columns; the rest hide, and the step columns hide in
+   the other views */
+.creeps-table.mode-timeline .col-main,
+.creeps-table:not(.mode-timeline) .col-tl { display: none; }
 /* BOTH header rows stay pinned: the category row (Basic/Vitality/…) sticks at
    top:0, and the column-name row pins directly beneath it at --cat-row-h
    (set by scripts.js from the category row's rendered height). */

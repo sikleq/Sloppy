@@ -438,23 +438,18 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   line-height: 26px; text-align: center; font-variant-numeric: tabular-nums; appearance: textfield; -moz-appearance: textfield; }
 .upg-input::-webkit-outer-spin-button, .upg-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .upg-input:hover, .upg-input:focus-visible { border-color: var(--gold); outline: none; }
-/* the step's game time with a clock, in the same square frame as the number box beside it (owner 2026-11-26:
-   "обводку вокруг 7:30 квадратную как вокруг «1» у upgrade") */
-.upg-time { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 9px; box-sizing: border-box;
-  border: 1px solid var(--line); border-radius: 5px; background: var(--bg-panel-3);
-  color: var(--text-main); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
-.upg-time::before { content: ""; width: 12px; height: 12px; border: 1.5px solid var(--gold); border-radius: 50%;
-  box-sizing: border-box; background: linear-gradient(var(--gold), var(--gold)) 50% 2px / 1.5px 4px no-repeat,
-  linear-gradient(var(--gold), var(--gold)) 5px 50% / 3px 1.5px no-repeat; }
+/* the step's game time is the number box's hover hint (owner 2026-11-26), no chip beside it */
 .creeps-table td.upg-on { color: var(--gold); }
 /* Inspiration Aura button: the ability's icon alone; off = dimmed, on = full colour in the gold frame */
 .aura-toggle { display: inline-flex; align-items: center; justify-content: center; padding: 2px 4px; }
 .aura-toggle .aura-ico { width: 22px; height: 22px; border-radius: 3px; display: block; opacity: 0.45; filter: grayscale(0.6); }
 .aura-toggle[aria-pressed="true"] .aura-ico { opacity: 1; filter: none; }
 /* Nuke: two damage boxes; the HP cell light green when the unit lives, red when it dies (owner 2026-11-26) */
-.nuke-group { display: inline-flex; align-items: center; gap: 10px; }
+.nuke-group { display: inline-flex; align-items: center; gap: 6px; }
 .nuke-group.nuke-off { visibility: hidden; }   /* its place stays: Nuke on / off never moves the toolbar */
-.nuke-field { display: inline-flex; align-items: center; gap: 6px; }
-.nuke-input { width: 56px; }
+.nuke-input { width: 52px; }
+.nuke-input::placeholder { color: var(--text-dimmer); font-weight: 600; }
+.nuke-input.nuke-mag { color: #5fb1ff; }    /* magic: blue, as the damage type on Unit Abilities */
+.nuke-input.nuke-phys { color: #e1716a; }   /* physical: red */
 .creeps-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }
 .creeps-table td.nuke-dead { background: rgba(224, 103, 90, 0.30); }

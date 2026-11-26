@@ -838,10 +838,24 @@ CATEGORIES = [
         ('ability3',     'Ability 3',        'std'),
     ]),
 ]
+# View "Timeline" (owner 2026-11-26, a sheet of the owner's: every stat at each 7:30 upgrade step): beside the Basic
+# columns, HP / Armor / Damage / Attack speed / Avg gold at 0:00, 7:30 … 60:00, worked out by the same upgrade rules
+# as the Upgrade box (neutral_upgrade; a lane creep's LANE_UPGRADE). Shown only in that view (mode 'tl').
+TL_STEPS = tuple(range(9))                     # 0:00 … 60:00
+TL_STATS = (('hp', 'HP'), ('armor', 'Armor'), ('dmg', 'Damage'), ('as', 'Attack speed'), ('gold', 'Avg gold'))
+_TL_SLUG = {label: f'tl-{key}' for key, label in TL_STATS}
+
+
+def _tl_time(step):
+    s = step * 450
+    return f'{s // 60}:{s % 60:02d}'
+
+
+CATEGORIES += [(label, [(f'tl_{key}_{i}', _tl_time(i), 'tl') for i in TL_STEPS]) for key, label in TL_STATS]
 COLUMNS = [(k, label) for _cat, cols in CATEGORIES for (k, label, _m) in cols]
 COL_MODE = {k: m for _cat, cols in CATEGORIES for (k, _l, m) in cols}
 _CAT_SLUG = {'Basic': 'basic', 'Vitality': 'vitality', 'Attack': 'attack',
-             'Bounty': 'bounty', 'Other': 'other', 'Abilities': 'abilities'}
+             'Bounty': 'bounty', 'Other': 'other', 'Abilities': 'abilities', **_TL_SLUG}
 COL_CAT = {k: _CAT_SLUG[cat] for cat, cols in CATEGORIES for (k, _l, _m) in cols}
 # No colgroup: table-layout: auto lets the browser size each column
 # to fit content (and each header) on one line. Headers and cells
@@ -866,6 +880,12 @@ def _col_cls(k, value=''):
         cls.append('col-sep')
     if COL_MODE.get(k) == 'exp':
         cls.append('col-exp')          # hidden in Standard view
+    if COL_MODE.get(k) == 'tl':
+        cls.append('col-tl')           # only in the Timeline view
+        if k.endswith('_0'):
+            cls.append('col-sep')
+    elif COL_CAT.get(k) != 'basic':
+        cls.append('col-main')         # hidden in the Timeline view
     if k == 'attack_type':
         if value == 'Default':
             cls.append('atk-basic')
@@ -931,11 +951,48 @@ def _stats_cat_cells():
     # Super-category row: one cell per category, colspan = its leaf columns.
     # Each category has at least one Standard column, so the cell always shows;
     # when Expanded columns under it are hidden, the cell shrinks naturally.
+    def view_cls(cat):
+        slug = _CAT_SLUG.get(cat, 'x')
+        return ' col-tl' if slug.startswith('tl-') else ('' if slug == 'basic' else ' col-main')
     return ''.join(
-        f'<th class="cat-head cat-{_CAT_SLUG.get(cat, "x")}" '
+        f'<th class="cat-head cat-{_CAT_SLUG.get(cat, "x")}{view_cls(cat)}" '
         f'data-cat="{_CAT_SLUG.get(cat, "x")}" colspan="{len(cols)}">{esc(cat)}</th>'
         for cat, cols in CATEGORIES
     )
+
+
+def _first_num(v):
+    """The unit's own number of a cell ("1500 (1740)" -> 1500.0), None when there is none."""
+    m = re.search(r'-?\d+(?:[.,]\d+)?', str(v or ''))
+    return float(m.group(0).replace(',', '.')) if m else None
+
+
+def timeline_value(d, stat, step):
+    """A stat of one row at an upgrade step, by the Upgrade box's rules (src/js/creeps-upgrade.js `rule`):
+    neutrals +30 HP, +0.5 armor, +3 damage, +5 attack speed, gold min +floor(L/2), max +floor((L+1)/2); a lane
+    creep by its LANE_UPGRADE (HP and damage to its cap, mega's floor; gold every step; no armor or attack speed;
+    without an entry — siege — it does not grow). None when the row has no such number."""
+    key = {'hp': 'hp', 'armor': 'armor', 'dmg': 'dmg_avg', 'as': 'as', 'gold': 'gold'}[stat]
+    base = _first_num(d.get(key))
+    if base is None:
+        return None
+    ch = (d.get('createhero') or '').strip()
+    if unit_group(ch) == 'lane':
+        u = LANE_UPGRADE.get(ch, {})
+        c = max(min(step, u.get('cap', step)), u.get('floor', 0))
+        add = {'hp': u.get('hp', 0) * c, 'dmg': u.get('dmg', 0) * c, 'gold': u.get('gold', 0) * step}.get(stat, 0)
+    else:
+        add = {'hp': 30 * step, 'armor': 0.5 * step, 'dmg': 3 * step, 'as': 5 * step,
+               'gold': (step // 2 + (step + 1) // 2) / 2}[stat]
+    return base + add
+
+
+def _tl_cell(k, d):
+    _, stat, step = k.split('_')
+    v = timeline_value(d, stat, int(step))
+    text = DASH if v is None else (str(int(round(v))) if stat in ('hp', 'as') else fmt_num(v))
+    sort = '' if v is None else f' data-sort="{v:g}"'
+    return f'<td class="{_col_cls(k)}"{sort}>{text}</td>'
 
 
 # ---- Neutral Stats: cells ----
@@ -1065,6 +1122,8 @@ def _history_attrs(k, v, npc_key, src):
 
 def _stats_cell(k, row, src, unit_page_slugs):
     d = row['data']
+    if COL_MODE.get(k) == 'tl':
+        return _tl_cell(k, d)
     v = d.get(k, '')
     if k == 'lvl':
         # Per-row level cell (no rowspan). data-lvl lets scripts.js
@@ -1166,10 +1225,12 @@ _NUKE_FIELDS = (
     # the boxes keep their place while Nuke is off (invisible, not removed), so switching it never moves the toolbar
     # (owner 2026-11-26: "nuke не должно делать так, чтобы на другую строку всё сползало")
     '<span class="view-group nuke-group nuke-off" id="nuke-fields">'
-    '<label class="nuke-field"><strong>Magic</strong><input type="text" inputmode="numeric" pattern="[0-9]*" '
-    'maxlength="5" id="nuke-mag" class="upg-input nuke-input" value="0" aria-label="Magic damage"></label>'
-    '<label class="nuke-field"><strong>Physical</strong><input type="text" inputmode="numeric" pattern="[0-9]*" '
-    'maxlength="5" id="nuke-phys" class="upg-input nuke-input" value="0" aria-label="Physical damage"></label>'
+    # no words beside the boxes (owner 2026-11-26: the toolbar grew a second row): a grey hint inside each, the
+    # number in its damage type's colour — magic blue, physical red, as on Unit Abilities
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-mag" '
+    'class="upg-input nuke-input nuke-mag" value="" placeholder="Mag" aria-label="Magic damage">'
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-phys" '
+    'class="upg-input nuke-input nuke-phys" value="" placeholder="Phys" aria-label="Physical damage">'
     '</span>'
 )
 
@@ -1180,6 +1241,7 @@ _STATS_TOOLBAR = (
     '<select class="cal-mode-select" id="view-mode">'
     '<option value="standard">Standard</option>'
     '<option value="expanded">Expanded</option>'
+    '<option value="timeline">Timeline</option>'   # every stat at each 7:30 step (TL_STATS)
     '</select>'
     '</span>'
     # lane creeps: Normal / Super (that lane's enemy barracks down) / Mega (all six down) — LANE_TIERS; beside View
@@ -1205,9 +1267,10 @@ _STATS_TOOLBAR = (
     # neutral_upgrade: every 7:30 from the horn, up to 30 steps (src/js/creeps-upgrade.js; owner 2026-11-23); after the
     # group switches (owner 2026-11-26)
     '<label class="view-group upg-group"><strong>Upgrade</strong>'
-    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="upgrade-step" class="upg-input" value="0" '
-    'aria-label="Creep upgrade number, 0 to 30">'
-    '<span class="upg-time" id="upgrade-time">0:00</span></label>'
+    # the step's game time is the box's hover hint, not a chip beside it (owner 2026-11-26)
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="upgrade-step" '
+    'class="upg-input tb-tip-target" value="0" data-tooltip="0:00" '
+    'aria-label="Creep upgrade number, 0 to 30"></label>'
     + _AURA_BUTTON + _NUKE_FIELDS +
     '</div></div>\n'
 )

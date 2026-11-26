@@ -127,8 +127,11 @@ def test_nuke_has_two_damage_boxes_and_marks_life_or_death():
     assert "dealt >= hp ? 'nuke-dead' : 'nuke-live'" in js
     css = (ROOT / "src" / "css" / "creeps-table.css").read_text(encoding="utf-8")
     assert "td.nuke-live" in css and "td.nuke-dead" in css
-    # the time beside Upgrade sits in the same square frame as the number box (owner 2026-11-26)
-    assert "border-radius: 5px" in css.split(".upg-time {")[1].split("}")[0]
+    # the step's game time is the Upgrade box's hover hint, no chip beside it (owner 2026-11-26)
+    assert 'id="upgrade-time"' not in bar and 'data-tooltip="0:00"' in bar and "tb-tip-target" in bar
+    assert "input.setAttribute('data-tooltip'" in js
+    # Nuke's boxes have no words beside them: a hint inside, the number in the damage type's colour
+    assert 'placeholder="Mag"' in bar and 'placeholder="Phys"' in bar and "<strong>Magic" not in bar
 
 
 def test_unit_changes_sorts_summons_into_three_columns():
@@ -140,3 +143,22 @@ def test_unit_changes_sorts_summons_into_three_columns():
     assert ec._SUMMON_BUCKET["npc_dota_rattletrap_cog"] == "Objects"
     for basename, icon in ec._SUMMON_ICON.items():
         assert (ROOT / icon.replace("../", "")).exists(), (basename, icon)
+
+
+def test_timeline_view_shows_every_stat_at_each_step():
+    # owner 2026-11-26: a View with HP / Armor / Damage / Attack speed / Avg gold at 0:00, 7:30 … 60:00
+    from builders import creeps
+    assert 'value="timeline"' in creeps._STATS_TOOLBAR
+    assert [creeps._tl_time(i) for i in (0, 1, 8)] == ["0:00", "7:30", "60:00"]
+    neutral = {"createhero": "kobold", "hp": "350", "armor": "2", "dmg_avg": "19", "as": "155", "gold": "17"}
+    assert [creeps.timeline_value(neutral, "hp", s) for s in (0, 1, 8)] == [350, 380, 590]
+    assert creeps.timeline_value(neutral, "armor", 8) == 6 and creeps.timeline_value(neutral, "as", 8) == 195
+    assert creeps.timeline_value(neutral, "gold", 3) == 18.5          # min +1, max +2
+    melee = {"createhero": "lane_melee", "hp": "550", "armor": "2", "dmg_avg": "21", "as": "100", "gold": "36,5"}
+    assert creeps.timeline_value(melee, "hp", 8) == 550 + 12 * 8 and creeps.timeline_value(melee, "armor", 8) == 2
+    mega = dict(melee, createhero="lane_melee_mega", hp="700")
+    assert creeps.timeline_value(mega, "hp", 0) == 700 + 19 * 30      # mega: 30 steps from the start
+    siege = dict(melee, createhero="lane_siege", hp="935")
+    assert creeps.timeline_value(siege, "hp", 8) == 935               # siege does not grow
+    css = (ROOT / "src" / "css" / "creeps-cells.css").read_text(encoding="utf-8")
+    assert ".creeps-table.mode-timeline .col-main" in css and ":not(.mode-timeline) .col-tl" in css

@@ -226,6 +226,8 @@
         const expanded = viewSel.value === 'expanded';
         table.classList.toggle('mode-standard', !expanded);
         table.classList.toggle('mode-expanded', expanded);
+        // Timeline (Unit Stats, owner 2026-11-26): the Basic columns + every stat at each 7:30 step
+        table.classList.toggle('mode-timeline', viewSel.value === 'timeline');
         recomputeCatColspans();
         applyLeftOffsets();   // column widths changed → recompute pinned offsets
         positionFramesRaf();
