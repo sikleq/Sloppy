@@ -32,9 +32,10 @@ KINDS = (('melee', 'lane_melee', 'Melee'), ('flag', 'lane_flagbearer', 'Flagbear
          ('ranged', 'lane_ranged', 'Ranged'), ('siege', 'lane_siege', 'Siege'))
 # the Timeline's stats (owner 2026-11-26: "а где другие характеристики"): HP / Damage / Gold / XP are the wave's
 # sums; armor and attack speed do not add up, so they are the mean over the wave's units (weighted by count)
-WAVE_STATS = (('hp', 'HP'), ('armor', 'Avg armor'), ('dmg', 'Damage'), ('as', 'Avg attack speed'),
-              ('gold', 'Gold'), ('xp', 'XP'))
-WAVE_MEAN = ('armor', 'as')
+WAVE_STATS = (('hp', 'HP'), ('dmg', 'Damage'), ('gold', 'Gold'), ('xp', 'XP'))
+# armor and attack speed: the wave's mean, ONE column each under "Avg" — a lane creep's never grow with the steps
+# (owner 2026-11-26: "броня одинаковые и не улучшается, как и attackspeed, это можно соединить в 1 столбец")
+WAVE_MEAN = (('armor', 'Armor'), ('as', 'Attack speed'))
 
 
 def wave_time(n):
@@ -82,10 +83,13 @@ def waves_table_html(icons):
     # the Timeline view's head (owner 2026-11-26: "по дизайну, не как в timeline"): a group row (tr.cat-row /
     # th.cat-head) over the column row (tr.col-row), a 2px col-sep where a group starts
     cat = ('<th class="cat-head cat-basic" data-cat="wave" colspan="2">Wave</th>'
+           f'<th class="cat-head" data-cat="wv-avg" colspan="{len(WAVE_MEAN)}">Avg</th>'
            + ''.join(f'<th class="cat-head" data-cat="wv-{k}" colspan="{len(STEPS)}">{esc(label)}</th>'
                      for k, label in WAVE_STATS))
     # data-cat on every column head: src/js/creeps-pinned.js recomputeCatColspans sets each group's colspan from them
     cols = ('<th class="wv-units-h" data-cat="wave">Units</th><th class="wv-when-h" data-cat="wave">Time</th>'
+            + ''.join(f'<th class="wv-avg{" col-sep" if j == 0 else ""}" data-cat="wv-avg">{esc(label)}</th>'
+                      for j, (_k, label) in enumerate(WAVE_MEAN))
             + ''.join(f'<th class="wv-t{" col-sep" if i == 0 else ""}" data-cat="wv-{k}">{_clock(i * UPGRADE_STEP_S)}</th>'
                       for k, _l in WAVE_STATS for i in STEPS))
     rows = []
@@ -99,7 +103,9 @@ def waves_table_html(icons):
         times = ', '.join(_clock(wave_time(n)) for n in ns)
         when = _clock(wave_time(ns[0])) + (f'–{_clock(wave_time(ns[-1]))}' if len(ns) > 1 else '')
         data = ' '.join(f'data-{key}="{c[key]}"' for key, _r, _l in KINDS)
-        cells = ''.join(
+        # the mean columns: one cell each, filled at step 0 (src/js/creeps-upgrade.js waves)
+        cells = ''.join(f'<td class="wv-{k}-0{" col-sep" if j == 0 else ""}"></td>'
+                        for j, (k, _l) in enumerate(WAVE_MEAN)) + ''.join(
             f'<td class="wv-{k}-{i}{" col-sep" if i == 0 else ""}{"" if i in steps else " wv-none"}"></td>'
             for k, _l in WAVE_STATS for i in STEPS)
         rows.append(f'<tr {data} data-steps="{" ".join(map(str, steps))}">'
