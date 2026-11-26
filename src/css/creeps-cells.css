@@ -378,11 +378,6 @@
 .creeps-table:not(.mode-timeline) .col-tl { display: none; }
 /* each Timeline group in its own colour, as in the owner's sheet (2026-11-26): HP green, Armor grey, Damage dark red,
    Attack speed blue, Avg gold — its numbers gold */
-.creeps-table thead tr.cat-row th.cat-head.cat-tl-hp    { background: #1f3a1c; color: #cfe8c4; }
-.creeps-table thead tr.cat-row th.cat-head.cat-tl-armor { background: #3a3936; color: #e6e1d6; }
-.creeps-table thead tr.cat-row th.cat-head.cat-tl-dmg   { background: #4a1a1a; color: #f0c9c4; }
-.creeps-table thead tr.cat-row th.cat-head.cat-tl-as    { background: #15304a; color: #c6dcf2; }
-.creeps-table thead tr.cat-row th.cat-head.cat-tl-gold  { background: #3d3217; color: var(--gold); }
 .creeps-table td.col-tl[class*="col-tl_gold_"] { color: var(--gold); }
 /* BOTH header rows stay pinned: the category row (Basic/Vitality/…) sticks at
    top:0, and the column-name row pins directly beneath it at --cat-row-h

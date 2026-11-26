@@ -150,10 +150,11 @@ def test_timeline_view_shows_every_stat_at_each_step():
     from builders import creeps
     assert 'value="timeline"' in creeps._STATS_TOOLBAR
     assert [creeps._tl_time(i) for i in (0, 1, 8)] == ["0:00", "7:30", "60:00"]
-    neutral = {"createhero": "kobold", "hp": "350", "armor": "2", "dmg_avg": "19", "as": "155", "gold": "17"}
+    neutral = {"createhero": "kobold", "hp": "350", "armor": "2", "dmg_avg": "19", "as": "155", "gold": "17",
+               "gold_min": "15", "gold_max": "19"}
     assert [creeps.timeline_value(neutral, "hp", s) for s in (0, 1, 8)] == [350, 380, 590]
     assert creeps.timeline_value(neutral, "armor", 8) == 6 and creeps.timeline_value(neutral, "as", 8) == 195
-    assert creeps.timeline_value(neutral, "gold", 3) == 18.5          # min +1, max +2
+    assert creeps.timeline_value(neutral, "gold", 3) == 19            # min +1, max +2: 18.5 rounded up like the column
     melee = {"createhero": "lane_melee", "hp": "550", "armor": "2", "dmg_avg": "21", "as": "100", "gold": "36,5"}
     assert creeps.timeline_value(melee, "hp", 8) == 550 + 12 * 8 and creeps.timeline_value(melee, "armor", 8) == 2
     mega = dict(melee, createhero="lane_melee_mega", hp="700")
@@ -162,3 +163,23 @@ def test_timeline_view_shows_every_stat_at_each_step():
     assert creeps.timeline_value(siege, "hp", 8) == 935               # siege does not grow
     css = (ROOT / "src" / "css" / "creeps-cells.css").read_text(encoding="utf-8")
     assert ".creeps-table.mode-timeline .col-main" in css and ":not(.mode-timeline) .col-tl" in css
+
+
+def test_percent_self_aura_multiplies_the_grown_number():
+    # Fable 5.2 review 2026-11-26: Granite Golem's +% HP aura was added flat on Upgrade
+    from builders import creeps
+    assert creeps.AURA_SELF["granite"]["hp"][0] == "%"
+    out = creeps._with_self_aura({}, type("S", (), {"hp": 1000})(), "granite")
+    assert out["_self_mul"]["hp"] > 1
+    js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
+    assert "dataset.selfMul" in js and "v * (mul - 1)" in js
+    assert "td.textContent !== td.dataset.base" in js        # gold only where the text changed
+
+
+def test_timeline_plain_and_redirects_keep_the_anchor():
+    # owner 2026-11-26: Timeline without coloured group heads and without a colour scale on the cells
+    css = (ROOT / "src" / "css" / "creeps-cells.css").read_text(encoding="utf-8")
+    assert "cat-tl-" not in css and "tl-bg" not in css
+    from builders import creeps, creeps_abilities
+    assert "location.hash" in creeps._STATS_REDIRECT_HTML and "location.hash" in creeps_abilities.UA_REDIRECT_HTML
+    assert 'data-tooltip="Inspiration Aura"' in creeps._AURA_BUTTON

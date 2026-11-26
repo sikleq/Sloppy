@@ -27,21 +27,26 @@
     if (!td) return;
     if (td.dataset.base === undefined) td.dataset.base = td.textContent.trim();
     if (L && !isFinite(v)) return;
-    const dl = selfAura(td);
+    const dl = selfAura(td, v);
     td.textContent = !L ? td.dataset.base : (dl ? `${fmt(v, d)} (${fmt(v + dl, d)})` : fmt(v, d));
-    td.classList.toggle('upg-on', !!L);
+    // gold only where the number really changed (a Mega row at step 0 keeps its armor, speed, gold…)
+    td.classList.toggle('upg-on', !!L && td.textContent !== td.dataset.base);
   };
   // A cell "own (with its own aura)" — a neutral whose aura buffs itself (builders/creeps.py AURA_SELF): how much its
   // own aura adds, read from the build's two numbers (owner 2026-11-26: Nuke has to count Centaur Courser's 20%)
-  function selfAura(td) {
+  // v = the unit's own number now (after the upgrade); a % aura (data-self-mul, builders/creeps.py) scales it, a flat
+  // one adds what it added at base (Fable 5.2 review 2026-11-26: Granite Golem's +16% HP was added flat)
+  function selfAura(td, v) {
     if (!td) return 0;
     if (td.dataset.base === undefined) td.dataset.base = td.textContent.trim();
     const parts = td.dataset.base.split('(');
     if (parts.length < 2) return 0;
+    const mul = num(td.dataset.selfMul);
+    if (isFinite(mul) && isFinite(v)) return v * (mul - 1);
     const dl = num(parts[1]) - num(parts[0]);
     return isFinite(dl) ? dl : 0;
   }
-  const own = (tr, k) => selfAura(cell(tr, k));
+  const own = (tr, k, v) => selfAura(cell(tr, k), v);
   function apply() {
     let L = Math.round(Number(input.value));
     if (!isFinite(L) || L < 0) L = 0;
@@ -66,9 +71,9 @@
       const auraMr = aura ? AURA.step * Math.min(L, AURA.max) / 100 : 0;
       const mr = 1 - (1 - base(tr, 'magres') / 100) * (1 - auraMr);
       // what the unit really has: its own aura included ("0% (20%)" -> 20%) — for EHP and Nuke
-      const mrOwn = (base(tr, 'magres') + own(tr, 'magres')) / 100;
+      const mrOwn = (base(tr, 'magres') + own(tr, 'magres', base(tr, 'magres'))) / 100;
       const mrEff = 1 - (1 - mrOwn) * (1 - auraMr);
-      const hpEff = hp + own(tr, 'hp'), armorEff = armor + own(tr, 'armor');
+      const hpEff = hp + own(tr, 'hp', hp), armorEff = armor + own(tr, 'armor', armor);
       ['hp_regen', 'magres'].forEach(k => {
         const td = cell(tr, k);
         if (!td) return;
@@ -94,7 +99,7 @@
       put(tr, 'as', as, 0, on);
       put(tr, 't_per_attack', bat / (as / 100), 2, on);
       // EHP with the unit's own aura even at step 0 (the build wrote them from its numbers without it)
-      const ownAura = own(tr, 'hp') || own(tr, 'armor') || own(tr, 'magres');
+      const ownAura = own(tr, 'hp', hp) || own(tr, 'armor', armor) || own(tr, 'magres', base(tr, 'magres'));
       put(tr, 'ehp_phys', hpEff / (1 - pctEff), 0, on || ownAura ? 1 : 0);
       if (isFinite(mrEff)) put(tr, 'ehp_mag', hpEff / (1 - mrEff), 0, on || aura || ownAura ? 1 : 0);
       nukeCell(cell(tr, 'hp'), hpEff, armorEff, mrEff);
@@ -103,7 +108,8 @@
         const th = cell(tr, 'tl_hp_' + i), ta = cell(tr, 'tl_armor_' + i);
         if (!th) continue;
         const am = aura ? AURA.step * Math.min(i, AURA.max) / 100 : 0;
-        nukeCell(th, num(th.textContent) + own(tr, 'hp'), (ta ? num(ta.textContent) : 0) + own(tr, 'armor'),
+        const hi = num(th.textContent), ai = ta ? num(ta.textContent) : 0;
+        nukeCell(th, hi + own(tr, 'hp', hi), ai + own(tr, 'armor', ai),
                  1 - (1 - mrOwn) * (1 - am));
       }
       put(tr, 'dmg_min', base(tr, 'dmg_min') + r.dmg, 0, on);
@@ -112,7 +118,7 @@
       const gmin = base(tr, 'gold_min') + r.gmin, gmax = base(tr, 'gold_max') + r.gmax;
       put(tr, 'gold_min', gmin, 0, on);
       put(tr, 'gold_max', gmax, 0, on);
-      put(tr, 'gold', (gmin + gmax) / 2, 1, on);
+      put(tr, 'gold', Math.ceil((gmin + gmax) / 2), 0, on);   // rounded up, as the build writes the column
       put(tr, 'xp', base(tr, 'xp') + r.xp, 0, on);
     });
   }

@@ -622,6 +622,9 @@ def _with_self_aura(result, s, createhero):
             print(f"  ! creeps: aura {spec[1]}.{spec[2]} not in the latest npc_abilities.json — skipped")
             continue
         op, val = resolved
+        if op == '*':      # a % aura: the page's Upgrade multiplies the grown number, not adds the old difference
+            cols = ('dmg_min', 'dmg_max', 'dmg_avg') if stat == 'dmg' else (stat,)
+            out['_self_mul'] = {**out.get('_self_mul', {}), **{c: val for c in cols}}
         if stat == 'dmg':
             for dk, dv in (('dmg_min', s.dmg_min), ('dmg_max', s.dmg_max),
                            ('dmg_avg', s.dmg_avg)):
@@ -972,18 +975,29 @@ def timeline_value(d, stat, step):
     neutrals +30 HP, +0.5 armor, +3 damage, +5 attack speed, gold min +floor(L/2), max +floor((L+1)/2); a lane
     creep by its LANE_UPGRADE (HP and damage to its cap, mega's floor; gold every step; no armor or attack speed;
     without an entry — siege — it does not grow). None when the row has no such number."""
-    key = {'hp': 'hp', 'armor': 'armor', 'dmg': 'dmg_avg', 'as': 'as', 'gold': 'gold'}[stat]
+    ch = (d.get('createhero') or '').strip()
+    lane = unit_group(ch) == 'lane'
+    u = LANE_UPGRADE.get(ch, {}) if lane else {}
+    if stat == 'gold':
+        # min and max grow on their own, the column shows their mean rounded up (as the build writes it): from the
+        # unrounded base, else 51,5 -> 52 first and then +0,5 a step (Fable 5.2 review 2026-11-26)
+        gmin, gmax = _first_num(d.get('gold_min')), _first_num(d.get('gold_max'))
+        if gmin is None or gmax is None:
+            return None
+        if lane:
+            gmin, gmax = gmin + u.get('gold', 0) * step, gmax + u.get('gold', 0) * step
+        else:
+            gmin, gmax = gmin + step // 2, gmax + (step + 1) // 2
+        return float(-(-(gmin + gmax) // 2))
+    key = {'hp': 'hp', 'armor': 'armor', 'dmg': 'dmg_avg', 'as': 'as'}[stat]
     base = _first_num(d.get(key))
     if base is None:
         return None
-    ch = (d.get('createhero') or '').strip()
-    if unit_group(ch) == 'lane':
-        u = LANE_UPGRADE.get(ch, {})
+    if lane:
         c = max(min(step, u.get('cap', step)), u.get('floor', 0))
-        add = {'hp': u.get('hp', 0) * c, 'dmg': u.get('dmg', 0) * c, 'gold': u.get('gold', 0) * step}.get(stat, 0)
+        add = {'hp': u.get('hp', 0) * c, 'dmg': u.get('dmg', 0) * c}.get(stat, 0)
     else:
-        add = {'hp': 30 * step, 'armor': 0.5 * step, 'dmg': 3 * step, 'as': 5 * step,
-               'gold': (step // 2 + (step + 1) // 2) / 2}[stat]
+        add = {'hp': 30 * step, 'armor': 0.5 * step, 'dmg': 3 * step, 'as': 5 * step}[stat]
     return base + add
 
 
@@ -1067,6 +1081,8 @@ def _ability_inner(k, v, d):
     # Abilities page. For abilities that share a single canonical row
     # across units (e.g. Riverborn Aura), route to that canonical unit.
     ch = (d.get('createhero') or '').strip()
+    # a Super / Mega lane creep's ability is on its Normal row of Unit Abilities (only Normal is listed there)
+    ch = re.sub(r'_(?:super|mega)$', '', ch) if ch.startswith('lane_') else ch
     target_ch = UA_CANONICAL_UNIT.get(slug, ch)
     return (f'<a class="abil-link" '
             f'href="units_abilities.html#{target_ch}-{slug}">{inner}</a>'
@@ -1155,11 +1171,13 @@ def _stats_cell(k, row, src, unit_page_slugs):
         extra = f' data-hist="{esc(payload)}"' if hist else ''
         cls = _col_cls(k, v) + (' has-history' if hist else '')
         return f'<td class="{cls}"{_sort_attr(k, v)}{extra}>{inner}</td>'
+    mul = (d.get('_self_mul') or {}).get(k)
+    mul_attr = f' data-self-mul="{mul:g}"' if mul else ''      # its own % aura (src/js/creeps-upgrade.js selfAura)
     if k in COL_HIST or k in COL_CHANGELOG:
         extra, has_hist = _history_attrs(k, v, row.get('npc_key'), src)
         cls = _col_cls(k, v) + (' has-history' if has_hist else '')
-        return f'<td class="{cls}"{_sort_attr(k, v)}{extra}>{inner}</td>'
-    return f'<td class="{_col_cls(k, v)}"{_sort_attr(k, v)}>{inner}</td>'
+        return f'<td class="{cls}"{_sort_attr(k, v)}{extra}{mul_attr}>{inner}</td>'
+    return f'<td class="{_col_cls(k, v)}"{_sort_attr(k, v)}{mul_attr}>{inner}</td>'
 
 
 def _stats_row_html(row, src, unit_page_slugs):
@@ -1208,7 +1226,8 @@ def _aura_button():
                                           'maximum_intervals')}
     if any(v is None for v in vals.values()):
         raise KeyError(f"flagbearer_creep_aura_effect: {vals} — a key is missing from the current npc_abilities.json")
-    return ('<button type="button" class="hs-attack-filter aura-toggle" id="flag-aura" aria-pressed="false" '
+    return ('<button type="button" class="hs-attack-filter aura-toggle tb-tip-target" id="flag-aura" '
+            'aria-pressed="false" data-tooltip="Inspiration Aura" '
             f'data-regen="{vals["bonus_health_regen"]}" data-mr-step="{vals["bonus_magic_resistance_per_interval"]}" '
             f'data-mr-max="{vals["maximum_intervals"]}" aria-label="Inspiration Aura">'
             # just the icon (owner 2026-11-26: "просто иконкой, а не полным именем")
@@ -1285,6 +1304,8 @@ _STATS_TOOLBAR = (
 _STATS_REDIRECT_PAGES = ('neutral_stats.html', 'neutral_creeps.html', 'creeps.html', 'materials.html')
 _STATS_REDIRECT_HTML = (
     '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    # keeps the #unit-… anchor (the meta refresh alone drops it)
+    '<script>location.replace("units_stats.html" + location.search + location.hash)</script>'
     '<meta http-equiv="refresh" content="0; url=units_stats.html">'
     '<link rel="canonical" href="units_stats.html">'
     '<title>Sloppy — moved</title></head><body>'
