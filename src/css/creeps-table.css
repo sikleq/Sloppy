@@ -455,6 +455,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .nuke-input.nuke-mag { color: #5fb1ff; }    /* magic: blue, as the damage type on Unit Abilities */
 .nuke-input.nuke-phys { color: #e1716a; }   /* physical: red */
 .nuke-input.nuke-pure { color: #ead992; }   /* pure: pale gold, as on Unit Abilities */
+.nuke-input.nuke-armor { width: 64px; color: #c9c2b3; }   /* armor reduction: armor's own grey */
 .creeps-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }
 .creeps-table td.nuke-dead { background: rgba(224, 103, 90, 0.30); }
 

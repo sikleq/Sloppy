@@ -159,27 +159,37 @@
   // turns light green when the unit lives, red when it dies; its title says what armor and resistance blocked.
   const nukeMag = document.getElementById('nuke-mag'), nukePhys = document.getElementById('nuke-phys');
   const nukePure = document.getElementById('nuke-pure');      // pure: nothing blocks it
+  // armor reduction (owner 2026-11-26): taken off the armor before the physical part; armor may go below zero
+  const nukeArmor = document.getElementById('nuke-armor');
   const nukeVal = el => { const v = Math.round(Number(el && el.value)); return isFinite(v) && v > 0 ? v : 0; };
-  function nukeCell(td, hp, armor, mr) {
-    if (!td) return;
+  // what the boxes do to a unit: null when they are empty, else the damage after armor / resistance
+  function nukeHit(armor, mr) {
     const mag = nukeVal(nukeMag), phys = nukeVal(nukePhys), pure = nukeVal(nukePure);
-    const on = !!(mag || phys || pure) && isFinite(hp);
-    td.classList.toggle('nuke-live', false);
-    td.classList.toggle('nuke-dead', false);
-    if (!on) { if (td.dataset.nukeTitle !== undefined) { td.removeAttribute('title'); delete td.dataset.nukeTitle; } return; }
-    const a = isFinite(armor) ? armor : 0, m = isFinite(mr) ? mr : 0;
+    if (!(mag || phys || pure)) return null;
+    const a = (isFinite(armor) ? armor : 0) - nukeVal(nukeArmor), m = isFinite(mr) ? mr : 0;
     const physTaken = phys * (1 - 0.06 * a / (1 + 0.06 * Math.abs(a)));
     const magTaken = mag * (1 - m);
-    const dealt = physTaken + magTaken + pure;
-    td.classList.toggle(dealt >= hp ? 'nuke-dead' : 'nuke-live', true);
+    return {mag, phys, pure, a, physTaken, magTaken, dealt: physTaken + magTaken + pure};
+  }
+  // the hint's last words: how much HP is left, or by how much the damage overshoots (owner 2026-11-26:
+  // "надо в всплывающей подсказке показывать, сколько ХП остается")
+  const hpLeft = (dealt, hp) => dealt >= hp ? `dies (${Math.round(dealt - hp)} over)` : `${Math.round(hp - dealt)} HP left`;
+  function nukeCell(td, hp, armor, mr) {
+    if (!td) return;
+    const h = isFinite(hp) ? nukeHit(armor, mr) : null;
+    td.classList.toggle('nuke-live', false);
+    td.classList.toggle('nuke-dead', false);
+    if (!h) { if (td.dataset.nukeTitle !== undefined) { td.removeAttribute('title'); delete td.dataset.nukeTitle; } return; }
+    td.classList.toggle(h.dealt >= hp ? 'nuke-dead' : 'nuke-live', true);
     td.dataset.nukeTitle = '';
-    td.title = `Physical ${phys} → ${Math.round(physTaken)} (armor blocks ${Math.round(phys - physTaken)}), ` +
-               `magic ${mag} → ${Math.round(magTaken)} (resistance blocks ${Math.round(mag - magTaken)}), ` +
-               `pure ${pure}: ` +
-               `${Math.round(dealt)} of ${Math.round(hp)} HP`;
+    const blocked = Math.round(h.phys - h.physTaken);     // armor below zero adds damage instead
+    td.title = `Physical ${h.phys} → ${Math.round(h.physTaken)} (armor ${fmt(h.a, 1)} ` +
+               `${blocked >= 0 ? 'blocks ' + blocked : 'adds ' + -blocked}), ` +
+               `magic ${h.mag} → ${Math.round(h.magTaken)} (resistance blocks ${Math.round(h.mag - h.magTaken)}), ` +
+               `pure ${h.pure}: ${Math.round(h.dealt)} of ${Math.round(hp)} HP, ${hpLeft(h.dealt, hp)}`;
   }
   // always open (owner 2026-11-26): it counts once a box holds a number
-  [nukeMag, nukePhys, nukePure].forEach(el => el && el.addEventListener('input', () => {
+  [nukeMag, nukePhys, nukePure, nukeArmor].forEach(el => el && el.addEventListener('input', () => {
     const v = el.value.replace(/[^0-9]/g, '');
     if (v !== el.value) el.value = v;
     apply();
@@ -204,12 +214,6 @@
             gold: (base(tr, 'gold_min') + r.gmin + base(tr, 'gold_max') + r.gmax) / 2,
             xp: base(tr, 'xp') + r.xp};
   }
-  function nukeDealt(armor, mr) {
-    const mag = nukeVal(nukeMag), phys = nukeVal(nukePhys), pure = nukeVal(nukePure);
-    if (!(mag || phys || pure)) return null;
-    const a = isFinite(armor) ? armor : 0;
-    return phys * (1 - 0.06 * a / (1 + 0.06 * Math.abs(a))) + mag * (1 - mr) + pure;
-  }
   function waves() {
     if (!wavesTable) return;
     const tier = tierSel ? tierSel.value : 'normal';
@@ -227,16 +231,20 @@
         // HP / damage / gold / XP: the wave's sums; armor and attack speed: the mean over its units
         const sum = {hp: 0, armor: 0, dmg: 0, as: 0, gold: 0, xp: 0};
         let units = 0, killed = 0, nukeOn = false;
+        const lines = [];      // the hint: each kind's HP left after the nuke
         Object.keys(WAVE_KINDS).forEach(k => {
           const n = Number(tr.dataset[k]) || 0;
           if (!n || !rowOf[k] || off.has(k)) return;
           const u = unitAt(rowOf[k], L, auraMr);
           Object.keys(sum).forEach(s => { sum[s] += n * (isFinite(u[s]) ? u[s] : 0); });
           units += n;
-          const dealt = nukeDealt(u.armor, u.mr);
-          if (dealt === null) return;
+          const h = nukeHit(u.armor, u.mr);
+          if (!h) return;
           nukeOn = true;
-          if (dealt >= u.hp) killed += n;
+          if (h.dealt >= u.hp) killed += n;
+          const label = rowOf[k].querySelector('td.col-name');
+          lines.push(`${(label ? label.textContent.trim() : k)}${n > 1 ? ' ×' + n : ''}: ` +
+                     `${Math.round(h.dealt)} of ${Math.round(u.hp)} HP, ${hpLeft(h.dealt, u.hp)}`);
         });
         Object.keys(sum).forEach(s => {
           const td = tr.querySelector(`td.wv-${s}-${L}`);
@@ -250,7 +258,7 @@
         hc.classList.remove('nuke-dead', 'nuke-live', 'nuke-part');
         if (nukeOn) {
           hc.classList.add(killed === units ? 'nuke-dead' : killed ? 'nuke-part' : 'nuke-live');
-          hc.title = `${killed}/${units} die`;
+          hc.title = `${killed}/${units} die\n` + lines.join('\n');
         } else hc.removeAttribute('title');
       }
     });
