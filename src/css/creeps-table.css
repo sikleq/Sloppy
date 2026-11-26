@@ -479,14 +479,16 @@ body.view-waves .upg-group { display: none !important; }
 .waves-table .wv-units-in { display: flex; gap: 4px; }
 .waves-table .wv-unit { position: relative; flex: none; }
 .waves-table .wv-unit img { width: 28px; height: 28px; max-width: none; object-fit: cover; border-radius: 3px; display: block; }
+/* the count on a dark plate, so it reads on any portrait (owner 2026-11-26: "цифры не видны, нужна подложка") */
 .waves-table .wv-unit b {
-  position: absolute; right: 1px; bottom: 0; font-weight: 700; font-size: 12px; line-height: 1;
-  color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 1px 1px 0 #000;
+  position: absolute; right: 0; bottom: 0; min-width: 11px; padding: 1px 2px 0;
+  background: rgba(10, 9, 8, 0.85); border-top-left-radius: 3px;
+  font-weight: 700; font-size: 11px; line-height: 11px; text-align: center; color: #f3ead6;
 }
-/* siege: a click greys it and takes it out of the sums (src/js/creeps-upgrade.js waves) */
-.waves-table .wv-unit[data-kind="siege"] { cursor: pointer; }
-.waves-table.wv-siege-off .wv-unit[data-kind="siege"] img { filter: grayscale(1); opacity: 0.35; }
-.waves-table.wv-siege-off .wv-unit[data-kind="siege"] b { opacity: 0.4; }
+/* any unit: a click greys it and takes it out of its row's sums (src/js/creeps-upgrade.js waves) */
+.waves-table .wv-unit { cursor: pointer; }
+.waves-table .wv-unit.wv-off img { filter: grayscale(1); opacity: 0.35; }
+.waves-table .wv-unit.wv-off b { opacity: 0.5; }
 .waves-table td[class*="wv-gold-"] { color: var(--gold); }
 /* a step when this make-up never leaves: dimmed */
 .waves-table td.wv-none { opacity: 0.35; }

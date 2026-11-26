@@ -187,20 +187,19 @@
   // One row per wave make-up, the wave sums at every 7:30 step like Timeline. The numbers are the lane rows' of the
   // Creeps choice (Normal / Super / Mega) at that step, by the same rule() as the table. A make-up with a flagbearer
   // has its Inspiration Aura on every unit (in the game it reaches its own wave); the aura button puts it on all.
-  // A click on a siege icon greys every siege creep and leaves it out of the sums (owner: "возможность не учитывать
-  // siege unit (сделать его серым)"). Nuke: each HP cell red when the whole wave dies, yellow when part of it,
+  // A click on any unit's icon greys it and leaves it out of THAT row's sums (owner 2026-11-26: "выключать дать
+  // возможность любой тип крипа … и не во всех строках сразу, а там где выключил"). Nuke: each HP cell red when the whole wave dies, yellow when part of it,
   // green when none; its hint says how many ("4/6").
   const wavesTable = document.querySelector('.waves-table');
   const tierSel = document.getElementById('lane-tier');
   const WAVE_KINDS = {melee: 'lane_melee', flag: 'lane_flagbearer', ranged: 'lane_ranged', siege: 'lane_siege'};
-  let siegeOff = false;
   function unitAt(tr, L, auraMr) {
     const r = rule(tr, L);
     const hp = base(tr, 'hp') + r.hp, armor = base(tr, 'armor') + r.armor;
     const mrOwn = (base(tr, 'magres') + own(tr, 'magres', base(tr, 'magres'))) / 100;
     return {hp: hp + own(tr, 'hp', hp), armor: armor + own(tr, 'armor', armor),
             mr: 1 - (1 - (isFinite(mrOwn) ? mrOwn : 0)) * (1 - auraMr),
-            dmg: base(tr, 'dmg_avg') + r.dmg,
+            dmg: base(tr, 'dmg_avg') + r.dmg, as: base(tr, 'as') + r.as,
             gold: (base(tr, 'gold_min') + r.gmin + base(tr, 'gold_max') + r.gmax) / 2,
             xp: base(tr, 'xp') + r.xp};
   }
@@ -217,27 +216,32 @@
     Object.entries(WAVE_KINDS).forEach(([k, id]) => {
       rowOf[k] = document.getElementById('unit-' + id + (tier === 'normal' ? '' : '_' + tier));
     });
-    wavesTable.classList.toggle('wv-siege-off', siegeOff);
     wavesTable.querySelectorAll('tbody tr').forEach(tr => {
       const hasFlag = Number(tr.dataset.flag) > 0;
+      const off = new Set((tr.dataset.off || '').split(' ').filter(Boolean));
+      tr.querySelectorAll('.wv-unit').forEach(ch => ch.classList.toggle('wv-off', off.has(ch.dataset.kind)));
       for (let L = 0; L <= 8; L++) {
         const auraMr = (hasFlag || auraOn()) && AURA ? AURA.step * Math.min(L, AURA.max) / 100 : 0;
-        const sum = {hp: 0, dmg: 0, gold: 0, xp: 0};
+        // HP / damage / gold / XP: the wave's sums; armor and attack speed: the mean over its units
+        const sum = {hp: 0, armor: 0, dmg: 0, as: 0, gold: 0, xp: 0};
         let units = 0, killed = 0, nukeOn = false;
         Object.keys(WAVE_KINDS).forEach(k => {
           const n = Number(tr.dataset[k]) || 0;
-          if (!n || !rowOf[k] || (k === 'siege' && siegeOff)) return;
+          if (!n || !rowOf[k] || off.has(k)) return;
           const u = unitAt(rowOf[k], L, auraMr);
-          ['hp', 'dmg', 'gold', 'xp'].forEach(s => { sum[s] += n * (isFinite(u[s]) ? u[s] : 0); });
+          Object.keys(sum).forEach(s => { sum[s] += n * (isFinite(u[s]) ? u[s] : 0); });
           units += n;
           const dealt = nukeDealt(u.armor, u.mr);
           if (dealt === null) return;
           nukeOn = true;
           if (dealt >= u.hp) killed += n;
         });
-        ['hp', 'dmg', 'gold', 'xp'].forEach(s => {
+        Object.keys(sum).forEach(s => {
           const td = tr.querySelector(`td.wv-${s}-${L}`);
-          if (td) td.textContent = Math.round(sum[s]);
+          if (!td) return;
+          if (s === 'armor') td.textContent = units ? fmt(sum.armor / units, 1) : '';
+          else if (s === 'as') td.textContent = units ? Math.round(sum.as / units) : '';
+          else td.textContent = Math.round(sum[s]);
         });
         const hc = tr.querySelector(`td.wv-hp-${L}`);
         if (!hc) continue;
@@ -251,8 +255,12 @@
   }
   if (wavesTable) {
     wavesTable.addEventListener('click', e => {
-      if (!e.target.closest('.wv-unit[data-kind="siege"]')) return;
-      siegeOff = !siegeOff;
+      const chip = e.target.closest('.wv-unit');
+      if (!chip) return;
+      const tr = chip.closest('tr');
+      const off = new Set((tr.dataset.off || '').split(' ').filter(Boolean));
+      if (off.has(chip.dataset.kind)) off.delete(chip.dataset.kind); else off.add(chip.dataset.kind);
+      tr.dataset.off = [...off].join(' ');
       waves();
     });
   }

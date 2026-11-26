@@ -30,7 +30,11 @@ LAST_WAVE = 121                # 60:00
 STEPS = tuple(range(9))        # 0:00 … 60:00, as the Timeline view
 KINDS = (('melee', 'lane_melee', 'Melee'), ('flag', 'lane_flagbearer', 'Flagbearer'),
          ('ranged', 'lane_ranged', 'Ranged'), ('siege', 'lane_siege', 'Siege'))
-WAVE_STATS = (('hp', 'HP'), ('dmg', 'Damage'), ('gold', 'Gold'), ('xp', 'XP'))
+# the Timeline's stats (owner 2026-11-26: "а где другие характеристики"): HP / Damage / Gold / XP are the wave's
+# sums; armor and attack speed do not add up, so they are the mean over the wave's units (weighted by count)
+WAVE_STATS = (('hp', 'HP'), ('armor', 'Avg armor'), ('dmg', 'Damage'), ('as', 'Avg attack speed'),
+              ('gold', 'Gold'), ('xp', 'XP'))
+WAVE_MEAN = ('armor', 'as')
 
 
 def wave_time(n):
