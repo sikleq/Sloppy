@@ -128,7 +128,8 @@
   // "cap" steps, gold (min and max alike) and XP do not; no armor or attack speed. A lane creep without data-upg
   // does not grow.
   function rule(tr, L) {
-    if (tr.dataset.group !== 'lane') {
+    // neutral_upgrade unless the row carries its own rule (lane creeps; hero summons carry "{}": no growth)
+    if (tr.dataset.group !== 'lane' && tr.dataset.upg === undefined) {
       return {hp: 30 * L, armor: 0.5 * L, as: 5 * L, dmg: 3 * L, xp: 4 * L,
               gmin: Math.floor(L / 2), gmax: Math.floor((L + 1) / 2)};
     }
@@ -212,13 +213,16 @@
   function waves() {
     if (!wavesTable) return;
     const tier = tierSel ? tierSel.value : 'normal';
+    const stepNow = Math.round(Number(input.value));
+    wavesTable.querySelectorAll('thead th.wv-t').forEach((th, j) => th.classList.toggle('wv-cur', j % 9 === stepNow));
     const rowOf = {};
     Object.entries(WAVE_KINDS).forEach(([k, id]) => {
       rowOf[k] = document.getElementById('unit-' + id + (tier === 'normal' ? '' : '_' + tier));
     });
     wavesTable.querySelectorAll('tbody tr').forEach(tr => {
-      const hasFlag = Number(tr.dataset.flag) > 0;
       const off = new Set((tr.dataset.off || '').split(' ').filter(Boolean));
+      // the flagbearer's aura only while it is in the wave (a flagbearer switched off takes its aura with it)
+      const hasFlag = Number(tr.dataset.flag) > 0 && !off.has('flag');
       tr.querySelectorAll('.wv-unit').forEach(ch => ch.classList.toggle('wv-off', off.has(ch.dataset.kind)));
       for (let L = 0; L <= 8; L++) {
         const auraMr = (hasFlag || auraOn()) && AURA ? AURA.step * Math.min(L, AURA.max) / 100 : 0;
@@ -239,6 +243,8 @@
         Object.keys(sum).forEach(s => {
           const td = tr.querySelector(`td.wv-${s}-${L}`);
           if (!td) return;
+          // the Upgrade box's step stands out in every group (owner 2026-11-26: "upgrade забыл добавить в waves")
+          td.classList.toggle('wv-cur', L === stepNow);
           if (s === 'armor') td.textContent = units ? fmt(sum.armor / units, 1) : '';
           else if (s === 'as') td.textContent = units ? Math.round(sum.as / units) : '';
           else td.textContent = Math.round(sum[s]);

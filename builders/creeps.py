@@ -35,6 +35,7 @@ _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 _sys.path.insert(0, _HERE)
 
 import patch.site_common as _site
+import builders.creeps_summons as _creeps_summons
 from builders.creeps_abilities import UA_CANONICAL_UNIT, save_neutral_abilities_html
 from builders.creeps_common import (
     ABILITY_COLS, ABILITY_SKIP, DASH, GROUP_SWITCHES, HULL_BOUNDS, NEUTRAL_DEFAULT_HULL, attr_esc,
@@ -64,12 +65,14 @@ NPC_FIELDS = ('StatusHealth', 'StatusHealthRegen', 'StatusMana',
               'ProjectileSpeed', 'BoundsHullName', 'RingRadius',
               'BountyGoldMin', 'BountyGoldMax', 'BountyXP',
               'VisionDaytimeRange', 'VisionNighttimeRange',
-              'Ability1', 'Ability2', 'Ability3', 'Ability4', 'Ability5')
+              'Ability1', 'Ability2', 'Ability3', 'Ability4', 'Ability5',
+              'include_keys_from')     # a summon's level 2+ takes its other keys from level 1 (summon_rows)
 # Capture both neutrals AND the hero-summoned units we surface
 # in the table (e.g. Dark Troll Summoner's skeleton_warrior).
 _NPC_HEAD_RE = re.compile(r'^\s*"(npc_dota_(?:neutral_[a-z0-9_]+|dark_troll_warlord_skeleton_warrior'
                           r'|creep_goodguys_(?:melee|ranged|flagbearer)(?:_upgraded(?:_mega)?)?'
                           r'|goodguys_siege(?:_upgraded(?:_mega)?)?))"\s*$')
+_NPC_ANY_HEAD_RE = re.compile(r'^\s*"(npc_dota_[a-z0-9_]+)"\s*$')
 _NPC_FIELD_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]+)"')
 
 
@@ -94,13 +97,15 @@ def _parse_npc_kv(path):
     # arbitrary depth.
     kv_lines = open(path, encoding='utf-8').read().splitlines()
     n_lines = len(kv_lines)
+    summons = _creeps_summons.head_names()      # hero summons shown on Unit Stats (builders/creeps_summons.py)
     i = 0
     while i < n_lines:
         m = _NPC_HEAD_RE.match(kv_lines[i])
-        if not m:
+        hm = None if m else _NPC_ANY_HEAD_RE.match(kv_lines[i])
+        if not m and not (hm and hm.group(1) in summons):
             i += 1
             continue
-        name = m.group(1)
+        name = (m or hm).group(1)
         # Find the opening brace (typically next line)
         j = i + 1
         while j < n_lines and '{' not in kv_lines[j]:
@@ -787,6 +792,31 @@ def lane_rows(src):
     return out
 
 
+def summon_rows(src):
+    """Hero / item summons (owner 2026-11-26), after the lane creeps: the game's numbers from
+    data/rules/summon_units.json over the unit KV (builders/creeps_summons.py). Unit Stats only — the abilities
+    page does not list them. No ability columns yet: their abilities are hero abilities, not in the neutral data."""
+    def kv(name, seen=()):
+        own = src.npc_data.get(name, {})
+        parent = own.get('include_keys_from')
+        if not parent or parent in seen:
+            return own
+        return {**kv(parent, seen + (name,)), **own}
+
+    out = []
+    for i, e in enumerate(_creeps_summons.entries()):
+        npc = {**kv(e['npc']), **_creeps_summons.kv_overrides(e)}
+        s = _unit_stats(npc, src.units.get(e['npc'], {}))
+        cells = _format_stats(s, npc, [('', '')] * 3, '')
+        if cells.get('vision') == '0/0':
+            cells['vision'] = ''        # the KV's 0/0 (treants): the ability sets it, the number is not ours to show
+        data = {**cells, 'lvl': '',
+                'createhero': _creeps_summons.ROW_PREFIX + e['key'], 'name': _creeps_summons.display_name(e),
+                'npc_key': e['npc'], 'icon': _creeps_summons.icon(e), 'camp': '', 'hero_summon': True}
+        out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': e['npc']})
+    return out
+
+
 # ---- Neutral Stats: column structure ----
 # Super-categories → columns (key, label, mode). mode 'std' = visible in
 # both Standard and Expanded; 'exp' = Expanded only. Render order follows
@@ -1150,7 +1180,7 @@ def _stats_cell(k, row, src, unit_page_slugs):
     if k == 'icon':
         if not v:
             return f'<td class="creep-icon-cell {_col_cls(k)}"></td>'
-        if unit_group(d.get('createhero')) == 'lane':      # no "-createhero <name> neutral" for a lane creep
+        if unit_group(d.get('createhero')) == 'lane' or d.get('hero_summon'):   # no "-createhero … neutral"
             return (f'<td class="creep-icon-cell {_col_cls(k)}">'
                     f'<img class="creep-copy" src="{esc(v)}" alt="" loading="lazy" width="128" height="72" '
                     f'onerror="this.style.visibility=\'hidden\'"></td>')
@@ -1191,6 +1221,8 @@ def _stats_row_html(row, src, unit_page_slugs):
     group = unit_group(d.get('createhero'))
     upg = LANE_UPGRADE.get((d.get('createhero') or '').strip())
     upg_attr = f' data-upg="{attr_esc(_json.dumps(upg, separators=(",", ":")))}"' if upg else ''
+    if d.get('hero_summon'):
+        upg_attr = ' data-upg="{}"'      # a hero summon does not grow with Upgrade (src/js/creeps-upgrade.js rule)
     tier = f' data-lane-tier="{d["lane_tier"]}"' if d.get('lane_tier') else ''
     return (f'<tr{rid} data-group="{group}"{tier} data-attack-type="{attack_type}"{removed}{upg_attr}{tr_cls}>'
             f'{cells}</tr>')
@@ -1369,7 +1401,7 @@ def save_creeps_html():
     with open(csv_path, encoding='utf-8') as f:
         csv_rows = list(_csv.reader(f))
     rendered = build_rows(csv_rows, src)
-    save_neutral_stats_html(rendered, src)
+    save_neutral_stats_html(rendered + summon_rows(src), src)     # summons: Unit Stats only
     save_neutral_abilities_html(rendered, src.hist, ASSET_VERSION)
 
 

@@ -470,8 +470,11 @@ body.view-waves .creeps-table:not(.waves-table),
 body.view-waves .sticky-frame,
 body.view-waves .hs-attack-filter-group,
 body.view-waves #removed-toggle,
-body.view-waves .unit-type-group,
-body.view-waves .upg-group { display: none !important; }
+body.view-waves .unit-type-group { display: none !important; }
+/* the Upgrade box's step: gold numbers and a gold frame on its time in every group */
+.waves-table td.wv-cur { color: var(--gold); font-weight: 700; }
+.waves-table td.wv-cur.wv-none { opacity: 0.6; }
+.creeps-table.waves-table thead th.wv-cur { color: var(--gold); box-shadow: inset 0 -2px 0 var(--gold); }
 .waves-table td.wv-units { text-align: left; }
 .waves-table .wv-count { color: var(--text-dim, #8a8170); }
 /* the count sits ON the icon, bottom-right (owner 2026-11-26: "цифры … лучше на иконке"); a flex row of fixed

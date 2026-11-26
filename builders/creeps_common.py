@@ -33,7 +33,8 @@ def unit_group(createhero):
     ch = (createhero or '').strip()
     if ch.startswith('lane_'):
         return 'lane'
-    return 'summon' if ch in SUMMON_UNITS else 'neutral'
+    # hero / item summons are rows 'summon_<key>' (builders/creeps_summons.py)
+    return 'summon' if ch in SUMMON_UNITS or ch.startswith('summon_') else 'neutral'
 
 # One "Type" dropdown with a box per group (owner 2026-11-26: "спрятать за выпадающий список в категории Type",
 # like Hero Lab's .hd-dd); src/js/creeps-pinned.js opens it and hides the unchecked groups.
