@@ -132,6 +132,10 @@ def test_nuke_has_two_damage_boxes_and_marks_life_or_death():
     assert 'id="nuke-armor"' in bar
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
     assert "- nukeVal(nukeArmor)" in js and "HP left" in js and "hpLeft(h.dealt, u.hp)" in js
+    # "−Armor" also comes off the armor columns, Phys resist and EHP, Timeline and Waves (owner 2026-11-26);
+    # Nuke reads the build's armor so the box is taken off once
+    assert "put(tr, 'armor', armor - cut, 1, armorOn)" in js and "0.06 * (armor - cut)" in js
+    assert "ai = ta ? num(ta.dataset.base)" in js and "sum.armor / units - cut" in js
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
     assert "0.06 * a / (1 + 0.06 * Math.abs(a))" in js and "mag * (1 - m)" in js
     assert "h.dealt >= hp ? 'nuke-dead' : 'nuke-live'" in js

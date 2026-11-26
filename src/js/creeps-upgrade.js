@@ -90,17 +90,21 @@
         }
         if (k === 'hp_regen') td.classList.toggle('regen-zero', td.textContent.trim() === '0');   // grey only at zero
       });
-      const pct = 0.06 * armor / (1 + 0.06 * Math.abs(armor));
-      const pctEff = 0.06 * armorEff / (1 + 0.06 * Math.abs(armorEff));
+      // Nuke's "−Armor" box comes off the armor the table shows too, and so off its physical resistance and EHP
+      // (owner 2026-11-26: "в столбцах с броней тоже надо отнимать значение и пересчитывать Phys. resist")
+      const cut = nukeVal(nukeArmor);
+      const armorOn = on || cut ? 1 : 0;
+      const pct = 0.06 * (armor - cut) / (1 + 0.06 * Math.abs(armor - cut));
+      const pctEff = 0.06 * (armorEff - cut) / (1 + 0.06 * Math.abs(armorEff - cut));
       put(tr, 'hp', hp, 0, on);
-      put(tr, 'armor', armor, 1, on);
-      put(tr, 'armor_pct', Math.round(pct * 100), 0, on);
-      if (on) { const td = cell(tr, 'armor_pct'); if (td) td.textContent += '%'; }
+      put(tr, 'armor', armor - cut, 1, armorOn);
+      put(tr, 'armor_pct', Math.round(pct * 100), 0, armorOn);
+      if (armorOn) { const td = cell(tr, 'armor_pct'); if (td && td.dataset.base) td.textContent += '%'; }
       put(tr, 'as', as, 0, on);
       put(tr, 't_per_attack', bat / (as / 100), 2, on);
       // EHP with the unit's own aura even at step 0 (the build wrote them from its numbers without it)
       const ownAura = own(tr, 'hp', hp) || own(tr, 'armor', armor) || own(tr, 'magres', base(tr, 'magres'));
-      put(tr, 'ehp_phys', hpEff / (1 - pctEff), 0, on || ownAura ? 1 : 0);
+      put(tr, 'ehp_phys', hpEff / (1 - pctEff), 0, on || ownAura || cut ? 1 : 0);
       if (isFinite(mrEff)) put(tr, 'ehp_mag', hpEff / (1 - mrEff), 0, on || aura || ownAura ? 1 : 0);
       nukeCell(cell(tr, 'hp'), hpEff, armorEff, mrEff);
       // Timeline view: the same test on every step's HP cell (its armor and the flagbearer's aura at that step)
@@ -108,7 +112,14 @@
         const th = cell(tr, 'tl_hp_' + i), ta = cell(tr, 'tl_armor_' + i);
         if (!th) continue;
         const am = aura ? AURA.step * Math.min(i, AURA.max) / 100 : 0;
-        const hi = num(th.textContent), ai = ta ? num(ta.textContent) : 0;
+        // the step's armor less "−Armor" on show; Nuke takes the box off by itself, so it reads the build's number
+        if (ta) {
+          if (ta.dataset.base === undefined) ta.dataset.base = ta.textContent.trim();
+          const b = num(ta.dataset.base);
+          ta.textContent = cut && isFinite(b) ? fmt(b - cut, 1) : ta.dataset.base;
+          ta.classList.toggle('upg-on', !!cut && isFinite(b));
+        }
+        const hi = num(th.textContent), ai = ta ? num(ta.dataset.base) : 0;
         nukeCell(th, hi + own(tr, 'hp', hi), ai + own(tr, 'armor', ai),
                  1 - (1 - mrOwn) * (1 - am));
       }
@@ -249,7 +260,11 @@
         Object.keys(sum).forEach(s => {
           const td = tr.querySelector(`td.wv-${s}-${L}`);
           if (!td) return;
-          if (s === 'armor') td.textContent = units ? fmt(sum.armor / units, 1) : '';
+          if (s === 'armor') {      // the wave's mean armor less Nuke's "−Armor"
+            const cut = nukeVal(nukeArmor);
+            td.textContent = units ? fmt(sum.armor / units - cut, 1) : '';
+            td.classList.toggle('upg-on', !!cut);
+          }
           else if (s === 'as') td.textContent = units ? Math.round(sum.as / units) : '';
           else td.textContent = Math.round(sum[s]);
         });
