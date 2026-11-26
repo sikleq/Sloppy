@@ -433,11 +433,15 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
    a cell that the upgrade changed is gold */
 .upg-group { display: inline-flex; align-items: center; gap: 8px; }
 /* a number box has no spin arrows on the site, and its value stands exactly in the middle (owner 2026-11-23) */
-.upg-input { width: 44px; height: 28px; padding: 0; box-sizing: border-box; background: var(--bg-panel-3);
-  border: 1px solid var(--line); border-radius: 5px; color: var(--gold); font: inherit; font-size: 13px; font-weight: 700;
-  line-height: 26px; text-align: center; font-variant-numeric: tabular-nums; appearance: textfield; -moz-appearance: textfield; }
+/* the pixel font and frame of the selects beside it, so its text stands on the same line as their captions
+   (owner 2026-11-26: Nuke "расположение кривое, не в одну линию" — the boxes were Segoe UI 13px) */
+.upg-input { width: 44px; height: 28px; padding: 0 0 2px; box-sizing: border-box;
+  border: 2px solid transparent; border-image: var(--px-edge) 2 stretch; border-radius: 0;
+  background-color: var(--px-field); background-clip: padding-box; box-shadow: inset 0 -3px 0 var(--px-press);
+  color: var(--gold); font-family: var(--font-j10); font-size: 18px; font-weight: 400; letter-spacing: 0.3px;
+  line-height: normal; text-align: center; font-variant-numeric: tabular-nums; appearance: textfield; -moz-appearance: textfield; }
 .upg-input::-webkit-outer-spin-button, .upg-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.upg-input:hover, .upg-input:focus-visible { border-color: var(--gold); outline: none; }
+.upg-input:hover, .upg-input:focus-visible { border-image-source: var(--px-edge-gold); outline: none; }
 /* the step's game time is the number box's hover hint (owner 2026-11-26), no chip beside it */
 .creeps-table td.upg-on { color: var(--gold); }
 /* Inspiration Aura button: the ability's icon alone; off = dimmed, on = full colour in the gold frame */
@@ -447,7 +451,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 /* Nuke: two damage boxes; the HP cell light green when the unit lives, red when it dies (owner 2026-11-26) */
 .nuke-group { display: inline-flex; align-items: center; gap: 6px; }
 .nuke-input { width: 52px; }
-.nuke-input::placeholder { color: var(--text-dimmer); font-weight: 600; }
+.nuke-input::placeholder { color: var(--px-text-dim); }
 .nuke-input.nuke-mag { color: #5fb1ff; }    /* magic: blue, as the damage type on Unit Abilities */
 .nuke-input.nuke-phys { color: #e1716a; }   /* physical: red */
 .nuke-input.nuke-pure { color: #ead992; }   /* pure: pale gold, as on Unit Abilities */
@@ -466,26 +470,38 @@ body.view-waves .hs-attack-filter-group,
 body.view-waves #removed-toggle,
 body.view-waves .unit-type-group,
 body.view-waves .upg-group { display: none !important; }
+/* two header rows (group, then step time) pinned together: sticky on the whole thead (ui-style.md) */
+.waves-table thead { position: sticky; top: 0; z-index: 50; box-shadow: inset 0 -2px 0 var(--blue-bright-85); }
 .waves-table thead th {
-  position: sticky; top: 0; z-index: 50;
   background: var(--bg-panel-3); color: var(--text-bright); font-weight: 600;
-  text-align: center; padding: 6px 10px; white-space: nowrap;
-  box-shadow: inset 0 -2px 0 var(--blue-bright-85);
+  text-align: center; padding: 5px 6px; white-space: nowrap;
+  border-left: 1px solid var(--tbl-col-line);
 }
-.waves-table td { text-align: center; padding: 3px 10px; white-space: nowrap;
+.waves-table thead th:first-child { border-left: none; }
+.waves-table td { text-align: center; padding: 3px 6px; white-space: nowrap;
   border-left: 1px solid var(--tbl-col-line); border-bottom: 1px solid var(--tbl-row-line); }
-.waves-table td:first-child, .waves-table th:first-child { border-left: none; }
+.waves-table td:first-child { border-left: none; }
+/* a 2px line where a stat group starts (the meaning border), like Timeline */
+.waves-table .wv-first, .waves-table th.wv-cat { border-left: 2px solid rgba(213, 207, 195, 0.22); }
 .waves-table td.wv-units { text-align: left; }
+.waves-table .wv-count { color: var(--text-dim, #8a8170); font-size: 0.85em; }
 /* the count sits ON the icon, bottom-right (owner 2026-11-26: "цифры … лучше на иконке") */
-.waves-table .wv-unit { position: relative; display: inline-block; margin-right: 4px; vertical-align: middle; }
-.waves-table .wv-unit img { width: 28px; height: 28px; object-fit: cover; border-radius: 3px; display: block; }
+/* a flex row of fixed icons: the cell can never be narrower than its icons (they ran over Waves, 2026-11-26) */
+.waves-table .wv-units-in { display: flex; gap: 4px; }
+.waves-table .wv-unit { position: relative; flex: none; }
+/* max-width:none — the site's img max-width:100% let the column shrink under its icons */
+.waves-table .wv-unit img { width: 28px; height: 28px; max-width: none; object-fit: cover; border-radius: 3px; display: block; }
 .waves-table .wv-unit b {
   position: absolute; right: 1px; bottom: 0; font-weight: 700; font-size: 12px; line-height: 1;
   color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 1px 1px 0 #000;
 }
-.waves-table .wv-unit.nuke-dead img { outline: 2px solid rgba(224, 103, 90, 0.9); }
-.waves-table .wv-unit.nuke-live img { outline: 2px solid rgba(126, 201, 107, 0.7); }
-.waves-table td.wv-gold { color: var(--gold); }
+/* siege: a click greys it and takes it out of the sums (src/js/creeps-upgrade.js waves) */
+.waves-table .wv-unit[data-kind="siege"] { cursor: pointer; }
+.waves-table.wv-siege-off .wv-unit[data-kind="siege"] img { filter: grayscale(1); opacity: 0.35; }
+.waves-table.wv-siege-off .wv-unit[data-kind="siege"] b { opacity: 0.4; }
+.waves-table td[class*="wv-gold-"] { color: var(--gold); }
+/* a step when this make-up never leaves: dimmed */
+.waves-table td.wv-none { opacity: 0.35; }
 .waves-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }
 .waves-table td.nuke-dead { background: rgba(224, 103, 90, 0.30); }
 .waves-table td.nuke-part { background: rgba(234, 217, 146, 0.18); }

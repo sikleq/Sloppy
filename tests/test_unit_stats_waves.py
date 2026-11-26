@@ -33,9 +33,18 @@ def test_wave_time_and_step():
 def test_waves_view_on_the_page():
     from builders import creeps
     assert 'value="waves"' in creeps._STATS_TOOLBAR
+    # owner 2026-11-26: like Timeline — one row per make-up, the wave sums at every 7:30 step
+    kinds = w.wave_kinds()
+    assert sum(len(ns) for _c, ns in kinds) == w.LAST_WAVE
+    assert len({tuple(c.values()) for c, _ns in kinds}) == len(kinds)
     html = w.waves_table_html({"lane_melee": "icons/units/m.png"})
-    assert html.count("<tr data-melee=") == w.LAST_WAVE
+    assert html.count("<tr data-melee=") == len(kinds)
+    assert html.count('class="wv-hp-') == len(kinds) * len(w.STEPS)
+    assert "<th class=\"wv-t\">60:00</th>" in html
+    first = kinds[0]
+    assert first[0] == {"melee": 3, "flag": 0, "ranged": 1, "siege": 0} and first[1][0] == 1
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
     assert "function waves()" in js and "killed}/${units}" in js
+    assert "siegeOff" in js and "k === 'siege' && siegeOff" in js     # a siege click: grey and out of the sums
     pinned = (ROOT / "src" / "js" / "creeps-pinned.js").read_text(encoding="utf-8")
     assert "'view-waves'" in pinned
