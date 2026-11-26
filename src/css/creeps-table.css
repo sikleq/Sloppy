@@ -493,4 +493,5 @@ body.view-waves .upg-group { display: none !important; }
 .waves-table td[class*="wv-gold-"] { color: var(--gold); }
 /* a step when this make-up never leaves: dimmed */
 .waves-table td.wv-none { opacity: 0.35; }
-.waves-table td.nuke-part { background: rgba(234, 217, 146, 0.18); }
+/* part of the wave dies: a clear amber, not a pale beige that read as red on the dark rows (owner 2026-11-26) */
+.waves-table td.nuke-part { background: rgba(240, 190, 60, 0.38); }
