@@ -1332,6 +1332,17 @@ def _load_items(version: str) -> list[dict]:
     )
 
 
+def _attack_point(hero: str, raw: dict) -> float:
+    """AttackAnimationPoint of the hero's KV block (npc_dota_hero_base's when the hero has none): the Duel's wind-up
+    before a hit lands, scaled by attack speed in src/js/hero-lab-duel.js."""
+    for block in (raw.get(hero) or {}, raw.get("npc_dota_hero_base") or {}):
+        try:
+            return float(block["AttackAnimationPoint"])
+        except (KeyError, TypeError, ValueError):
+            continue
+    return 0.0
+
+
 def _load_heroes(version: str) -> list[dict]:
     snap = _json.loads((STATS_DIR / version / "heroes.json").read_text(encoding="utf-8"))
     raw = _load_raw_heroes(version)
@@ -1367,6 +1378,7 @@ def _load_heroes(version: str) -> list[dict]:
             "name": name,
             "icon": f"icons/heroes/{icon_slug}.png",
             "attackType": _attack_type(version, hero, raw),
+            "attackPoint": _attack_point(hero, raw),
             "stats": stats,
             "statInnate": {
                 "slug": innate_slug,
@@ -1436,6 +1448,7 @@ def render_html() -> str:
 <div class="hero-lab" data-patch="{_esc(version)}">
   <div class="hl-panel" data-side="a"></div>
   <div class="hl-diff-panel">
+    <section class="hl-duel" id="hl-duel" aria-live="polite"></section>
     <div class="hl-diff-head">
       <strong id="hl-diff-title">DIFFERENCE</strong>
     </div>

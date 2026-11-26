@@ -589,3 +589,52 @@
 .hl-diff-row strong.neg { color: #ff7b72; }
 .hl-diff-row strong.zero { color: var(--text-dimmer); }
 
+
+/* Duel (hero-lab-duel.js): above Difference, its rows are Difference rows; left hero gold, right hero blue */
+.hl-duel {
+  margin: 0 -8px 10px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hl-duel:empty { display: none; }
+.hl-duel .hl-diff-head { margin: 0 8px 6px; }
+.hl-duel-bar {
+  display: flex;
+  height: 8px;
+  margin: 0 16px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.4);
+}
+.hl-duel-bar span { flex-basis: 0; transition: flex-grow 0.25s ease; }
+.hl-duel-bar .hl-duel-a { background: #e1b85b; }
+.hl-duel-bar .hl-duel-b { background: #63b8e6; }
+.hl-duel-bar .hl-duel-draw { background: #555; }
+.hl-duel-row strong.hl-diff-left { color: #e1b85b; }
+.hl-duel-row strong.hl-diff-right { color: #63b8e6; }
+.hl-duel-chart { margin: 8px 16px 0; }
+.hl-duel-chart svg {
+  display: block;
+  width: 100%;
+  height: 74px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hl-duel-line { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.hl-duel-line.hl-duel-a { stroke: #e1b85b; }
+.hl-duel-line.hl-duel-b { stroke: #63b8e6; }
+.hl-duel-tick { stroke: rgba(255, 255, 255, 0.06); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.hl-duel-chart figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 2px;
+  color: #a9a49a;
+  font-size: 10px;
+}
+.hl-duel-note {
+  margin: 6px 16px 0;
+  color: var(--text-dimmer);
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: center;
+}
