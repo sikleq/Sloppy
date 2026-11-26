@@ -1288,6 +1288,10 @@ _NUKE_FIELDS = (
     # pure damage: no armor, no resistance takes anything off it (owner 2026-11-26)
     '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-pure" '
     'class="upg-input nuke-input nuke-pure" value="" placeholder="Pure" aria-label="Pure damage">'
+    # armor reduction before the physical part (owner 2026-11-26: "Armor reduction поле, где можно вносить сколько
+    # минус брони можно снять"); the armor may go below zero, the formula takes it
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" id="nuke-armor" '
+    'class="upg-input nuke-input nuke-armor" value="" placeholder="−Armor" aria-label="Armor reduction">'
     '</span>'
 )
 

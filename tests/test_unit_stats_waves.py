@@ -42,15 +42,17 @@ def test_waves_view_on_the_page():
     assert html.count('class="wv-hp-') == len(kinds) * len(w.STEPS)
     assert '<th class="wv-t" data-cat="wv-hp">60:00</th>' in html      # data-cat: the page sets group colspans
     # the Timeline's stats too (owner 2026-11-26): armor and attack speed as the wave's mean
-    assert [k for k, _l in w.WAVE_STATS] == ["hp", "armor", "dmg", "as", "gold", "xp"]
-    assert 'class="wv-armor-0' in html and 'class="wv-as-8' in html
+    assert [k for k, _l in w.WAVE_STATS] == ["hp", "dmg", "gold", "xp"]
+    # armor and attack speed do not grow: one "Avg" column each (owner 2026-11-26)
+    assert 'class="wv-armor-0 col-sep"' in html and 'class="wv-as-0"' in html
+    assert 'wv-armor-1' not in html and 'wv-as-8' not in html and '>Avg</th>' in html
     assert "sum.armor / units" in (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
     # the Timeline view's look: a .creeps-table with the two-storey head (owner 2026-11-26)
     assert 'class="creeps-table waves-table"' in html and '<tr class="cat-row">' in html and '<tr class="col-row">' in html
     first = kinds[0]
     assert first[0] == {"melee": 3, "flag": 0, "ranged": 1, "siege": 0} and first[1][0] == 1
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
-    assert "function waves()" in js and "killed}/${units}" in js
+    assert "function waves()" in js and "${killed} of ${units} die" in js      # the hint's head
     # any unit, only in its own row: grey and out of that row's sums (owner 2026-11-26)
     assert "tr.dataset.off" in js and "off.has(k)" in js and "siegeOff" not in js
     # the flagbearer's aura leaves with a switched-off flagbearer (2026-11-26)

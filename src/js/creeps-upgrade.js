@@ -90,17 +90,21 @@
         }
         if (k === 'hp_regen') td.classList.toggle('regen-zero', td.textContent.trim() === '0');   // grey only at zero
       });
-      const pct = 0.06 * armor / (1 + 0.06 * Math.abs(armor));
-      const pctEff = 0.06 * armorEff / (1 + 0.06 * Math.abs(armorEff));
+      // Nuke's "−Armor" box comes off the armor the table shows too, and so off its physical resistance and EHP
+      // (owner 2026-11-26: "в столбцах с броней тоже надо отнимать значение и пересчитывать Phys. resist")
+      const cut = nukeVal(nukeArmor);
+      const armorOn = on || cut ? 1 : 0;
+      const pct = 0.06 * (armor - cut) / (1 + 0.06 * Math.abs(armor - cut));
+      const pctEff = 0.06 * (armorEff - cut) / (1 + 0.06 * Math.abs(armorEff - cut));
       put(tr, 'hp', hp, 0, on);
-      put(tr, 'armor', armor, 1, on);
-      put(tr, 'armor_pct', Math.round(pct * 100), 0, on);
-      if (on) { const td = cell(tr, 'armor_pct'); if (td) td.textContent += '%'; }
+      put(tr, 'armor', armor - cut, 1, armorOn);
+      put(tr, 'armor_pct', Math.round(pct * 100), 0, armorOn);
+      if (armorOn) { const td = cell(tr, 'armor_pct'); if (td && td.dataset.base) td.textContent += '%'; }
       put(tr, 'as', as, 0, on);
       put(tr, 't_per_attack', bat / (as / 100), 2, on);
       // EHP with the unit's own aura even at step 0 (the build wrote them from its numbers without it)
       const ownAura = own(tr, 'hp', hp) || own(tr, 'armor', armor) || own(tr, 'magres', base(tr, 'magres'));
-      put(tr, 'ehp_phys', hpEff / (1 - pctEff), 0, on || ownAura ? 1 : 0);
+      put(tr, 'ehp_phys', hpEff / (1 - pctEff), 0, on || ownAura || cut ? 1 : 0);
       if (isFinite(mrEff)) put(tr, 'ehp_mag', hpEff / (1 - mrEff), 0, on || aura || ownAura ? 1 : 0);
       nukeCell(cell(tr, 'hp'), hpEff, armorEff, mrEff);
       // Timeline view: the same test on every step's HP cell (its armor and the flagbearer's aura at that step)
@@ -108,7 +112,14 @@
         const th = cell(tr, 'tl_hp_' + i), ta = cell(tr, 'tl_armor_' + i);
         if (!th) continue;
         const am = aura ? AURA.step * Math.min(i, AURA.max) / 100 : 0;
-        const hi = num(th.textContent), ai = ta ? num(ta.textContent) : 0;
+        // the step's armor less "−Armor" on show; Nuke takes the box off by itself, so it reads the build's number
+        if (ta) {
+          if (ta.dataset.base === undefined) ta.dataset.base = ta.textContent.trim();
+          const b = num(ta.dataset.base);
+          ta.textContent = cut && isFinite(b) ? fmt(b - cut, 1) : ta.dataset.base;
+          ta.classList.toggle('upg-on', !!cut && isFinite(b));
+        }
+        const hi = num(th.textContent), ai = ta ? num(ta.dataset.base) : 0;
         nukeCell(th, hi + own(tr, 'hp', hi), ai + own(tr, 'armor', ai),
                  1 - (1 - mrOwn) * (1 - am));
       }
@@ -159,27 +170,65 @@
   // turns light green when the unit lives, red when it dies; its title says what armor and resistance blocked.
   const nukeMag = document.getElementById('nuke-mag'), nukePhys = document.getElementById('nuke-phys');
   const nukePure = document.getElementById('nuke-pure');      // pure: nothing blocks it
+  // armor reduction (owner 2026-11-26): taken off the armor before the physical part; armor may go below zero
+  const nukeArmor = document.getElementById('nuke-armor');
   const nukeVal = el => { const v = Math.round(Number(el && el.value)); return isFinite(v) && v > 0 ? v : 0; };
-  function nukeCell(td, hp, armor, mr) {
-    if (!td) return;
+  // what the boxes do to a unit: null when they are empty, else the damage after armor / resistance
+  function nukeHit(armor, mr) {
     const mag = nukeVal(nukeMag), phys = nukeVal(nukePhys), pure = nukeVal(nukePure);
-    const on = !!(mag || phys || pure) && isFinite(hp);
-    td.classList.toggle('nuke-live', false);
-    td.classList.toggle('nuke-dead', false);
-    if (!on) { if (td.dataset.nukeTitle !== undefined) { td.removeAttribute('title'); delete td.dataset.nukeTitle; } return; }
-    const a = isFinite(armor) ? armor : 0, m = isFinite(mr) ? mr : 0;
+    if (!(mag || phys || pure)) return null;
+    const a = (isFinite(armor) ? armor : 0) - nukeVal(nukeArmor), m = isFinite(mr) ? mr : 0;
     const physTaken = phys * (1 - 0.06 * a / (1 + 0.06 * Math.abs(a)));
     const magTaken = mag * (1 - m);
-    const dealt = physTaken + magTaken + pure;
-    td.classList.toggle(dealt >= hp ? 'nuke-dead' : 'nuke-live', true);
-    td.dataset.nukeTitle = '';
-    td.title = `Physical ${phys} → ${Math.round(physTaken)} (armor blocks ${Math.round(phys - physTaken)}), ` +
-               `magic ${mag} → ${Math.round(magTaken)} (resistance blocks ${Math.round(mag - magTaken)}), ` +
-               `pure ${pure}: ` +
-               `${Math.round(dealt)} of ${Math.round(hp)} HP`;
+    return {mag, phys, pure, a, physTaken, magTaken, dealt: physTaken + magTaken + pure};
+  }
+  // ---- Nuke hints: a little table in the site's tooltip (tooltips.js .tb-tip-target, .tb-tip-table as the
+  // patches' [?]), owner 2026-11-26: "в виде таблицы … сами крипы иконками внутри тоже там". What is left of the HP,
+  // or by how much the damage overshoots it, is the last column.
+  const R0 = Math.round;
+  const tipRow = (cells, cls) => `<tr${cls ? ` class="${cls}"` : ''}>` + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+  const leftCell = (dealt, hp) => dealt >= hp ? `<span class="nuke-tip-dead">dies +${R0(dealt - hp)}</span>`
+                                              : `<span class="nuke-tip-live">${R0(hp - dealt)}</span>`;
+  // the cell's tooltip; while it shows Nuke, the cell's history popup (creeps-changelog.js td[data-hist]) waits
+  function setTip(td, html) {
+    if (html) {
+      if (td.dataset.hist !== undefined) { td.dataset.histOff = td.dataset.hist; delete td.dataset.hist; }
+      td.classList.add('tb-tip-target');
+      td.dataset.tooltip = html;
+    } else if (td.dataset.tooltip !== undefined) {
+      td.classList.remove('tb-tip-target');
+      delete td.dataset.tooltip;
+      if (td.dataset.histOff !== undefined) { td.dataset.hist = td.dataset.histOff; delete td.dataset.histOff; }
+    }
+  }
+  function unitTip(h, hp) {
+    const rows = [];
+    if (h.phys) {
+      const d = R0(h.phys - h.physTaken);           // armor below zero adds damage instead
+      rows.push(tipRow(['<span class="nuke-tip-phys">Physical</span>', h.phys,
+                        `armor ${fmt(h.a, 1)}`, d >= 0 ? '−' + d : '+' + -d, R0(h.physTaken)]));
+    }
+    if (h.mag) {
+      rows.push(tipRow(['<span class="nuke-tip-mag">Magic</span>', h.mag,
+                        `resist ${R0((1 - h.magTaken / h.mag) * 100)}%`, '−' + R0(h.mag - h.magTaken), R0(h.magTaken)]));
+    }
+    if (h.pure) rows.push(tipRow(['<span class="nuke-tip-pure">Pure</span>', h.pure, '', '', h.pure]));
+    rows.push(tipRow(['Total', '', '', '', R0(h.dealt)], 'nuke-tip-sum'));
+    return `<b class="tip-head">${R0(h.dealt)} of ${R0(hp)} HP, left ${leftCell(h.dealt, hp)}</b>` +
+           `<table class="tb-tip-table nuke-tip">${tipRow(['', 'Hit', '', 'Blocked', 'Taken'], 'nuke-tip-h')}` +
+           rows.join('') + '</table>';
+  }
+  function nukeCell(td, hp, armor, mr) {
+    if (!td) return;
+    const h = isFinite(hp) ? nukeHit(armor, mr) : null;
+    td.classList.toggle('nuke-live', false);
+    td.classList.toggle('nuke-dead', false);
+    if (!h) { setTip(td, null); return; }
+    td.classList.toggle(h.dealt >= hp ? 'nuke-dead' : 'nuke-live', true);
+    setTip(td, unitTip(h, hp));
   }
   // always open (owner 2026-11-26): it counts once a box holds a number
-  [nukeMag, nukePhys, nukePure].forEach(el => el && el.addEventListener('input', () => {
+  [nukeMag, nukePhys, nukePure, nukeArmor].forEach(el => el && el.addEventListener('input', () => {
     const v = el.value.replace(/[^0-9]/g, '');
     if (v !== el.value) el.value = v;
     apply();
@@ -204,12 +253,6 @@
             gold: (base(tr, 'gold_min') + r.gmin + base(tr, 'gold_max') + r.gmax) / 2,
             xp: base(tr, 'xp') + r.xp};
   }
-  function nukeDealt(armor, mr) {
-    const mag = nukeVal(nukeMag), phys = nukeVal(nukePhys), pure = nukeVal(nukePure);
-    if (!(mag || phys || pure)) return null;
-    const a = isFinite(armor) ? armor : 0;
-    return phys * (1 - 0.06 * a / (1 + 0.06 * Math.abs(a))) + mag * (1 - mr) + pure;
-  }
   function waves() {
     if (!wavesTable) return;
     const tier = tierSel ? tierSel.value : 'normal';
@@ -227,21 +270,28 @@
         // HP / damage / gold / XP: the wave's sums; armor and attack speed: the mean over its units
         const sum = {hp: 0, armor: 0, dmg: 0, as: 0, gold: 0, xp: 0};
         let units = 0, killed = 0, nukeOn = false;
+        const list = [];       // the hint: each kind of creep, its HP and what is left of it
         Object.keys(WAVE_KINDS).forEach(k => {
           const n = Number(tr.dataset[k]) || 0;
           if (!n || !rowOf[k] || off.has(k)) return;
           const u = unitAt(rowOf[k], L, auraMr);
           Object.keys(sum).forEach(s => { sum[s] += n * (isFinite(u[s]) ? u[s] : 0); });
           units += n;
-          const dealt = nukeDealt(u.armor, u.mr);
-          if (dealt === null) return;
+          const h = nukeHit(u.armor, u.mr);
+          if (!h) return;
           nukeOn = true;
-          if (dealt >= u.hp) killed += n;
+          if (h.dealt >= u.hp) killed += n;
+          const chip = tr.querySelector(`.wv-unit[data-kind="${k}"] img`);
+          list.push({src: chip ? chip.getAttribute('src') : '', name: chip ? chip.alt : k, n, dealt: h.dealt, hp: u.hp});
         });
         Object.keys(sum).forEach(s => {
           const td = tr.querySelector(`td.wv-${s}-${L}`);
           if (!td) return;
-          if (s === 'armor') td.textContent = units ? fmt(sum.armor / units, 1) : '';
+          if (s === 'armor') {      // the wave's mean armor less Nuke's "−Armor"
+            const cut = nukeVal(nukeArmor);
+            td.textContent = units ? fmt(sum.armor / units - cut, 1) : '';
+            td.classList.toggle('upg-on', !!cut);
+          }
           else if (s === 'as') td.textContent = units ? Math.round(sum.as / units) : '';
           else td.textContent = Math.round(sum[s]);
         });
@@ -250,8 +300,12 @@
         hc.classList.remove('nuke-dead', 'nuke-live', 'nuke-part');
         if (nukeOn) {
           hc.classList.add(killed === units ? 'nuke-dead' : killed ? 'nuke-part' : 'nuke-live');
-          hc.title = `${killed}/${units} die`;
-        } else hc.removeAttribute('title');
+          setTip(hc, `<b class="tip-head">${killed} of ${units} die</b><table class="tb-tip-table nuke-tip">` +
+            tipRow(['', 'Taken', 'HP', 'Left'], 'nuke-tip-h') +
+            list.map(x => tipRow([`<span class="nuke-tip-unit"><img src="${x.src}" alt="">${x.name}` +
+                                  `${x.n > 1 ? ' <i>×' + x.n + '</i>' : ''}</span>`,
+                                  R0(x.dealt), R0(x.hp), leftCell(x.dealt, x.hp)])).join('') + '</table>');
+        } else setTip(hc, null);
       }
     });
   }

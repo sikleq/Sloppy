@@ -128,9 +128,20 @@ def test_nuke_has_two_damage_boxes_and_marks_life_or_death():
     # always open, captioned like View / Creeps / Type, no switch (owner 2026-11-26)
     assert 'id="nuke-toggle"' not in bar and "<strong>Nuke</strong>" in bar
     assert 'id="nuke-mag"' in bar and 'id="nuke-phys"' in bar and 'id="nuke-pure"' in bar
+    # armor reduction before the physical part; the hints say how much HP is left (owner 2026-11-26)
+    assert 'id="nuke-armor"' in bar
+    js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
+    assert "- nukeVal(nukeArmor)" in js
+    # the hints: a little table in the site tooltip, creeps as icons in Waves (owner 2026-11-26)
+    assert "tb-tip-table nuke-tip" in js and "nuke-tip-unit\"><img" in js and "leftCell(x.dealt, x.hp)" in js
+    assert "td.dataset.histOff = td.dataset.hist" in js      # the history popup waits while Nuke shows
+    # "−Armor" also comes off the armor columns, Phys resist and EHP, Timeline and Waves (owner 2026-11-26);
+    # Nuke reads the build's armor so the box is taken off once
+    assert "put(tr, 'armor', armor - cut, 1, armorOn)" in js and "0.06 * (armor - cut)" in js
+    assert "ai = ta ? num(ta.dataset.base)" in js and "sum.armor / units - cut" in js
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
     assert "0.06 * a / (1 + 0.06 * Math.abs(a))" in js and "mag * (1 - m)" in js
-    assert "dealt >= hp ? 'nuke-dead' : 'nuke-live'" in js
+    assert "h.dealt >= hp ? 'nuke-dead' : 'nuke-live'" in js
     css = (ROOT / "src" / "css" / "creeps-table.css").read_text(encoding="utf-8")
     assert "td.nuke-live" in css and "td.nuke-dead" in css
     # the step's game time is the Upgrade box's hover hint, no chip beside it (owner 2026-11-26)
