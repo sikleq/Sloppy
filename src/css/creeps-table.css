@@ -461,35 +461,23 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 /* "Type" field: the Creeps select's look, the ticked groups as its text (builders/creeps_common.py GROUP_SWITCHES) */
 .unit-type-btn { text-align: left; white-space: nowrap; height: 28px; }
 
-/* ---- View: Waves (builders/creeps_waves.py, src/js/creeps-upgrade.js waves) ---- */
+/* ---- View: Waves (builders/creeps_waves.py, src/js/creeps-upgrade.js waves) ----
+   The table is a .creeps-table with the Timeline head (owner 2026-11-26: "по дизайну, не как в timeline"): head,
+   cells, lines and fonts all come from the units table's rules; only what is the waves' own is here. */
 .waves-table { display: none; }
-body.view-waves .waves-table { display: table; border-collapse: collapse; margin: 0 auto; font-variant-numeric: tabular-nums; }
-body.view-waves .creeps-table,
+body.view-waves .waves-table { display: table; }
+body.view-waves .creeps-table:not(.waves-table),
 body.view-waves .sticky-frame,
 body.view-waves .hs-attack-filter-group,
 body.view-waves #removed-toggle,
 body.view-waves .unit-type-group,
 body.view-waves .upg-group { display: none !important; }
-/* two header rows (group, then step time) pinned together: sticky on the whole thead (ui-style.md) */
-.waves-table thead { position: sticky; top: 0; z-index: 50; box-shadow: inset 0 -2px 0 var(--blue-bright-85); }
-.waves-table thead th {
-  background: var(--bg-panel-3); color: var(--text-bright); font-weight: 600;
-  text-align: center; padding: 5px 6px; white-space: nowrap;
-  border-left: 1px solid var(--tbl-col-line);
-}
-.waves-table thead th:first-child { border-left: none; }
-.waves-table td { text-align: center; padding: 3px 6px; white-space: nowrap;
-  border-left: 1px solid var(--tbl-col-line); border-bottom: 1px solid var(--tbl-row-line); }
-.waves-table td:first-child { border-left: none; }
-/* a 2px line where a stat group starts (the meaning border), like Timeline */
-.waves-table .wv-first, .waves-table th.wv-cat { border-left: 2px solid rgba(213, 207, 195, 0.22); }
 .waves-table td.wv-units { text-align: left; }
-.waves-table .wv-count { color: var(--text-dim, #8a8170); font-size: 0.85em; }
-/* the count sits ON the icon, bottom-right (owner 2026-11-26: "цифры … лучше на иконке") */
-/* a flex row of fixed icons: the cell can never be narrower than its icons (they ran over Waves, 2026-11-26) */
+.waves-table .wv-count { color: var(--text-dim, #8a8170); }
+/* the count sits ON the icon, bottom-right (owner 2026-11-26: "цифры … лучше на иконке"); a flex row of fixed
+   icons, max-width:none — the site's img max-width:100% let the column shrink under its icons */
 .waves-table .wv-units-in { display: flex; gap: 4px; }
 .waves-table .wv-unit { position: relative; flex: none; }
-/* max-width:none — the site's img max-width:100% let the column shrink under its icons */
 .waves-table .wv-unit img { width: 28px; height: 28px; max-width: none; object-fit: cover; border-radius: 3px; display: block; }
 .waves-table .wv-unit b {
   position: absolute; right: 1px; bottom: 0; font-weight: 700; font-size: 12px; line-height: 1;
@@ -502,6 +490,4 @@ body.view-waves .upg-group { display: none !important; }
 .waves-table td[class*="wv-gold-"] { color: var(--gold); }
 /* a step when this make-up never leaves: dimmed */
 .waves-table td.wv-none { opacity: 0.35; }
-.waves-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }
-.waves-table td.nuke-dead { background: rgba(224, 103, 90, 0.30); }
 .waves-table td.nuke-part { background: rgba(234, 217, 146, 0.18); }

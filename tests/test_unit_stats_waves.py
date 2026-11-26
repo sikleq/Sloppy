@@ -40,7 +40,9 @@ def test_waves_view_on_the_page():
     html = w.waves_table_html({"lane_melee": "icons/units/m.png"})
     assert html.count("<tr data-melee=") == len(kinds)
     assert html.count('class="wv-hp-') == len(kinds) * len(w.STEPS)
-    assert "<th class=\"wv-t\">60:00</th>" in html
+    assert '<th class="wv-t" data-cat="wv-hp">60:00</th>' in html      # data-cat: the page sets group colspans
+    # the Timeline view's look: a .creeps-table with the two-storey head (owner 2026-11-26)
+    assert 'class="creeps-table waves-table"' in html and '<tr class="cat-row">' in html and '<tr class="col-row">' in html
     first = kinds[0]
     assert first[0] == {"melee": 3, "flag": 0, "ranged": 1, "siege": 0} and first[1][0] == 1
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")

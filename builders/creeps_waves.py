@@ -75,10 +75,15 @@ def wave_kinds():
 
 def waves_table_html(icons):
     """The Waves table; icons = {'lane_melee': src, …}. Number cells are filled by the page's script."""
-    cat = ('<th class="wv-tall" rowspan="2">Units</th><th class="wv-tall" rowspan="2">Waves</th>'
-           + ''.join(f'<th class="wv-cat" colspan="{len(STEPS)}">{esc(label)}</th>' for _k, label in WAVE_STATS))
-    cols = ''.join(f'<th class="wv-t{" wv-first" if i == 0 else ""}">{_clock(i * UPGRADE_STEP_S)}</th>'
-                   for _k, _l in WAVE_STATS for i in STEPS)
+    # the Timeline view's head (owner 2026-11-26: "по дизайну, не как в timeline"): a group row (tr.cat-row /
+    # th.cat-head) over the column row (tr.col-row), a 2px col-sep where a group starts
+    cat = ('<th class="cat-head cat-basic" data-cat="wave" colspan="2">Wave</th>'
+           + ''.join(f'<th class="cat-head" data-cat="wv-{k}" colspan="{len(STEPS)}">{esc(label)}</th>'
+                     for k, label in WAVE_STATS))
+    # data-cat on every column head: src/js/creeps-pinned.js recomputeCatColspans sets each group's colspan from them
+    cols = ('<th class="wv-units-h" data-cat="wave">Units</th><th class="wv-when-h" data-cat="wave">Time</th>'
+            + ''.join(f'<th class="wv-t{" col-sep" if i == 0 else ""}" data-cat="wv-{k}">{_clock(i * UPGRADE_STEP_S)}</th>'
+                      for k, _l in WAVE_STATS for i in STEPS))
     rows = []
     for c, ns in wave_kinds():
         chips = ''.join(
@@ -91,11 +96,13 @@ def waves_table_html(icons):
         when = _clock(wave_time(ns[0])) + (f'–{_clock(wave_time(ns[-1]))}' if len(ns) > 1 else '')
         data = ' '.join(f'data-{key}="{c[key]}"' for key, _r, _l in KINDS)
         cells = ''.join(
-            f'<td class="wv-{k}-{i}{" wv-first" if i == 0 else ""}{"" if i in steps else " wv-none"}"></td>'
+            f'<td class="wv-{k}-{i}{" col-sep" if i == 0 else ""}{"" if i in steps else " wv-none"}"></td>'
             for k, _l in WAVE_STATS for i in STEPS)
         rows.append(f'<tr {data} data-steps="{" ".join(map(str, steps))}">'
                     f'<td class="wv-units"><div class="wv-units-in">{chips}</div></td>'
                     f'<td class="wv-when tb-tip-target" data-tooltip="{esc(times)}">{when} '
                     f'<span class="wv-count">×{len(ns)}</span></td>{cells}</tr>')
-    return (f'<table class="waves-table"><thead><tr class="wv-cat-row">{cat}</tr><tr>{cols}</tr></thead>'
+    # .creeps-table: the units table's whole look; the page's scripts take the FIRST .creeps-table (the units one)
+    return (f'<table class="creeps-table waves-table"><thead><tr class="cat-row">{cat}</tr>'
+            f'<tr class="col-row">{cols}</tr></thead>'
             f'<tbody>\n{chr(10).join(rows)}\n</tbody></table>\n')
