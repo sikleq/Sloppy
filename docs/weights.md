@@ -227,6 +227,71 @@ the item's cost (median of 748 KV changes 7.08 → 7.41f; cost changes 4.0 %), w
 into 0.19 while a typical hero change is ~1.0. Calibrating the scale to it (typical change = 1.0, K = 15.6)
 gives 0.397 / 0.437 — no clear gain, not applied (open question).
 
+### Neutral enchantments in gold (2026-11-26)
+
+Owner: the stats of an enchantment have shop prices, so its rows count in gold like an item's
+(`patch/enchant_gold.py`, called from `_row_scores` for `kind == "enchant"`). Reviewed the same day by Fable 5.2, and
+fixed after the review.
+- **Values per tier** come from `data/rules/enchant_tables.json`. Tier start times per patch come from
+  `data/rules/neutral_tier_times.json` (`tools/build_neutral_tier_times.py`, from neutral_items.txt).
+- **Compared tier against tier on the patch's own schedule** (owner: "с тиром").
+  - Players swap the enchantment every time a tier opens (owner: "чары точно всегда меняют"). So an enchantment
+    counts only while its tier is the current one: before its first tier and after a later tier without it, it is
+    not held.
+  - Both sides are laid on the NEW patch's tier times. Each tier slot lasts from its start to the next tier's start.
+  - A change of the schedule itself (7.42: tier 3 at 30:00 instead of 25:00) hits every enchantment alike, so it is
+    not put on each one's rows.
+  - A Fable 5.2 review the same day proposed comparing by real game minutes, the old side on the old schedule. That
+    cancelled Keen-eyed's tier-3 Mana Regen 1.5 → 2 against tier 3 opening later; the owner chose tier against
+    tier.
+- **Minutes are weighted** by the share of pro games still running (`SURVIVAL`: 1.0 at 0–15 min, 0.94 at 25, 0.64
+  at 35, 0.06 at 60, 0 at 75). Only the minutes when the enchantment is held on both sides count.
+- **Gold moved by a row** = price × the weighted mean of (new − old).
+- **Worth of the enchantment** = the same weighted mean of its stats' gold, then the mean of before and after. It is
+  the denominator, the way an item's cost is: net = 0.6 × direction × 10 × min(gold / worth, 1).
+- **Penalties** are neither priced nor counted in the worth: their cost depends on the hero's role. A penalty is the
+  table's flag, a red label (`#e03e2e`: the 7.42 table has no flag on them), or "penalty" in the label.
+- **Labels** are cleaned of the notes' markup before the stat is read: `Attack Range <font>(Melee & Ranged)</font>`
+  is attack range.
+- **When the old formula is kept instead:**
+  - penalty rows;
+  - the enchantment has a non-penalty stat without a shop price (night vision, debuff duration, Item Potency,
+    knockback reduction): its worth would come out too low. Timeless 7.42 "+5 % spell amp" scored −3.2, ten times
+    an ordinary row. Alert, Tough, Timeless and Evolved are left out this way; scoring them in part waits for the
+    owner's paper grades;
+  - no table or no tier times for the patch (before 7.38b, 7.40, 7.42a), or no change in the minutes held on both
+    sides. For example, Brawny 7.42 Slow Resist was tier 4 only, and 7.42 Brawny has no tier 4.
+
+### How often pros use a neutral artifact or enchantment (2026-11-26)
+
+Owner: a change weighs more when the thing is used more often.
+- **Data.** `data/rules/neutral_pick_share.json` is built by `tools/build_neutral_share.py` from a per-patch export
+  of the pro match database: 11 patches from 7.38 to 7.42, 8 344 matches.
+- **Pick share:**
+  - artifact = hero-games that picked it / hero-games that reached its tier, compared with the mean of the SAME
+    tier (tier-1 shares add up to 0.99, tier-4 to 0.58; one mean over all tiers made tier-2 artifacts look 1.7×
+    popular);
+  - enchantment = mean over its levels of picks / hero-games that could take that level, compared with the mean of
+    all enchantments. The export counts hero-games that reached the FIRST tier it is offered at, so the denominator
+    of level L is scaled by reach(tier of level L) / reach(first tier). The tier of each level comes from
+    neutral_items.txt.
+- **Share before the change.** The previous patch's data is used, so a buff is not counted twice through the picks
+  it brings (Vampiric 7.38b was halved by its own after-nerf share). The patch's own data is used only for a thing
+  the previous data lacks.
+- **Merged patches.** The database merges letter patches into the patch without one, so 7.38b's "before" is the
+  whole 7.38 series.
+- **Multiplier** (`neutral_use_multiplier`, applied in `row_scores` to net and volume):
+  - √ratio, kept within 0.5 to 2;
+  - then pulled toward 1 by n / (n + 200), where n = hero-games measured on.
+  - Versions before 7.38 and shop items stay at ×1.
+- **Effect on the build** (both changes together, against the build before them): 57 enchantment and 137 artifact
+  cells changed; heroes and shop items are unchanged.
+  - 7.42: Quickened 1.48 → 3.26 (+15 % evasion now on tier 3, +30 mana on tier 2), Brawny 2.72 → 1.27,
+    Mystical 1.56 → 1.37, Keen-eyed 0.76 → −0.12 (Cast Range −25/−15 against Mana Regen +0.5 on tier 3).
+  - Crude 7.39b 2.67 → 1.38.
+  - Tests: `tests/test_enchant_gold_weights.py`.
+- **Not yet checked** against the owner's paper grades. That check decides the power, the bounds and the shrink.
+
 ## Items — one scale for stats and actives (2026-09-26)
 
 Two fixes to the item gold scale above (owner: "fix these weak spots yourself").

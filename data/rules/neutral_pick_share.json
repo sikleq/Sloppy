@@ -1,0 +1,2834 @@
+{
+ "_doc": "Pro pick share of neutral artifacts (items, against the mean of their tier) and enchantments (against the mean of all enchantments) per patch, as a ratio; n = hero-games it was measured on (tools/build_neutral_share.py). Patches with a letter are merged into the patch without one in the source. Used by patch/weights.py neutral_use_multiplier.",
+ "versions": {
+  "7.38": {
+   "matches": 1120,
+   "items": {
+    "ceremonial_robe": {
+     "ratio": 0.901,
+     "n": 6870
+    },
+    "crippling_crossbow": {
+     "ratio": 0.314,
+     "n": 6870
+    },
+    "demonicon": {
+     "ratio": 1.824,
+     "n": 590
+    },
+    "desolator_2": {
+     "ratio": 0.85,
+     "n": 590
+    },
+    "essence_ring": {
+     "ratio": 1.341,
+     "n": 11130
+    },
+    "fallen_sky": {
+     "ratio": 1.016,
+     "n": 590
+    },
+    "gale_guard": {
+     "ratio": 1.798,
+     "n": 10300
+    },
+    "gossamer_cape": {
+     "ratio": 1.03,
+     "n": 11130
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 0.828,
+     "n": 10300
+    },
+    "iron_talon": {
+     "ratio": 0.756,
+     "n": 11130
+    },
+    "magnifying_monocle": {
+     "ratio": 1.046,
+     "n": 6870
+    },
+    "mana_draught": {
+     "ratio": 2.114,
+     "n": 11200
+    },
+    "mind_breaker": {
+     "ratio": 0.936,
+     "n": 6870
+    },
+    "minotaur_horn": {
+     "ratio": 1.285,
+     "n": 590
+    },
+    "misericorde": {
+     "ratio": 0.929,
+     "n": 11130
+    },
+    "nemesis_curse": {
+     "ratio": 0.519,
+     "n": 10300
+    },
+    "ninja_gear": {
+     "ratio": 1.117,
+     "n": 10300
+    },
+    "occult_bracelet": {
+     "ratio": 0.43,
+     "n": 11200
+    },
+    "ogre_seal_totem": {
+     "ratio": 2.086,
+     "n": 6870
+    },
+    "orb_of_destruction": {
+     "ratio": 1.178,
+     "n": 11200
+    },
+    "panic_button": {
+     "ratio": 2.031,
+     "n": 590
+    },
+    "pirate_hat": {
+     "ratio": 0.062,
+     "n": 590
+    },
+    "pogo_stick": {
+     "ratio": 0.903,
+     "n": 11130
+    },
+    "polliwog_charm": {
+     "ratio": 0.806,
+     "n": 11200
+    },
+    "pyrrhic_cloak": {
+     "ratio": 0.717,
+     "n": 6870
+    },
+    "rippers_lash": {
+     "ratio": 0.338,
+     "n": 11200
+    },
+    "searing_signet": {
+     "ratio": 1.041,
+     "n": 11130
+    },
+    "serrated_shiv": {
+     "ratio": 0.969,
+     "n": 10300
+    },
+    "spark_of_courage": {
+     "ratio": 0.899,
+     "n": 11200
+    },
+    "spider_legs": {
+     "ratio": 0.767,
+     "n": 590
+    },
+    "trusty_shovel": {
+     "ratio": 1.709,
+     "n": 11200
+    },
+    "unrelenting_eye": {
+     "ratio": 0.166,
+     "n": 590
+    },
+    "unstable_wand": {
+     "ratio": 0.526,
+     "n": 11200
+    },
+    "whisper_of_the_dread": {
+     "ratio": 0.769,
+     "n": 10300
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 0.959,
+     "n": 11200
+    },
+    "audacious": {
+     "ratio": 1.059,
+     "n": 590
+    },
+    "boundless": {
+     "ratio": 1.157,
+     "n": 590
+    },
+    "brawny": {
+     "ratio": 1.94,
+     "n": 11200
+    },
+    "crude": {
+     "ratio": 0.265,
+     "n": 6870
+    },
+    "evolved": {
+     "ratio": 0.588,
+     "n": 590
+    },
+    "feverish": {
+     "ratio": 1.138,
+     "n": 590
+    },
+    "fleetfooted": {
+     "ratio": 0.824,
+     "n": 590
+    },
+    "greedy": {
+     "ratio": 1.329,
+     "n": 11130
+    },
+    "keen_eyed": {
+     "ratio": 0.739,
+     "n": 11130
+    },
+    "mystical": {
+     "ratio": 1.985,
+     "n": 11200
+    },
+    "quickened": {
+     "ratio": 1.047,
+     "n": 11200
+    },
+    "timeless": {
+     "ratio": 1.376,
+     "n": 6870
+    },
+    "titanic": {
+     "ratio": 0.815,
+     "n": 6870
+    },
+    "tough": {
+     "ratio": 1.268,
+     "n": 11200
+    },
+    "vampiric": {
+     "ratio": 0.553,
+     "n": 11130
+    },
+    "vast": {
+     "ratio": 0.645,
+     "n": 11130
+    },
+    "wise": {
+     "ratio": 0.314,
+     "n": 590
+    }
+   }
+  },
+  "7.39": {
+   "matches": 2617,
+   "items": {
+    "chipped_vest": {
+     "ratio": 1.064,
+     "n": 26170
+    },
+    "crippling_crossbow": {
+     "ratio": 0.223,
+     "n": 15920
+    },
+    "demonicon": {
+     "ratio": 1.781,
+     "n": 1350
+    },
+    "desolator_2": {
+     "ratio": 1.067,
+     "n": 1350
+    },
+    "dezun_bloodrite": {
+     "ratio": 0.871,
+     "n": 15920
+    },
+    "divine_regalia": {
+     "ratio": 0.812,
+     "n": 1350
+    },
+    "dormant_curio": {
+     "ratio": 1.288,
+     "n": 26170
+    },
+    "essence_ring": {
+     "ratio": 1.224,
+     "n": 26040
+    },
+    "fallen_sky": {
+     "ratio": 0.788,
+     "n": 1350
+    },
+    "gale_guard": {
+     "ratio": 1.847,
+     "n": 24470
+    },
+    "giant_maul": {
+     "ratio": 0.909,
+     "n": 15920
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.238,
+     "n": 24470
+    },
+    "helm_of_the_undying": {
+     "ratio": 1.969,
+     "n": 1350
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.299,
+     "n": 24470
+    },
+    "kobold_cup": {
+     "ratio": 0.989,
+     "n": 26170
+    },
+    "magnifying_monocle": {
+     "ratio": 1.579,
+     "n": 15920
+    },
+    "mana_draught": {
+     "ratio": 1.249,
+     "n": 26040
+    },
+    "minotaur_horn": {
+     "ratio": 0.812,
+     "n": 1350
+    },
+    "misericorde": {
+     "ratio": 0.887,
+     "n": 26040
+    },
+    "occult_bracelet": {
+     "ratio": 0.531,
+     "n": 26170
+    },
+    "outworld_staff": {
+     "ratio": 1.312,
+     "n": 15920
+    },
+    "pogo_stick": {
+     "ratio": 0.953,
+     "n": 26040
+    },
+    "polliwog_charm": {
+     "ratio": 1.016,
+     "n": 26170
+    },
+    "poor_mans_shield": {
+     "ratio": 0.657,
+     "n": 26040
+    },
+    "psychic_headband": {
+     "ratio": 0.387,
+     "n": 24470
+    },
+    "pyrrhic_cloak": {
+     "ratio": 1.106,
+     "n": 15920
+    },
+    "rippers_lash": {
+     "ratio": 0.316,
+     "n": 26170
+    },
+    "searing_signet": {
+     "ratio": 1.03,
+     "n": 26040
+    },
+    "serrated_shiv": {
+     "ratio": 1.081,
+     "n": 24470
+    },
+    "sisters_shroud": {
+     "ratio": 1.515,
+     "n": 26170
+    },
+    "spark_of_courage": {
+     "ratio": 1.281,
+     "n": 26170
+    },
+    "spider_legs": {
+     "ratio": 0.615,
+     "n": 1350
+    },
+    "unrelenting_eye": {
+     "ratio": 0.156,
+     "n": 1350
+    },
+    "whisper_of_the_dread": {
+     "ratio": 1.148,
+     "n": 24470
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.129,
+     "n": 26170
+    },
+    "audacious": {
+     "ratio": 1.19,
+     "n": 1350
+    },
+    "boundless": {
+     "ratio": 1.513,
+     "n": 1350
+    },
+    "brawny": {
+     "ratio": 1.71,
+     "n": 26170
+    },
+    "crude": {
+     "ratio": 0.26,
+     "n": 15920
+    },
+    "evolved": {
+     "ratio": 0.799,
+     "n": 1350
+    },
+    "feverish": {
+     "ratio": 0.995,
+     "n": 1350
+    },
+    "fleetfooted": {
+     "ratio": 0.859,
+     "n": 1350
+    },
+    "greedy": {
+     "ratio": 1.306,
+     "n": 26040
+    },
+    "keen_eyed": {
+     "ratio": 0.758,
+     "n": 26040
+    },
+    "mystical": {
+     "ratio": 2.113,
+     "n": 26170
+    },
+    "quickened": {
+     "ratio": 1.073,
+     "n": 26170
+    },
+    "timeless": {
+     "ratio": 1.243,
+     "n": 15920
+    },
+    "titanic": {
+     "ratio": 0.639,
+     "n": 15920
+    },
+    "tough": {
+     "ratio": 0.936,
+     "n": 26170
+    },
+    "vampiric": {
+     "ratio": 0.533,
+     "n": 26040
+    },
+    "vast": {
+     "ratio": 0.653,
+     "n": 26040
+    },
+    "wise": {
+     "ratio": 0.289,
+     "n": 1350
+    }
+   }
+  },
+  "7.40": {
+   "matches": 1380,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.254,
+     "n": 13800
+    },
+    "chipped_vest": {
+     "ratio": 1.194,
+     "n": 13800
+    },
+    "crippling_crossbow": {
+     "ratio": 0.47,
+     "n": 8500
+    },
+    "defiant_shell": {
+     "ratio": 0.457,
+     "n": 13770
+    },
+    "demonicon": {
+     "ratio": 2.022,
+     "n": 730
+    },
+    "desolator_2": {
+     "ratio": 1.047,
+     "n": 730
+    },
+    "dezun_bloodrite": {
+     "ratio": 0.961,
+     "n": 730
+    },
+    "divine_regalia": {
+     "ratio": 0.717,
+     "n": 730
+    },
+    "dormant_curio": {
+     "ratio": 1.126,
+     "n": 13800
+    },
+    "duelist_gloves": {
+     "ratio": 0.712,
+     "n": 13800
+    },
+    "essence_ring": {
+     "ratio": 1.212,
+     "n": 13770
+    },
+    "fallen_sky": {
+     "ratio": 1.276,
+     "n": 730
+    },
+    "flayers_bota": {
+     "ratio": 1.025,
+     "n": 8500
+    },
+    "giant_maul": {
+     "ratio": 1.18,
+     "n": 8500
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.533,
+     "n": 12880
+    },
+    "idol_of_screeauk": {
+     "ratio": 1.246,
+     "n": 8500
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.365,
+     "n": 12880
+    },
+    "kobold_cup": {
+     "ratio": 1.211,
+     "n": 13800
+    },
+    "mana_draught": {
+     "ratio": 1.497,
+     "n": 13770
+    },
+    "metamorphic_mandible": {
+     "ratio": 0.431,
+     "n": 8500
+    },
+    "minotaur_horn": {
+     "ratio": 0.989,
+     "n": 730
+    },
+    "occult_bracelet": {
+     "ratio": 0.574,
+     "n": 13800
+    },
+    "pogo_stick": {
+     "ratio": 1.336,
+     "n": 13770
+    },
+    "polliwog_charm": {
+     "ratio": 1.401,
+     "n": 13800
+    },
+    "poor_mans_shield": {
+     "ratio": 0.45,
+     "n": 13770
+    },
+    "psychic_headband": {
+     "ratio": 0.818,
+     "n": 12880
+    },
+    "rattlecage": {
+     "ratio": 1.648,
+     "n": 8500
+    },
+    "riftshadow_prism": {
+     "ratio": 0.301,
+     "n": 730
+    },
+    "searing_signet": {
+     "ratio": 1.048,
+     "n": 13770
+    },
+    "serrated_shiv": {
+     "ratio": 1.112,
+     "n": 12880
+    },
+    "spider_legs": {
+     "ratio": 0.688,
+     "n": 730
+    },
+    "unrelenting_eye": {
+     "ratio": 0.543,
+     "n": 12880
+    },
+    "weighted_dice": {
+     "ratio": 0.527,
+     "n": 13800
+    },
+    "whisper_of_the_dread": {
+     "ratio": 1.629,
+     "n": 12880
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.194,
+     "n": 13800
+    },
+    "audacious": {
+     "ratio": 0.835,
+     "n": 730
+    },
+    "boundless": {
+     "ratio": 1.831,
+     "n": 730
+    },
+    "brawny": {
+     "ratio": 1.642,
+     "n": 13800
+    },
+    "crude": {
+     "ratio": 0.296,
+     "n": 8500
+    },
+    "evolved": {
+     "ratio": 0.948,
+     "n": 730
+    },
+    "feverish": {
+     "ratio": 1.221,
+     "n": 730
+    },
+    "fleetfooted": {
+     "ratio": 0.964,
+     "n": 730
+    },
+    "greedy": {
+     "ratio": 1.416,
+     "n": 13770
+    },
+    "keen_eyed": {
+     "ratio": 0.744,
+     "n": 13770
+    },
+    "mystical": {
+     "ratio": 1.922,
+     "n": 13800
+    },
+    "quickened": {
+     "ratio": 1.167,
+     "n": 13800
+    },
+    "timeless": {
+     "ratio": 1.16,
+     "n": 8500
+    },
+    "titanic": {
+     "ratio": 0.445,
+     "n": 8500
+    },
+    "tough": {
+     "ratio": 0.819,
+     "n": 13800
+    },
+    "vampiric": {
+     "ratio": 0.506,
+     "n": 13770
+    },
+    "vast": {
+     "ratio": 0.617,
+     "n": 13770
+    },
+    "wise": {
+     "ratio": 0.273,
+     "n": 730
+    }
+   }
+  },
+  "7.41": {
+   "matches": 56,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.779,
+     "n": 560
+    },
+    "chipped_vest": {
+     "ratio": 1.436,
+     "n": 560
+    },
+    "cloak_of_flames": {
+     "ratio": 0.68,
+     "n": 530
+    },
+    "conjurers_catalyst": {
+     "ratio": 0.647,
+     "n": 340
+    },
+    "crippling_crossbow": {
+     "ratio": 0.361,
+     "n": 560
+    },
+    "dagger_of_ristul": {
+     "ratio": 0.193,
+     "n": 560
+    },
+    "dandelion_amulet": {
+     "ratio": 0.701,
+     "n": 340
+    },
+    "defiant_shell": {
+     "ratio": 0.396,
+     "n": 560
+    },
+    "demonicon": {
+     "ratio": 1.6,
+     "n": 20
+    },
+    "desolator_2": {
+     "ratio": 0.8,
+     "n": 20
+    },
+    "dezun_bloodrite": {
+     "ratio": 1.6,
+     "n": 20
+    },
+    "divine_regalia": {
+     "ratio": 1.2,
+     "n": 20
+    },
+    "dormant_curio": {
+     "ratio": 1.393,
+     "n": 560
+    },
+    "duelist_gloves": {
+     "ratio": 0.986,
+     "n": 560
+    },
+    "enchanters_bauble": {
+     "ratio": 0.701,
+     "n": 340
+    },
+    "essence_ring": {
+     "ratio": 1.273,
+     "n": 560
+    },
+    "flayers_bota": {
+     "ratio": 1.778,
+     "n": 340
+    },
+    "foragers_kit": {
+     "ratio": 0.793,
+     "n": 560
+    },
+    "giant_maul": {
+     "ratio": 1.563,
+     "n": 340
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 2.258,
+     "n": 530
+    },
+    "idol_of_screeauk": {
+     "ratio": 0.916,
+     "n": 340
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.526,
+     "n": 530
+    },
+    "kobold_cup": {
+     "ratio": 1.886,
+     "n": 560
+    },
+    "mana_draught": {
+     "ratio": 2.082,
+     "n": 560
+    },
+    "medallion_of_courage": {
+     "ratio": 0.878,
+     "n": 560
+    },
+    "metamorphic_mandible": {
+     "ratio": 0.539,
+     "n": 340
+    },
+    "minotaur_horn": {
+     "ratio": 0.4,
+     "n": 20
+    },
+    "occult_bracelet": {
+     "ratio": 0.771,
+     "n": 560
+    },
+    "partisans_brand": {
+     "ratio": 0.278,
+     "n": 530
+    },
+    "pogo_stick": {
+     "ratio": 2.048,
+     "n": 560
+    },
+    "polliwog_charm": {
+     "ratio": 1.629,
+     "n": 560
+    },
+    "poor_mans_shield": {
+     "ratio": 0.62,
+     "n": 560
+    },
+    "possessed_mask": {
+     "ratio": 0.257,
+     "n": 560
+    },
+    "prophets_pendulum": {
+     "ratio": 0.808,
+     "n": 340
+    },
+    "psychic_headband": {
+     "ratio": 1.052,
+     "n": 530
+    },
+    "rattlecage": {
+     "ratio": 1.347,
+     "n": 340
+    },
+    "searing_signet": {
+     "ratio": 1.136,
+     "n": 560
+    },
+    "seeds_of_serenity": {
+     "ratio": 0.207,
+     "n": 560
+    },
+    "serrated_shiv": {
+     "ratio": 2.01,
+     "n": 530
+    },
+    "spellslinger": {
+     "ratio": 0.309,
+     "n": 530
+    },
+    "spider_legs": {
+     "ratio": 0.4,
+     "n": 20
+    },
+    "stonefeather_satchel": {
+     "ratio": 0.214,
+     "n": 560
+    },
+    "stormcrafter": {
+     "ratio": 0.99,
+     "n": 530
+    },
+    "unrelenting_eye": {
+     "ratio": 0.897,
+     "n": 530
+    },
+    "weighted_dice": {
+     "ratio": 0.664,
+     "n": 560
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.564,
+     "n": 220
+    },
+    "audacious": {
+     "ratio": 1.368,
+     "n": 6
+    },
+    "brawny": {
+     "ratio": 1.362,
+     "n": 277
+    },
+    "crude": {
+     "ratio": 0.576,
+     "n": 168
+    },
+    "evolved": {
+     "ratio": 0.821,
+     "n": 20
+    },
+    "feverish": {
+     "ratio": 3.284,
+     "n": 5
+    },
+    "fleetfooted": {
+     "ratio": 0.41,
+     "n": 20
+    },
+    "greedy": {
+     "ratio": 1.452,
+     "n": 560
+    },
+    "keen_eyed": {
+     "ratio": 0.513,
+     "n": 172
+    },
+    "mystical": {
+     "ratio": 1.994,
+     "n": 283
+    },
+    "nimble": {
+     "ratio": 0.221,
+     "n": 109
+    },
+    "quickened": {
+     "ratio": 0.795,
+     "n": 560
+    },
+    "timeless": {
+     "ratio": 0.543,
+     "n": 340
+    },
+    "titanic": {
+     "ratio": 0.132,
+     "n": 111
+    },
+    "tough": {
+     "ratio": 0.731,
+     "n": 340
+    },
+    "vital": {
+     "ratio": 0.235,
+     "n": 560
+    }
+   }
+  },
+  "7.41a": {
+   "matches": 131,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.784,
+     "n": 1310
+    },
+    "chipped_vest": {
+     "ratio": 1.306,
+     "n": 1310
+    },
+    "cloak_of_flames": {
+     "ratio": 1.291,
+     "n": 1230
+    },
+    "conjurers_catalyst": {
+     "ratio": 2.259,
+     "n": 770
+    },
+    "crippling_crossbow": {
+     "ratio": 0.53,
+     "n": 1280
+    },
+    "dagger_of_ristul": {
+     "ratio": 0.368,
+     "n": 1310
+    },
+    "dandelion_amulet": {
+     "ratio": 0.892,
+     "n": 770
+    },
+    "defiant_shell": {
+     "ratio": 0.545,
+     "n": 1280
+    },
+    "demonicon": {
+     "ratio": 2.167,
+     "n": 80
+    },
+    "desolator_2": {
+     "ratio": 1.333,
+     "n": 80
+    },
+    "dezun_bloodrite": {
+     "ratio": 1.167,
+     "n": 80
+    },
+    "divine_regalia": {
+     "ratio": 0.667,
+     "n": 80
+    },
+    "dormant_curio": {
+     "ratio": 1.223,
+     "n": 1310
+    },
+    "duelist_gloves": {
+     "ratio": 0.772,
+     "n": 1310
+    },
+    "enchanters_bauble": {
+     "ratio": 0.892,
+     "n": 770
+    },
+    "essence_ring": {
+     "ratio": 1.17,
+     "n": 1280
+    },
+    "fallen_sky": {
+     "ratio": 1.667,
+     "n": 80
+    },
+    "flayers_bota": {
+     "ratio": 1.006,
+     "n": 770
+    },
+    "foragers_kit": {
+     "ratio": 0.901,
+     "n": 1310
+    },
+    "giant_maul": {
+     "ratio": 0.816,
+     "n": 770
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.806,
+     "n": 1230
+    },
+    "harmonizer": {
+     "ratio": 0.167,
+     "n": 80
+    },
+    "heavy_blade": {
+     "ratio": 0.5,
+     "n": 80
+    },
+    "idol_of_screeauk": {
+     "ratio": 0.589,
+     "n": 770
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.504,
+     "n": 1230
+    },
+    "kobold_cup": {
+     "ratio": 1.03,
+     "n": 1310
+    },
+    "mana_draught": {
+     "ratio": 1.479,
+     "n": 1280
+    },
+    "medallion_of_courage": {
+     "ratio": 1.693,
+     "n": 1280
+    },
+    "metamorphic_mandible": {
+     "ratio": 0.209,
+     "n": 770
+    },
+    "minotaur_horn": {
+     "ratio": 1.167,
+     "n": 80
+    },
+    "occult_bracelet": {
+     "ratio": 0.874,
+     "n": 1310
+    },
+    "partisans_brand": {
+     "ratio": 0.726,
+     "n": 1230
+    },
+    "pogo_stick": {
+     "ratio": 1.56,
+     "n": 1280
+    },
+    "polliwog_charm": {
+     "ratio": 1.554,
+     "n": 1310
+    },
+    "poor_mans_shield": {
+     "ratio": 0.5,
+     "n": 1280
+    },
+    "possessed_mask": {
+     "ratio": 0.855,
+     "n": 1310
+    },
+    "prophets_pendulum": {
+     "ratio": 1.481,
+     "n": 770
+    },
+    "psychic_headband": {
+     "ratio": 0.948,
+     "n": 1230
+    },
+    "rattlecage": {
+     "ratio": 0.854,
+     "n": 770
+    },
+    "searing_signet": {
+     "ratio": 1.244,
+     "n": 1280
+    },
+    "seeds_of_serenity": {
+     "ratio": 0.28,
+     "n": 1280
+    },
+    "serrated_shiv": {
+     "ratio": 1.655,
+     "n": 1230
+    },
+    "spellslinger": {
+     "ratio": 0.585,
+     "n": 1230
+    },
+    "spider_legs": {
+     "ratio": 0.167,
+     "n": 80
+    },
+    "stonefeather_satchel": {
+     "ratio": 0.653,
+     "n": 1310
+    },
+    "stormcrafter": {
+     "ratio": 0.918,
+     "n": 1230
+    },
+    "unrelenting_eye": {
+     "ratio": 0.565,
+     "n": 1230
+    },
+    "weighted_dice": {
+     "ratio": 0.68,
+     "n": 1310
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.906,
+     "n": 543
+    },
+    "audacious": {
+     "ratio": 1.81,
+     "n": 19
+    },
+    "brawny": {
+     "ratio": 1.343,
+     "n": 662
+    },
+    "crude": {
+     "ratio": 0.412,
+     "n": 372
+    },
+    "evolved": {
+     "ratio": 0.946,
+     "n": 80
+    },
+    "feverish": {
+     "ratio": 0.625,
+     "n": 22
+    },
+    "fleetfooted": {
+     "ratio": 0.688,
+     "n": 80
+    },
+    "greedy": {
+     "ratio": 1.925,
+     "n": 1280
+    },
+    "hulking": {
+     "ratio": 0.344,
+     "n": 20
+    },
+    "keen_eyed": {
+     "ratio": 0.678,
+     "n": 377
+    },
+    "mystical": {
+     "ratio": 2.132,
+     "n": 648
+    },
+    "nimble": {
+     "ratio": 0.716,
+     "n": 271
+    },
+    "quickened": {
+     "ratio": 0.716,
+     "n": 1310
+    },
+    "timeless": {
+     "ratio": 1.851,
+     "n": 770
+    },
+    "titanic": {
+     "ratio": 0.272,
+     "n": 260
+    },
+    "tough": {
+     "ratio": 0.899,
+     "n": 767
+    },
+    "vampiric": {
+     "ratio": 0.086,
+     "n": 80
+    },
+    "vital": {
+     "ratio": 0.651,
+     "n": 1310
+    }
+   }
+  },
+  "7.41b": {
+   "matches": 423,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.713,
+     "n": 4230
+    },
+    "chipped_vest": {
+     "ratio": 1.149,
+     "n": 4230
+    },
+    "cloak_of_flames": {
+     "ratio": 1.511,
+     "n": 4060
+    },
+    "conjurers_catalyst": {
+     "ratio": 1.79,
+     "n": 2980
+    },
+    "crippling_crossbow": {
+     "ratio": 0.547,
+     "n": 4230
+    },
+    "dagger_of_ristul": {
+     "ratio": 0.383,
+     "n": 4230
+    },
+    "dandelion_amulet": {
+     "ratio": 1.015,
+     "n": 2980
+    },
+    "defiant_shell": {
+     "ratio": 0.508,
+     "n": 4230
+    },
+    "demonicon": {
+     "ratio": 1.667,
+     "n": 220
+    },
+    "desolator_2": {
+     "ratio": 1.771,
+     "n": 220
+    },
+    "dezun_bloodrite": {
+     "ratio": 0.885,
+     "n": 220
+    },
+    "divine_regalia": {
+     "ratio": 0.938,
+     "n": 220
+    },
+    "dormant_curio": {
+     "ratio": 1.248,
+     "n": 4230
+    },
+    "duelist_gloves": {
+     "ratio": 0.78,
+     "n": 4230
+    },
+    "enchanters_bauble": {
+     "ratio": 0.897,
+     "n": 2980
+    },
+    "essence_ring": {
+     "ratio": 1.276,
+     "n": 4230
+    },
+    "fallen_sky": {
+     "ratio": 0.938,
+     "n": 220
+    },
+    "flayers_bota": {
+     "ratio": 0.928,
+     "n": 2980
+    },
+    "foragers_kit": {
+     "ratio": 0.8,
+     "n": 4230
+    },
+    "giant_maul": {
+     "ratio": 1.234,
+     "n": 2980
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.857,
+     "n": 4060
+    },
+    "harmonizer": {
+     "ratio": 0.885,
+     "n": 220
+    },
+    "heavy_blade": {
+     "ratio": 0.365,
+     "n": 220
+    },
+    "idol_of_screeauk": {
+     "ratio": 0.535,
+     "n": 2980
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.458,
+     "n": 4060
+    },
+    "kobold_cup": {
+     "ratio": 1.186,
+     "n": 4230
+    },
+    "mana_draught": {
+     "ratio": 1.762,
+     "n": 4230
+    },
+    "medallion_of_courage": {
+     "ratio": 1.3,
+     "n": 4230
+    },
+    "metamorphic_mandible": {
+     "ratio": 0.214,
+     "n": 2980
+    },
+    "minotaur_horn": {
+     "ratio": 1.51,
+     "n": 220
+    },
+    "occult_bracelet": {
+     "ratio": 0.865,
+     "n": 4230
+    },
+    "partisans_brand": {
+     "ratio": 1.141,
+     "n": 4060
+    },
+    "pogo_stick": {
+     "ratio": 1.46,
+     "n": 4230
+    },
+    "polliwog_charm": {
+     "ratio": 1.515,
+     "n": 4230
+    },
+    "poor_mans_shield": {
+     "ratio": 0.499,
+     "n": 4230
+    },
+    "possessed_mask": {
+     "ratio": 0.851,
+     "n": 4230
+    },
+    "prophets_pendulum": {
+     "ratio": 1.555,
+     "n": 2980
+    },
+    "psychic_headband": {
+     "ratio": 0.807,
+     "n": 4060
+    },
+    "rattlecage": {
+     "ratio": 0.831,
+     "n": 2980
+    },
+    "riftshadow_prism": {
+     "ratio": 0.312,
+     "n": 220
+    },
+    "searing_signet": {
+     "ratio": 1.217,
+     "n": 4230
+    },
+    "seeds_of_serenity": {
+     "ratio": 0.43,
+     "n": 4230
+    },
+    "serrated_shiv": {
+     "ratio": 1.481,
+     "n": 4060
+    },
+    "spellslinger": {
+     "ratio": 0.575,
+     "n": 4060
+    },
+    "spider_legs": {
+     "ratio": 0.729,
+     "n": 220
+    },
+    "stonefeather_satchel": {
+     "ratio": 0.885,
+     "n": 4230
+    },
+    "stormcrafter": {
+     "ratio": 0.743,
+     "n": 4060
+    },
+    "unrelenting_eye": {
+     "ratio": 0.427,
+     "n": 4060
+    },
+    "weighted_dice": {
+     "ratio": 0.624,
+     "n": 4230
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.785,
+     "n": 1678
+    },
+    "audacious": {
+     "ratio": 1.789,
+     "n": 42
+    },
+    "brawny": {
+     "ratio": 1.412,
+     "n": 2161
+    },
+    "crude": {
+     "ratio": 0.258,
+     "n": 1305
+    },
+    "evolved": {
+     "ratio": 0.807,
+     "n": 220
+    },
+    "feverish": {
+     "ratio": 1.105,
+     "n": 68
+    },
+    "fleetfooted": {
+     "ratio": 1.366,
+     "n": 220
+    },
+    "greedy": {
+     "ratio": 1.873,
+     "n": 4230
+    },
+    "hulking": {
+     "ratio": 0.099,
+     "n": 69
+    },
+    "keen_eyed": {
+     "ratio": 0.736,
+     "n": 1247
+    },
+    "manic": {
+     "ratio": 0.5,
+     "n": 41
+    },
+    "mystical": {
+     "ratio": 1.959,
+     "n": 2069
+    },
+    "nimble": {
+     "ratio": 0.56,
+     "n": 856
+    },
+    "quickened": {
+     "ratio": 0.824,
+     "n": 4230
+    },
+    "timeless": {
+     "ratio": 1.863,
+     "n": 2980
+    },
+    "titanic": {
+     "ratio": 0.219,
+     "n": 822
+    },
+    "tough": {
+     "ratio": 1.093,
+     "n": 2552
+    },
+    "vampiric": {
+     "ratio": 0.186,
+     "n": 220
+    },
+    "vital": {
+     "ratio": 0.565,
+     "n": 4230
+    }
+   }
+  },
+  "7.41c": {
+   "matches": 451,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.801,
+     "n": 4510
+    },
+    "chipped_vest": {
+     "ratio": 1.282,
+     "n": 4510
+    },
+    "cloak_of_flames": {
+     "ratio": 1.529,
+     "n": 4260
+    },
+    "conjurers_catalyst": {
+     "ratio": 2.287,
+     "n": 3210
+    },
+    "crippling_crossbow": {
+     "ratio": 0.653,
+     "n": 4490
+    },
+    "dagger_of_ristul": {
+     "ratio": 0.317,
+     "n": 4510
+    },
+    "dandelion_amulet": {
+     "ratio": 0.77,
+     "n": 3210
+    },
+    "defiant_shell": {
+     "ratio": 0.403,
+     "n": 4490
+    },
+    "demonicon": {
+     "ratio": 1.748,
+     "n": 510
+    },
+    "desolator_2": {
+     "ratio": 1.966,
+     "n": 510
+    },
+    "dezun_bloodrite": {
+     "ratio": 1.092,
+     "n": 510
+    },
+    "divine_regalia": {
+     "ratio": 0.777,
+     "n": 510
+    },
+    "dormant_curio": {
+     "ratio": 1.109,
+     "n": 4510
+    },
+    "duelist_gloves": {
+     "ratio": 0.834,
+     "n": 4510
+    },
+    "enchanters_bauble": {
+     "ratio": 1.182,
+     "n": 3210
+    },
+    "essence_ring": {
+     "ratio": 1.342,
+     "n": 4490
+    },
+    "fallen_sky": {
+     "ratio": 1.214,
+     "n": 510
+    },
+    "flayers_bota": {
+     "ratio": 0.811,
+     "n": 3210
+    },
+    "foragers_kit": {
+     "ratio": 0.546,
+     "n": 4510
+    },
+    "giant_maul": {
+     "ratio": 0.96,
+     "n": 3210
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.784,
+     "n": 4260
+    },
+    "harmonizer": {
+     "ratio": 0.607,
+     "n": 510
+    },
+    "heavy_blade": {
+     "ratio": 0.51,
+     "n": 510
+    },
+    "idol_of_screeauk": {
+     "ratio": 0.453,
+     "n": 3210
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.47,
+     "n": 4260
+    },
+    "kobold_cup": {
+     "ratio": 1.205,
+     "n": 4510
+    },
+    "mana_draught": {
+     "ratio": 1.982,
+     "n": 4490
+    },
+    "medallion_of_courage": {
+     "ratio": 0.974,
+     "n": 4490
+    },
+    "metamorphic_mandible": {
+     "ratio": 0.317,
+     "n": 3210
+    },
+    "minotaur_horn": {
+     "ratio": 1.141,
+     "n": 510
+    },
+    "occult_bracelet": {
+     "ratio": 0.733,
+     "n": 4510
+    },
+    "partisans_brand": {
+     "ratio": 1.285,
+     "n": 4260
+    },
+    "pogo_stick": {
+     "ratio": 1.856,
+     "n": 4490
+    },
+    "polliwog_charm": {
+     "ratio": 1.546,
+     "n": 4510
+    },
+    "poor_mans_shield": {
+     "ratio": 0.455,
+     "n": 4490
+    },
+    "possessed_mask": {
+     "ratio": 0.943,
+     "n": 4510
+    },
+    "prophets_pendulum": {
+     "ratio": 1.617,
+     "n": 3210
+    },
+    "psychic_headband": {
+     "ratio": 0.958,
+     "n": 4260
+    },
+    "rattlecage": {
+     "ratio": 0.602,
+     "n": 3210
+    },
+    "riftshadow_prism": {
+     "ratio": 0.218,
+     "n": 510
+    },
+    "searing_signet": {
+     "ratio": 1.017,
+     "n": 4490
+    },
+    "seeds_of_serenity": {
+     "ratio": 0.319,
+     "n": 4490
+    },
+    "serrated_shiv": {
+     "ratio": 1.337,
+     "n": 4260
+    },
+    "spellslinger": {
+     "ratio": 0.591,
+     "n": 4260
+    },
+    "spider_legs": {
+     "ratio": 0.728,
+     "n": 510
+    },
+    "stonefeather_satchel": {
+     "ratio": 1.058,
+     "n": 4510
+    },
+    "stormcrafter": {
+     "ratio": 0.608,
+     "n": 4260
+    },
+    "unrelenting_eye": {
+     "ratio": 0.439,
+     "n": 4260
+    },
+    "weighted_dice": {
+     "ratio": 0.626,
+     "n": 4510
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.933,
+     "n": 1835
+    },
+    "audacious": {
+     "ratio": 2.054,
+     "n": 105
+    },
+    "brawny": {
+     "ratio": 1.247,
+     "n": 2337
+    },
+    "crude": {
+     "ratio": 0.28,
+     "n": 1409
+    },
+    "evolved": {
+     "ratio": 0.902,
+     "n": 510
+    },
+    "feverish": {
+     "ratio": 1.069,
+     "n": 148
+    },
+    "fleetfooted": {
+     "ratio": 1.142,
+     "n": 510
+    },
+    "greedy": {
+     "ratio": 2.26,
+     "n": 4490
+    },
+    "hulking": {
+     "ratio": 0.18,
+     "n": 160
+    },
+    "keen_eyed": {
+     "ratio": 0.641,
+     "n": 1255
+    },
+    "manic": {
+     "ratio": 0.296,
+     "n": 97
+    },
+    "mystical": {
+     "ratio": 1.951,
+     "n": 2173
+    },
+    "nimble": {
+     "ratio": 0.471,
+     "n": 920
+    },
+    "quickened": {
+     "ratio": 1.141,
+     "n": 4510
+    },
+    "timeless": {
+     "ratio": 1.751,
+     "n": 3210
+    },
+    "titanic": {
+     "ratio": 0.17,
+     "n": 906
+    },
+    "tough": {
+     "ratio": 0.804,
+     "n": 2675
+    },
+    "vampiric": {
+     "ratio": 0.197,
+     "n": 510
+    },
+    "vital": {
+     "ratio": 0.512,
+     "n": 4510
+    }
+   }
+  },
+  "7.41d": {
+   "matches": 716,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.718,
+     "n": 7160
+    },
+    "chipped_vest": {
+     "ratio": 1.161,
+     "n": 7160
+    },
+    "cloak_of_flames": {
+     "ratio": 1.726,
+     "n": 6650
+    },
+    "conjurers_catalyst": {
+     "ratio": 2.345,
+     "n": 4650
+    },
+    "crippling_crossbow": {
+     "ratio": 0.585,
+     "n": 7100
+    },
+    "dagger_of_ristul": {
+     "ratio": 0.323,
+     "n": 7160
+    },
+    "dandelion_amulet": {
+     "ratio": 0.817,
+     "n": 4650
+    },
+    "defiant_shell": {
+     "ratio": 0.473,
+     "n": 7100
+    },
+    "demonicon": {
+     "ratio": 1.903,
+     "n": 640
+    },
+    "desolator_2": {
+     "ratio": 1.615,
+     "n": 640
+    },
+    "dezun_bloodrite": {
+     "ratio": 1.15,
+     "n": 640
+    },
+    "divine_regalia": {
+     "ratio": 0.774,
+     "n": 640
+    },
+    "dormant_curio": {
+     "ratio": 1.264,
+     "n": 7160
+    },
+    "duelist_gloves": {
+     "ratio": 0.848,
+     "n": 7160
+    },
+    "enchanters_bauble": {
+     "ratio": 1.225,
+     "n": 4650
+    },
+    "essence_ring": {
+     "ratio": 1.376,
+     "n": 7100
+    },
+    "fallen_sky": {
+     "ratio": 1.438,
+     "n": 640
+    },
+    "flayers_bota": {
+     "ratio": 0.846,
+     "n": 4650
+    },
+    "foragers_kit": {
+     "ratio": 0.542,
+     "n": 7160
+    },
+    "giant_maul": {
+     "ratio": 0.859,
+     "n": 4650
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.556,
+     "n": 6650
+    },
+    "harmonizer": {
+     "ratio": 0.31,
+     "n": 640
+    },
+    "heavy_blade": {
+     "ratio": 0.31,
+     "n": 640
+    },
+    "idol_of_screeauk": {
+     "ratio": 0.484,
+     "n": 4650
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.48,
+     "n": 6650
+    },
+    "kobold_cup": {
+     "ratio": 1.273,
+     "n": 7160
+    },
+    "mana_draught": {
+     "ratio": 1.828,
+     "n": 7100
+    },
+    "medallion_of_courage": {
+     "ratio": 0.809,
+     "n": 7100
+    },
+    "metamorphic_mandible": {
+     "ratio": 0.217,
+     "n": 4650
+    },
+    "minotaur_horn": {
+     "ratio": 1.416,
+     "n": 640
+    },
+    "occult_bracelet": {
+     "ratio": 0.79,
+     "n": 7160
+    },
+    "partisans_brand": {
+     "ratio": 1.439,
+     "n": 6650
+    },
+    "pogo_stick": {
+     "ratio": 1.777,
+     "n": 7100
+    },
+    "polliwog_charm": {
+     "ratio": 1.513,
+     "n": 7160
+    },
+    "poor_mans_shield": {
+     "ratio": 0.493,
+     "n": 7100
+    },
+    "possessed_mask": {
+     "ratio": 0.831,
+     "n": 7160
+    },
+    "prophets_pendulum": {
+     "ratio": 1.604,
+     "n": 4650
+    },
+    "psychic_headband": {
+     "ratio": 0.811,
+     "n": 6650
+    },
+    "rattlecage": {
+     "ratio": 0.603,
+     "n": 4650
+    },
+    "riftshadow_prism": {
+     "ratio": 0.376,
+     "n": 640
+    },
+    "searing_signet": {
+     "ratio": 1.348,
+     "n": 7100
+    },
+    "seeds_of_serenity": {
+     "ratio": 0.311,
+     "n": 7100
+    },
+    "serrated_shiv": {
+     "ratio": 1.361,
+     "n": 6650
+    },
+    "spellslinger": {
+     "ratio": 0.584,
+     "n": 6650
+    },
+    "spider_legs": {
+     "ratio": 0.708,
+     "n": 640
+    },
+    "stonefeather_satchel": {
+     "ratio": 1.08,
+     "n": 7160
+    },
+    "stormcrafter": {
+     "ratio": 0.576,
+     "n": 6650
+    },
+    "unrelenting_eye": {
+     "ratio": 0.466,
+     "n": 6650
+    },
+    "weighted_dice": {
+     "ratio": 0.658,
+     "n": 7160
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 2.143,
+     "n": 2788
+    },
+    "audacious": {
+     "ratio": 1.792,
+     "n": 149
+    },
+    "brawny": {
+     "ratio": 1.345,
+     "n": 3930
+    },
+    "crude": {
+     "ratio": 0.177,
+     "n": 2355
+    },
+    "evolved": {
+     "ratio": 0.996,
+     "n": 640
+    },
+    "feverish": {
+     "ratio": 1.3,
+     "n": 194
+    },
+    "fleetfooted": {
+     "ratio": 0.892,
+     "n": 640
+    },
+    "greedy": {
+     "ratio": 2.415,
+     "n": 7100
+    },
+    "hulking": {
+     "ratio": 0.148,
+     "n": 201
+    },
+    "keen_eyed": {
+     "ratio": 0.664,
+     "n": 1982
+    },
+    "manic": {
+     "ratio": 0.463,
+     "n": 96
+    },
+    "mystical": {
+     "ratio": 1.668,
+     "n": 3230
+    },
+    "nimble": {
+     "ratio": 0.569,
+     "n": 1538
+    },
+    "quickened": {
+     "ratio": 1.063,
+     "n": 7160
+    },
+    "timeless": {
+     "ratio": 1.692,
+     "n": 4650
+    },
+    "titanic": {
+     "ratio": 0.127,
+     "n": 1225
+    },
+    "tough": {
+     "ratio": 0.791,
+     "n": 4372
+    },
+    "vampiric": {
+     "ratio": 0.151,
+     "n": 640
+    },
+    "vital": {
+     "ratio": 0.606,
+     "n": 7160
+    }
+   }
+  },
+  "7.41e": {
+   "matches": 594,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.951,
+     "n": 5940
+    },
+    "chipped_vest": {
+     "ratio": 1.175,
+     "n": 5940
+    },
+    "cloak_of_flames": {
+     "ratio": 1.84,
+     "n": 5580
+    },
+    "conjurers_catalyst": {
+     "ratio": 2.376,
+     "n": 4230
+    },
+    "crippling_crossbow": {
+     "ratio": 0.764,
+     "n": 5920
+    },
+    "dagger_of_ristul": {
+     "ratio": 0.33,
+     "n": 5940
+    },
+    "dandelion_amulet": {
+     "ratio": 0.728,
+     "n": 4230
+    },
+    "defiant_shell": {
+     "ratio": 0.391,
+     "n": 5920
+    },
+    "demonicon": {
+     "ratio": 1.643,
+     "n": 530
+    },
+    "desolator_2": {
+     "ratio": 1.616,
+     "n": 530
+    },
+    "dezun_bloodrite": {
+     "ratio": 1.253,
+     "n": 530
+    },
+    "divine_regalia": {
+     "ratio": 0.752,
+     "n": 530
+    },
+    "dormant_curio": {
+     "ratio": 1.003,
+     "n": 5940
+    },
+    "duelist_gloves": {
+     "ratio": 0.762,
+     "n": 5940
+    },
+    "enchanters_bauble": {
+     "ratio": 0.926,
+     "n": 4230
+    },
+    "essence_ring": {
+     "ratio": 1.34,
+     "n": 5920
+    },
+    "fallen_sky": {
+     "ratio": 1.504,
+     "n": 530
+    },
+    "flayers_bota": {
+     "ratio": 0.749,
+     "n": 4230
+    },
+    "foragers_kit": {
+     "ratio": 0.473,
+     "n": 5940
+    },
+    "giant_maul": {
+     "ratio": 0.763,
+     "n": 4230
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.567,
+     "n": 5580
+    },
+    "harmonizer": {
+     "ratio": 0.418,
+     "n": 530
+    },
+    "heavy_blade": {
+     "ratio": 0.279,
+     "n": 530
+    },
+    "idol_of_screeauk": {
+     "ratio": 0.59,
+     "n": 4230
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.563,
+     "n": 5580
+    },
+    "kobold_cup": {
+     "ratio": 1.245,
+     "n": 5940
+    },
+    "mana_draught": {
+     "ratio": 1.957,
+     "n": 5920
+    },
+    "medallion_of_courage": {
+     "ratio": 0.694,
+     "n": 5920
+    },
+    "metamorphic_mandible": {
+     "ratio": 0.371,
+     "n": 4230
+    },
+    "minotaur_horn": {
+     "ratio": 1.476,
+     "n": 530
+    },
+    "occult_bracelet": {
+     "ratio": 0.681,
+     "n": 5940
+    },
+    "partisans_brand": {
+     "ratio": 1.603,
+     "n": 5580
+    },
+    "pogo_stick": {
+     "ratio": 1.88,
+     "n": 5920
+    },
+    "polliwog_charm": {
+     "ratio": 1.441,
+     "n": 5940
+    },
+    "poor_mans_shield": {
+     "ratio": 0.386,
+     "n": 5920
+    },
+    "possessed_mask": {
+     "ratio": 0.73,
+     "n": 5940
+    },
+    "prophets_pendulum": {
+     "ratio": 2.036,
+     "n": 4230
+    },
+    "psychic_headband": {
+     "ratio": 0.781,
+     "n": 5580
+    },
+    "rattlecage": {
+     "ratio": 0.461,
+     "n": 4230
+    },
+    "riftshadow_prism": {
+     "ratio": 0.306,
+     "n": 530
+    },
+    "searing_signet": {
+     "ratio": 1.306,
+     "n": 5920
+    },
+    "seeds_of_serenity": {
+     "ratio": 0.281,
+     "n": 5920
+    },
+    "serrated_shiv": {
+     "ratio": 1.335,
+     "n": 5580
+    },
+    "spellslinger": {
+     "ratio": 0.529,
+     "n": 5580
+    },
+    "spider_legs": {
+     "ratio": 0.752,
+     "n": 530
+    },
+    "stonefeather_satchel": {
+     "ratio": 1.462,
+     "n": 5940
+    },
+    "stormcrafter": {
+     "ratio": 0.453,
+     "n": 5580
+    },
+    "unrelenting_eye": {
+     "ratio": 0.328,
+     "n": 5580
+    },
+    "weighted_dice": {
+     "ratio": 0.748,
+     "n": 5940
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.86,
+     "n": 2369
+    },
+    "audacious": {
+     "ratio": 1.448,
+     "n": 119
+    },
+    "brawny": {
+     "ratio": 1.071,
+     "n": 3432
+    },
+    "crude": {
+     "ratio": 0.233,
+     "n": 1924
+    },
+    "evolved": {
+     "ratio": 0.867,
+     "n": 530
+    },
+    "feverish": {
+     "ratio": 0.814,
+     "n": 150
+    },
+    "fleetfooted": {
+     "ratio": 0.989,
+     "n": 530
+    },
+    "greedy": {
+     "ratio": 2.759,
+     "n": 5920
+    },
+    "hulking": {
+     "ratio": 0.536,
+     "n": 174
+    },
+    "keen_eyed": {
+     "ratio": 0.749,
+     "n": 1640
+    },
+    "mystical": {
+     "ratio": 1.539,
+     "n": 2508
+    },
+    "nimble": {
+     "ratio": 0.606,
+     "n": 1493
+    },
+    "quickened": {
+     "ratio": 1.13,
+     "n": 5940
+    },
+    "timeless": {
+     "ratio": 1.547,
+     "n": 4230
+    },
+    "titanic": {
+     "ratio": 0.188,
+     "n": 863
+    },
+    "tough": {
+     "ratio": 0.848,
+     "n": 3571
+    },
+    "vampiric": {
+     "ratio": 0.135,
+     "n": 530
+    },
+    "vital": {
+     "ratio": 0.679,
+     "n": 5940
+    }
+   }
+  },
+  "7.41f": {
+   "matches": 791,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.855,
+     "n": 7910
+    },
+    "chipped_vest": {
+     "ratio": 1.233,
+     "n": 7910
+    },
+    "cloak_of_flames": {
+     "ratio": 1.815,
+     "n": 7540
+    },
+    "conjurers_catalyst": {
+     "ratio": 2.606,
+     "n": 5540
+    },
+    "crippling_crossbow": {
+     "ratio": 1.053,
+     "n": 7890
+    },
+    "dagger_of_ristul": {
+     "ratio": 0.349,
+     "n": 7910
+    },
+    "dandelion_amulet": {
+     "ratio": 0.757,
+     "n": 5540
+    },
+    "defiant_shell": {
+     "ratio": 0.353,
+     "n": 7890
+    },
+    "demonicon": {
+     "ratio": 1.699,
+     "n": 590
+    },
+    "desolator_2": {
+     "ratio": 1.481,
+     "n": 590
+    },
+    "dezun_bloodrite": {
+     "ratio": 1.238,
+     "n": 590
+    },
+    "divine_regalia": {
+     "ratio": 0.752,
+     "n": 590
+    },
+    "dormant_curio": {
+     "ratio": 0.994,
+     "n": 7910
+    },
+    "duelist_gloves": {
+     "ratio": 0.698,
+     "n": 7910
+    },
+    "enchanters_bauble": {
+     "ratio": 0.824,
+     "n": 5540
+    },
+    "essence_ring": {
+     "ratio": 1.327,
+     "n": 7890
+    },
+    "fallen_sky": {
+     "ratio": 1.189,
+     "n": 590
+    },
+    "flayers_bota": {
+     "ratio": 0.883,
+     "n": 5540
+    },
+    "foragers_kit": {
+     "ratio": 0.43,
+     "n": 7910
+    },
+    "giant_maul": {
+     "ratio": 0.905,
+     "n": 5540
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.576,
+     "n": 7540
+    },
+    "harmonizer": {
+     "ratio": 0.364,
+     "n": 590
+    },
+    "heavy_blade": {
+     "ratio": 0.752,
+     "n": 590
+    },
+    "idol_of_screeauk": {
+     "ratio": 0.546,
+     "n": 5540
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.514,
+     "n": 7540
+    },
+    "kobold_cup": {
+     "ratio": 1.19,
+     "n": 7910
+    },
+    "mana_draught": {
+     "ratio": 2.0,
+     "n": 7890
+    },
+    "medallion_of_courage": {
+     "ratio": 0.645,
+     "n": 7890
+    },
+    "metamorphic_mandible": {
+     "ratio": 0.384,
+     "n": 5540
+    },
+    "minotaur_horn": {
+     "ratio": 1.311,
+     "n": 590
+    },
+    "occult_bracelet": {
+     "ratio": 0.659,
+     "n": 7910
+    },
+    "partisans_brand": {
+     "ratio": 1.69,
+     "n": 7540
+    },
+    "pogo_stick": {
+     "ratio": 1.877,
+     "n": 7890
+    },
+    "polliwog_charm": {
+     "ratio": 1.372,
+     "n": 7910
+    },
+    "poor_mans_shield": {
+     "ratio": 0.351,
+     "n": 7890
+    },
+    "possessed_mask": {
+     "ratio": 0.679,
+     "n": 7910
+    },
+    "prophets_pendulum": {
+     "ratio": 1.715,
+     "n": 5540
+    },
+    "psychic_headband": {
+     "ratio": 0.83,
+     "n": 7540
+    },
+    "rattlecage": {
+     "ratio": 0.381,
+     "n": 5540
+    },
+    "riftshadow_prism": {
+     "ratio": 0.388,
+     "n": 590
+    },
+    "searing_signet": {
+     "ratio": 1.247,
+     "n": 7890
+    },
+    "seeds_of_serenity": {
+     "ratio": 0.147,
+     "n": 7890
+    },
+    "serrated_shiv": {
+     "ratio": 1.298,
+     "n": 7540
+    },
+    "spellslinger": {
+     "ratio": 0.529,
+     "n": 7540
+    },
+    "spider_legs": {
+     "ratio": 0.825,
+     "n": 590
+    },
+    "stonefeather_satchel": {
+     "ratio": 1.624,
+     "n": 7910
+    },
+    "stormcrafter": {
+     "ratio": 0.44,
+     "n": 7540
+    },
+    "unrelenting_eye": {
+     "ratio": 0.308,
+     "n": 7540
+    },
+    "weighted_dice": {
+     "ratio": 0.917,
+     "n": 7910
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.773,
+     "n": 3770
+    },
+    "audacious": {
+     "ratio": 2.055,
+     "n": 118
+    },
+    "brawny": {
+     "ratio": 1.024,
+     "n": 3885
+    },
+    "crude": {
+     "ratio": 0.278,
+     "n": 2073
+    },
+    "evolved": {
+     "ratio": 0.989,
+     "n": 590
+    },
+    "feverish": {
+     "ratio": 0.867,
+     "n": 166
+    },
+    "fleetfooted": {
+     "ratio": 1.169,
+     "n": 590
+    },
+    "greedy": {
+     "ratio": 2.487,
+     "n": 7890
+    },
+    "hulking": {
+     "ratio": 0.198,
+     "n": 153
+    },
+    "keen_eyed": {
+     "ratio": 0.694,
+     "n": 2057
+    },
+    "manic": {
+     "ratio": 0.495,
+     "n": 153
+    },
+    "mystical": {
+     "ratio": 1.811,
+     "n": 4025
+    },
+    "nimble": {
+     "ratio": 0.611,
+     "n": 1803
+    },
+    "quickened": {
+     "ratio": 1.394,
+     "n": 7910
+    },
+    "timeless": {
+     "ratio": 1.555,
+     "n": 5540
+    },
+    "titanic": {
+     "ratio": 0.145,
+     "n": 1957
+    },
+    "tough": {
+     "ratio": 0.902,
+     "n": 4140
+    },
+    "vampiric": {
+     "ratio": 0.09,
+     "n": 590
+    },
+    "vital": {
+     "ratio": 0.465,
+     "n": 7910
+    }
+   }
+  },
+  "7.42": {
+   "matches": 65,
+   "items": {
+    "ash_legion_shield": {
+     "ratio": 1.879,
+     "n": 650
+    },
+    "balmhook": {
+     "ratio": 0.172,
+     "n": 590
+    },
+    "brick": {
+     "ratio": 0.395,
+     "n": 650
+    },
+    "ceremonial_robe": {
+     "ratio": 1.346,
+     "n": 590
+    },
+    "chipped_vest": {
+     "ratio": 1.079,
+     "n": 650
+    },
+    "conjurers_catalyst": {
+     "ratio": 1.433,
+     "n": 140
+    },
+    "crippling_crossbow": {
+     "ratio": 1.141,
+     "n": 650
+    },
+    "dandelion_amulet": {
+     "ratio": 1.518,
+     "n": 590
+    },
+    "defiant_shell": {
+     "ratio": 0.285,
+     "n": 650
+    },
+    "demonicon": {
+     "ratio": 2.06,
+     "n": 140
+    },
+    "dezun_bloodrite": {
+     "ratio": 1.164,
+     "n": 140
+    },
+    "divine_regalia": {
+     "ratio": 0.627,
+     "n": 140
+    },
+    "dormant_curio": {
+     "ratio": 0.465,
+     "n": 650
+    },
+    "enchanters_bauble": {
+     "ratio": 0.802,
+     "n": 590
+    },
+    "fallen_sky": {
+     "ratio": 1.433,
+     "n": 140
+    },
+    "flicker": {
+     "ratio": 0.716,
+     "n": 140
+    },
+    "foragers_kit": {
+     "ratio": 0.205,
+     "n": 650
+    },
+    "giants_ring": {
+     "ratio": 0.627,
+     "n": 140
+    },
+    "gunpowder_gauntlets": {
+     "ratio": 1.294,
+     "n": 650
+    },
+    "harmonizer": {
+     "ratio": 0.945,
+     "n": 590
+    },
+    "heavy_blade": {
+     "ratio": 0.537,
+     "n": 140
+    },
+    "helm_of_the_hivemind": {
+     "ratio": 0.358,
+     "n": 140
+    },
+    "idol_of_screeauk": {
+     "ratio": 1.002,
+     "n": 590
+    },
+    "imp_claw": {
+     "ratio": 1.163,
+     "n": 650
+    },
+    "jidi_pollen_bag": {
+     "ratio": 0.812,
+     "n": 650
+    },
+    "kobold_cup": {
+     "ratio": 1.284,
+     "n": 650
+    },
+    "mana_draught": {
+     "ratio": 1.777,
+     "n": 650
+    },
+    "metamorphic_mandible": {
+     "ratio": 1.272,
+     "n": 650
+    },
+    "mind_breaker": {
+     "ratio": 0.269,
+     "n": 140
+    },
+    "minotaur_horn": {
+     "ratio": 1.791,
+     "n": 140
+    },
+    "partisans_brand": {
+     "ratio": 1.229,
+     "n": 650
+    },
+    "pogo_stick": {
+     "ratio": 2.307,
+     "n": 650
+    },
+    "polliwog_charm": {
+     "ratio": 0.67,
+     "n": 650
+    },
+    "possessed_mask": {
+     "ratio": 0.763,
+     "n": 650
+    },
+    "prophets_pendulum": {
+     "ratio": 1.862,
+     "n": 590
+    },
+    "psychic_headband": {
+     "ratio": 0.812,
+     "n": 650
+    },
+    "rattlecage": {
+     "ratio": 0.315,
+     "n": 590
+    },
+    "red_ledger": {
+     "ratio": 0.26,
+     "n": 650
+    },
+    "revenants_brooch": {
+     "ratio": 1.461,
+     "n": 590
+    },
+    "riftshadow_prism": {
+     "ratio": 0.985,
+     "n": 140
+    },
+    "safety_bubble": {
+     "ratio": 1.097,
+     "n": 650
+    },
+    "seeds_of_serenity": {
+     "ratio": 0.391,
+     "n": 650
+    },
+    "serrated_shiv": {
+     "ratio": 1.06,
+     "n": 590
+    },
+    "spellslinger": {
+     "ratio": 0.724,
+     "n": 650
+    },
+    "stonefeather_satchel": {
+     "ratio": 1.693,
+     "n": 650
+    },
+    "stormcrafter": {
+     "ratio": 0.258,
+     "n": 590
+    },
+    "vile_phial": {
+     "ratio": 1.26,
+     "n": 590
+    },
+    "weighted_dice": {
+     "ratio": 1.005,
+     "n": 650
+    }
+   },
+   "enchants": {
+    "alert": {
+     "ratio": 1.489,
+     "n": 324
+    },
+    "audacious": {
+     "ratio": 2.568,
+     "n": 28
+    },
+    "brawny": {
+     "ratio": 0.992,
+     "n": 281
+    },
+    "crude": {
+     "ratio": 0.37,
+     "n": 154
+    },
+    "evolved": {
+     "ratio": 0.77,
+     "n": 140
+    },
+    "feverish": {
+     "ratio": 0.936,
+     "n": 32
+    },
+    "fleetfooted": {
+     "ratio": 1.498,
+     "n": 140
+    },
+    "greedy": {
+     "ratio": 1.036,
+     "n": 590
+    },
+    "keen_eyed": {
+     "ratio": 1.012,
+     "n": 172
+    },
+    "manic": {
+     "ratio": 0.125,
+     "n": 48
+    },
+    "mystical": {
+     "ratio": 2.088,
+     "n": 369
+    },
+    "nimble": {
+     "ratio": 0.644,
+     "n": 127
+    },
+    "quickened": {
+     "ratio": 1.355,
+     "n": 650
+    },
+    "timeless": {
+     "ratio": 1.798,
+     "n": 140
+    },
+    "titanic": {
+     "ratio": 0.195,
+     "n": 197
+    },
+    "tough": {
+     "ratio": 0.821,
+     "n": 326
+    },
+    "vampiric": {
+     "ratio": 0.128,
+     "n": 140
+    },
+    "vital": {
+     "ratio": 0.175,
+     "n": 650
+    }
+   }
+  }
+ }
+}

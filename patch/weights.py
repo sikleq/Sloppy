@@ -598,6 +598,26 @@ def rework_adoption_net(ctx, other_net):
     return round(max(-ITEM_REWORK_CAP, min(ITEM_REWORK_CAP, score)), 3)
 
 
+def _enchant_row_scores(text, tags, ctx):
+    """(net, volume) of a priced enchantment row, scored like an item row (patch/enchant_gold.py), or None."""
+    from .enchant_gold import clean_label, enchant_row_gold, stat_is_pct
+    ver = ctx.get("version")
+
+    def price_of(st):
+        return _price(_stat_key(clean_label(st), stat_is_pct(st), None), ver)
+
+    r = enchant_row_gold(_plain(text).strip(), ctx.get("enchant") or "", ver, price_of)
+    if r is None:
+        return None
+    gold, cost = r
+    mag = ITEM_GOLD_K * min(abs(gold) / cost, ITEM_ROW_CAP)
+    if "buff" in tags or "nerf" in tags:
+        d = _DIR["buff"] if "buff" in tags else _DIR["nerf"]
+    else:
+        d = 1.0 if gold > 0 else (-1.0 if gold < 0 else 0.0)
+    return round(ITEM_GOLD_W * d * mag, 3), round(ITEM_GOLD_W * mag, 3)
+
+
 def _item_gold_fraction(text, ctx, tags=("buff",)):
     """|gold| / item cost of an item row, or None when the row is not priced (back-compat API)."""
     r = _item_gold(text, tags, ctx)
@@ -860,7 +880,61 @@ def row_scores(text, tags, badge_html="", ctx=None):
     # leaving the game; owner 2026-09-27)
     if net and tags == {"new"} and _item_debut(ctx):
         return 0.0, vol
+    m = neutral_use_multiplier(ctx)
+    if m != 1.0:
+        return round(net * m, 3), round(vol * m, 3)
     return net, vol
+
+
+# ---- How often pros use a neutral artifact / enchantment (owner 2026-11-26) ----
+# The owner weighs a change by how often the thing is used. data/rules/neutral_pick_share.json
+# (tools/build_neutral_share.py): the pick share against the patch's mean share of its kind. A change to an
+# enchantment a third of heroes take (Mystical, Quickened) moves the game more than one to an enchantment
+# nobody takes (Hulking 7.42). Multiplier = sqrt(ratio) within [0.5, 2], pulled toward 1 on small samples.
+NEUTRAL_USE_POW = 0.5
+NEUTRAL_USE_MIN, NEUTRAL_USE_MAX = 0.5, 2.0
+NEUTRAL_USE_SHRINK_N = 200      # hero-games: at n = 200 half of the step is trusted
+try:
+    _NEUTRAL_SHARE = _json.load(open(_os.path.join(_HERE, "data", "rules", "neutral_pick_share.json"),
+                                     encoding="utf-8"))["versions"]
+except OSError:
+    _NEUTRAL_SHARE = {}
+_LETTER_RE = _re.compile(r"[a-z]+$")
+
+
+def _share_rec(ver):
+    """The share data a version is covered by: its own, else its base patch (the source merges 7.38b into 7.38)."""
+    return _NEUTRAL_SHARE.get(ver) or _NEUTRAL_SHARE.get(_LETTER_RE.sub("", ver)) if ver else None
+
+
+def _neutral_share(table, key, ver):
+    """Share BEFORE the change (the previous patch's data), so a buff is not counted twice through the extra picks
+    it brings (Fable 5.2 review 2026-11-26: Vampiric 7.38b was halved by its own after-nerf share); the patch's own
+    data only for a thing the previous patch's data does not have (new in the pool, first patch with data)."""
+    prev = _share_rec(_prev_version(ver))
+    hit = prev and prev[table].get(key)
+    if hit:
+        return hit
+    cur = _share_rec(ver)
+    return cur and cur[table].get(key)
+
+
+def neutral_use_multiplier(ctx):
+    """x of a neutral artifact's / enchantment's row by how often pros pick it in that patch; 1.0 when unknown."""
+    if not ctx:
+        return 1.0
+    if ctx.get("kind") == "enchant":
+        table, key = "enchants", (ctx.get("enchant") or "").lower().replace("-", "_").replace(" ", "_")
+    elif ctx.get("kind") == "item" and ctx.get("neutral"):
+        table, key = "items", ctx.get("item") or ""
+    else:
+        return 1.0
+    hit = _neutral_share(table, key, ctx.get("version") or "")
+    if not hit:
+        return 1.0
+    raw = min(NEUTRAL_USE_MAX, max(NEUTRAL_USE_MIN, max(hit["ratio"], 1e-9) ** NEUTRAL_USE_POW))
+    n = hit["n"]
+    return round(1.0 + (raw - 1.0) * n / (n + NEUTRAL_USE_SHRINK_N), 3)
 
 
 def _row_scores(text, tags, badge_html="", ctx=None):
@@ -870,6 +944,8 @@ def _row_scores(text, tags, badge_html="", ctx=None):
     item_row = None
     if ctx and ctx.get("kind") == "item" and (tags & {"buff", "nerf", "rework"} or tags in ({"new"}, {"del"})):
         item_row = _item_row_scores(text, tags, ctx)       # gold: priced stat / cost / mana cost / block
+    elif ctx and ctx.get("kind") == "enchant" and (tags & {"buff", "nerf"} or tags in ({"new"}, {"del"})):
+        item_row = _enchant_row_scores(text, tags, ctx)    # a stat of a neutral enchantment, in gold
     if ctx and ctx.get("kind") == "item" and item_row is None:
         cm *= ITEM_ABILITY_F                                # same scale as the gold-priced rows
         w = weight_of(kind) * cm

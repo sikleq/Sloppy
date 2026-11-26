@@ -61,6 +61,8 @@ def _row_ctx(text):
     return {
         "kind": ek.split("|", 1)[0] if ek else "",
         "item": (_State.dynamics.get(ek) or {}).get("icon") if ek.startswith("item|") else None,
+        "enchant": (_State.dynamics.get(ek) or {}).get("name") if ek.startswith("enchant|") else None,
+        "neutral": bool((_State.dynamics.get(ek) or {}).get("neutral_section")),
         "version": _State.current_patch_version,
         "hero": _State.current_hero,
         "base_stat": bool(_State.in_stats_ul),
