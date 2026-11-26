@@ -1231,6 +1231,9 @@ _NUKE_FIELDS = (
     'class="upg-input nuke-input nuke-mag" value="" placeholder="Mag" aria-label="Magic damage">'
     '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-phys" '
     'class="upg-input nuke-input nuke-phys" value="" placeholder="Phys" aria-label="Physical damage">'
+    # pure damage: no armor, no resistance takes anything off it (owner 2026-11-26)
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-pure" '
+    'class="upg-input nuke-input nuke-pure" value="" placeholder="Pure" aria-label="Pure damage">'
     '</span>'
 )
 
