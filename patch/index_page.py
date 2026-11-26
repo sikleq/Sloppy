@@ -183,7 +183,7 @@ def save_index_html():
     creeps_panel = (
         '<div class="inv-panel creeps-panel" data-panel="creeps" aria-hidden="true">'
         '<div class="support-options">'
-        + _panel_link_btn('inv-cell-creeps', 'neutral_stats.html', 'icon_creeps.png', 'Neutrals')
+        + _panel_link_btn('inv-cell-creeps', 'units_stats.html', 'icon_creeps.png', 'Units')
         + _panel_soon_btn('icon_summons.png', 'Summons')
         + _panel_soon_btn('icon_swords.png', 'Lane Creeps')
         + _panel_link_btn('', 'unit_changes.html', 'icon_changes_unit.png', 'Changes')

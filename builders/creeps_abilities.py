@@ -1,4 +1,4 @@
-"""Neutral Abilities companion page (neutral_abilities.html) — built in the
+"""Unit Abilities companion page (units_abilities.html, was neutral_abilities.html) — built in the
 same run as Neutral Stats by builders/creeps.py.
 
 One row per (creep, ability), mirroring the Creeps Table's Lvl + Unit
@@ -14,8 +14,8 @@ import re
 import patch.site_common as _site
 from patch.html_util import strip_tags      # noqa: E402
 from builders.creeps_common import (
-    ABILITY_COLS, DASH, abil_icon_html, attr_esc, esc, has_abil_icon,
-    page_shell, write_dist,
+    ABILITY_COLS, DASH, GROUP_SWITCHES, abil_icon_html, attr_esc, esc, has_abil_icon,
+    page_shell, unit_group, write_dist,
 )
 
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
@@ -377,7 +377,7 @@ ABIL_MANUAL = {
             '">?</span></span>'),
         'effect2': (
             '\x01Golems have <a class="ua-inline-link" '
-            'href="neutral_abilities.html#mud-mud_golem_hurl_boulder">'
+            'href="units_abilities.html#mud-mud_golem_hurl_boulder">'
             'Hurl Boulder</a>'),
     },
     'frogmen_arm_of_the_deep': {
@@ -467,7 +467,7 @@ ABIL_MANUAL = {
         '_force_leveled': ('effect',),
         'effect': (
             '\x01<span class="cell-wrap">Summons 3 <a class="ua-inline-link" '
-            'href="neutral_stats.html#unit-skeleton_warrior">'
+            'href="units_stats.html#unit-skeleton_warrior">'
             'Skeleton Warriors</a>'
             '<span class="qhint" tabindex="0" role="button" '
             'aria-label="HP = 250/275/300/375, attack damage = 12/15/18/21" '
@@ -475,7 +475,7 @@ ABIL_MANUAL = {
             '>?</span></span>'),
         'effect2': (
             '\x01Skeletons have <a class="ua-inline-link" '
-            'href="neutral_abilities.html#skeleton_warrior-hill_troll_rally">'
+            'href="units_abilities.html#skeleton_warrior-hill_troll_rally">'
             'Rally</a> aura'),
     },
     'spawnlord_master_stomp': {
@@ -641,6 +641,38 @@ def _leveled_cells(props):
 
 _DESCS: dict = {}        # the game's ability descriptions, read once (load_ability_descriptions)
 
+# Lane creep passives: what they do, with the numbers read from the KV of the current patch (owner 2026-11-26:
+# "Runty/Reinforced должны показывать, что делают (значения в %), Inspiration aura тоже"). {key} = av_<key>.
+KV_EFFECTS = {
+    'creep_irresolute': (
+        ('effect', '{hero_damage_penalty}% damage to heroes'),),
+    'creep_siege': (
+        ('effect', '+{bonus_building_damage}% damage to buildings and siege creeps'),
+        ('effect2', '{incoming_hero_damage_penalty}% attack damage from heroes'),
+        ('effect3', '{incoming_basic_damage_penalty}% from creeps, {incoming_controlled_unit_penalty}% from '
+                    'controlled units')),
+    'flagbearer_creep_aura_effect': (
+        ('effect', '+{bonus_health_regen} HP regen to allied creeps'),
+        ('effect2', '+{bonus_magic_resistance_per_interval}% magic resistance every 7:30, up to '
+                    '{maximum_intervals} times'),
+        ('effect3', 'Bounty +{bonus_gold} gold, +{bonus_xp} XP')),
+}
+_KV_KEY_RE = re.compile(r'\{(\w+)\}')
+
+
+def _kv_effects(slug, a):
+    """Effect cells of KV_EFFECTS filled from the ability's values; a key the patch lacks raises (a renamed key must
+    not leave a "{key}" or an empty cell on the page)."""
+    out = {}
+    for col, tpl in KV_EFFECTS.get(slug, ()):
+        def val(m):
+            raw = a.get('av_' + m.group(1))
+            if raw is None:
+                raise KeyError(f"{slug}: av_{m.group(1)} is not in the current npc_abilities.json")
+            return str(raw).split()[0]
+        out[col] = _KV_KEY_RE.sub(val, tpl)
+    return out
+
 
 def abil_props(slug, cur_ab):
     """Every property cell value for one ability. `cur_ab` is the current
@@ -680,6 +712,7 @@ def abil_props(slug, cur_ab):
         _DESCS.update(load_ability_descriptions())
     for col, text in zip(('effect', 'effect2', 'effect3'), auto_effects(a, _DESCS.get(slug, ''))):
         props[col] = text
+    props.update(_kv_effects(slug, a))
     props.update(ABIL_MANUAL.get(slug, {}))
     leveled = _leveled_cells(props)
     # Manual overrides can force cells to render as leveled even when the
@@ -1015,7 +1048,7 @@ def _unit_rows(row, cur_ab, abil_desc):
     icon = d.get('icon')
     unit_img = (
         # the link wraps an alt="" picture, so it names itself (57 nameless links, audit 2026-10-05)
-        f'<a class="unit-link" href="neutral_stats.html#unit-{esc(ch)}" aria-label="{esc(d.get("name", ch))}">'
+        f'<a class="unit-link" href="units_stats.html#unit-{esc(ch)}" aria-label="{esc(d.get("name", ch))}">'
         f'<img class="creep-copy" src="{esc(icon)}" alt="" loading="lazy" '
         f'onerror="this.style.visibility=\'hidden\'"></a>' if icon else '')
     out = []
@@ -1041,7 +1074,7 @@ def _unit_rows(row, cur_ab, abil_desc):
         cells += [prop_cell(pk, p[pk], p) for pk in PROP_COLS]
         aura_cls = ' class="ua-row-aura"' if p['type'] == 'Aura' else ''
         out.append(
-            f'<tr id="{esc(ch)}-{slug}" data-unit="{esc(ch)}"{aura_cls}>'
+            f'<tr id="{esc(ch)}-{slug}" data-unit="{esc(ch)}" data-group="{unit_group(ch)}"{aura_cls}>'
             f'{"".join(cells)}</tr>')
     return out
 
@@ -1071,6 +1104,7 @@ _UA_TOOLBAR = (
     '<input type="checkbox" id="ua-upgrades-mode" class="ua-switch-input" checked>'
     '<span class="ua-switch" aria-hidden="true"></span>'
     '</label>'
+    + GROUP_SWITCHES +
     '</div></div>\n'
 )
 
@@ -1078,11 +1112,11 @@ _UA_TOOLBAR = (
 # generated patch pages, bookmarks, external references) don't 404.
 UA_REDIRECT_HTML = (
     '<!DOCTYPE html><html><head><meta charset="UTF-8">'
-    '<meta http-equiv="refresh" content="0; url=neutral_abilities.html">'
-    '<link rel="canonical" href="neutral_abilities.html">'
+    '<meta http-equiv="refresh" content="0; url=units_abilities.html">'
+    '<link rel="canonical" href="units_abilities.html">'
     '<title>Sloppy - moved</title></head><body>'
-    '<p>This page moved to <a href="neutral_abilities.html">'
-    'neutral_abilities.html</a>.</p></body></html>'
+    '<p>This page moved to <a href="units_abilities.html">'
+    'units_abilities.html</a>.</p></body></html>'
 )
 
 
@@ -1102,7 +1136,7 @@ def ua_page_html(rows, asset_version):
         f'<tbody>\n{chr(10).join(rows)}\n</tbody>\n'
         '</table>\n'
     )
-    return page_shell('Neutral Abilities', nav_ua, inner, asset_version)
+    return page_shell('Unit Abilities', nav_ua, inner, asset_version)
 
 
 def current_ability_patch(hist):
@@ -1116,14 +1150,15 @@ def current_ability_patch(hist):
 
 
 def save_neutral_abilities_html(rendered, hist, asset_version):
-    """Write neutral_abilities.html (+ the unit_abilities.html redirect) from
+    """Write units_abilities.html (+ the neutral_abilities.html / unit_abilities.html redirects) from
     the Neutral Stats rows (`rendered`, builders/creeps.py build_rows)."""
     cur_ver = current_ability_patch(hist)
-    print(f"  neutral_abilities source patch: {cur_ver}")
+    print(f"  units_abilities source patch: {cur_ver}")
     cur_ab = hist.abil_by_patch.get(cur_ver, {})
     html = ua_page_html(ua_rows(rendered, cur_ab, load_ability_descriptions()),
                         asset_version)
-    write_dist('neutral_abilities.html', html)
-    print(f"  -> dist/neutral_abilities.html: {len(html):,} bytes")
+    write_dist('units_abilities.html', html)
+    print(f"  -> dist/units_abilities.html: {len(html):,} bytes")
+    write_dist('neutral_abilities.html', UA_REDIRECT_HTML)
     write_dist('unit_abilities.html', UA_REDIRECT_HTML)
     print(f"  -> dist/unit_abilities.html: {len(UA_REDIRECT_HTML)} bytes (redirect)")

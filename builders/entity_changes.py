@@ -643,7 +643,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         # (owner 2026-10-06, Kobold Foreman: Liquipedia lists 14 changes, the site's patches hold one)
         ranges = _annotated_ranges()
         where = f" ({_esc(ranges)})" if ranges else ""
-        stats = (' Its values in every patch since 7.08: <a href="../neutral_stats.html">Neutral Stats</a>.'
+        stats = (' Its values in every patch since 7.08: <a href="../units_stats.html">Unit Stats</a>.'
                  if e["kind"] == "unit" and _npc_of(e["icon"]).startswith("npc_dota_neutral_") else "")
         out.append('<section class="cat-panel ec-patch ec-nochange"><p class="ec-nochange-note">'
                    f'No changes to {_esc(e["name"])} in the patches this site annotates{where}.{stats}'

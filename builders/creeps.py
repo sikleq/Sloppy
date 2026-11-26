@@ -1,4 +1,4 @@
-"""build_creeps.py — generates neutral_stats.html, the neutral stats
+"""build_creeps.py — generates units_stats.html (was neutral_stats.html), the unit stats
 table. This is a standalone side-project, decoupled from the patch
 changelog generator (builders/build_patches.py). Both share the site chrome via
 site_common.py.
@@ -37,10 +37,10 @@ _sys.path.insert(0, _HERE)
 import patch.site_common as _site
 from builders.creeps_abilities import UA_CANONICAL_UNIT, save_neutral_abilities_html
 from builders.creeps_common import (
-    ABILITY_COLS, ABILITY_SKIP, DASH, HULL_BOUNDS, NEUTRAL_DEFAULT_HULL,
+    ABILITY_COLS, ABILITY_SKIP, DASH, GROUP_SWITCHES, HULL_BOUNDS, NEUTRAL_DEFAULT_HULL, attr_esc,
     NEUTRAL_DEFAULT_TURN_RATE, abil_icon_html, ability_dname, armor_factor,
     ehp_mag_val, ehp_phys_val, esc, fmt_num, fmt_regen, has_abil_icon,
-    page_shell, safe_float, safe_int, write_dist,
+    page_shell, safe_float, safe_int, unit_group, write_dist,
 )
 from builders.creeps_history import (
     COL_CHANGELOG, COL_HIST, StatHistory, ability_changelog, load_history,
@@ -67,7 +67,8 @@ NPC_FIELDS = ('StatusHealth', 'StatusHealthRegen', 'StatusMana',
               'Ability1', 'Ability2', 'Ability3', 'Ability4', 'Ability5')
 # Capture both neutrals AND the hero-summoned units we surface
 # in the table (e.g. Dark Troll Summoner's skeleton_warrior).
-_NPC_HEAD_RE = re.compile(r'^\s*"(npc_dota_(?:neutral_[a-z0-9_]+|dark_troll_warlord_skeleton_warrior))"\s*$')
+_NPC_HEAD_RE = re.compile(r'^\s*"(npc_dota_(?:neutral_[a-z0-9_]+|dark_troll_warlord_skeleton_warrior'
+                          r'|creep_goodguys_(?:melee|ranged|flagbearer)|goodguys_siege))"\s*$')
 _NPC_FIELD_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]+)"')
 
 
@@ -746,7 +747,30 @@ def build_rows(csv_rows, src):
     # can be re-sorted by any column. scripts.js collapses repeated level
     # numbers in the current row order (showing the number once per run +
     # a divider) to keep the grouped look in the default/level-sorted view.
-    return rendered
+    return rendered + lane_rows(src)
+
+
+# ---- Lane creeps (owner 2026-11-26: "добавить lane melee, ranged, siege, flagbearer") ----
+# Radiant's units: Dire's carry the same numbers in every patch (npc_units.txt). Row token -> npc key, name.
+LANE_CREEPS = (
+    ('lane_melee',      'npc_dota_creep_goodguys_melee',      'Melee Creep'),
+    ('lane_ranged',     'npc_dota_creep_goodguys_ranged',     'Ranged Creep'),
+    ('lane_siege',      'npc_dota_goodguys_siege',            'Siege Creep'),
+    ('lane_flagbearer', 'npc_dota_creep_goodguys_flagbearer', 'Flagbearer Creep'),
+)
+LANE_ATTACK_TYPE = {'lane_siege': 'Siege'}
+
+
+def lane_rows(src):
+    """The lane creep rows, after the neutrals, in the same row format as build_rows."""
+    out = []
+    for i, (token, npc_key, name) in enumerate(LANE_CREEPS):
+        data = {**_row_data(npc_key, token, src), 'lvl': '', 'createhero': token, 'name': name,
+                'npc_key': npc_key, 'icon': f'icons/units/{npc_key}.png', 'camp': ''}   # no camp: a dash
+        if token in LANE_ATTACK_TYPE:
+            data['attack_type'] = LANE_ATTACK_TYPE[token]
+        out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': npc_key})
+    return out
 
 
 # ---- Neutral Stats: column structure ----
@@ -977,7 +1001,7 @@ def _ability_inner(k, v, d):
     ch = (d.get('createhero') or '').strip()
     target_ch = UA_CANONICAL_UNIT.get(slug, ch)
     return (f'<a class="abil-link" '
-            f'href="neutral_abilities.html#{target_ch}-{slug}">{inner}</a>'
+            f'href="units_abilities.html#{target_ch}-{slug}">{inner}</a>'
             if slug else inner)
 
 
@@ -1040,6 +1064,10 @@ def _stats_cell(k, row, src, unit_page_slugs):
     if k == 'icon':
         if not v:
             return f'<td class="creep-icon-cell {_col_cls(k)}"></td>'
+        if unit_group(d.get('createhero')) == 'lane':      # no "-createhero <name> neutral" for a lane creep
+            return (f'<td class="creep-icon-cell {_col_cls(k)}">'
+                    f'<img class="creep-copy" src="{esc(v)}" alt="" loading="lazy" width="128" height="72" '
+                    f'onerror="this.style.visibility=\'hidden\'"></td>')
         # Clicking the icon copies the dev-console spawn command
         # "-createhero <name> neutral" to the clipboard (handled
         # in scripts.js via the data-cmd attribute).
@@ -1072,7 +1100,22 @@ def _stats_row_html(row, src, unit_page_slugs):
     attack_type = 'ranged' if d.get('attack_range_ranged') else 'melee'
     gone = REMOVED_CREEPS.get((d.get("createhero") or "").strip())
     removed = f' data-removed="{esc(gone)}"' if gone else ''
-    return f'<tr{rid} data-attack-type="{attack_type}"{removed}{tr_cls}>{cells}</tr>'
+    group = unit_group(d.get('createhero'))
+    upg = LANE_UPGRADE.get((d.get('createhero') or '').strip())
+    upg_attr = f' data-upg="{attr_esc(_json.dumps(upg, separators=(",", ":")))}"' if upg else ''
+    return (f'<tr{rid} data-group="{group}" data-attack-type="{attack_type}"{removed}{upg_attr}{tr_cls}>'
+            f'{cells}</tr>')
+
+
+# Lane creeps grow by their own rule, not neutral_upgrade (src/js/creeps-upgrade.js reads data-upg): every 7:30,
+# per step flat; HP and damage stop at 30 steps ("cap"), gold and XP do not. server.dll 6997 (7.42a; the same in
+# 6728 and 6978, increments table 0x187e3a0, applied at 0x26bb4d0) and Liquipedia "Lane Creeps" agree. Siege creeps
+# do not grow at all: the spawner calls the upgrade only for "melee" / "range" / "flagbearer" names — no data-upg.
+LANE_UPGRADE = {
+    'lane_melee':      {'hp': 12, 'dmg': 1, 'gold': 1, 'xp': 0, 'cap': 30},
+    'lane_flagbearer': {'hp': 12, 'dmg': 1, 'gold': 1, 'xp': 0, 'cap': 30},
+    'lane_ranged':     {'hp': 12, 'dmg': 2, 'gold': 3, 'xp': 8, 'cap': 30},
+}
 
 
 # ---- Neutral Stats: page ----
@@ -1102,23 +1145,24 @@ _STATS_TOOLBAR = (
     # neutral_upgrade: every 7:30 from the horn, up to 30 steps (src/js/creeps-upgrade.js; owner 2026-11-23)
     '<label class="view-group upg-group"><strong>Upgrade</strong>'
     '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="upgrade-step" class="upg-input" value="0" '
-    'aria-label="Neutral upgrade number, 0 to 30">'
+    'aria-label="Creep upgrade number, 0 to 30">'
     '<span class="upg-time" id="upgrade-time">0:00</span></label>'
+    + GROUP_SWITCHES +
     '</div></div>\n'
 )
 
 # Backward-compat redirects: any old bookmark / external link to the former
 # /neutral_creeps.html, /creeps.html or /materials.html bounces to
-# /neutral_stats.html. Removed
+# /units_stats.html (neutral_stats.html until 2026-11-26). Removed
 # once we're confident no traffic references the old URLs.
-_STATS_REDIRECT_PAGES = ('neutral_creeps.html', 'creeps.html', 'materials.html')
+_STATS_REDIRECT_PAGES = ('neutral_stats.html', 'neutral_creeps.html', 'creeps.html', 'materials.html')
 _STATS_REDIRECT_HTML = (
     '<!DOCTYPE html><html><head><meta charset="UTF-8">'
-    '<meta http-equiv="refresh" content="0; url=neutral_stats.html">'
-    '<link rel="canonical" href="neutral_stats.html">'
+    '<meta http-equiv="refresh" content="0; url=units_stats.html">'
+    '<link rel="canonical" href="units_stats.html">'
     '<title>Sloppy — moved</title></head><body>'
     '<p>This page moved to '
-    '<a href="neutral_stats.html">neutral_stats.html</a>.</p>'
+    '<a href="units_stats.html">units_stats.html</a>.</p>'
     '</body></html>'
 )
 
@@ -1142,22 +1186,22 @@ def stats_page_html(body_parts, asset_version):
         f'<tbody>\n{chr(10).join(body_parts)}\n</tbody>\n'
         '</table>\n'
     )
-    return page_shell('Neutral Stats', nav, inner, asset_version)
+    return page_shell('Unit Stats', nav, inner, asset_version)
 
 
 def save_neutral_stats_html(rendered, src):
-    """Write neutral_stats.html (+ the old-URL redirects)."""
+    """Write units_stats.html (+ the old-URL redirects, neutral_stats.html among them)."""
     unit_page_slugs = _load_unit_page_slugs()
     body_parts = [_stats_row_html(row, src, unit_page_slugs) for row in rendered]
     html = stats_page_html(body_parts, ASSET_VERSION)
-    write_dist('neutral_stats.html', html)
-    print(f"  -> dist/neutral_stats.html: {len(html):,} bytes")
+    write_dist('units_stats.html', html)
+    print(f"  -> dist/units_stats.html: {len(html):,} bytes")
     for old in _STATS_REDIRECT_PAGES:
         write_dist(old, _STATS_REDIRECT_HTML)
 
 
 def save_creeps_html():
-    """Generate neutral_stats.html — neutral stats table. CSV provides the
+    """Generate units_stats.html — unit stats table. CSV provides the
     ordering, level (Ур.) and createhero name; every other column is
     auto-pulled from data/stats/<latest>/units.json (latest_stats_version()) + npc_units.txt and
     abilities_slim.json. Derived columns (Armor %, EHP Phys/Mag, Avg dmg,
@@ -1169,7 +1213,7 @@ def save_creeps_html():
     csv_path = _os.path.join(_HERE,
                              'data', 'creeps_raw.csv')
     if not _os.path.exists(csv_path):
-        print("  ! creeps_raw.csv not found, skipping neutral_stats.html")
+        print("  ! creeps_raw.csv not found, skipping units_stats.html")
         return
     src = load_sources()
     with open(csv_path, encoding='utf-8') as f:

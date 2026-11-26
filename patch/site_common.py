@@ -92,8 +92,8 @@ MATERIALS_GROUPS = [
         ("unit_changes", "Unit Changes",   "unit_changes.html"),
         # Neutral Abilities nests UNDER Neutral Stats (4th tuple element = its
         # own sub-pages, rendered indented inside the dropdown).
-        ("creeps",    "Neutral Stats",     "neutral_stats.html", [
-            ("abilities", "Neutral Abilities", "neutral_abilities.html"),
+        ("creeps",    "Unit Stats",        "units_stats.html", [
+            ("abilities", "Unit Abilities",    "units_abilities.html"),
         ]),
     ]),
     ("items_grp", "Items", "item_changes.html", [

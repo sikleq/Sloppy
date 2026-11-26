@@ -245,7 +245,8 @@
 .mr-table tbody tr.mr-search-out { display: none; }
 .mr-table tbody tr.mr-attack-out,
 .creeps-table tbody tr.mr-attack-out,
-.creeps-table tbody tr.mr-removed-out {
+.creeps-table tbody tr.mr-removed-out,
+.creeps-table tbody tr.mr-group-out {
   display: none;
 }
 

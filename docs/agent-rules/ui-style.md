@@ -136,7 +136,7 @@ Gorgon's Grasp. На телефоне таблица под текстом. Чт
 ## Таблицы — единые правила (свод владельца 2026-10-01 … 2026-11-22)
 
 Одинаково на всех таблицах сайта: Materials (Hero Stats, Neutral Stats/Abilities, Unit Abilities, Mana Items,
-Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы механик/формул на патч-страницах. **Эталон — Neutral Stats** (`neutral_stats.html`, `builders/creeps.py`,
+Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы механик/формул на патч-страницах. **Эталон — Neutral Stats** (`units_stats.html`, `builders/creeps.py`,
 владелец 2026-11-22: «эталон для оформления таблиц, делай везде так, оттуда правила»). Новых тестов
 на это не заводим (владелец 2026-11-22): правило держится тем, что записано здесь и в `AGENTS.md`, и общими классами.
 Перед отчётом — один скрипт в браузере по всем страницам (заголовки, линии, зазоры), не тест.
@@ -246,7 +246,7 @@ Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы ме
 
 ## Regen columns in stats tables
 
-For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats.html`: do not show a leading `+`; render non-zero values with exactly two decimals (`1.60`, `0.50`; Neutral Stats may use its comma decimal style `1,60`); render exact zero as `0` and tint it with a muted version of that column color. Keep numeric `data-sort` values separate from display formatting.
+For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `units_stats.html`: do not show a leading `+`; render non-zero values with exactly two decimals (`1.60`, `0.50`; Neutral Stats may use its comma decimal style `1,60`); render exact zero as `0` and tint it with a muted version of that column color. Keep numeric `data-sort` values separate from display formatting.
 
 ## Hero Stats: innate-derived computed values
 

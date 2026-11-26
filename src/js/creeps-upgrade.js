@@ -40,9 +40,10 @@
     time.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
     table.querySelectorAll('tbody tr').forEach(tr => {
       if (!cell(tr, 'hp')) return;
-      const hp = base(tr, 'hp') + 30 * L;
-      const armor = base(tr, 'armor') + 0.5 * L;
-      const as = base(tr, 'as') + 5 * L;
+      const r = rule(tr, L);
+      const hp = base(tr, 'hp') + r.hp;
+      const armor = base(tr, 'armor') + r.armor;
+      const as = base(tr, 'as') + r.as;
       const bat = base(tr, 'bat');
       const mr = base(tr, 'magres') / 100;
       const pct = 0.06 * armor / (1 + 0.06 * Math.abs(armor));
@@ -54,15 +55,30 @@
       put(tr, 't_per_attack', bat / (as / 100), 2, L);
       put(tr, 'ehp_phys', hp / (1 - pct), 0, L);
       if (isFinite(mr)) put(tr, 'ehp_mag', hp / (1 - mr), 0, L);
-      put(tr, 'dmg_min', base(tr, 'dmg_min') + 3 * L, 0, L);
-      put(tr, 'dmg_max', base(tr, 'dmg_max') + 3 * L, 0, L);
-      put(tr, 'dmg_avg', base(tr, 'dmg_avg') + 3 * L, 1, L);
-      const gmin = base(tr, 'gold_min') + Math.floor(L / 2), gmax = base(tr, 'gold_max') + Math.floor((L + 1) / 2);
+      put(tr, 'dmg_min', base(tr, 'dmg_min') + r.dmg, 0, L);
+      put(tr, 'dmg_max', base(tr, 'dmg_max') + r.dmg, 0, L);
+      put(tr, 'dmg_avg', base(tr, 'dmg_avg') + r.dmg, 1, L);
+      const gmin = base(tr, 'gold_min') + r.gmin, gmax = base(tr, 'gold_max') + r.gmax;
       put(tr, 'gold_min', gmin, 0, L);
       put(tr, 'gold_max', gmax, 0, L);
       put(tr, 'gold', (gmin + gmax) / 2, 1, L);
-      put(tr, 'xp', base(tr, 'xp') + 4 * L, 0, L);
+      put(tr, 'xp', base(tr, 'xp') + r.xp, 0, L);
     });
+  }
+  // What step L adds to a row. Neutrals: neutral_upgrade above. Lane creeps (data-upg, builders/creeps.py
+  // LANE_UPGRADE; owner 2026-11-26 "правила другие, не как у нейтралов"): flat per step, HP and damage stop at
+  // "cap" steps, gold (min and max alike) and XP do not; no armor or attack speed. A lane creep without data-upg
+  // does not grow.
+  function rule(tr, L) {
+    if (tr.dataset.group !== 'lane') {
+      return {hp: 30 * L, armor: 0.5 * L, as: 5 * L, dmg: 3 * L, xp: 4 * L,
+              gmin: Math.floor(L / 2), gmax: Math.floor((L + 1) / 2)};
+    }
+    let u = {};
+    try { u = JSON.parse(tr.dataset.upg || '{}'); } catch (e) { u = {}; }
+    const c = Math.min(L, u.cap === undefined ? L : u.cap);
+    const g = (u.gold || 0) * L;
+    return {hp: (u.hp || 0) * c, armor: 0, as: 0, dmg: (u.dmg || 0) * c, xp: (u.xp || 0) * L, gmin: g, gmax: g};
   }
   input.addEventListener('input', apply);
   input.addEventListener('change', apply);

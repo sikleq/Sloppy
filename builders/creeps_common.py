@@ -18,6 +18,29 @@ DASH = '<span class="ua-dash">—</span>'
 # Neutral Stats ability columns (slot order).
 ABILITY_COLS = ('ability1', 'ability2', 'ability3')
 
+# Which units the table shows (owner 2026-11-26: "чекбоксы neutrals, lane, summons. по умолчанию включены все"):
+# the site's switch, one per group; rows carry data-group (builders/creeps.py unit_group), src/js/creeps-pinned.js
+# hides the unchecked groups.
+UNIT_GROUPS = (('neutral', 'Neutrals'), ('lane', 'Lane'), ('summon', 'Summons'))
+# Units a neutral summons (Dark Troll Summoner's skeletons). Hero summons come later (docs/todo.md).
+SUMMON_UNITS = {'skeleton_warrior'}
+
+
+def unit_group(createhero):
+    """'lane' / 'summon' / 'neutral' for a row token (lane rows are 'lane_*', builders/creeps.py LANE_CREEPS)."""
+    ch = (createhero or '').strip()
+    if ch.startswith('lane_'):
+        return 'lane'
+    return 'summon' if ch in SUMMON_UNITS else 'neutral'
+
+GROUP_SWITCHES = ''.join(
+    f'<label class="ua-upgrades-toggle unit-group-toggle">'
+    f'<span class="ua-upgrades-label">{label}</span>'
+    f'<input type="checkbox" class="ua-switch-input" data-unit-group="{key}" checked>'
+    f'<span class="ua-switch" aria-hidden="true"></span>'
+    f'</label>'
+    for key, label in UNIT_GROUPS)
+
 # Hidden marker abilities — not real spells, suppressed from output.
 # `neutral_upgrade`: every neutral has this; auto-buff tracker.
 # `creep_piercing`: tags the unit with pierce attack-class. The info

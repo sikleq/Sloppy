@@ -152,8 +152,11 @@ def test_build_rows_skips_legend_and_lane_rows_but_keeps_their_level():
             ['', '', '', 'gnoll', '', 'Проникающий*']]
     src = creeps.CreepSources(units={}, npc_data={}, abil_slim={}, hist=_hist())
     out = creeps.build_rows(rows, src)
-    assert [(r['data']['name'], r['level'], r['tier_break'], r['data']['attack_type']) for r in out] == [
+    # the CSV's own lane rows stay out; the lane creeps come after the neutrals from LANE_CREEPS (owner 2026-11-26)
+    neutral = [r for r in out if not r['data']['createhero'].startswith('lane_')]
+    assert [(r['data']['name'], r['level'], r['tier_break'], r['data']['attack_type']) for r in neutral] == [
         ('Kobold', '1', True, 'Default'), ('Vhoul Assassin', '2', True, 'Piercing')]   # the game's name
+    assert [r['data']['createhero'] for r in out[len(neutral):]] == [t for t, _, _ in creeps.LANE_CREEPS]
 
 
 def test_abil_props_aura_defaults_and_manual_overrides():

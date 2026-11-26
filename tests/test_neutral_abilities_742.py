@@ -22,7 +22,7 @@ def test_property_from_the_keys_and_the_description():
 def test_no_row_of_the_table_has_an_empty_property():
     import re
     import pytest
-    page = ROOT / "dist" / "neutral_abilities.html"
+    page = ROOT / "dist" / "units_abilities.html"
     if not page.exists():
         pytest.skip("the site is not built")
     empty = []

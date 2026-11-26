@@ -59,7 +59,7 @@ Helpers are imported in every `content/p*.py` via `from patch.api import *`.
 | `builders/build_patches.py` | orchestrator — walks `content/p*.py` in chronological order from `RELEASE_HISTORY` |
 
 `python build_site.py` writes everything to `dist/`: one HTML per patch
-under `dist/patches/`, plus `index.html`, `calendar.html`, `neutral_stats.html`
+under `dist/patches/`, plus `index.html`, `calendar.html`, `units_stats.html`
 (with `creeps.html` / `neutral_creeps.html` / `materials.html` redirects),
 `unit_abilities.html`, `structures.html`, `heroes_stats.html`, `heroes_dyn.html`,
 `items_dyn.html`, `hero_lab.html`, `mana_items.html`, `aoe_increase.html`,
@@ -117,7 +117,7 @@ The autodetector is right ~80% of the time. Tag classification, `l=True` placeme
 
 `src/css/*.css` (glued into `dist/styles.css` in the order of `patch/css_bundle.py` CSS_PARTS: that order is the cascade) and `src/js/*.js` (glued in the order of `patch/js_bundle.py` JS_PARTS into `dist/src/scripts-<kind>.js`, one file per kind of page: JS_PAGES says which parts beyond the common ones it gets, PART_MARKERS what in a page's HTML asks for a part, `tests/test_js_pages.py` checks every built page) are **hand-edited source files**. They are **linked, not embedded**: patch pages reference
 `../styles.css?v=…` / `../src/scripts-base.js?v=…`, and root pages (`index.html`,
-`calendar.html`, `neutral_stats.html`, …) reference them relative to root.
+`calendar.html`, `units_stats.html`, …) reference them relative to root.
 `patch/page.py` reads them from disk and stamps a cache-busting `?v=` asset
 version — editing happens in one place, no copy is embedded.
 

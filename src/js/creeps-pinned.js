@@ -293,6 +293,23 @@
     } else if (removedBtn) {
       removedBtn.hidden = true;
     }
+
+    // Neutrals / Lane / Summons switches (owner 2026-11-26): a row shows when its data-group is switched on
+    const groupInputs = [...document.querySelectorAll('input[data-unit-group]')];
+    if (groupInputs.length && table.querySelector('tbody tr[data-group]')) {
+      const applyGroups = () => {
+        const on = new Set(groupInputs.filter(i => i.checked).map(i => i.dataset.unitGroup));
+        table.querySelectorAll('tbody tr[data-group]').forEach(tr => {
+          tr.classList.toggle('mr-group-out', !on.has(tr.dataset.group));
+        });
+        if (table._groupRows) {
+          table._groupRows([...table.querySelectorAll('tbody tr')]);
+        }
+        applyLeftOffsets();
+      };
+      groupInputs.forEach(i => i.addEventListener('change', applyGroups));
+      applyGroups();
+    }
     positionFramesRaf();
   }
 })();
