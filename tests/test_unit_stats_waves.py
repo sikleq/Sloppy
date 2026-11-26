@@ -53,11 +53,10 @@ def test_waves_view_on_the_page():
     assert "function waves()" in js and "killed}/${units}" in js
     # any unit, only in its own row: grey and out of that row's sums (owner 2026-11-26)
     assert "tr.dataset.off" in js and "off.has(k)" in js and "siegeOff" not in js
-    # Upgrade shows in Waves and marks its step (owner 2026-11-26: "upgrade забыл добавить в waves")
-    assert "td.classList.toggle('wv-cur', L === stepNow)" in js
     # the flagbearer's aura leaves with a switched-off flagbearer (2026-11-26)
     assert "Number(tr.dataset.flag) > 0 && !off.has('flag')" in js
+    # no Upgrade box in Waves: every step is a column (owner 2026-11-26, tried and taken out again)
     css = (ROOT / "src" / "css" / "creeps-table.css").read_text(encoding="utf-8")
-    assert "body.view-waves .upg-group" not in css
+    assert "body.view-waves .upg-group" in css and "wv-cur" not in js
     pinned = (ROOT / "src" / "js" / "creeps-pinned.js").read_text(encoding="utf-8")
     assert "'view-waves'" in pinned

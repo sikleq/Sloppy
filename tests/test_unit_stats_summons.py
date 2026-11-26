@@ -1,6 +1,7 @@
 """Hero / item summons on Unit Stats (owner 2026-11-26: "добавить других summon units (не wards)"): the game's
 numbers from data/rules/summon_units.json, only sure entries, no growth with Upgrade, off by default (Type)."""
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -33,6 +34,21 @@ def test_names_and_icons():
     assert names["undying_zombie_torso"] == "Zombie Torso (Undying)"
     for e in cs.entries():
         assert (ROOT / cs.icon(e)).exists(), e["key"]
+
+
+def test_summons_show_their_abilities_with_icons_and_the_hero_link():
+    # owner 2026-11-26: "способность у суммонов отсутствуют"
+    assert cs.ability_name("warlock_golem_flaming_fists") == "Flaming Fists"
+    got = cs.abilities({"Ability1": "generic_hidden", "Ability2": "warlock_golem_flaming_fists",
+                        "Ability3": "special_bonus_unique_x", "Ability4": "lycan_summon_wolves_hightail"})
+    assert got == [("warlock_golem_flaming_fists", "Flaming Fists"), ("lycan_summon_wolves_hightail", "Hightail"),
+                   ("", "")]
+    html = (ROOT / "dist" / "units_stats.html").read_text(encoding="utf-8")
+    i = html.find('id="unit-summon_warlock_golem_1"')
+    row = html[i:html.find("</tr>", i)]
+    assert 'href="heroes/warlock.html"' in row and "icons/abilities/warlock_golem_flaming_fists.png" in row
+    for slug in re.findall(r'class="abil-ico" src="icons/abilities/([a-z0-9_]+)\.png"', row):
+        assert (ROOT / "icons" / "abilities" / f"{slug}.png").exists(), slug
 
 
 def test_empty_file_is_an_error(tmp_path):

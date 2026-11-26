@@ -213,8 +213,6 @@
   function waves() {
     if (!wavesTable) return;
     const tier = tierSel ? tierSel.value : 'normal';
-    const stepNow = Math.round(Number(input.value));
-    wavesTable.querySelectorAll('thead th.wv-t').forEach((th, j) => th.classList.toggle('wv-cur', j % 9 === stepNow));
     const rowOf = {};
     Object.entries(WAVE_KINDS).forEach(([k, id]) => {
       rowOf[k] = document.getElementById('unit-' + id + (tier === 'normal' ? '' : '_' + tier));
@@ -243,8 +241,6 @@
         Object.keys(sum).forEach(s => {
           const td = tr.querySelector(`td.wv-${s}-${L}`);
           if (!td) return;
-          // the Upgrade box's step stands out in every group (owner 2026-11-26: "upgrade забыл добавить в waves")
-          td.classList.toggle('wv-cur', L === stepNow);
           if (s === 'armor') td.textContent = units ? fmt(sum.armor / units, 1) : '';
           else if (s === 'as') td.textContent = units ? Math.round(sum.as / units) : '';
           else td.textContent = Math.round(sum[s]);

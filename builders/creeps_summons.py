@@ -69,6 +69,34 @@ def icon(e, exists=_os.path.exists):
     return f"icons/abilities/{e['ability']}.png"
 
 
+_LOC_FILE = _os.path.join(_HERE, 'data', 'abilities_english.txt')
+_LOC = None
+
+
+def ability_name(slug):
+    """The game's English name of a hero ability (abilities_english.txt), '' when it has none."""
+    global _LOC
+    if _LOC is None:
+        _LOC = (open(_LOC_FILE, encoding='utf-8', errors='replace').read()
+                if _os.path.exists(_LOC_FILE) else '')
+    m = _re.search(r'"DOTA_Tooltip_ability_' + _re.escape(slug) + r'"\s+"([^"]*)"', _LOC, _re.I)
+    return m.group(1) if m else ''
+
+
+def abilities(npc, skip=()):
+    """[(slug, name)] of the unit's own abilities, at most 3 (the table's columns): no hidden markers, no talents,
+    nothing without a game name (owner 2026-11-26: "способность у суммонов отсутствуют")."""
+    out = []
+    for i in range(1, 6):
+        slug = (npc.get(f'Ability{i}') or '').strip()
+        if not slug or slug in skip or slug == 'generic_hidden' or slug.startswith('special_bonus_'):
+            continue
+        name = ability_name(slug)
+        if name and '{' not in name:
+            out.append((slug, name))
+    return out[:3] + [('', '')] * (3 - len(out[:3]))
+
+
 def head_names(path=SUMMON_FILE):
     """npc keys whose blocks the npc_units.txt reader must also keep (vision, projectile, hull …)."""
     return {e['npc'] for e in entries(path)}

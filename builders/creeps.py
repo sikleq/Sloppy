@@ -36,6 +36,7 @@ _sys.path.insert(0, _HERE)
 
 import patch.site_common as _site
 import builders.creeps_summons as _creeps_summons
+import builders.mr_table as _mr_table
 from builders.creeps_abilities import UA_CANONICAL_UNIT, save_neutral_abilities_html
 from builders.creeps_common import (
     ABILITY_COLS, ABILITY_SKIP, DASH, GROUP_SWITCHES, HULL_BOUNDS, NEUTRAL_DEFAULT_HULL, attr_esc,
@@ -807,12 +808,14 @@ def summon_rows(src):
     for i, e in enumerate(_creeps_summons.entries()):
         npc = {**kv(e['npc']), **_creeps_summons.kv_overrides(e)}
         s = _unit_stats(npc, src.units.get(e['npc'], {}))
-        cells = _format_stats(s, npc, [('', '')] * 3, '')
+        cells = _format_stats(s, npc, _creeps_summons.abilities(npc, ABILITY_SKIP), '')
         if cells.get('vision') == '0/0':
             cells['vision'] = ''        # the KV's 0/0 (treants): the ability sets it, the number is not ours to show
         data = {**cells, 'lvl': '',
                 'createhero': _creeps_summons.ROW_PREFIX + e['key'], 'name': _creeps_summons.display_name(e),
-                'npc_key': e['npc'], 'icon': _creeps_summons.icon(e), 'camp': '', 'hero_summon': True}
+                'npc_key': e['npc'], 'icon': _creeps_summons.icon(e), 'camp': '', 'hero_summon': True,
+                # its abilities are its hero's: they link to the hero's page, not to Unit Abilities
+                'ability_href': _mr_table.hero_href(e.get('hero') or '')}
         out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': e['npc']})
     return out
 
@@ -1110,6 +1113,9 @@ def _ability_inner(k, v, d):
     # Clicking an ability jumps to its (unit, ability) row on the Unit
     # Abilities page. For abilities that share a single canonical row
     # across units (e.g. Riverborn Aura), route to that canonical unit.
+    if d.get('hero_summon'):          # a hero summon's ability: its hero's page (builders/creeps_summons.py)
+        href = d.get('ability_href')
+        return f'<a class="abil-link" href="{esc(href)}">{inner}</a>' if href else inner
     ch = (d.get('createhero') or '').strip()
     # a Super / Mega lane creep's ability is on its Normal row of Unit Abilities (only Normal is listed there)
     ch = re.sub(r'_(?:super|mega)$', '', ch) if ch.startswith('lane_') else ch
