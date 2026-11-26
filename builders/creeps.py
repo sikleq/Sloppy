@@ -1007,7 +1007,12 @@ def timeline_value(d, stat, step):
     """A stat of one row at an upgrade step, by the Upgrade box's rules (src/js/creeps-upgrade.js `rule`):
     neutrals +30 HP, +0.5 armor, +3 damage, +5 attack speed, gold min +floor(L/2), max +floor((L+1)/2); a lane
     creep by its LANE_UPGRADE (HP and damage to its cap, mega's floor; gold every step; no armor or attack speed;
-    without an entry — siege — it does not grow). None when the row has no such number."""
+    without an entry — siege — it does not grow); a hero summon does not grow at all, as on Upgrade (data-upg="{}").
+    None when the row has no such number."""
+    if d.get('hero_summon'):
+        # neutral_upgrade is the neutrals' ability, a hero summon has none: the Timeline counted Warlock's Golem at
+        # 1740 HP at 60:00 while Upgrade 8 showed its 1500
+        step = 0
     ch = (d.get('createhero') or '').strip()
     lane = unit_group(ch) == 'lane'
     u = LANE_UPGRADE.get(ch, {}) if lane else {}

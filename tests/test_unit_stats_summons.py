@@ -69,3 +69,12 @@ def test_summon_rows_on_the_page_do_not_grow_and_start_hidden():
     assert "tr.dataset.group !== 'lane' && tr.dataset.upg === undefined" in js
     from builders.creeps_common import unit_group, UNIT_GROUPS_OFF
     assert unit_group("summon_lycan_wolf_1") == "summon" and "summon" in UNIT_GROUPS_OFF
+
+
+def test_timeline_does_not_grow_a_summon_either():
+    # the Timeline counted neutral_upgrade on hero summons: Warlock's Golem 1740 HP at 60:00, 1500 on Upgrade 8
+    from builders import creeps
+    golem = {"createhero": cs.ROW_PREFIX + "warlock_golem_1", "hero_summon": True, "hp": "1500", "armor": "8",
+             "dmg_avg": "80", "as": "100", "gold_min": "100", "gold_max": "100"}
+    for stat, want in (("hp", 1500), ("armor", 8), ("dmg", 80), ("as", 100), ("gold", 100)):
+        assert [creeps.timeline_value(golem, stat, s) for s in (0, 8)] == [want, want], stat
