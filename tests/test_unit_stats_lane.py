@@ -131,7 +131,10 @@ def test_nuke_has_two_damage_boxes_and_marks_life_or_death():
     # armor reduction before the physical part; the hints say how much HP is left (owner 2026-11-26)
     assert 'id="nuke-armor"' in bar
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
-    assert "- nukeVal(nukeArmor)" in js and "HP left" in js and "hpLeft(h.dealt, u.hp)" in js
+    assert "- nukeVal(nukeArmor)" in js
+    # the hints: a little table in the site tooltip, creeps as icons in Waves (owner 2026-11-26)
+    assert "tb-tip-table nuke-tip" in js and "nuke-tip-unit\"><img" in js and "leftCell(x.dealt, x.hp)" in js
+    assert "td.dataset.histOff = td.dataset.hist" in js      # the history popup waits while Nuke shows
     # "−Armor" also comes off the armor columns, Phys resist and EHP, Timeline and Waves (owner 2026-11-26);
     # Nuke reads the build's armor so the box is taken off once
     assert "put(tr, 'armor', armor - cut, 1, armorOn)" in js and "0.06 * (armor - cut)" in js

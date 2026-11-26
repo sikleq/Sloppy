@@ -456,6 +456,20 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .nuke-input.nuke-phys { color: #e1716a; }   /* physical: red */
 .nuke-input.nuke-pure { color: #ead992; }   /* pure: pale gold, as on Unit Abilities */
 .nuke-input.nuke-armor { width: 64px; color: #c9c2b3; }   /* armor reduction: armor's own grey */
+/* Nuke's tooltip table (src/js/creeps-upgrade.js unitTip / waves): narrow first column, creeps as icons */
+.qhint-tip .tb-tip-table.nuke-tip td:first-child { min-width: 0; }
+.qhint-tip .tb-tip-table.nuke-tip td { text-align: right; }
+.qhint-tip .tb-tip-table.nuke-tip td:first-child { text-align: left; }
+.nuke-tip tr.nuke-tip-h td { color: var(--px-text-dim, #9a907d); font-weight: 400; }
+.nuke-tip tr.nuke-tip-sum td { font-weight: 700; }
+.nuke-tip-unit { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.nuke-tip-unit img { width: 22px; height: 22px; max-width: none; object-fit: cover; border-radius: 3px; }
+.nuke-tip-unit i { font-style: normal; color: var(--px-text-dim, #9a907d); }
+.nuke-tip-dead { color: #e8806f; }
+.nuke-tip-live { color: #8fd17d; }
+.nuke-tip-phys { color: #e1716a; }
+.nuke-tip-mag { color: #5fb1ff; }
+.nuke-tip-pure { color: #ead992; }
 .creeps-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }
 .creeps-table td.nuke-dead { background: rgba(224, 103, 90, 0.30); }
 
