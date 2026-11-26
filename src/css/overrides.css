@@ -346,6 +346,7 @@ a.ec-hstat-who:hover { color: var(--gold); }
 .ec-ucards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
 .ec-card-unit { aspect-ratio: 128 / 72; border-radius: 4px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--muted-04); transition: transform 0.12s, border-color 0.12s; }
 .ec-card-unit img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ec-card-unit img.ec-abil-ico { object-fit: contain; }   /* a summon's ability icon, square: whole, not cropped */
 .ec-card-unit:not(.ec-nopage):not(.ec-static):hover { transform: translateY(-2px); border-color: rgba(227, 196, 106, 0.5); }
 .ec-card-unit.ec-nopage { opacity: 0.38; }
 .ec-card-unit.ec-nopage:hover { opacity: 0.62; }

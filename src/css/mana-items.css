@@ -246,7 +246,8 @@
 .mr-table tbody tr.mr-attack-out,
 .creeps-table tbody tr.mr-attack-out,
 .creeps-table tbody tr.mr-removed-out,
-.creeps-table tbody tr.mr-group-out {
+.creeps-table tbody tr.mr-group-out,
+.creeps-table tbody tr.mr-tier-out {
   display: none;
 }
 

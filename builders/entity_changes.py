@@ -908,7 +908,7 @@ def _hero_card(e: dict) -> str:
 
 
 _UNIT_CAMP_CACHE = None
-_UNIT_ORDER = ["Small", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Other"]
+_UNIT_ORDER = ["Small", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Wards", "Other"]
 # Map units with their own Changes page but no camp: Roshan -> "Other"; the Tormentor is
 # reached from its card on structures.html, not listed among the units.
 _UNIT_BUCKET = {"npc_dota_roshan": "Other", "npc_dota_courier": "Other"}
@@ -937,7 +937,81 @@ _SUMMON_UNITS = [
     ("brewmaster_earth_unit", "Brewmaster: Earth"),
     ("brewmaster_storm_unit", "Brewmaster: Storm"),
     ("brewmaster_void_unit", "Brewmaster: Void"),
+    # owner 2026-11-26: every hero / item summon of the game files (Spirit Bear is a hero on Hero Stats; Dire Eidolons
+    # repeat the Radiant ones; Elder Titan's Astral Spirit is not wanted (owner); units no hero has any more —
+    # Stasis / Snare Trap, Frozen Sigil, Ofrenda, Greater Treant — left out; Revenant, Swarm, Sticky Bomb, Stone
+    # Remnant and Death Ward are an ability's effect, not a unit (owner 2026-11-26))
+    ("npc_dota_beastmaster_hawk", "Raptor (Beastmaster)"),
+    ("npc_dota_beastmaster_thunderhide", "Ancient Thunderhide (Beastmaster)"),
+    ("npc_dota_broodmother_spiderite", "Spiderite (Broodmother)"),
+    ("npc_dota_chen_zealot", "Zealot (Chen)"),
+    ("npc_dota_clinkz_skeleton_archer", "Skeleton Archer (Clinkz)"),
+    ("npc_dota_warlock_minor_imp", "Imp (Warlock)"),
+    ("npc_dota_wraith_king_skeleton_warrior", "Skeleton (Wraith King)"),
+    # Book of the Dead (7.42 tier-4 neutral) summons "2 demonic warriors and 2 demonic archers" — the game's names of
+    # the necronomicon units, which were under "Removed" until 2026-11-26
+    ("npc_dota_necronomicon_warrior", "Demonic Warrior (Book of the Dead)"),
+    ("npc_dota_necronomicon_archer", "Demonic Archer (Book of the Dead)"),
+    # wards and turrets
+    ("npc_dota_pugna_nether_ward", "Nether Ward (Pugna)"),
+    ("npc_dota_juggernaut_healing_ward", "Healing Ward (Juggernaut)"),
+    ("npc_dota_unit_tombstone", "Tombstone (Undying)"),
+    ("npc_dota_tinker_turret", "Keen Cannon (Tinker)"),
+    # objects an ability places
+    ("npc_dota_rattletrap_cog", "Power Cog (Clockwerk)"),
+    ("npc_dota_techies_land_mine", "Proximity Mine (Techies)"),
+    ("npc_dota_techies_innate_mine", "M.A.D. (Techies)"),
+    ("npc_dota_templar_assassin_psionic_trap", "Psionic Trap (Templar Assassin)"),
+    ("npc_dota_lich_ice_spire", "Ice Spire (Lich)"),
+    ("npc_dota_zeus_cloud", "Nimbus (Zeus)"),
+    ("npc_dota_phoenix_sun", "Sun (Phoenix)"),
+    ("npc_dota_grimstroke_ink_creature", "Phantom (Grimstroke)"),
+    ("npc_dota_treant_eyes", "Eyes in the Forest (Treant Protector)"),
+    ("npc_dota_gyrocopter_homing_missile", "Homing Missile (Gyrocopter)"),
+    ("npc_dota_ignis_fatuus", "Ignis Fatuus (Keeper of the Light)"),
+    ("npc_dota_unit_tidehunter_anchor", "Anchor (Tidehunter)"),
 ]
+
+# The game has no portrait for most summons (icons/units/ only holds the VPK's panorama/images/heroes and
+# heroes/selection ones): the card shows the unit's model art where another unit shares it, else the summoning
+# ability's icon (dota2-ida-researcher, 2026-11-26).
+_SUMMON_ICON = {
+    # these share a model with a neutral / another summon, so a portrait would repeat: the ability's icon tells them apart
+    "npc_dota_beastmaster_thunderhide": "../icons/abilities/beastmaster_summon_thunderhide.png",
+    "npc_dota_broodmother_spiderite": "../icons/abilities/broodmother_spawn_spiderlings.png",
+    "npc_dota_wraith_king_skeleton_warrior": "../icons/abilities/skeleton_king_bone_guard.png",  # not the Dark Troll skeleton: the two must differ
+    "npc_dota_beastmaster_hawk": "../icons/abilities/beastmaster_summon_raptor.png",
+    "npc_dota_clinkz_skeleton_archer": "../icons/abilities/clinkz_burning_army.png",
+    "npc_dota_warlock_minor_imp": "../icons/abilities/warlock_imp_explode.png",
+    "npc_dota_pugna_nether_ward": "../icons/abilities/pugna_nether_ward.png",
+    "npc_dota_juggernaut_healing_ward": "../icons/abilities/juggernaut_healing_ward.png",
+    "npc_dota_unit_tombstone": "../icons/abilities/undying_tombstone.png",
+    "npc_dota_tinker_turret": "../icons/abilities/tinker_deploy_turrets.png",
+    "npc_dota_rattletrap_cog": "../icons/abilities/rattletrap_power_cogs.png",
+    "npc_dota_techies_land_mine": "../icons/abilities/techies_land_mines.png",
+    "npc_dota_techies_innate_mine": "../icons/abilities/techies_mutually_assured_destruction.png",
+    "npc_dota_lich_ice_spire": "../icons/abilities/lich_ice_spire.png",
+    "npc_dota_zeus_cloud": "../icons/abilities/zuus_cloud.png",
+    "npc_dota_phoenix_sun": "../icons/abilities/phoenix_supernova.png",
+    "npc_dota_grimstroke_ink_creature": "../icons/abilities/grimstroke_ink_creature.png",
+    "npc_dota_treant_eyes": "../icons/abilities/treant_eyes_in_the_forest.png",
+    "npc_dota_gyrocopter_homing_missile": "../icons/abilities/gyrocopter_homing_missile.png",
+    "npc_dota_ignis_fatuus": "../icons/abilities/keeper_of_the_light_will_o_wisp.png",
+    "npc_dota_unit_tidehunter_anchor": "../icons/abilities/tidehunter_dead_in_the_water.png",
+}
+# column of a summon card (owner 2026-11-26: "по этим категориям"); not listed = "Summons" (units that fight)
+_SUMMON_BUCKET = {b: "Wards" for b in (
+    "npc_dota_venomancer_plague_ward", "npc_dota_shadow_shaman_ward", "npc_dota_pugna_nether_ward",
+    "npc_dota_juggernaut_healing_ward", "npc_dota_unit_tombstone",
+    "npc_dota_tinker_turret")}
+# owner 2026-11-26: planted / effect units (cog, mine, trap, spire, nimbus, sun ...) are wards too, no "Objects" column
+_SUMMON_BUCKET.update({b: "Wards" for b in (
+    "npc_dota_rattletrap_cog", "npc_dota_techies_land_mine",
+    "npc_dota_techies_innate_mine", "npc_dota_templar_assassin_psionic_trap", "npc_dota_lich_ice_spire",
+    "npc_dota_zeus_cloud", "npc_dota_phoenix_sun", "npc_dota_grimstroke_ink_creature",
+    "npc_dota_treant_eyes", "npc_dota_gyrocopter_homing_missile",
+    "npc_dota_ignis_fatuus",
+    "npc_dota_unit_tidehunter_anchor")})
 
 # A summon has no change page of its own — its balance changes are documented on
 # its parent's change page (the hero's ability section, or the neutral that
@@ -962,6 +1036,31 @@ _SUMMON_PARENT = {
     "brewmaster_earth_unit": ("heroes/brewmaster.html", "Earth Brewling"),
     "brewmaster_storm_unit": ("heroes/brewmaster.html", "Storm Brewling"),
     "brewmaster_void_unit": ("heroes/brewmaster.html", "Void Brewling"),
+    "npc_dota_beastmaster_hawk": ("heroes/beastmaster.html", "Summon Raptors"),
+    "npc_dota_beastmaster_thunderhide": ("heroes/beastmaster.html", "Summon Ancient Thunderhide"),
+    "npc_dota_broodmother_spiderite": ("heroes/broodmother.html", "Spawn Spiderlings"),
+    "npc_dota_chen_zealot": ("heroes/chen.html", None),
+    "npc_dota_clinkz_skeleton_archer": ("heroes/clinkz.html", "Burning Army"),
+    "npc_dota_warlock_minor_imp": ("heroes/warlock.html", "Eldritch Summoning"),
+    "npc_dota_wraith_king_skeleton_warrior": ("heroes/wraith-king.html", "Bone Guard"),
+    "npc_dota_necronomicon_warrior": ("items/book-of-the-dead.html", None),
+    "npc_dota_necronomicon_archer": ("items/book-of-the-dead.html", None),
+    "npc_dota_pugna_nether_ward": ("heroes/pugna.html", "Nether Ward"),
+    "npc_dota_juggernaut_healing_ward": ("heroes/juggernaut.html", "Healing Ward"),
+    "npc_dota_unit_tombstone": ("heroes/undying.html", "Tombstone"),
+    "npc_dota_tinker_turret": ("heroes/tinker.html", "Deploy Turrets"),
+    "npc_dota_rattletrap_cog": ("heroes/clockwerk.html", "Power Cogs"),
+    "npc_dota_techies_land_mine": ("heroes/techies.html", "Proximity Mines"),
+    "npc_dota_techies_innate_mine": ("heroes/techies.html", "M.A.D."),
+    "npc_dota_templar_assassin_psionic_trap": ("heroes/templar-assassin.html", "Psionic Trap"),
+    "npc_dota_lich_ice_spire": ("heroes/lich.html", "Ice Spire"),
+    "npc_dota_zeus_cloud": ("heroes/zeus.html", "Nimbus"),
+    "npc_dota_phoenix_sun": ("heroes/phoenix.html", "Supernova"),
+    "npc_dota_grimstroke_ink_creature": ("heroes/grimstroke.html", "Phantom's Embrace"),
+    "npc_dota_treant_eyes": ("heroes/treant-protector.html", "Eyes In The Forest"),
+    "npc_dota_gyrocopter_homing_missile": ("heroes/gyrocopter.html", "Homing Missile"),
+    "npc_dota_ignis_fatuus": ("heroes/keeper-of-the-light.html", "Will-O-Wisp"),
+    "npc_dota_unit_tidehunter_anchor": ("heroes/tidehunter.html", "Dead in the Water"),
 }
 
 # Lane creeps (Radiant portraits are the shared reference art for both teams).
@@ -976,10 +1075,7 @@ _UNIT_BUCKET.update({basename: "Lane Creeps" for basename, _ in _LANE_UNITS})
 
 # Units removed from the game — shown only under the "Show deleted" toggle,
 # as (icon basename, display name, column bucket).
-_REMOVED_UNITS = [
-    ("npc_dota_necronomicon_warrior", "Necronomicon Warrior", "Summons"),
-    ("npc_dota_necronomicon_archer", "Necronomicon Archer", "Summons"),
-]
+_REMOVED_UNITS = []   # Necronomicon's warrior / archer came back with Book of the Dead (7.42): now in _SUMMON_UNITS
 
 
 # a lane creep's page is named after the creep, not its Radiant model (owner 2026-10-16: "не надо писать
@@ -1159,9 +1255,10 @@ def _unit_groups(ents: list[dict]):
             if ability:
                 href += "&ability=" + _quote(ability)
         roster.append({"kind": "unit", "slug": _unit_slug(basename),
-                       "name": name, "icon": f"../icons/units/{basename}.png", "patches": [],
-                       "_nopage": not clickable, "_href": href,
-                       "_current": True, "_npc": _npc_of(f"{basename}.png"), "_bucket": "Summons"})
+                       "name": name, "icon": _SUMMON_ICON.get(basename, f"../icons/units/{basename}.png"),
+                       "patches": [], "_nopage": not clickable, "_href": href,
+                       "_current": True, "_npc": _npc_of(f"{basename}.png"),
+                       "_bucket": _SUMMON_BUCKET.get(basename, "Summons")})
     # Lane creeps — greyed reference cards in their own column.
     for basename, name in _LANE_UNITS:
         if f"{basename}.png" in have_icons:
@@ -1226,7 +1323,10 @@ def _unit_card(e: dict) -> str:
     attrs = (f'class="{cls}" data-current="{1 if cur else 0}"{"" if cur else " hidden"} '
              f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}"'
              + (f' data-side="{side}"' if side else ''))
-    img = f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" title="{_esc(e["name"])}" loading="lazy">'
+    # a summon without a portrait shows its summoning ability's square icon, whole (_SUMMON_ICON)
+    abil = ' class="ec-abil-ico"' if "/abilities/" in e["icon"] else ''
+    img = (f'<img{abil} src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" '
+           f'title="{_esc(e["name"])}" loading="lazy">')
     if static or nop:                                  # no change page — shown, not clickable
         return f'<span {attrs}>{img}</span>'
     href = e.get("_href") or f"units/{_file_slug(e)}.html"

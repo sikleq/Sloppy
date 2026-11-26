@@ -1080,8 +1080,10 @@ def _unit_rows(row, cur_ab, abil_desc):
 
 
 def ua_rows(rendered, cur_ab, abil_desc):
-    """Every Neutral Abilities <tr>, in the Neutral Stats row order."""
-    return [tr for row in rendered for tr in _unit_rows(row, cur_ab, abil_desc)]
+    """Every Unit Abilities <tr>, in the Unit Stats row order. A lane creep's Super / Mega unit has the same
+    abilities as the normal one, so only the normal one is listed."""
+    return [tr for row in rendered if row['data'].get('lane_tier', 'normal') == 'normal'
+            for tr in _unit_rows(row, cur_ab, abil_desc)]
 
 
 # ---- Page ----
@@ -1112,6 +1114,7 @@ _UA_TOOLBAR = (
 # generated patch pages, bookmarks, external references) don't 404.
 UA_REDIRECT_HTML = (
     '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    '<script>location.replace("units_abilities.html" + location.search + location.hash)</script>'
     '<meta http-equiv="refresh" content="0; url=units_abilities.html">'
     '<link rel="canonical" href="units_abilities.html">'
     '<title>Sloppy - moved</title></head><body>'

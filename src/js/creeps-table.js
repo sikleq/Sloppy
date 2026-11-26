@@ -113,7 +113,9 @@
       if (tr.classList.contains('mr-attack-out')
           || tr.classList.contains('mr-removed-out')
           || tr.classList.contains('mr-filtered-out')
-          || tr.classList.contains('mr-search-out')) return;
+          || tr.classList.contains('mr-search-out')
+          || tr.classList.contains('mr-tier-out')        // Unit Stats: another Creeps variant
+          || tr.classList.contains('mr-group-out')) return;   // a group switched off
       const lvl = cell.dataset.lvl;
       if (lvl !== prev) { cell.textContent = lvl; tr.classList.add('tier-break'); }
       else { cell.textContent = ''; tr.classList.remove('tier-break'); }
@@ -174,11 +176,14 @@
         const td = rows[i].children[idx];
         const name = td && td.dataset.name;
         if (!name) { i++; continue; }
+        // lane creep rows never merge: their Normal / Super / Mega rows sit side by side, one set hidden, and a run
+        // across a hidden row left a visible row short of a cell (Fable 5.2 review 2026-11-26)
+        if (rows[i].dataset.laneTier) { i++; continue; }
         // Shared auras stay per-unit: each frog keeps its own cell so a row
         // click highlights it (merging would rowspan 4 frogs into one block).
         if (name === 'Riverborn Aura') { i++; continue; }
         let j = i + 1;
-        while (j < rows.length && rows[j].children[idx] &&
+        while (j < rows.length && rows[j].children[idx] && !rows[j].dataset.laneTier &&
                rows[j].children[idx].dataset.name === name) j++;
         if (j - i > 1) {
           td.rowSpan = j - i;

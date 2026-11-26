@@ -433,16 +433,64 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
    a cell that the upgrade changed is gold */
 .upg-group { display: inline-flex; align-items: center; gap: 8px; }
 /* a number box has no spin arrows on the site, and its value stands exactly in the middle (owner 2026-11-23) */
-.upg-input { width: 44px; height: 28px; padding: 0; box-sizing: border-box; background: var(--bg-panel-3);
-  border: 1px solid var(--line); border-radius: 5px; color: var(--gold); font: inherit; font-size: 13px; font-weight: 700;
-  line-height: 26px; text-align: center; font-variant-numeric: tabular-nums; appearance: textfield; -moz-appearance: textfield; }
+/* the pixel font and frame of the selects beside it, so its text stands on the same line as their captions
+   (owner 2026-11-26: Nuke "расположение кривое, не в одну линию" — the boxes were Segoe UI 13px) */
+.upg-input { width: 44px; height: 28px; padding: 0 0 2px; box-sizing: border-box;
+  border: 2px solid transparent; border-image: var(--px-edge) 2 stretch; border-radius: 0;
+  background-color: var(--px-field); background-clip: padding-box; box-shadow: inset 0 -3px 0 var(--px-press);
+  color: var(--gold); font-family: var(--font-j10); font-size: 18px; font-weight: 400; letter-spacing: 0.3px;
+  line-height: normal; text-align: center; font-variant-numeric: tabular-nums; appearance: textfield; -moz-appearance: textfield; }
 .upg-input::-webkit-outer-spin-button, .upg-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.upg-input:hover, .upg-input:focus-visible { border-color: var(--gold); outline: none; }
-/* the step's game time as a chip with a clock, like the shop's tier times */
-.upg-time { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 9px; box-sizing: border-box;
-  border: 1px solid var(--line); border-radius: 14px; background: var(--bg-panel-2, var(--bg-panel-3));
-  color: var(--text-main); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
-.upg-time::before { content: ""; width: 12px; height: 12px; border: 1.5px solid var(--gold); border-radius: 50%;
-  box-sizing: border-box; background: linear-gradient(var(--gold), var(--gold)) 50% 2px / 1.5px 4px no-repeat,
-  linear-gradient(var(--gold), var(--gold)) 5px 50% / 3px 1.5px no-repeat; }
+.upg-input:hover, .upg-input:focus-visible { border-image-source: var(--px-edge-gold); outline: none; }
+/* the step's game time is the number box's hover hint (owner 2026-11-26), no chip beside it */
 .creeps-table td.upg-on { color: var(--gold); }
+/* Inspiration Aura button: the ability's icon alone; off = dimmed, on = full colour in the gold frame */
+.aura-toggle { display: inline-flex; align-items: center; justify-content: center; padding: 2px 4px; }
+.aura-toggle .aura-ico { width: 22px; height: 22px; border-radius: 3px; display: block; opacity: 0.45; filter: grayscale(0.6); }
+.aura-toggle[aria-pressed="true"] .aura-ico { opacity: 1; filter: none; }
+/* Nuke: two damage boxes; the HP cell light green when the unit lives, red when it dies (owner 2026-11-26) */
+.nuke-group { display: inline-flex; align-items: center; gap: 6px; }
+.nuke-input { width: 52px; }
+.nuke-input::placeholder { color: var(--px-text-dim); }
+.nuke-input.nuke-mag { color: #5fb1ff; }    /* magic: blue, as the damage type on Unit Abilities */
+.nuke-input.nuke-phys { color: #e1716a; }   /* physical: red */
+.nuke-input.nuke-pure { color: #ead992; }   /* pure: pale gold, as on Unit Abilities */
+.creeps-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }
+.creeps-table td.nuke-dead { background: rgba(224, 103, 90, 0.30); }
+
+/* "Type" field: the Creeps select's look, the ticked groups as its text (builders/creeps_common.py GROUP_SWITCHES) */
+.unit-type-btn { text-align: left; white-space: nowrap; height: 28px; }
+
+/* ---- View: Waves (builders/creeps_waves.py, src/js/creeps-upgrade.js waves) ----
+   The table is a .creeps-table with the Timeline head (owner 2026-11-26: "по дизайну, не как в timeline"): head,
+   cells, lines and fonts all come from the units table's rules; only what is the waves' own is here. */
+.waves-table { display: none; }
+body.view-waves .waves-table { display: table; }
+body.view-waves .creeps-table:not(.waves-table),
+body.view-waves .sticky-frame,
+body.view-waves .hs-attack-filter-group,
+body.view-waves #removed-toggle,
+body.view-waves .unit-type-group,
+/* no Upgrade box: every step is a column already (owner 2026-11-26, tried and taken out again) */
+body.view-waves .upg-group { display: none !important; }
+.waves-table td.wv-units { text-align: left; }
+.waves-table .wv-count { color: var(--text-dim, #8a8170); }
+/* the count sits ON the icon, bottom-right (owner 2026-11-26: "цифры … лучше на иконке"); a flex row of fixed
+   icons, max-width:none — the site's img max-width:100% let the column shrink under its icons */
+.waves-table .wv-units-in { display: flex; gap: 4px; }
+.waves-table .wv-unit { position: relative; flex: none; }
+.waves-table .wv-unit img { width: 28px; height: 28px; max-width: none; object-fit: cover; border-radius: 3px; display: block; }
+/* the count on a dark plate, so it reads on any portrait (owner 2026-11-26: "цифры не видны, нужна подложка") */
+.waves-table .wv-unit b {
+  position: absolute; right: 0; bottom: 0; min-width: 11px; padding: 1px 2px 0;
+  background: rgba(10, 9, 8, 0.85); border-top-left-radius: 3px;
+  font-weight: 700; font-size: 11px; line-height: 11px; text-align: center; color: #f3ead6;
+}
+/* any unit: a click greys it and takes it out of its row's sums (src/js/creeps-upgrade.js waves) */
+.waves-table .wv-unit { cursor: pointer; }
+.waves-table .wv-unit.wv-off img { filter: grayscale(1); opacity: 0.35; }
+.waves-table .wv-unit.wv-off b { opacity: 0.5; }
+.waves-table td[class*="wv-gold-"] { color: var(--gold); }
+/* a step when this make-up never leaves: dimmed */
+.waves-table td.wv-none { opacity: 0.35; }
+.waves-table td.nuke-part { background: rgba(234, 217, 146, 0.18); }

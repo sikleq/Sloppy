@@ -226,6 +226,10 @@
         const expanded = viewSel.value === 'expanded';
         table.classList.toggle('mode-standard', !expanded);
         table.classList.toggle('mode-expanded', expanded);
+        // Timeline (Unit Stats, owner 2026-11-26): the Basic columns + every stat at each 7:30 step
+        table.classList.toggle('mode-timeline', viewSel.value === 'timeline');
+        // Waves (owner 2026-11-26): the waves table instead of the units one (builders/creeps_waves.py)
+        document.body.classList.toggle('view-waves', viewSel.value === 'waves');
         recomputeCatColspans();
         applyLeftOffsets();   // column widths changed → recompute pinned offsets
         positionFramesRaf();
@@ -309,6 +313,55 @@
       };
       groupInputs.forEach(i => i.addEventListener('change', applyGroups));
       applyGroups();
+      // the "Type" dropdown holding them (builders/creeps_common.py GROUP_SWITCHES; Hero Lab's .hd-dd look):
+      // the menu goes to <body> so the scroll box does not clip it, "All" ticks every box, the badge counts them
+      const dd = document.querySelector('.unit-type-dd');
+      const menu = dd && dd.querySelector('.hd-dd-menu');
+      if (menu) {
+        const btn = dd.querySelector('.unit-type-btn'), text = dd.querySelector('.unit-type-text');
+        const allBox = menu.querySelector('input[data-dd-all]');
+        document.body.appendChild(menu);
+        menu.style.position = 'fixed';
+        const sync = () => {
+          const on = groupInputs.filter(i => i.checked);
+          const n = on.length;
+          // the field names what is ticked, as the Creeps select shows its choice
+          text.textContent = n === groupInputs.length ? 'All' : n ? on.map(i => i.nextElementSibling.textContent).join(', ') : 'None';
+          allBox.checked = n === groupInputs.length;
+          allBox.indeterminate = n > 0 && n < groupInputs.length;
+        };
+        const close = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const open = menu.hidden;
+          if (open) { const r = btn.getBoundingClientRect(); menu.style.top = (r.bottom + 6) + 'px'; menu.style.left = r.left + 'px'; }
+          menu.hidden = !open;
+          btn.setAttribute('aria-expanded', String(open));
+        });
+        menu.addEventListener('click', e => e.stopPropagation());
+        allBox.addEventListener('change', () => { groupInputs.forEach(i => { i.checked = allBox.checked; }); sync(); applyGroups(); });
+        groupInputs.forEach(i => i.addEventListener('change', sync));
+        document.addEventListener('click', close);
+        window.addEventListener('scroll', close, true);
+        window.addEventListener('resize', close);
+        sync();
+      }
+    }
+
+    // Lane creeps: Normal / Super / Mega (owner 2026-11-26) — one set of four rows shows (data-lane-tier)
+    const tierSel = document.getElementById('lane-tier');
+    if (tierSel && table.querySelector('tbody tr[data-lane-tier]')) {
+      const applyTier = () => {
+        table.querySelectorAll('tbody tr[data-lane-tier]').forEach(tr => {
+          tr.classList.toggle('mr-tier-out', tr.dataset.laneTier !== tierSel.value);
+        });
+        if (table._groupRows) {
+          table._groupRows([...table.querySelectorAll('tbody tr')]);
+        }
+        applyLeftOffsets();
+      };
+      tierSel.addEventListener('change', applyTier);
+      applyTier();
     }
     positionFramesRaf();
   }

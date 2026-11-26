@@ -22,6 +22,8 @@ ABILITY_COLS = ('ability1', 'ability2', 'ability3')
 # the site's switch, one per group; rows carry data-group (builders/creeps.py unit_group), src/js/creeps-pinned.js
 # hides the unchecked groups.
 UNIT_GROUPS = (('neutral', 'Neutrals'), ('lane', 'Lane'), ('summon', 'Summons'))
+# Summons start switched off (owner 2026-11-26: "по умолчанию выключить summons")
+UNIT_GROUPS_OFF = {'summon'}
 # Units a neutral summons (Dark Troll Summoner's skeletons). Hero summons come later (docs/todo.md).
 SUMMON_UNITS = {'skeleton_warrior'}
 
@@ -31,15 +33,26 @@ def unit_group(createhero):
     ch = (createhero or '').strip()
     if ch.startswith('lane_'):
         return 'lane'
-    return 'summon' if ch in SUMMON_UNITS else 'neutral'
+    # hero / item summons are rows 'summon_<key>' (builders/creeps_summons.py)
+    return 'summon' if ch in SUMMON_UNITS or ch.startswith('summon_') else 'neutral'
 
-GROUP_SWITCHES = ''.join(
-    f'<label class="ua-upgrades-toggle unit-group-toggle">'
-    f'<span class="ua-upgrades-label">{label}</span>'
-    f'<input type="checkbox" class="ua-switch-input" data-unit-group="{key}" checked>'
-    f'<span class="ua-switch" aria-hidden="true"></span>'
-    f'</label>'
-    for key, label in UNIT_GROUPS)
+# One "Type" dropdown with a box per group (owner 2026-11-26: "спрятать за выпадающий список в категории Type",
+# like Hero Lab's .hd-dd); src/js/creeps-pinned.js opens it and hides the unchecked groups.
+# Looks like the Creeps select: a caption and a field that names what is ticked (owner 2026-11-26, screenshot).
+GROUP_SWITCHES = (
+    '<span class="view-group unit-type-group"><strong>Type</strong>'
+    '<div class="hd-dd unit-type-dd" data-dd="unit-type">'
+    '<button type="button" class="cal-mode-select unit-type-btn" aria-expanded="false" aria-haspopup="true" '
+    'aria-label="Unit types shown"><span class="unit-type-text">'
+    + ', '.join(label for key, label in UNIT_GROUPS if key not in UNIT_GROUPS_OFF) +
+    '</span></button>'
+    '<div class="hd-dd-menu" data-dd="unit-type" role="group" hidden>'
+    '<label class="hd-dd-opt hd-dd-all"><input type="checkbox" data-dd-all><span>All</span></label>'
+    '<div class="hd-dd-sep" aria-hidden="true"></div>'
+    + ''.join(f'<label class="hd-dd-opt"><input type="checkbox" data-unit-group="{key}"'
+              f'{"" if key in UNIT_GROUPS_OFF else " checked"}><span>{label}</span></label>'
+              for key, label in UNIT_GROUPS)
+    + '</div></div></span>')
 
 # Hidden marker abilities — not real spells, suppressed from output.
 # `neutral_upgrade`: every neutral has this; auto-buff tracker.

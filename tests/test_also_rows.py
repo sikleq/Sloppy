@@ -54,8 +54,9 @@ def test_every_roster_unit_gets_a_page_even_without_changes(monkeypatch):
     names = {e["name"]: e for e in out}
     assert "Kobold" not in names                                   # it has a change page already
     assert names["Hellbear Smasher"]["slug"] == "hellbear-smasher" and names["Hellbear Smasher"]["patches"] == []
-    assert {"Necronomicon Warrior", "Necronomicon Archer"} <= set(names)
-    assert names["Necronomicon Warrior"]["_current"] is False      # removed: behind "Show deleted"
+    # 7.42: Book of the Dead summons the necronomicon units again — Summons cards, no longer removed (2026-11-26)
+    assert not {"Necronomicon Warrior", "Necronomicon Archer"} & set(names)
+    assert {"npc_dota_necronomicon_warrior", "npc_dota_necronomicon_archer"} <= {b for b, _n in ec._SUMMON_UNITS}
 
 
 def test_annotated_patches_are_named_as_ranges(monkeypatch):

@@ -45,8 +45,10 @@ NPC_FIELDS = (
 HEAD_RE = re.compile(
     r'^\s*"(npc_dota_(?:neutral_[a-z0-9_]+'
     r'|dark_troll_warlord_skeleton_warrior'
-    # lane creeps on Unit Stats (owner 2026-11-26): Radiant's melee / ranged / flagbearer / siege
-    r'|creep_goodguys_(?:melee|ranged|flagbearer)|goodguys_siege))"\s*$'
+    # lane creeps on Unit Stats (owner 2026-11-26): Radiant's melee / ranged / flagbearer / siege, and their super
+    # (_upgraded) and mega (_upgraded_mega) units
+    r'|creep_goodguys_(?:melee|ranged|flagbearer)(?:_upgraded(?:_mega)?)?'
+    r'|goodguys_siege(?:_upgraded(?:_mega)?)?))"\s*$'
 )
 FIELD_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]+)"')
 

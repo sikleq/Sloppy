@@ -35,6 +35,8 @@ _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 _sys.path.insert(0, _HERE)
 
 import patch.site_common as _site
+import builders.creeps_summons as _creeps_summons
+import builders.mr_table as _mr_table
 from builders.creeps_abilities import UA_CANONICAL_UNIT, save_neutral_abilities_html
 from builders.creeps_common import (
     ABILITY_COLS, ABILITY_SKIP, DASH, GROUP_SWITCHES, HULL_BOUNDS, NEUTRAL_DEFAULT_HULL, attr_esc,
@@ -64,11 +66,14 @@ NPC_FIELDS = ('StatusHealth', 'StatusHealthRegen', 'StatusMana',
               'ProjectileSpeed', 'BoundsHullName', 'RingRadius',
               'BountyGoldMin', 'BountyGoldMax', 'BountyXP',
               'VisionDaytimeRange', 'VisionNighttimeRange',
-              'Ability1', 'Ability2', 'Ability3', 'Ability4', 'Ability5')
+              'Ability1', 'Ability2', 'Ability3', 'Ability4', 'Ability5',
+              'include_keys_from')     # a summon's level 2+ takes its other keys from level 1 (summon_rows)
 # Capture both neutrals AND the hero-summoned units we surface
 # in the table (e.g. Dark Troll Summoner's skeleton_warrior).
 _NPC_HEAD_RE = re.compile(r'^\s*"(npc_dota_(?:neutral_[a-z0-9_]+|dark_troll_warlord_skeleton_warrior'
-                          r'|creep_goodguys_(?:melee|ranged|flagbearer)|goodguys_siege))"\s*$')
+                          r'|creep_goodguys_(?:melee|ranged|flagbearer)(?:_upgraded(?:_mega)?)?'
+                          r'|goodguys_siege(?:_upgraded(?:_mega)?)?))"\s*$')
+_NPC_ANY_HEAD_RE = re.compile(r'^\s*"(npc_dota_[a-z0-9_]+)"\s*$')
 _NPC_FIELD_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]+)"')
 
 
@@ -93,13 +98,15 @@ def _parse_npc_kv(path):
     # arbitrary depth.
     kv_lines = open(path, encoding='utf-8').read().splitlines()
     n_lines = len(kv_lines)
+    summons = _creeps_summons.head_names()      # hero summons shown on Unit Stats (builders/creeps_summons.py)
     i = 0
     while i < n_lines:
         m = _NPC_HEAD_RE.match(kv_lines[i])
-        if not m:
+        hm = None if m else _NPC_ANY_HEAD_RE.match(kv_lines[i])
+        if not m and not (hm and hm.group(1) in summons):
             i += 1
             continue
-        name = m.group(1)
+        name = (m or hm).group(1)
         # Find the opening brace (typically next line)
         j = i + 1
         while j < n_lines and '{' not in kv_lines[j]:
@@ -621,6 +628,9 @@ def _with_self_aura(result, s, createhero):
             print(f"  ! creeps: aura {spec[1]}.{spec[2]} not in the latest npc_abilities.json — skipped")
             continue
         op, val = resolved
+        if op == '*':      # a % aura: the page's Upgrade multiplies the grown number, not adds the old difference
+            cols = ('dmg_min', 'dmg_max', 'dmg_avg') if stat == 'dmg' else (stat,)
+            out['_self_mul'] = {**out.get('_self_mul', {}), **{c: val for c in cols}}
         if stat == 'dmg':
             for dk, dv in (('dmg_min', s.dmg_min), ('dmg_max', s.dmg_max),
                            ('dmg_avg', s.dmg_avg)):
@@ -759,17 +769,54 @@ LANE_CREEPS = (
     ('lane_flagbearer', 'npc_dota_creep_goodguys_flagbearer', 'Flagbearer Creep'),
 )
 LANE_ATTACK_TYPE = {'lane_siege': 'Siege'}
+# Normal / Super / Mega (owner 2026-11-26: "у lane creeps есть статус super/mega … добавить выбор в тулбаре"): the
+# game spawns <unit>_upgraded once the enemy barracks of that lane fall, <unit>_upgraded_mega when all six are down.
+# One row per variant; the toolbar's choice (#lane-tier, src/js/creeps-pinned.js) shows one set of four.
+LANE_TIERS = (('normal', '', ''), ('super', '_upgraded', 'Super '), ('mega', '_upgraded_mega', 'Mega '))
 
 
 def lane_rows(src):
-    """The lane creep rows, after the neutrals, in the same row format as build_rows."""
+    """The lane creep rows, after the neutrals, in the same row format as build_rows: each creep in its Normal, Super
+    and Mega unit (row token lane_<creep>, lane_<creep>_super, lane_<creep>_mega)."""
     out = []
-    for i, (token, npc_key, name) in enumerate(LANE_CREEPS):
-        data = {**_row_data(npc_key, token, src), 'lvl': '', 'createhero': token, 'name': name,
-                'npc_key': npc_key, 'icon': f'icons/units/{npc_key}.png', 'camp': ''}   # no camp: a dash
-        if token in LANE_ATTACK_TYPE:
-            data['attack_type'] = LANE_ATTACK_TYPE[token]
-        out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': npc_key})
+    for tier, suffix, prefix in LANE_TIERS:
+        for i, (token, base_npc, name) in enumerate(LANE_CREEPS):
+            npc_key = base_npc + suffix
+            row_token = token if tier == 'normal' else f'{token}_{tier}'
+            data = {**_row_data(npc_key, row_token, src), 'lvl': '', 'createhero': row_token,
+                    'name': prefix + name, 'npc_key': npc_key, 'lane_tier': tier,
+                    # the variants wear the base unit's portrait; no camp: a dash
+                    'icon': f'icons/units/{base_npc}.png', 'camp': ''}
+            if token in LANE_ATTACK_TYPE:
+                data['attack_type'] = LANE_ATTACK_TYPE[token]
+            out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': npc_key})
+    return out
+
+
+def summon_rows(src):
+    """Hero / item summons (owner 2026-11-26), after the lane creeps: the game's numbers from
+    data/rules/summon_units.json over the unit KV (builders/creeps_summons.py). Unit Stats only — the abilities
+    page does not list them. No ability columns yet: their abilities are hero abilities, not in the neutral data."""
+    def kv(name, seen=()):
+        own = src.npc_data.get(name, {})
+        parent = own.get('include_keys_from')
+        if not parent or parent in seen:
+            return own
+        return {**kv(parent, seen + (name,)), **own}
+
+    out = []
+    for i, e in enumerate(_creeps_summons.entries()):
+        npc = {**kv(e['npc']), **_creeps_summons.kv_overrides(e)}
+        s = _unit_stats(npc, src.units.get(e['npc'], {}))
+        cells = _format_stats(s, npc, _creeps_summons.abilities(npc, ABILITY_SKIP), '')
+        if cells.get('vision') == '0/0':
+            cells['vision'] = ''        # the KV's 0/0 (treants): the ability sets it, the number is not ours to show
+        data = {**cells, 'lvl': '',
+                'createhero': _creeps_summons.ROW_PREFIX + e['key'], 'name': _creeps_summons.display_name(e),
+                'npc_key': e['npc'], 'icon': _creeps_summons.icon(e), 'camp': '', 'hero_summon': True,
+                # its abilities are its hero's: they link to the hero's page, not to Unit Abilities
+                'ability_href': _mr_table.hero_href(e.get('hero') or '')}
+        out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': e['npc']})
     return out
 
 
@@ -827,10 +874,24 @@ CATEGORIES = [
         ('ability3',     'Ability 3',        'std'),
     ]),
 ]
+# View "Timeline" (owner 2026-11-26, a sheet of the owner's: every stat at each 7:30 upgrade step): beside the Basic
+# columns, HP / Armor / Damage / Attack speed / Avg gold at 0:00, 7:30 … 60:00, worked out by the same upgrade rules
+# as the Upgrade box (neutral_upgrade; a lane creep's LANE_UPGRADE). Shown only in that view (mode 'tl').
+TL_STEPS = tuple(range(9))                     # 0:00 … 60:00
+TL_STATS = (('hp', 'HP'), ('armor', 'Armor'), ('dmg', 'Damage'), ('as', 'Attack speed'), ('gold', 'Avg gold'))
+_TL_SLUG = {label: f'tl-{key}' for key, label in TL_STATS}
+
+
+def _tl_time(step):
+    s = step * 450
+    return f'{s // 60}:{s % 60:02d}'
+
+
+CATEGORIES += [(label, [(f'tl_{key}_{i}', _tl_time(i), 'tl') for i in TL_STEPS]) for key, label in TL_STATS]
 COLUMNS = [(k, label) for _cat, cols in CATEGORIES for (k, label, _m) in cols]
 COL_MODE = {k: m for _cat, cols in CATEGORIES for (k, _l, m) in cols}
 _CAT_SLUG = {'Basic': 'basic', 'Vitality': 'vitality', 'Attack': 'attack',
-             'Bounty': 'bounty', 'Other': 'other', 'Abilities': 'abilities'}
+             'Bounty': 'bounty', 'Other': 'other', 'Abilities': 'abilities', **_TL_SLUG}
 COL_CAT = {k: _CAT_SLUG[cat] for cat, cols in CATEGORIES for (k, _l, _m) in cols}
 # No colgroup: table-layout: auto lets the browser size each column
 # to fit content (and each header) on one line. Headers and cells
@@ -855,6 +916,12 @@ def _col_cls(k, value=''):
         cls.append('col-sep')
     if COL_MODE.get(k) == 'exp':
         cls.append('col-exp')          # hidden in Standard view
+    if COL_MODE.get(k) == 'tl':
+        cls.append('col-tl')           # only in the Timeline view
+        if k.endswith('_0'):
+            cls.append('col-sep')
+    elif COL_CAT.get(k) != 'basic':
+        cls.append('col-main')         # hidden in the Timeline view
     if k == 'attack_type':
         if value == 'Default':
             cls.append('atk-basic')
@@ -920,11 +987,59 @@ def _stats_cat_cells():
     # Super-category row: one cell per category, colspan = its leaf columns.
     # Each category has at least one Standard column, so the cell always shows;
     # when Expanded columns under it are hidden, the cell shrinks naturally.
+    def view_cls(cat):
+        slug = _CAT_SLUG.get(cat, 'x')
+        return ' col-tl' if slug.startswith('tl-') else ('' if slug == 'basic' else ' col-main')
     return ''.join(
-        f'<th class="cat-head cat-{_CAT_SLUG.get(cat, "x")}" '
+        f'<th class="cat-head cat-{_CAT_SLUG.get(cat, "x")}{view_cls(cat)}" '
         f'data-cat="{_CAT_SLUG.get(cat, "x")}" colspan="{len(cols)}">{esc(cat)}</th>'
         for cat, cols in CATEGORIES
     )
+
+
+def _first_num(v):
+    """The unit's own number of a cell ("1500 (1740)" -> 1500.0), None when there is none."""
+    m = re.search(r'-?\d+(?:[.,]\d+)?', str(v or ''))
+    return float(m.group(0).replace(',', '.')) if m else None
+
+
+def timeline_value(d, stat, step):
+    """A stat of one row at an upgrade step, by the Upgrade box's rules (src/js/creeps-upgrade.js `rule`):
+    neutrals +30 HP, +0.5 armor, +3 damage, +5 attack speed, gold min +floor(L/2), max +floor((L+1)/2); a lane
+    creep by its LANE_UPGRADE (HP and damage to its cap, mega's floor; gold every step; no armor or attack speed;
+    without an entry — siege — it does not grow). None when the row has no such number."""
+    ch = (d.get('createhero') or '').strip()
+    lane = unit_group(ch) == 'lane'
+    u = LANE_UPGRADE.get(ch, {}) if lane else {}
+    if stat == 'gold':
+        # min and max grow on their own, the column shows their mean rounded up (as the build writes it): from the
+        # unrounded base, else 51,5 -> 52 first and then +0,5 a step (Fable 5.2 review 2026-11-26)
+        gmin, gmax = _first_num(d.get('gold_min')), _first_num(d.get('gold_max'))
+        if gmin is None or gmax is None:
+            return None
+        if lane:
+            gmin, gmax = gmin + u.get('gold', 0) * step, gmax + u.get('gold', 0) * step
+        else:
+            gmin, gmax = gmin + step // 2, gmax + (step + 1) // 2
+        return float(-(-(gmin + gmax) // 2))
+    key = {'hp': 'hp', 'armor': 'armor', 'dmg': 'dmg_avg', 'as': 'as'}[stat]
+    base = _first_num(d.get(key))
+    if base is None:
+        return None
+    if lane:
+        c = max(min(step, u.get('cap', step)), u.get('floor', 0))
+        add = {'hp': u.get('hp', 0) * c, 'dmg': u.get('dmg', 0) * c}.get(stat, 0)
+    else:
+        add = {'hp': 30 * step, 'armor': 0.5 * step, 'dmg': 3 * step, 'as': 5 * step}[stat]
+    return base + add
+
+
+def _tl_cell(k, d):
+    _, stat, step = k.split('_')
+    v = timeline_value(d, stat, int(step))
+    text = DASH if v is None else (str(int(round(v))) if stat in ('hp', 'as') else fmt_num(v))
+    sort = '' if v is None else f' data-sort="{v:g}"'
+    return f'<td class="{_col_cls(k)}"{sort}>{text}</td>'
 
 
 # ---- Neutral Stats: cells ----
@@ -998,7 +1113,12 @@ def _ability_inner(k, v, d):
     # Clicking an ability jumps to its (unit, ability) row on the Unit
     # Abilities page. For abilities that share a single canonical row
     # across units (e.g. Riverborn Aura), route to that canonical unit.
+    if d.get('hero_summon'):          # a hero summon's ability: its hero's page (builders/creeps_summons.py)
+        href = d.get('ability_href')
+        return f'<a class="abil-link" href="{esc(href)}">{inner}</a>' if href else inner
     ch = (d.get('createhero') or '').strip()
+    # a Super / Mega lane creep's ability is on its Normal row of Unit Abilities (only Normal is listed there)
+    ch = re.sub(r'_(?:super|mega)$', '', ch) if ch.startswith('lane_') else ch
     target_ch = UA_CANONICAL_UNIT.get(slug, ch)
     return (f'<a class="abil-link" '
             f'href="units_abilities.html#{target_ch}-{slug}">{inner}</a>'
@@ -1054,6 +1174,8 @@ def _history_attrs(k, v, npc_key, src):
 
 def _stats_cell(k, row, src, unit_page_slugs):
     d = row['data']
+    if COL_MODE.get(k) == 'tl':
+        return _tl_cell(k, d)
     v = d.get(k, '')
     if k == 'lvl':
         # Per-row level cell (no rowspan). data-lvl lets scripts.js
@@ -1064,7 +1186,7 @@ def _stats_cell(k, row, src, unit_page_slugs):
     if k == 'icon':
         if not v:
             return f'<td class="creep-icon-cell {_col_cls(k)}"></td>'
-        if unit_group(d.get('createhero')) == 'lane':      # no "-createhero <name> neutral" for a lane creep
+        if unit_group(d.get('createhero')) == 'lane' or d.get('hero_summon'):   # no "-createhero … neutral"
             return (f'<td class="creep-icon-cell {_col_cls(k)}">'
                     f'<img class="creep-copy" src="{esc(v)}" alt="" loading="lazy" width="128" height="72" '
                     f'onerror="this.style.visibility=\'hidden\'"></td>')
@@ -1085,11 +1207,13 @@ def _stats_cell(k, row, src, unit_page_slugs):
         extra = f' data-hist="{esc(payload)}"' if hist else ''
         cls = _col_cls(k, v) + (' has-history' if hist else '')
         return f'<td class="{cls}"{_sort_attr(k, v)}{extra}>{inner}</td>'
+    mul = (d.get('_self_mul') or {}).get(k)
+    mul_attr = f' data-self-mul="{mul:g}"' if mul else ''      # its own % aura (src/js/creeps-upgrade.js selfAura)
     if k in COL_HIST or k in COL_CHANGELOG:
         extra, has_hist = _history_attrs(k, v, row.get('npc_key'), src)
         cls = _col_cls(k, v) + (' has-history' if has_hist else '')
-        return f'<td class="{cls}"{_sort_attr(k, v)}{extra}>{inner}</td>'
-    return f'<td class="{_col_cls(k, v)}"{_sort_attr(k, v)}>{inner}</td>'
+        return f'<td class="{cls}"{_sort_attr(k, v)}{extra}{mul_attr}>{inner}</td>'
+    return f'<td class="{_col_cls(k, v)}"{_sort_attr(k, v)}{mul_attr}>{inner}</td>'
 
 
 def _stats_row_html(row, src, unit_page_slugs):
@@ -1103,7 +1227,10 @@ def _stats_row_html(row, src, unit_page_slugs):
     group = unit_group(d.get('createhero'))
     upg = LANE_UPGRADE.get((d.get('createhero') or '').strip())
     upg_attr = f' data-upg="{attr_esc(_json.dumps(upg, separators=(",", ":")))}"' if upg else ''
-    return (f'<tr{rid} data-group="{group}" data-attack-type="{attack_type}"{removed}{upg_attr}{tr_cls}>'
+    if d.get('hero_summon'):
+        upg_attr = ' data-upg="{}"'      # a hero summon does not grow with Upgrade (src/js/creeps-upgrade.js rule)
+    tier = f' data-lane-tier="{d["lane_tier"]}"' if d.get('lane_tier') else ''
+    return (f'<tr{rid} data-group="{group}"{tier} data-attack-type="{attack_type}"{removed}{upg_attr}{tr_cls}>'
             f'{cells}</tr>')
 
 
@@ -1115,10 +1242,54 @@ LANE_UPGRADE = {
     'lane_melee':      {'hp': 12, 'dmg': 1, 'gold': 1, 'xp': 0, 'cap': 30},
     'lane_flagbearer': {'hp': 12, 'dmg': 1, 'gold': 1, 'xp': 0, 'cap': 30},
     'lane_ranged':     {'hp': 12, 'dmg': 2, 'gold': 3, 'xp': 8, 'cap': 30},
+    # super (the increments table's "upgraded" rows): melee and flagbearer give no extra gold
+    'lane_melee_super':      {'hp': 19, 'dmg': 2, 'gold': 0, 'xp': 0, 'cap': 30},
+    'lane_flagbearer_super': {'hp': 19, 'dmg': 2, 'gold': 0, 'xp': 0, 'cap': 30},
+    'lane_ranged_super':     {'hp': 18, 'dmg': 3, 'gold': 3, 'xp': 0, 'cap': 30},
 }
+# mega: the super increments, HP and damage at the 30 steps from the start (all six barracks down); gold and XP still
+# by the real number of steps ("floor": the lowest number of steps HP / damage count)
+LANE_UPGRADE.update({k.replace('_super', '_mega'): {**v, 'floor': 30}
+                     for k, v in list(LANE_UPGRADE.items()) if k.endswith('_super')})
 
 
 # ---- Neutral Stats: page ----
+
+def _aura_button():
+    """Inspiration Aura on / off (owner 2026-11-26): the flagbearer's aura on every lane creep row at the chosen
+    upgrade step — +HP regen, and magic resistance growing every 7:30 up to its maximum, stacked multiplicatively
+    with the creep's own (src/js/creeps-upgrade.js). The numbers come from the current KV; a renamed key fails."""
+    a = _latest_abilities().get('flagbearer_creep_aura_effect') or {}
+    vals = {k: a.get('av_' + k) for k in ('bonus_health_regen', 'bonus_magic_resistance_per_interval',
+                                          'maximum_intervals')}
+    if any(v is None for v in vals.values()):
+        raise KeyError(f"flagbearer_creep_aura_effect: {vals} — a key is missing from the current npc_abilities.json")
+    return ('<button type="button" class="hs-attack-filter aura-toggle tb-tip-target" id="flag-aura" '
+            'aria-pressed="false" data-tooltip="Inspiration Aura" '
+            f'data-regen="{vals["bonus_health_regen"]}" data-mr-step="{vals["bonus_magic_resistance_per_interval"]}" '
+            f'data-mr-max="{vals["maximum_intervals"]}" aria-label="Inspiration Aura">'
+            # just the icon (owner 2026-11-26: "просто иконкой, а не полным именем")
+            '<img class="aura-ico" src="icons/abilities/flagbearer_creep_aura_effect.png" alt=""></button>')
+
+
+_AURA_BUTTON = _aura_button()
+# Nuke (owner 2026-11-26): magic and physical damage in two boxes; every row's HP cell turns light green when the
+# unit survives, red when it dies — after its armor and magic resistance at the chosen step (src/js/creeps-upgrade.js)
+_NUKE_FIELDS = (
+    # always open, a caption like View / Creeps / Type (owner 2026-11-26: "nuke пусть всегда открыто"); it counts
+    # as soon as a box holds a number
+    '<span class="view-group nuke-group" id="nuke-fields"><strong>Nuke</strong>'
+    # no words beside the boxes (owner 2026-11-26: the toolbar grew a second row): a grey hint inside each, the
+    # number in its damage type's colour — magic blue, physical red, as on Unit Abilities
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-mag" '
+    'class="upg-input nuke-input nuke-mag" value="" placeholder="Mag" aria-label="Magic damage">'
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-phys" '
+    'class="upg-input nuke-input nuke-phys" value="" placeholder="Phys" aria-label="Physical damage">'
+    # pure damage: no armor, no resistance takes anything off it (owner 2026-11-26)
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-pure" '
+    'class="upg-input nuke-input nuke-pure" value="" placeholder="Pure" aria-label="Pure damage">'
+    '</span>'
+)
 
 _STATS_TOOLBAR = (
     '<div class="cal-toggle-bar inbox-bar"><div class="toolbar-panel">'
@@ -1127,8 +1298,17 @@ _STATS_TOOLBAR = (
     '<select class="cal-mode-select" id="view-mode">'
     '<option value="standard">Standard</option>'
     '<option value="expanded">Expanded</option>'
+    '<option value="timeline">Timeline</option>'   # every stat at each 7:30 step (TL_STATS)
+    '<option value="waves">Waves</option>'         # every lane wave to 60:00 (builders/creeps_waves.py)
     '</select>'
     '</span>'
+    # lane creeps: Normal / Super (that lane's enemy barracks down) / Mega (all six down) — LANE_TIERS; beside View
+    # (owner 2026-11-26: "Creeps поставить рядом с view")
+    '<span class="view-group"><strong>Creeps</strong>'
+    '<select class="cal-mode-select" id="lane-tier" aria-label="Lane creeps: normal, super or mega">'
+    '<option value="normal">Normal</option><option value="super">Super</option><option value="mega">Mega</option>'
+    '</select></span>'
+    + GROUP_SWITCHES +    # "Type" beside Creeps (owner 2026-11-26)
     '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
     '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
     'aria-pressed="false" title="Show melee units">'
@@ -1141,13 +1321,15 @@ _STATS_TOOLBAR = (
     '</span>'
     # creeps whose camp left the game (REMOVED_CREEPS): hidden until pressed
     '<button type="button" class="hs-attack-filter" id="removed-toggle" aria-pressed="false">'
-    '<span>Removed</span></button>'
-    # neutral_upgrade: every 7:30 from the horn, up to 30 steps (src/js/creeps-upgrade.js; owner 2026-11-23)
+    '<span>Removed</span></button>' +
+    # neutral_upgrade: every 7:30 from the horn, up to 30 steps (src/js/creeps-upgrade.js; owner 2026-11-23); after the
+    # group switches (owner 2026-11-26)
     '<label class="view-group upg-group"><strong>Upgrade</strong>'
-    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="upgrade-step" class="upg-input" value="0" '
-    'aria-label="Creep upgrade number, 0 to 30">'
-    '<span class="upg-time" id="upgrade-time">0:00</span></label>'
-    + GROUP_SWITCHES +
+    # the step's game time is the box's hover hint, not a chip beside it (owner 2026-11-26)
+    '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="upgrade-step" '
+    'class="upg-input tb-tip-target" value="0" data-tooltip="0:00" '
+    'aria-label="Creep upgrade number, 0 to 30"></label>'
+    + _AURA_BUTTON + _NUKE_FIELDS +
     '</div></div>\n'
 )
 
@@ -1158,6 +1340,8 @@ _STATS_TOOLBAR = (
 _STATS_REDIRECT_PAGES = ('neutral_stats.html', 'neutral_creeps.html', 'creeps.html', 'materials.html')
 _STATS_REDIRECT_HTML = (
     '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    # keeps the #unit-… anchor (the meta refresh alone drops it)
+    '<script>location.replace("units_stats.html" + location.search + location.hash)</script>'
     '<meta http-equiv="refresh" content="0; url=units_stats.html">'
     '<link rel="canonical" href="units_stats.html">'
     '<title>Sloppy — moved</title></head><body>'
@@ -1165,6 +1349,9 @@ _STATS_REDIRECT_HTML = (
     '<a href="units_stats.html">units_stats.html</a>.</p>'
     '</body></html>'
 )
+
+
+import builders.creeps_waves as _creeps_waves  # noqa: E402  (View: Waves)
 
 
 def stats_page_html(body_parts, asset_version):
@@ -1185,6 +1372,7 @@ def stats_page_html(body_parts, asset_version):
         f'<tr class="col-row">{_stats_thead()}</tr></thead>\n'
         f'<tbody>\n{chr(10).join(body_parts)}\n</tbody>\n'
         '</table>\n'
+        + _creeps_waves.waves_table_html({key: f'icons/units/{npc}.png' for key, npc, _name in LANE_CREEPS})
     )
     return page_shell('Unit Stats', nav, inner, asset_version)
 
@@ -1219,7 +1407,7 @@ def save_creeps_html():
     with open(csv_path, encoding='utf-8') as f:
         csv_rows = list(_csv.reader(f))
     rendered = build_rows(csv_rows, src)
-    save_neutral_stats_html(rendered, src)
+    save_neutral_stats_html(rendered + summon_rows(src), src)     # summons: Unit Stats only
     save_neutral_abilities_html(rendered, src.hist, ASSET_VERSION)
 
 
