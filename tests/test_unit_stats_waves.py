@@ -52,7 +52,7 @@ def test_waves_view_on_the_page():
     first = kinds[0]
     assert first[0] == {"melee": 3, "flag": 0, "ranged": 1, "siege": 0} and first[1][0] == 1
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
-    assert "function waves()" in js and "killed}/${units}" in js
+    assert "function waves()" in js and "${killed} of ${units} die" in js      # the hint's head
     # any unit, only in its own row: grey and out of that row's sums (owner 2026-11-26)
     assert "tr.dataset.off" in js and "off.has(k)" in js and "siegeOff" not in js
     # the flagbearer's aura leaves with a switched-off flagbearer (2026-11-26)
