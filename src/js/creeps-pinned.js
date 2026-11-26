@@ -310,6 +310,22 @@
       groupInputs.forEach(i => i.addEventListener('change', applyGroups));
       applyGroups();
     }
+
+    // Lane creeps: Normal / Super / Mega (owner 2026-11-26) — one set of four rows shows (data-lane-tier)
+    const tierSel = document.getElementById('lane-tier');
+    if (tierSel && table.querySelector('tbody tr[data-lane-tier]')) {
+      const applyTier = () => {
+        table.querySelectorAll('tbody tr[data-lane-tier]').forEach(tr => {
+          tr.classList.toggle('mr-tier-out', tr.dataset.laneTier !== tierSel.value);
+        });
+        if (table._groupRows) {
+          table._groupRows([...table.querySelectorAll('tbody tr')]);
+        }
+        applyLeftOffsets();
+      };
+      tierSel.addEventListener('change', applyTier);
+      applyTier();
+    }
     positionFramesRaf();
   }
 })();

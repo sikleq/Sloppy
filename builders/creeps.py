@@ -68,7 +68,8 @@ NPC_FIELDS = ('StatusHealth', 'StatusHealthRegen', 'StatusMana',
 # Capture both neutrals AND the hero-summoned units we surface
 # in the table (e.g. Dark Troll Summoner's skeleton_warrior).
 _NPC_HEAD_RE = re.compile(r'^\s*"(npc_dota_(?:neutral_[a-z0-9_]+|dark_troll_warlord_skeleton_warrior'
-                          r'|creep_goodguys_(?:melee|ranged|flagbearer)|goodguys_siege))"\s*$')
+                          r'|creep_goodguys_(?:melee|ranged|flagbearer)(?:_upgraded(?:_mega)?)?'
+                          r'|goodguys_siege(?:_upgraded(?:_mega)?)?))"\s*$')
 _NPC_FIELD_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]+)"')
 
 
@@ -759,17 +760,27 @@ LANE_CREEPS = (
     ('lane_flagbearer', 'npc_dota_creep_goodguys_flagbearer', 'Flagbearer Creep'),
 )
 LANE_ATTACK_TYPE = {'lane_siege': 'Siege'}
+# Normal / Super / Mega (owner 2026-11-26: "у lane creeps есть статус super/mega … добавить выбор в тулбаре"): the
+# game spawns <unit>_upgraded once the enemy barracks of that lane fall, <unit>_upgraded_mega when all six are down.
+# One row per variant; the toolbar's choice (#lane-tier, src/js/creeps-pinned.js) shows one set of four.
+LANE_TIERS = (('normal', '', ''), ('super', '_upgraded', 'Super '), ('mega', '_upgraded_mega', 'Mega '))
 
 
 def lane_rows(src):
-    """The lane creep rows, after the neutrals, in the same row format as build_rows."""
+    """The lane creep rows, after the neutrals, in the same row format as build_rows: each creep in its Normal, Super
+    and Mega unit (row token lane_<creep>, lane_<creep>_super, lane_<creep>_mega)."""
     out = []
-    for i, (token, npc_key, name) in enumerate(LANE_CREEPS):
-        data = {**_row_data(npc_key, token, src), 'lvl': '', 'createhero': token, 'name': name,
-                'npc_key': npc_key, 'icon': f'icons/units/{npc_key}.png', 'camp': ''}   # no camp: a dash
-        if token in LANE_ATTACK_TYPE:
-            data['attack_type'] = LANE_ATTACK_TYPE[token]
-        out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': npc_key})
+    for tier, suffix, prefix in LANE_TIERS:
+        for i, (token, base_npc, name) in enumerate(LANE_CREEPS):
+            npc_key = base_npc + suffix
+            row_token = token if tier == 'normal' else f'{token}_{tier}'
+            data = {**_row_data(npc_key, row_token, src), 'lvl': '', 'createhero': row_token,
+                    'name': prefix + name, 'npc_key': npc_key, 'lane_tier': tier,
+                    # the variants wear the base unit's portrait; no camp: a dash
+                    'icon': f'icons/units/{base_npc}.png', 'camp': ''}
+            if token in LANE_ATTACK_TYPE:
+                data['attack_type'] = LANE_ATTACK_TYPE[token]
+            out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': npc_key})
     return out
 
 
@@ -1103,7 +1114,8 @@ def _stats_row_html(row, src, unit_page_slugs):
     group = unit_group(d.get('createhero'))
     upg = LANE_UPGRADE.get((d.get('createhero') or '').strip())
     upg_attr = f' data-upg="{attr_esc(_json.dumps(upg, separators=(",", ":")))}"' if upg else ''
-    return (f'<tr{rid} data-group="{group}" data-attack-type="{attack_type}"{removed}{upg_attr}{tr_cls}>'
+    tier = f' data-lane-tier="{d["lane_tier"]}"' if d.get('lane_tier') else ''
+    return (f'<tr{rid} data-group="{group}"{tier} data-attack-type="{attack_type}"{removed}{upg_attr}{tr_cls}>'
             f'{cells}</tr>')
 
 
@@ -1115,10 +1127,49 @@ LANE_UPGRADE = {
     'lane_melee':      {'hp': 12, 'dmg': 1, 'gold': 1, 'xp': 0, 'cap': 30},
     'lane_flagbearer': {'hp': 12, 'dmg': 1, 'gold': 1, 'xp': 0, 'cap': 30},
     'lane_ranged':     {'hp': 12, 'dmg': 2, 'gold': 3, 'xp': 8, 'cap': 30},
+    # super (the increments table's "upgraded" rows): melee and flagbearer give no extra gold
+    'lane_melee_super':      {'hp': 19, 'dmg': 2, 'gold': 0, 'xp': 0, 'cap': 30},
+    'lane_flagbearer_super': {'hp': 19, 'dmg': 2, 'gold': 0, 'xp': 0, 'cap': 30},
+    'lane_ranged_super':     {'hp': 18, 'dmg': 3, 'gold': 3, 'xp': 0, 'cap': 30},
 }
+# mega: the super increments, HP and damage at the 30 steps from the start (all six barracks down); gold and XP still
+# by the real number of steps ("floor": the lowest number of steps HP / damage count)
+LANE_UPGRADE.update({k.replace('_super', '_mega'): {**v, 'floor': 30}
+                     for k, v in list(LANE_UPGRADE.items()) if k.endswith('_super')})
 
 
 # ---- Neutral Stats: page ----
+
+def _aura_button():
+    """Inspiration Aura on / off (owner 2026-11-26): the flagbearer's aura on every lane creep row at the chosen
+    upgrade step — +HP regen, and magic resistance growing every 7:30 up to its maximum, stacked multiplicatively
+    with the creep's own (src/js/creeps-upgrade.js). The numbers come from the current KV; a renamed key fails."""
+    a = _latest_abilities().get('flagbearer_creep_aura_effect') or {}
+    vals = {k: a.get('av_' + k) for k in ('bonus_health_regen', 'bonus_magic_resistance_per_interval',
+                                          'maximum_intervals')}
+    if any(v is None for v in vals.values()):
+        raise KeyError(f"flagbearer_creep_aura_effect: {vals} — a key is missing from the current npc_abilities.json")
+    return ('<button type="button" class="hs-attack-filter aura-toggle" id="flag-aura" aria-pressed="false" '
+            f'data-regen="{vals["bonus_health_regen"]}" data-mr-step="{vals["bonus_magic_resistance_per_interval"]}" '
+            f'data-mr-max="{vals["maximum_intervals"]}" aria-label="Inspiration Aura">'
+            # just the icon (owner 2026-11-26: "просто иконкой, а не полным именем")
+            '<img class="aura-ico" src="icons/abilities/flagbearer_creep_aura_effect.png" alt=""></button>')
+
+
+_AURA_BUTTON = _aura_button()
+# Nuke (owner 2026-11-26): magic and physical damage in two boxes; every row's HP cell turns light green when the
+# unit survives, red when it dies — after its armor and magic resistance at the chosen step (src/js/creeps-upgrade.js)
+_NUKE_FIELDS = (
+    '<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Nuke</span>'
+    '<input type="checkbox" id="nuke-toggle" class="ua-switch-input">'
+    '<span class="ua-switch" aria-hidden="true"></span></label>'
+    '<span class="view-group nuke-group" id="nuke-fields" hidden>'
+    '<label class="nuke-field"><strong>Magic</strong><input type="text" inputmode="numeric" pattern="[0-9]*" '
+    'maxlength="5" id="nuke-mag" class="upg-input nuke-input" value="0" aria-label="Magic damage"></label>'
+    '<label class="nuke-field"><strong>Physical</strong><input type="text" inputmode="numeric" pattern="[0-9]*" '
+    'maxlength="5" id="nuke-phys" class="upg-input nuke-input" value="0" aria-label="Physical damage"></label>'
+    '</span>'
+)
 
 _STATS_TOOLBAR = (
     '<div class="cal-toggle-bar inbox-bar"><div class="toolbar-panel">'
@@ -1147,6 +1198,12 @@ _STATS_TOOLBAR = (
     '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="upgrade-step" class="upg-input" value="0" '
     'aria-label="Creep upgrade number, 0 to 30">'
     '<span class="upg-time" id="upgrade-time">0:00</span></label>'
+    + _AURA_BUTTON + _NUKE_FIELDS +
+    # lane creeps: Normal / Super (that lane's enemy barracks down) / Mega (all six down) — LANE_TIERS
+    '<span class="view-group"><strong>Creeps</strong>'
+    '<select class="cal-mode-select" id="lane-tier" aria-label="Lane creeps: normal, super or mega">'
+    '<option value="normal">Normal</option><option value="super">Super</option><option value="mega">Mega</option>'
+    '</select></span>'
     + GROUP_SWITCHES +
     '</div></div>\n'
 )
