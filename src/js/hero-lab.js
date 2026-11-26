@@ -1266,9 +1266,11 @@
   function duelSide(st, v) {
     const ranged = st.hero.attackType === 'ranged';
     return {
-      hp: v.hp, hpr: v.hpr, armor: v.armor, evasion: v.evasion, dmin: v.dmin, dmax: v.dmax, aspd: v.aspd,
-      tHit: v.tHit, attackPoint: st.hero.attackPoint, range: v.range, proj: v.proj, lifesteal: v.lifesteal,
-      ranged: ranged, melee: !ranged, noBlock: st.hero.id === 'vengefulspirit',
+      hp: v.hp, hpr: v.hpr, mp: v.mp, mpr: v.mpr, armor: v.armor, mr: v.mr, evasion: v.evasion,
+      dmin: v.dmin, dmax: v.dmax, aspd: v.aspd, tHit: v.tHit, attackPoint: st.hero.attackPoint, range: v.range,
+      proj: v.proj, lifesteal: v.lifesteal, int: v.int, ranged: ranged, noBlock: st.hero.id === 'vengefulspirit',
+      // the items' passives on attack (builders/hero_lab.py _item_on_hit); a second copy of one item adds nothing
+      onHit: [...new Set(st.itemEntries.map(e => e.id))].map(id => (byItem.get(id) || {}).onHit).filter(Boolean),
     };
   }
   function duelChart(res, names) {
@@ -1289,6 +1291,19 @@
       </svg>
       <figcaption><span>0s</span><span>a typical fight: ${esc(won)} wins at ${fmt(s.t, 2)}s</span><span>${fmt(T, 1)}s</span></figcaption>
     </figure>`;
+  }
+  // the items whose passives play in the fight, as icons per side (the same order as the inventory)
+  function duelItems(aState, bState) {
+    const icons = st => [...new Set(st.itemEntries.map(e => e.id))].map(id => byItem.get(id))
+      .filter(it => it && it.onHit)
+      .map(it => `<img src="${it.icon}" alt="${esc(it.name)}" title="${esc(it.name)}">`).join('');
+    const l = icons(aState), r = icons(bState);
+    if (!l && !r) return '';
+    return `<div class="hl-diff-row hl-duel-row hl-duel-items" data-adv="none">
+      <span class="hl-diff-side hl-diff-left">${l}</span>
+      <span class="hl-diff-center"><span class="hl-diff-label">On hit</span></span>
+      <span class="hl-diff-side hl-diff-right">${r}</span>
+    </div>`;
   }
   function renderDuel(aState, a, bState, b) {
     const box = document.getElementById('hl-duel');
@@ -1311,7 +1326,7 @@
       </div>`;
     };
     const drawNote = res.draw > 0 ? ` · ${pct(res.draw)} still standing after ${res.maxTime}s` : '';
-    box.innerHTML = `<div class="hl-diff-head"><strong>Duel</strong></div>
+    const html = `<div class="hl-diff-head"><strong>Duel</strong></div>
       <div class="hl-duel-bar" title="${esc(names[0])} ${pct(L.win)} · ${esc(names[1])} ${pct(R.win)}">
         <span class="hl-duel-a" style="flex-grow:${L.win}"></span>
         ${res.draw > 0 ? `<span class="hl-duel-draw" style="flex-grow:${res.draw}"></span>` : ''}
@@ -1319,12 +1334,16 @@
       </div>
       ${row('Win chance', pct(L.win), pct(R.win), L.win, R.win)}
       ${row('Time to kill', time(L.time), time(R.time), L.time, R.time, true)}
-      ${row('Hits to kill', num(L.hitsToKill), num(R.hitsToKill), L.hitsToKill, R.hitsToKill, true)}
+      ${row('Hits to kill', num(L.hits), num(R.hits), L.hits, R.hits, true)}
       ${row('Effective DPS', fmt(L.dps, 1), fmt(R.dps, 1), L.dps, R.dps)}
       ${row('HP left', num(L.hpLeft), num(R.hpLeft), L.hpLeft, R.hpLeft)}
+      ${duelItems(aState, bState)}
       ${duelChart(res, names)}
-      <p class="hl-duel-note">${res.runs} fights of right-clicks: no abilities, crits or bashes. Both swing at 0.00s;
-        melee heroes block 16 (PRD, 50%); evasion, lifesteal and regen count${drawNote}.</p>`;
+      <p class="hl-duel-note">${res.runs} fights of right-clicks, both swinging at 0.00s: attack point, projectiles,
+        melee block 16 (PRD 50%), evasion, lifesteal, regen and the items' passives count; abilities, talents,
+        cleave and actives do not${drawNote}.</p>`;
+    // the same builds redraw to the same markup: leave the icons in place instead of loading them again
+    if (box.dataset.html !== html) { box.innerHTML = html; box.dataset.html = html; }
   }
   function esc(s) {
     return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -1372,7 +1391,7 @@
       const diffValue = diffPctOn ? (delta === 0 ? 0 : (delta > 0 ? pctAbs : -pctAbs)) : delta;
       const cls = delta > 0 ? 'pos' : delta < 0 ? 'neg' : 'zero';
       const side = delta > 0 ? 'left' : delta < 0 ? 'right' : 'none';
-      return `<div class="hl-diff-row ${cls}" data-adv="${side}" data-diff-key="${key}"
+      return `<div class="hl-diff-row ${cls}" data-adv="${side}" data-diff-key="${key}">
         <strong class="hl-diff-side hl-diff-left">${fmtMetric(key, leftVal)}</strong>
         <span class="hl-diff-center">
           <span class="hl-diff-label">${label}</span>

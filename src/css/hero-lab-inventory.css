@@ -638,3 +638,6 @@
   line-height: 1.35;
   text-align: center;
 }
+.hl-duel-items .hl-diff-side { display: flex; flex-wrap: wrap; gap: 2px; white-space: normal; }
+.hl-duel-items .hl-diff-right { justify-content: flex-end; }
+.hl-duel-items img { width: 22px; height: 16px; object-fit: cover; }
