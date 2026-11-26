@@ -1163,7 +1163,9 @@ _NUKE_FIELDS = (
     '<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Nuke</span>'
     '<input type="checkbox" id="nuke-toggle" class="ua-switch-input">'
     '<span class="ua-switch" aria-hidden="true"></span></label>'
-    '<span class="view-group nuke-group" id="nuke-fields" hidden>'
+    # the boxes keep their place while Nuke is off (invisible, not removed), so switching it never moves the toolbar
+    # (owner 2026-11-26: "nuke не должно делать так, чтобы на другую строку всё сползало")
+    '<span class="view-group nuke-group nuke-off" id="nuke-fields">'
     '<label class="nuke-field"><strong>Magic</strong><input type="text" inputmode="numeric" pattern="[0-9]*" '
     'maxlength="5" id="nuke-mag" class="upg-input nuke-input" value="0" aria-label="Magic damage"></label>'
     '<label class="nuke-field"><strong>Physical</strong><input type="text" inputmode="numeric" pattern="[0-9]*" '
@@ -1180,6 +1182,12 @@ _STATS_TOOLBAR = (
     '<option value="expanded">Expanded</option>'
     '</select>'
     '</span>'
+    # lane creeps: Normal / Super (that lane's enemy barracks down) / Mega (all six down) — LANE_TIERS; beside View
+    # (owner 2026-11-26: "Creeps поставить рядом с view")
+    '<span class="view-group"><strong>Creeps</strong>'
+    '<select class="cal-mode-select" id="lane-tier" aria-label="Lane creeps: normal, super or mega">'
+    '<option value="normal">Normal</option><option value="super">Super</option><option value="mega">Mega</option>'
+    '</select></span>'
     '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
     '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
     'aria-pressed="false" title="Show melee units">'
@@ -1193,18 +1201,14 @@ _STATS_TOOLBAR = (
     # creeps whose camp left the game (REMOVED_CREEPS): hidden until pressed
     '<button type="button" class="hs-attack-filter" id="removed-toggle" aria-pressed="false">'
     '<span>Removed</span></button>'
-    # neutral_upgrade: every 7:30 from the horn, up to 30 steps (src/js/creeps-upgrade.js; owner 2026-11-23)
+    + GROUP_SWITCHES +
+    # neutral_upgrade: every 7:30 from the horn, up to 30 steps (src/js/creeps-upgrade.js; owner 2026-11-23); after the
+    # group switches (owner 2026-11-26)
     '<label class="view-group upg-group"><strong>Upgrade</strong>'
     '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="upgrade-step" class="upg-input" value="0" '
     'aria-label="Creep upgrade number, 0 to 30">'
     '<span class="upg-time" id="upgrade-time">0:00</span></label>'
     + _AURA_BUTTON + _NUKE_FIELDS +
-    # lane creeps: Normal / Super (that lane's enemy barracks down) / Mega (all six down) — LANE_TIERS
-    '<span class="view-group"><strong>Creeps</strong>'
-    '<select class="cal-mode-select" id="lane-tier" aria-label="Lane creeps: normal, super or mega">'
-    '<option value="normal">Normal</option><option value="super">Super</option><option value="mega">Mega</option>'
-    '</select></span>'
-    + GROUP_SWITCHES +
     '</div></div>\n'
 )
 

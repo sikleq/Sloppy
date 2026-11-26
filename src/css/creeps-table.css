@@ -453,7 +453,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .aura-toggle[aria-pressed="true"] .aura-ico { opacity: 1; filter: none; }
 /* Nuke: two damage boxes; the HP cell light green when the unit lives, red when it dies (owner 2026-11-26) */
 .nuke-group { display: inline-flex; align-items: center; gap: 10px; }
-.nuke-group[hidden] { display: none; }
+.nuke-group.nuke-off { visibility: hidden; }   /* its place stays: Nuke on / off never moves the toolbar */
 .nuke-field { display: inline-flex; align-items: center; gap: 6px; }
 .nuke-input { width: 56px; }
 .creeps-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }

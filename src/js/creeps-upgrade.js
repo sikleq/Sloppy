@@ -145,7 +145,10 @@
                `${Math.round(dealt)} of ${Math.round(hp)} HP`;
   }
   if (nukeToggle) {
-    nukeToggle.addEventListener('change', () => { if (nukeFields) nukeFields.hidden = !nukeToggle.checked; apply(); });
+    nukeToggle.addEventListener('change', () => {
+      if (nukeFields) nukeFields.classList.toggle('nuke-off', !nukeToggle.checked);   // invisible, its place kept
+      apply();
+    });
     [nukeMag, nukePhys].forEach(el => el && el.addEventListener('input', () => {
       const v = el.value.replace(/[^0-9]/g, '');
       if (v !== el.value) el.value = v;
