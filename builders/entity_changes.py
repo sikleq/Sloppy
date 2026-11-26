@@ -908,7 +908,7 @@ def _hero_card(e: dict) -> str:
 
 
 _UNIT_CAMP_CACHE = None
-_UNIT_ORDER = ["Small", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Wards", "Objects", "Other"]
+_UNIT_ORDER = ["Small", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Wards", "Other"]
 # Map units with their own Changes page but no camp: Roshan -> "Other"; the Tormentor is
 # reached from its card on structures.html, not listed among the units.
 _UNIT_BUCKET = {"npc_dota_roshan": "Other", "npc_dota_courier": "Other"}
@@ -976,8 +976,9 @@ _SUMMON_UNITS = [
 # heroes/selection ones): the card shows the unit's model art where another unit shares it, else the summoning
 # ability's icon (dota2-ida-researcher, 2026-11-26).
 _SUMMON_ICON = {
-    "npc_dota_beastmaster_thunderhide": "../icons/units/npc_dota_neutral_big_thunder_lizard.png",
-    "npc_dota_broodmother_spiderite": "../icons/units/npc_dota_broodmother_spiderling.png",
+    # these share a model with a neutral / another summon, so a portrait would repeat: the ability's icon tells them apart
+    "npc_dota_beastmaster_thunderhide": "../icons/abilities/beastmaster_summon_thunderhide.png",
+    "npc_dota_broodmother_spiderite": "../icons/abilities/broodmother_spawn_spiderlings.png",
     "npc_dota_wraith_king_skeleton_warrior": "../icons/abilities/skeleton_king_bone_guard.png",  # not the Dark Troll skeleton: the two must differ
     "npc_dota_beastmaster_hawk": "../icons/abilities/beastmaster_summon_raptor.png",
     "npc_dota_clinkz_skeleton_archer": "../icons/abilities/clinkz_burning_army.png",
@@ -1003,7 +1004,8 @@ _SUMMON_BUCKET = {b: "Wards" for b in (
     "npc_dota_venomancer_plague_ward", "npc_dota_shadow_shaman_ward", "npc_dota_pugna_nether_ward",
     "npc_dota_juggernaut_healing_ward", "npc_dota_unit_tombstone",
     "npc_dota_tinker_turret")}
-_SUMMON_BUCKET.update({b: "Objects" for b in (
+# owner 2026-11-26: planted / effect units (cog, mine, trap, spire, nimbus, sun ...) are wards too, no "Objects" column
+_SUMMON_BUCKET.update({b: "Wards" for b in (
     "npc_dota_rattletrap_cog", "npc_dota_techies_land_mine",
     "npc_dota_techies_innate_mine", "npc_dota_templar_assassin_psionic_trap", "npc_dota_lich_ice_spire",
     "npc_dota_zeus_cloud", "npc_dota_phoenix_sun", "npc_dota_grimstroke_ink_creature",

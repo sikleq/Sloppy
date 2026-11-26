@@ -446,7 +446,6 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .aura-toggle[aria-pressed="true"] .aura-ico { opacity: 1; filter: none; }
 /* Nuke: two damage boxes; the HP cell light green when the unit lives, red when it dies (owner 2026-11-26) */
 .nuke-group { display: inline-flex; align-items: center; gap: 6px; }
-.nuke-group.nuke-off { visibility: hidden; }   /* its place stays: Nuke on / off never moves the toolbar */
 .nuke-input { width: 52px; }
 .nuke-input::placeholder { color: var(--text-dimmer); font-weight: 600; }
 .nuke-input.nuke-mag { color: #5fb1ff; }    /* magic: blue, as the damage type on Unit Abilities */
@@ -454,3 +453,39 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .nuke-input.nuke-pure { color: #ead992; }   /* pure: pale gold, as on Unit Abilities */
 .creeps-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }
 .creeps-table td.nuke-dead { background: rgba(224, 103, 90, 0.30); }
+
+/* "Type" field: the Creeps select's look, the ticked groups as its text (builders/creeps_common.py GROUP_SWITCHES) */
+.unit-type-btn { text-align: left; white-space: nowrap; height: 28px; }
+
+/* ---- View: Waves (builders/creeps_waves.py, src/js/creeps-upgrade.js waves) ---- */
+.waves-table { display: none; }
+body.view-waves .waves-table { display: table; border-collapse: collapse; margin: 0 auto; font-variant-numeric: tabular-nums; }
+body.view-waves .creeps-table,
+body.view-waves .sticky-frame,
+body.view-waves .hs-attack-filter-group,
+body.view-waves #removed-toggle,
+body.view-waves .unit-type-group,
+body.view-waves .upg-group { display: none !important; }
+.waves-table thead th {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--bg-panel-3); color: var(--text-bright); font-weight: 600;
+  text-align: center; padding: 6px 10px; white-space: nowrap;
+  box-shadow: inset 0 -2px 0 var(--blue-bright-85);
+}
+.waves-table td { text-align: center; padding: 3px 10px; white-space: nowrap;
+  border-left: 1px solid var(--tbl-col-line); border-bottom: 1px solid var(--tbl-row-line); }
+.waves-table td:first-child, .waves-table th:first-child { border-left: none; }
+.waves-table td.wv-units { text-align: left; }
+/* the count sits ON the icon, bottom-right (owner 2026-11-26: "цифры … лучше на иконке") */
+.waves-table .wv-unit { position: relative; display: inline-block; margin-right: 4px; vertical-align: middle; }
+.waves-table .wv-unit img { width: 28px; height: 28px; object-fit: cover; border-radius: 3px; display: block; }
+.waves-table .wv-unit b {
+  position: absolute; right: 1px; bottom: 0; font-weight: 700; font-size: 12px; line-height: 1;
+  color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 1px 1px 0 #000;
+}
+.waves-table .wv-unit.nuke-dead img { outline: 2px solid rgba(224, 103, 90, 0.9); }
+.waves-table .wv-unit.nuke-live img { outline: 2px solid rgba(126, 201, 107, 0.7); }
+.waves-table td.wv-gold { color: var(--gold); }
+.waves-table td.nuke-live { background: rgba(126, 201, 107, 0.16); }
+.waves-table td.nuke-dead { background: rgba(224, 103, 90, 0.30); }
+.waves-table td.nuke-part { background: rgba(234, 217, 146, 0.18); }

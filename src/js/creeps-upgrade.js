@@ -121,6 +121,7 @@
       put(tr, 'gold', Math.ceil((gmin + gmax) / 2), 0, on);   // rounded up, as the build writes the column
       put(tr, 'xp', base(tr, 'xp') + r.xp, 0, on);
     });
+    waves();
   }
   // What step L adds to a row. Neutrals: neutral_upgrade above. Lane creeps (data-upg, builders/creeps.py
   // LANE_UPGRADE; owner 2026-11-26 "правила другие, не как у нейтралов"): flat per step, HP and damage stop at
@@ -155,15 +156,13 @@
   // ---- Nuke: does the unit survive this much magic + physical damage? (owner 2026-11-26) ----
   // physical after armor: dmg x (1 - 0.06a / (1 + 0.06|a|)); magic after resistance: dmg x (1 - mr). The HP cell
   // turns light green when the unit lives, red when it dies; its title says what armor and resistance blocked.
-  const nukeToggle = document.getElementById('nuke-toggle');
-  const nukeFields = document.getElementById('nuke-fields');
   const nukeMag = document.getElementById('nuke-mag'), nukePhys = document.getElementById('nuke-phys');
   const nukePure = document.getElementById('nuke-pure');      // pure: nothing blocks it
   const nukeVal = el => { const v = Math.round(Number(el && el.value)); return isFinite(v) && v > 0 ? v : 0; };
   function nukeCell(td, hp, armor, mr) {
     if (!td) return;
     const mag = nukeVal(nukeMag), phys = nukeVal(nukePhys), pure = nukeVal(nukePure);
-    const on = !!(nukeToggle && nukeToggle.checked) && (mag || phys || pure) && isFinite(hp);
+    const on = !!(mag || phys || pure) && isFinite(hp);
     td.classList.toggle('nuke-live', false);
     td.classList.toggle('nuke-dead', false);
     if (!on) { if (td.dataset.nukeTitle !== undefined) { td.removeAttribute('title'); delete td.dataset.nukeTitle; } return; }
@@ -178,17 +177,80 @@
                `pure ${pure}: ` +
                `${Math.round(dealt)} of ${Math.round(hp)} HP`;
   }
-  if (nukeToggle) {
-    nukeToggle.addEventListener('change', () => {
-      if (nukeFields) nukeFields.classList.toggle('nuke-off', !nukeToggle.checked);   // invisible, its place kept
-      apply();
-    });
-    [nukeMag, nukePhys, nukePure].forEach(el => el && el.addEventListener('input', () => {
-      const v = el.value.replace(/[^0-9]/g, '');
-      if (v !== el.value) el.value = v;
-      apply();
-    }));
+  // always open (owner 2026-11-26): it counts once a box holds a number
+  [nukeMag, nukePhys, nukePure].forEach(el => el && el.addEventListener('input', () => {
+    const v = el.value.replace(/[^0-9]/g, '');
+    if (v !== el.value) el.value = v;
+    apply();
+  }));
+  // ---- View: Waves (owner 2026-11-26; builders/creeps_waves.py) ----
+  // Each wave row carries its unit counts and its own upgrade step; the numbers are the lane rows' of the Creeps
+  // choice (Normal / Super / Mega) at that step, by the same rule() as the table. A wave with a flagbearer has its
+  // Inspiration Aura on every unit (in the game it reaches its own wave); the aura button puts it on every wave.
+  // Nuke: how many of the wave's units the damage kills ("4/6"); each unit's icon framed red / green.
+  const wavesTable = document.querySelector('.waves-table');
+  const tierSel = document.getElementById('lane-tier');
+  const WAVE_KINDS = {melee: 'lane_melee', flag: 'lane_flagbearer', ranged: 'lane_ranged', siege: 'lane_siege'};
+  function unitAt(tr, L, auraMr) {
+    const r = rule(tr, L);
+    const hp = base(tr, 'hp') + r.hp, armor = base(tr, 'armor') + r.armor;
+    const mrOwn = (base(tr, 'magres') + own(tr, 'magres', base(tr, 'magres'))) / 100;
+    return {hp: hp + own(tr, 'hp', hp), armor: armor + own(tr, 'armor', armor),
+            mr: 1 - (1 - (isFinite(mrOwn) ? mrOwn : 0)) * (1 - auraMr),
+            dmg: base(tr, 'dmg_avg') + r.dmg,
+            gold: (base(tr, 'gold_min') + r.gmin + base(tr, 'gold_max') + r.gmax) / 2,
+            xp: base(tr, 'xp') + r.xp};
   }
+  function nukeDealt(armor, mr) {
+    const mag = nukeVal(nukeMag), phys = nukeVal(nukePhys), pure = nukeVal(nukePure);
+    if (!(mag || phys || pure)) return null;
+    const a = isFinite(armor) ? armor : 0;
+    return phys * (1 - 0.06 * a / (1 + 0.06 * Math.abs(a))) + mag * (1 - mr) + pure;
+  }
+  function waves() {
+    if (!wavesTable) return;
+    const tier = tierSel ? tierSel.value : 'normal';
+    const rowOf = {};
+    Object.entries(WAVE_KINDS).forEach(([k, id]) => {
+      rowOf[k] = document.getElementById('unit-' + id + (tier === 'normal' ? '' : '_' + tier));
+    });
+    wavesTable.querySelectorAll('tbody tr').forEach(tr => {
+      const L = Number(tr.dataset.step);
+      const hasFlag = Number(tr.dataset.flag) > 0;
+      const auraMr = (hasFlag || auraOn()) && AURA ? AURA.step * Math.min(L, AURA.max) / 100 : 0;
+      const sum = {hp: 0, dmg: 0, gold: 0, xp: 0};
+      let units = 0, killed = 0, nukeOn = false;
+      Object.keys(WAVE_KINDS).forEach(k => {
+        const n = Number(tr.dataset[k]) || 0;
+        const chip = tr.querySelector(`.wv-unit[data-kind="${k}"]`);
+        if (!n || !rowOf[k]) return;
+        const u = unitAt(rowOf[k], L, auraMr);
+        ['hp', 'dmg', 'gold', 'xp'].forEach(s => { sum[s] += n * (isFinite(u[s]) ? u[s] : 0); });
+        units += n;
+        const dealt = nukeDealt(u.armor, u.mr);
+        if (chip) {
+          chip.classList.remove('nuke-dead', 'nuke-live');
+          chip.title = `${chip.querySelector('img').alt}: ${Math.round(u.hp)} HP, ${fmt(u.armor, 1)} armor, ` +
+                       `${Math.round(u.mr * 100)}% magic resistance`;
+        }
+        if (dealt === null) return;
+        nukeOn = true;
+        const dies = dealt >= u.hp;
+        if (dies) killed += n;
+        if (chip) chip.classList.add(dies ? 'nuke-dead' : 'nuke-live');
+      });
+      const td = k => tr.querySelector('td.wv-' + k);
+      td('hp').textContent = Math.round(sum.hp);
+      td('dmg').textContent = Math.round(sum.dmg);
+      td('gold').textContent = Math.round(sum.gold);
+      td('xp').textContent = Math.round(sum.xp);
+      const kc = td('kill');
+      kc.classList.remove('nuke-dead', 'nuke-live', 'nuke-part');
+      kc.textContent = nukeOn ? `${killed}/${units}` : '';
+      if (nukeOn) kc.classList.add(killed === units ? 'nuke-dead' : killed ? 'nuke-part' : 'nuke-live');
+    });
+  }
+  if (tierSel) tierSel.addEventListener('change', waves);
   input.addEventListener('input', apply);
   input.addEventListener('change', apply);
   apply();

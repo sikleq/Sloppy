@@ -76,11 +76,15 @@ def test_every_row_has_a_group_and_lane_rows_their_upgrade_rule():
     assert upg == {"hp": 12, "dmg": 2, "gold": 3, "xp": 8, "cap": 30}       # ranged creep per 7:30 step
 
 
-def test_switches_on_both_pages_start_on():
+def test_type_dropdown_on_both_pages_summons_start_off():
+    # owner 2026-11-26: the switches went into a "Type" dropdown; Summons off by default
     from builders import creeps, creeps_abilities
     for bar in (creeps._STATS_TOOLBAR, creeps_abilities._UA_TOOLBAR):
-        for key in ("neutral", "lane", "summon"):
+        assert 'class="hd-dd unit-type-dd"' in bar and '<strong>Type</strong>' in bar
+        assert 'class="cal-mode-select unit-type-btn"' in bar        # looks like the Creeps select
+        for key in ("neutral", "lane"):
             assert re.search(rf'data-unit-group="{key}" checked', bar), key
+        assert 'data-unit-group="summon">' in bar
 
 
 def test_lane_rows_grow_by_their_own_rule_in_the_script():
@@ -121,7 +125,9 @@ def test_aura_button_carries_the_game_values_and_the_script_stacks_resistance():
 def test_nuke_has_two_damage_boxes_and_marks_life_or_death():
     from builders import creeps
     bar = creeps._STATS_TOOLBAR
-    assert 'id="nuke-toggle"' in bar and 'id="nuke-mag"' in bar and 'id="nuke-phys"' in bar
+    # always open, captioned like View / Creeps / Type, no switch (owner 2026-11-26)
+    assert 'id="nuke-toggle"' not in bar and "<strong>Nuke</strong>" in bar
+    assert 'id="nuke-mag"' in bar and 'id="nuke-phys"' in bar and 'id="nuke-pure"' in bar
     js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
     assert "0.06 * a / (1 + 0.06 * Math.abs(a))" in js and "mag * (1 - m)" in js
     assert "dealt >= hp ? 'nuke-dead' : 'nuke-live'" in js
@@ -134,13 +140,21 @@ def test_nuke_has_two_damage_boxes_and_marks_life_or_death():
     assert 'placeholder="Mag"' in bar and 'placeholder="Phys"' in bar and "<strong>Magic" not in bar
 
 
-def test_unit_changes_sorts_summons_into_three_columns():
+def test_unit_changes_sorts_summons_into_two_columns():
     from builders import entity_changes as ec
-    assert ec._UNIT_ORDER.index("Summons") < ec._UNIT_ORDER.index("Wards") < ec._UNIT_ORDER.index("Objects")
+    assert ec._UNIT_ORDER.index("Summons") < ec._UNIT_ORDER.index("Wards") and "Objects" not in ec._UNIT_ORDER
     names = dict(ec._SUMMON_UNITS)
     assert "npc_dota_lone_druid_bear1" not in names and "npc_dota_elder_titan_ancestral_spirit" not in names
     assert ec._SUMMON_BUCKET["npc_dota_pugna_nether_ward"] == "Wards"
-    assert ec._SUMMON_BUCKET["npc_dota_rattletrap_cog"] == "Objects"
+    # owner 2026-11-26: nimbus, power cog, proximity mine, homing missile, sun, psionic trap, ice spire ... are wards
+    for b in ("npc_dota_rattletrap_cog", "npc_dota_zeus_cloud", "npc_dota_techies_land_mine", "npc_dota_gyrocopter_homing_missile",
+              "npc_dota_phoenix_sun", "npc_dota_templar_assassin_psionic_trap", "npc_dota_lich_ice_spire"):
+        assert ec._SUMMON_BUCKET[b] == "Wards", b
+    assert ec._SUMMON_BUCKET.get("npc_dota_broodmother_spiderling", "Summons") == "Summons"
+    assert set(ec._SUMMON_BUCKET.values()) == {"Wards"}
+    icon = lambda b: ec._SUMMON_ICON.get(b, f"../icons/units/{b}.png")
+    assert icon("npc_dota_broodmother_spiderling") != icon("npc_dota_broodmother_spiderite")
+    assert icon("npc_dota_beastmaster_thunderhide") != "../icons/units/npc_dota_neutral_big_thunder_lizard.png"
     for basename, icon in ec._SUMMON_ICON.items():
         assert (ROOT / icon.replace("../", "")).exists(), (basename, icon)
 
@@ -183,3 +197,18 @@ def test_timeline_plain_and_redirects_keep_the_anchor():
     from builders import creeps, creeps_abilities
     assert "location.hash" in creeps._STATS_REDIRECT_HTML and "location.hash" in creeps_abilities.UA_REDIRECT_HTML
     assert 'data-tooltip="Inspiration Aura"' in creeps._AURA_BUTTON
+
+
+def test_every_unit_card_icon_exists_in_dist():
+    import pytest
+    import re
+    html = ROOT / "dist" / "unit_changes.html"
+    if not html.exists():
+        pytest.skip("site not built")
+    cards = re.findall(r'<a[^>]*ec-card[^>]*>.*?</a>', html.read_text(encoding="utf-8"), re.S)
+    assert cards
+    for card in cards:
+        src = re.search(r'src="([^"]+)"', card).group(1)
+        assert (ROOT / "dist" / src).exists(), src
+    spider = {re.search(r'src="([^"]+)"', c).group(1) for c in cards if "broodmother spider" in c}
+    assert len(spider) == 2

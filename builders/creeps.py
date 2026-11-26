@@ -1238,12 +1238,9 @@ _AURA_BUTTON = _aura_button()
 # Nuke (owner 2026-11-26): magic and physical damage in two boxes; every row's HP cell turns light green when the
 # unit survives, red when it dies — after its armor and magic resistance at the chosen step (src/js/creeps-upgrade.js)
 _NUKE_FIELDS = (
-    '<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Nuke</span>'
-    '<input type="checkbox" id="nuke-toggle" class="ua-switch-input">'
-    '<span class="ua-switch" aria-hidden="true"></span></label>'
-    # the boxes keep their place while Nuke is off (invisible, not removed), so switching it never moves the toolbar
-    # (owner 2026-11-26: "nuke не должно делать так, чтобы на другую строку всё сползало")
-    '<span class="view-group nuke-group nuke-off" id="nuke-fields">'
+    # always open, a caption like View / Creeps / Type (owner 2026-11-26: "nuke пусть всегда открыто"); it counts
+    # as soon as a box holds a number
+    '<span class="view-group nuke-group" id="nuke-fields"><strong>Nuke</strong>'
     # no words beside the boxes (owner 2026-11-26: the toolbar grew a second row): a grey hint inside each, the
     # number in its damage type's colour — magic blue, physical red, as on Unit Abilities
     '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" id="nuke-mag" '
@@ -1264,6 +1261,7 @@ _STATS_TOOLBAR = (
     '<option value="standard">Standard</option>'
     '<option value="expanded">Expanded</option>'
     '<option value="timeline">Timeline</option>'   # every stat at each 7:30 step (TL_STATS)
+    '<option value="waves">Waves</option>'         # every lane wave to 60:00 (builders/creeps_waves.py)
     '</select>'
     '</span>'
     # lane creeps: Normal / Super (that lane's enemy barracks down) / Mega (all six down) — LANE_TIERS; beside View
@@ -1272,6 +1270,7 @@ _STATS_TOOLBAR = (
     '<select class="cal-mode-select" id="lane-tier" aria-label="Lane creeps: normal, super or mega">'
     '<option value="normal">Normal</option><option value="super">Super</option><option value="mega">Mega</option>'
     '</select></span>'
+    + GROUP_SWITCHES +    # "Type" beside Creeps (owner 2026-11-26)
     '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
     '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
     'aria-pressed="false" title="Show melee units">'
@@ -1284,8 +1283,7 @@ _STATS_TOOLBAR = (
     '</span>'
     # creeps whose camp left the game (REMOVED_CREEPS): hidden until pressed
     '<button type="button" class="hs-attack-filter" id="removed-toggle" aria-pressed="false">'
-    '<span>Removed</span></button>'
-    + GROUP_SWITCHES +
+    '<span>Removed</span></button>' +
     # neutral_upgrade: every 7:30 from the horn, up to 30 steps (src/js/creeps-upgrade.js; owner 2026-11-23); after the
     # group switches (owner 2026-11-26)
     '<label class="view-group upg-group"><strong>Upgrade</strong>'
@@ -1315,6 +1313,9 @@ _STATS_REDIRECT_HTML = (
 )
 
 
+import builders.creeps_waves as _creeps_waves  # noqa: E402  (View: Waves)
+
+
 def stats_page_html(body_parts, asset_version):
     # Materials sub-tabs are embedded directly into the site header now
     # (subtabs_active), so there's no separate strip below it to freeze on
@@ -1333,6 +1334,7 @@ def stats_page_html(body_parts, asset_version):
         f'<tr class="col-row">{_stats_thead()}</tr></thead>\n'
         f'<tbody>\n{chr(10).join(body_parts)}\n</tbody>\n'
         '</table>\n'
+        + _creeps_waves.waves_table_html({key: f'icons/units/{npc}.png' for key, npc, _name in LANE_CREEPS})
     )
     return page_shell('Unit Stats', nav, inner, asset_version)
 
