@@ -230,7 +230,8 @@
       if (va === null) return 1;          // empties always last
       if (vb === null) return -1;
       if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
-      return String(va).localeCompare(String(vb)) * dir;
+      // text: the first click ("best first", dir -1) is A→Z, not Z→A (owner 2026-11-27, Unit column)
+      return String(va).localeCompare(String(vb)) * -dir;
     });
     const snap = snapAnims(rows);
     rows.forEach(tr => tbody.appendChild(tr));

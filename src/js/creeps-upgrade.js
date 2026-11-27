@@ -115,8 +115,11 @@
         // the step's armor less "−Armor" on show; Nuke takes the box off by itself, so it reads the build's number
         if (ta) {
           if (ta.dataset.base === undefined) ta.dataset.base = ta.textContent.trim();
-          const b = num(ta.dataset.base);
-          ta.textContent = cut && isFinite(b) ? fmt(b - cut, 1) : ta.dataset.base;
+          // "own (with its own aura)" keeps both numbers (Black Dragon, Enraged Wildkin; owner 2026-11-27)
+          const [p0, p1] = ta.dataset.base.split('(');
+          const b = num(p0), b2 = p1 === undefined ? NaN : num(p1);
+          ta.textContent = cut && isFinite(b)
+            ? fmt(b - cut, 1) + (isFinite(b2) ? ` (${fmt(b2 - cut, 1)})` : '') : ta.dataset.base;
           ta.classList.toggle('upg-on', !!cut && isFinite(b));
         }
         const hi = num(th.textContent), ai = ta ? num(ta.dataset.base) : 0;

@@ -203,6 +203,16 @@ Item Potency, Dormant Curio, AoE Increase, Terrain Stats) и таблицы ме
   (`width:0; padding:0; font-size:0`), не `display:none` (строка групп его считает). Ряд карточек листается вбок.
 
 **Грабли, на которых уже спотыкались (не повторять)**
+- Unit Stats / Unit Changes (2026-11-27, проверка Fable 5.2 + владелец): первый клик по столбцу Unit сортировал Z→A —
+  текст первым кликом идёт A→Z (`mana-items.js`, `creeps-table.js`); на 1600 px таблица была шире блока на 65 px —
+  поля ячеек 6px, заголовков 4px (`table-marks.css`); тулбар на телефоне занимал 6 строк — 4 строки, Melee / Ranged
+  одними значками (`creeps-table.css`); Type «Piercing» ставился всем дальнобойным, а в игре его даёт способность
+  `creep_piercing` (у Ice Shaman, Thunderhide, Black Dragon её нет); в Timeline у юнитов со своей аурой нужно «x (y)», как
+  в Standard. Второй столбец призывов на Unit Changes — «Wards/Objects» (Phantom, Ignis Fatuus там).
+- Пустой GENERAL (2026-11-27, 7.42 Nyx: «в General пустота»): все строки блока скрыты под карточкой (covered) —
+  блок прячется целиком (`patch/general_rows.hide_general_all_covered`), строки остаются для фильтров и весов.
+- Hero Stats Expanded (2026-11-27): «Dmg lvl» после Dmg min / max — урон за уровень от прироста атрибутов (у Universal —
+  множитель на сумму трёх приростов).
 - Фильтры страницы героя / предмета (2026-11-24): «сделай теги, как на странице патчей» — карточка `filter-pop ec-rail`
   справа, кнопка фильтров в `corner-dock`; выбран вариант «сетка значков» (у Brewmaster список с именами не влезал);
   «shard/scepter без Aghanim слова и с квадратным чекбоксом, как и везде». Карточка стоит под шапкой (`top:130px`), а не

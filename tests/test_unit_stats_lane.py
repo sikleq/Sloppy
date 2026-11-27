@@ -57,7 +57,7 @@ def test_lane_creep_passives_say_what_they_do_from_the_game_values():
     cur = json.loads((ROOT / "data" / "stats" / "7.42a" / "npc_abilities.json").read_text(encoding="utf-8"))
     assert ua.abil_props("creep_irresolute", cur)["effect"] == "-25% damage to heroes"
     siege = ua.abil_props("creep_siege", cur)
-    assert siege["effect"] == "+150% damage to buildings and siege creeps"
+    assert siege["effect"] == "+150% damage to buildings and other Reinforced units"
     assert siege["effect2"] == "-50% attack damage from heroes"
     flag = ua.abil_props("flagbearer_creep_aura_effect", cur)
     assert flag["effect"] == "+3 HP regen to allied creeps"
@@ -153,16 +153,18 @@ def test_nuke_has_two_damage_boxes_and_marks_life_or_death():
 
 def test_unit_changes_sorts_summons_into_two_columns():
     from builders import entity_changes as ec
-    assert ec._UNIT_ORDER.index("Summons") < ec._UNIT_ORDER.index("Wards") and "Objects" not in ec._UNIT_ORDER
+    # owner 2026-11-27: the second column is "Wards/Objects"; Phantom and Ignis Fatuus stay in it
+    assert ec._UNIT_ORDER.index("Summons") < ec._UNIT_ORDER.index("Wards/Objects") and "Wards" not in ec._UNIT_ORDER
     names = dict(ec._SUMMON_UNITS)
     assert "npc_dota_lone_druid_bear1" not in names and "npc_dota_elder_titan_ancestral_spirit" not in names
-    assert ec._SUMMON_BUCKET["npc_dota_pugna_nether_ward"] == "Wards"
+    assert ec._SUMMON_BUCKET["npc_dota_pugna_nether_ward"] == "Wards/Objects"
+    assert ec._SUMMON_BUCKET["npc_dota_grimstroke_ink_creature"] == ec._SUMMON_BUCKET["npc_dota_ignis_fatuus"] == "Wards/Objects"
     # owner 2026-11-26: nimbus, power cog, proximity mine, homing missile, sun, psionic trap, ice spire ... are wards
     for b in ("npc_dota_rattletrap_cog", "npc_dota_zeus_cloud", "npc_dota_techies_land_mine", "npc_dota_gyrocopter_homing_missile",
               "npc_dota_phoenix_sun", "npc_dota_templar_assassin_psionic_trap", "npc_dota_lich_ice_spire"):
-        assert ec._SUMMON_BUCKET[b] == "Wards", b
+        assert ec._SUMMON_BUCKET[b] == "Wards/Objects", b
     assert ec._SUMMON_BUCKET.get("npc_dota_broodmother_spiderling", "Summons") == "Summons"
-    assert set(ec._SUMMON_BUCKET.values()) == {"Wards"}
+    assert set(ec._SUMMON_BUCKET.values()) == {"Wards/Objects"}
     icon = lambda b: ec._SUMMON_ICON.get(b, f"../icons/units/{b}.png")
     assert icon("npc_dota_broodmother_spiderling") != icon("npc_dota_broodmother_spiderite")
     assert icon("npc_dota_beastmaster_thunderhide") != "../icons/units/npc_dota_neutral_big_thunder_lizard.png"
@@ -223,3 +225,39 @@ def test_every_unit_card_icon_exists_in_dist():
         assert (ROOT / "dist" / src).exists(), src
     spider = {re.search(r'src="([^"]+)"', c).group(1) for c in cards if "broodmother spider" in c}
     assert len(spider) == 2
+
+
+def test_attack_type_piercing_only_with_the_ability():
+    # owner 2026-11-27 (Fable check): Piercing comes from the creep_piercing ability, not from a ranged attack
+    from builders.creeps import _attack_type
+    ranged = {'AttackCapabilities': 'DOTA_UNIT_CAP_RANGED_ATTACK'}
+    assert _attack_type({**ranged, 'Ability1': 'ice_shaman_incendiary_bomb', 'Ability2': 'neutral_upgrade'}) == 'Default'
+    assert _attack_type({**ranged, 'Ability1': 'creep_piercing'}) == 'Piercing'
+    assert _attack_type({'AttackCapabilities': 'DOTA_UNIT_CAP_MELEE_ATTACK', 'Ability2': 'creep_piercing'}) == 'Piercing'
+
+
+def test_text_columns_first_click_sorts_a_to_z():
+    # owner 2026-11-27 (Fable check): the first click on Unit sorted Z→A
+    js = (ROOT / "src" / "js" / "creeps-table.js").read_text(encoding="utf-8")
+    assert "return String(va).localeCompare(String(vb)) * -dir;" in js
+    mi = (ROOT / "src" / "js" / "mana-items.js").read_text(encoding="utf-8")
+    assert "return dir === 'asc' ? sb.localeCompare(sa) : sa.localeCompare(sb);" in mi
+
+
+def test_timeline_shows_own_aura_second_number():
+    # owner 2026-11-27 (Fable check): Timeline had no "x (y)" for a unit whose own aura buffs the stat
+    from builders import creeps as cr
+    op, val = cr.aura_self_value(*cr.AURA_SELF['enraged']['armor'])
+    d = {'createhero': 'enraged', 'armor': '4 (6)'}
+    cell = cr._tl_cell('tl_armor_2', d)
+    assert f'>5 ({cr.fmt_num(cr._aura_total(5.0, op, val))})</td>' in cell
+    plain = cr._tl_cell('tl_hp_0', {'createhero': 'kobold', 'hp': '240'})
+    assert '(' not in plain
+
+
+def test_phone_toolbar_is_compact():
+    # owner 2026-11-27 (Fable check): the toolbar took 6 lines on a phone; and the table fits 1600 px
+    css = (ROOT / "src" / "css" / "creeps-table.css").read_text(encoding="utf-8")
+    assert ".hs-attack-filter > span:not(.atk-badge) {" in css and "select.cal-mode-select {" in css
+    marks = (ROOT / "src" / "css" / "table-marks.css").read_text(encoding="utf-8")
+    assert "padding: 5px 6px;" in marks and "padding: 6px 4px;" in marks

@@ -60,8 +60,9 @@
         if (typeof va === 'number' && typeof vb === 'number') {
           return dir === 'asc' ? va - vb : vb - va;
         }
+        // text: the first click ("best first") is A→Z, not Z→A (owner 2026-11-27, Unit column)
         const sa = String(va), sb = String(vb);
-        return dir === 'asc' ? sa.localeCompare(sb) : sb.localeCompare(sa);
+        return dir === 'asc' ? sb.localeCompare(sa) : sa.localeCompare(sb);
       });
       blocks.forEach(g => g.forEach(r => tbody.appendChild(r)));
     }

@@ -647,7 +647,8 @@ KV_EFFECTS = {
     'creep_irresolute': (
         ('effect', '{hero_damage_penalty}% damage to heroes'),),
     'creep_siege': (
-        ('effect', '+{bonus_building_damage}% damage to buildings and siege creeps'),
+        # the game's own words: Reinforced units deal bonus damage to other Reinforced units and buildings
+        ('effect', '+{bonus_building_damage}% damage to buildings and other Reinforced units'),
         ('effect2', '{incoming_hero_damage_penalty}% attack damage from heroes'),
         ('effect3', '{incoming_basic_damage_penalty}% from creeps, {incoming_controlled_unit_penalty}% from '
                     'controlled units')),

@@ -328,7 +328,7 @@
   color: var(--text-bright);
   font-weight: 600;
   text-align: center;
-  padding: 6px 6px;
+  padding: 6px 4px;      /* 4px / 6px sides: Standard fits a 1600 px window (owner 2026-11-27, was 65 px wider) */
   border-bottom: 1px solid var(--muted-35);
   white-space: nowrap;
   line-height: 1.2;
@@ -351,7 +351,7 @@
   line-height: 0;
 }
 .creeps-table tbody td {
-  padding: 5px 8px;
+  padding: 5px 6px;
   border-bottom: 1px solid var(--tbl-row-line);
   /* Single-line cells: every value is short (numbers, %, "Ближняя (100)",
      ability dnames like "Envenomed Weapon"). nowrap lets table-layout:
