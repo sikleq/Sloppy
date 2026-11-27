@@ -21,7 +21,8 @@ def test_only_sure_entries():
             "beastmaster_raptor_4"} <= keys
     # numbers that depend on the hero (Enigma's HP, hero level) and units the game does not summon
     assert not keys & {"enigma_eidolon_1", "chen_zealot", "warlock_minor_imp", "clinkz_skeleton_walk",
-                       "book_of_the_dead_warrior_1", "enigma_eidolon_5", "warlock_major_imp", "brewmaster_void_1"}
+                       "book_of_the_dead_warrior_1", "enigma_eidolon_5", "warlock_major_imp", "brewmaster_void_1",
+                       "broodmother_spiderite"}   # Spawn Spiderite makes a plain spiderling (server.dll 6997)
 
 
 def test_confirmed_numbers_from_server_dll():
@@ -83,6 +84,13 @@ def test_summon_rows_on_the_page_do_not_grow_and_start_hidden():
     assert "tr.dataset.group !== 'lane' && tr.dataset.upg === undefined" in js
     from builders.creeps_common import unit_group, UNIT_GROUPS_OFF
     assert unit_group("summon_lycan_wolf_1") == "summon" and "summon" in UNIT_GROUPS_OFF
+
+
+def test_summon_ability_cells_never_merge():
+    # owner 2026-11-27: "неправильно выделяется" - one Flaming Fists cell over six golem names broke the gold frame
+    js = (ROOT / "src" / "js" / "creeps-table.js").read_text(encoding="utf-8")
+    assert "if (rows[i].dataset.group === 'summon') { i++; continue; }" in js
+    assert "rows[j].dataset.group !== 'summon'" in js
 
 
 def test_summons_do_not_grow_in_the_timeline():

@@ -638,7 +638,8 @@
    "dmg_min",
    "dmg_max"
   ],
-  "note": "All numbers are plain KV; the ability only sets duration 40. Not known whether the Spawn Spiderlings damage_bonus also applies to spiderites."
+  "not_in_game": true,
+  "note": "Not summoned in 7.42a: Spawn Spiderite makes one plain spiderling (npc_dota_broodmother_spiderling, with the Spawn Spiderlings hp_bonus / damage_bonus) when the debuffed target dies; the spiderite unit name is only compared in code (server.dll 6997, dota2-ida-researcher 2026-11-27)."
  },
  {
   "key": "visage_familiar_1",

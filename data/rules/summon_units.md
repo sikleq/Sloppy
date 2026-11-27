@@ -43,6 +43,7 @@
 | Warlock Imp minor | HP 5 + 15·L, скорость 297 + 3·L | `sure: false`: зависит от уровня Варлока |
 | Clinkz скелеты | оба вида одинаковые: 2 пипа, BAT 1.6, 20% урона Клинкза | `sure: false`: урон от Клинкза |
 | `enigma_eidolon_5`, Major imp, Void Brewling | в игре 7.42a не появляются | `not_in_game: true` |
+| Spiderite | Spawn Spiderite создаёт обычного паучка (`npc_dota_broodmother_spiderling`) с бонусами Spawn Spiderlings; юнит `npc_dota_broodmother_spiderite` код только сравнивает по имени, не создаёт | `not_in_game: true`, его роль — строки Spiderling |
 
 Полный разбор с адресами: заметка сессии `summons_confirm_742a.md` (папка заметок сессий, не в репозитории).
 
