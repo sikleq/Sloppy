@@ -510,3 +510,16 @@ body.view-waves .upg-group { display: none !important; }
 .waves-table td.wv-none { opacity: 0.35; }
 /* part of the wave dies: a clear amber, not a pale beige that read as red on the dark rows (owner 2026-11-26) */
 .waves-table td.nuke-part { background: rgba(240, 190, 60, 0.38); }
+
+/* Unit Stats toolbar on a phone: 4 lines, not 6 (owner 2026-11-27, the Fable check). Selects as wide as their words,
+   tighter sides, Melee / Ranged as their icons only (the title still names them). */
+@media (max-width: 760px) {
+  body:has(.creeps-table) .toolbar-panel { padding-left: 8px; padding-right: 8px; }
+  body:has(.creeps-table) .toolbar-panel .view-group { gap: 6px; }
+  body:has(.creeps-table) .toolbar-panel > .view-group + .view-group,
+  body:has(.creeps-table) .toolbar-panel > .hs-attack-filter-group { padding-left: 6px; }
+  body:has(.creeps-table) .toolbar-panel select.cal-mode-select {
+    width: auto; min-width: 0; padding-left: 8px; padding-right: 24px; }
+  body:has(.creeps-table) .toolbar-panel .hs-attack-filter-group .hs-attack-filter > span:not(.atk-badge) {
+    display: none; }
+}

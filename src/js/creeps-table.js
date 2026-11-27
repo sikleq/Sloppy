@@ -179,11 +179,14 @@
         // lane creep rows never merge: their Normal / Super / Mega rows sit side by side, one set hidden, and a run
         // across a hidden row left a visible row short of a cell (Fable 5.2 review 2026-11-26)
         if (rows[i].dataset.laneTier) { i++; continue; }
+        // hero summons never merge: Golem 1..3 and Aghanim 1..3 share Flaming Fists, and one cell over six names
+        // broke the selected row's gold frame (owner 2026-11-27: "неправильно выделяется")
+        if (rows[i].dataset.group === 'summon') { i++; continue; }
         // Shared auras stay per-unit: each frog keeps its own cell so a row
         // click highlights it (merging would rowspan 4 frogs into one block).
         if (name === 'Riverborn Aura') { i++; continue; }
         let j = i + 1;
-        while (j < rows.length && rows[j].children[idx] && !rows[j].dataset.laneTier &&
+        while (j < rows.length && rows[j].children[idx] && !rows[j].dataset.laneTier && rows[j].dataset.group !== 'summon' &&
                rows[j].children[idx].dataset.name === name) j++;
         if (j - i > 1) {
           td.rowSpan = j - i;
@@ -230,7 +233,8 @@
       if (va === null) return 1;          // empties always last
       if (vb === null) return -1;
       if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
-      return String(va).localeCompare(String(vb)) * dir;
+      // text: the first click ("best first", dir -1) is A→Z, not Z→A (owner 2026-11-27, Unit column)
+      return String(va).localeCompare(String(vb)) * -dir;
     });
     const snap = snapAnims(rows);
     rows.forEach(tr => tbody.appendChild(tr));

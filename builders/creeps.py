@@ -467,9 +467,11 @@ class UnitStats(NamedTuple):
 
 
 def _attack_type(npc):
-    """Ranged attack capability → "Piercing", else "Default"."""
-    cap = npc.get('AttackCapabilities', '')
-    return 'Piercing' if 'RANGED' in cap else 'Default'
+    """"Piercing" when the unit has the `creep_piercing` ability (the game's way since 7.41c: "Replacing legacy
+    Piercing Attack Type"), else "Default". Not every ranged unit pierces: 7.42a Ice Shaman, Thunderhides, Black
+    Dragon … have no such ability (owner 2026-11-27, the Fable check; it was "every ranged unit")."""
+    abilities = {str(v).strip() for k, v in npc.items() if re.fullmatch(r'Ability\d+', k)}
+    return 'Piercing' if 'creep_piercing' in abilities else 'Default'
 
 
 def _attack_range_label(npc):
@@ -1009,6 +1011,8 @@ def timeline_value(d, stat, step):
     creep by its LANE_UPGRADE (HP and damage to its cap, mega's floor; gold every step; no armor or attack speed;
     without an entry — siege — it does not grow). None when the row has no such number."""
     ch = (d.get('createhero') or '').strip()
+    if unit_group(ch) == 'summon':     # a hero / item summon does not grow with the creep upgrade (2026-11-27)
+        step = 0
     lane = unit_group(ch) == 'lane'
     u = LANE_UPGRADE.get(ch, {}) if lane else {}
     if stat == 'gold':
@@ -1037,7 +1041,14 @@ def timeline_value(d, stat, step):
 def _tl_cell(k, d):
     _, stat, step = k.split('_')
     v = timeline_value(d, stat, int(step))
-    text = DASH if v is None else (str(int(round(v))) if stat in ('hp', 'as') else fmt_num(v))
+    show = (lambda x: str(int(round(x)))) if stat in ('hp', 'as') else fmt_num
+    text = DASH if v is None else show(v)
+    # a unit whose own aura buffs this stat: "own (with its aura)" as in the Standard view (owner 2026-11-27, the Fable
+    # check: Timeline had no second number); a % aura scales the grown number, a flat one adds
+    spec = AURA_SELF.get((d.get('createhero') or '').strip(), {}).get(stat)
+    resolved = aura_self_value(*spec) if spec and v is not None else None
+    if resolved:
+        text += f' ({show(_aura_total(v, *resolved))})'
     sort = '' if v is None else f' data-sort="{v:g}"'
     return f'<td class="{_col_cls(k)}"{sort}>{text}</td>'
 

@@ -908,7 +908,7 @@ def _hero_card(e: dict) -> str:
 
 
 _UNIT_CAMP_CACHE = None
-_UNIT_ORDER = ["Small", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Wards", "Other"]
+_UNIT_ORDER = ["Small", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Wards/Objects", "Other"]
 # Map units with their own Changes page but no camp: Roshan -> "Other"; the Tormentor is
 # reached from its card on structures.html, not listed among the units.
 _UNIT_BUCKET = {"npc_dota_roshan": "Other", "npc_dota_courier": "Other"}
@@ -999,13 +999,15 @@ _SUMMON_ICON = {
     "npc_dota_ignis_fatuus": "../icons/abilities/keeper_of_the_light_will_o_wisp.png",
     "npc_dota_unit_tidehunter_anchor": "../icons/abilities/tidehunter_dead_in_the_water.png",
 }
-# column of a summon card (owner 2026-11-26: "по этим категориям"); not listed = "Summons" (units that fight)
-_SUMMON_BUCKET = {b: "Wards" for b in (
+# column of a summon card (owner 2026-11-26: "по этим категориям"); not listed = "Summons" (units that fight).
+# owner 2026-11-27: Phantom (Grimstroke) and Ignis Fatuus stay here, the column is named "Wards/Objects"
+WARDS = "Wards/Objects"
+_SUMMON_BUCKET = {b: WARDS for b in (
     "npc_dota_venomancer_plague_ward", "npc_dota_shadow_shaman_ward", "npc_dota_pugna_nether_ward",
     "npc_dota_juggernaut_healing_ward", "npc_dota_unit_tombstone",
     "npc_dota_tinker_turret")}
 # owner 2026-11-26: planted / effect units (cog, mine, trap, spire, nimbus, sun ...) are wards too, no "Objects" column
-_SUMMON_BUCKET.update({b: "Wards" for b in (
+_SUMMON_BUCKET.update({b: WARDS for b in (
     "npc_dota_rattletrap_cog", "npc_dota_techies_land_mine",
     "npc_dota_techies_innate_mine", "npc_dota_templar_assassin_psionic_trap", "npc_dota_lich_ice_spire",
     "npc_dota_zeus_cloud", "npc_dota_phoenix_sun", "npc_dota_grimstroke_ink_creature",

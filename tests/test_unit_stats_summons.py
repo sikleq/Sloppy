@@ -11,13 +11,28 @@ from builders import creeps_summons as cs
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_only_sure_entries_and_no_aghanim_guesses():
+def test_only_sure_entries():
     keep = cs.entries()
-    assert keep and all(e["sure"] for e in keep)
-    assert not any("scepter" in e["key"] for e in keep)
+    assert keep and all(e["sure"] and not e.get("not_in_game") for e in keep)
     keys = {e["key"] for e in keep}
     assert {"warlock_golem_1", "lycan_wolf_4", "brewmaster_earth_4"} <= keys
-    assert not keys & {"enigma_eidolon_1", "chen_zealot", "beastmaster_raptor_1"}      # numbers worked out in code
+    # confirmed by server.dll 6997 (2026-11-27): Aghanim golem, Book of the Dead (level 3 only), Raptor
+    assert {"warlock_golem_scepter_1", "book_of_the_dead_warrior_3", "book_of_the_dead_archer_3",
+            "beastmaster_raptor_4"} <= keys
+    # numbers that depend on the hero (Enigma's HP, hero level) and units the game does not summon
+    assert not keys & {"enigma_eidolon_1", "chen_zealot", "warlock_minor_imp", "clinkz_skeleton_walk",
+                       "book_of_the_dead_warrior_1", "enigma_eidolon_5", "warlock_major_imp", "brewmaster_void_1",
+                       "broodmother_spiderite"}   # Spawn Spiderite makes a plain spiderling (server.dll 6997)
+
+
+def test_confirmed_numbers_from_server_dll():
+    by = {e["key"]: e for e in cs.entries()}
+    g = by["warlock_golem_scepter_1"]
+    assert (g["dmg_min"], g["dmg_max"], g["armor"], g["hp"]) == (75, 85, 8, 1500)     # golem_dmg_scepter -+5
+    w = by["book_of_the_dead_warrior_3"]
+    assert w["hp"] == 1600 and (w["dmg_min"], w["dmg_max"]) == (122.5, 148.75)         # +100% HP, +75% base damage
+    assert cs.display_name(w) == "Demonic Warrior (Book of the Dead)"
+    assert by["beastmaster_raptor_1"]["dmg_min"] is None
 
 
 def test_ability_numbers_override_the_unit_kv():
@@ -69,3 +84,19 @@ def test_summon_rows_on_the_page_do_not_grow_and_start_hidden():
     assert "tr.dataset.group !== 'lane' && tr.dataset.upg === undefined" in js
     from builders.creeps_common import unit_group, UNIT_GROUPS_OFF
     assert unit_group("summon_lycan_wolf_1") == "summon" and "summon" in UNIT_GROUPS_OFF
+
+
+def test_summon_ability_cells_never_merge():
+    # owner 2026-11-27: "неправильно выделяется" - one Flaming Fists cell over six golem names broke the gold frame
+    js = (ROOT / "src" / "js" / "creeps-table.js").read_text(encoding="utf-8")
+    assert "if (rows[i].dataset.group === 'summon') { i++; continue; }" in js
+    assert "rows[j].dataset.group !== 'summon'" in js
+
+
+def test_summons_do_not_grow_in_the_timeline():
+    # 2026-11-27: Timeline added the neutral upgrade (+3 damage, +30 HP a step) to hero summons
+    from builders import creeps as cr
+    d = {'createhero': 'summon_warlock_golem_1', 'hp': '1500', 'dmg_avg': '100', 'armor': '8', 'as': '100',
+         'gold_min': '100', 'gold_max': '100'}
+    for stat in ('hp', 'dmg', 'armor', 'as', 'gold'):
+        assert cr.timeline_value(d, stat, 8) == cr.timeline_value(d, stat, 0), stat

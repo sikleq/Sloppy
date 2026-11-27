@@ -3,8 +3,9 @@
 Their numbers are the game's, not the plain unit KV: many summons take HP / damage / armor … from the summoning
 ability's values (data/rules/summon_units.json, gathered 2026-11-26 from data/stats/7.42a: unit KV with
 include_keys_from + the hero ability values; data/rules/summon_units.md says where each number came from).
-Only entries marked sure are shown; an entry whose numbers the game works out in code (sure: false) or the
-Aghanim variants with guessed fields are left out until they are confirmed. They do not grow with Upgrade.
+Only entries marked sure are shown; an entry whose numbers the game works out from its hero (sure: false: Enigma's HP,
+the hero's level) or a unit the game never summons (not_in_game) is left out. The Aghanim golem, Book of the Dead and
+Raptor were confirmed by server.dll 6997 (2026-11-27). They do not grow with Upgrade.
 A new patch: gather the file again for that patch."""
 import json as _json
 import os as _os
@@ -25,7 +26,8 @@ _ICON_SHARED = {r'npc_dota_lycan_wolf\d': 'icons/units/npc_dota_lycan_wolf.png',
                 r'npc_dota_brewmaster_(earth|storm|fire|void)_\d': r'icons/units/brewmaster_\1_unit.png',
                 r'npc_dota_unit_undying_zombie_torso': 'icons/units/npc_dota_unit_undying_zombie.png',
                 r'npc_dota_beastmaster_thunderhide': 'icons/abilities/beastmaster_summon_thunderhide.png',
-                r'npc_dota_wraith_king_skeleton_warrior': 'icons/abilities/skeleton_king_bone_guard.png'}
+                r'npc_dota_wraith_king_skeleton_warrior': 'icons/abilities/skeleton_king_bone_guard.png',
+                r'npc_dota_necronomicon_(warrior|archer)_\d': r'icons/units/npc_dota_necronomicon_\1.png'}
 
 
 def entries(path=SUMMON_FILE):
@@ -34,8 +36,9 @@ def entries(path=SUMMON_FILE):
         data = _json.load(f)
     if not data:
         raise ValueError(f'{path}: no summon units')
+    # 2026-11-27: the Aghanim golem, Book of the Dead and Raptor confirmed by server.dll 6997 (summon_units.md)
     keep = [e for e in data
-            if e.get('sure') and 'scepter' not in e['key'] and 'all' not in (e.get('unsure_fields') or [])
+            if e.get('sure') and not e.get('not_in_game') and 'all' not in (e.get('unsure_fields') or [])
             and e.get('hp')]
     if not keep:
         raise ValueError(f'{path}: no summon marked sure')
