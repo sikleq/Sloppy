@@ -8,6 +8,24 @@ _UL_RE = re.compile(r'(<ul class="changes"[^>]*>)(.*?)(</ul>)', re.S)
 _ATTR_MARK = 'row-text">Main attribute changed from <b class="attr-chip'
 
 
+# GENERAL whose every row a card below already shows (covered): an empty box with the gear icon was left (owner
+# 2026-11-27, 7.42 Nyx Assassin: "в General пустота"). The rows stay in the page for tag filters and weights.
+_GENERAL_RE = re.compile(
+    r'<h4 class="subgroup">GENERAL</h4><div class="ability-block other-block">'
+    r'(<div class="ability-icon-wrap">(?:(?!</div>).)*</div><ul class="changes">(.*?)</ul>\s*</div>)', re.S)
+_LI_RE = re.compile(r'<li\b[^>]*>')
+
+
+def hide_general_all_covered(html):
+    def one(m):
+        lis = _LI_RE.findall(m.group(2))
+        if not lis or any('iab-covered' not in li for li in lis) or '<div' in m.group(2):
+            return m.group(0)
+        return ('<h4 class="subgroup all-covered">GENERAL</h4><div class="ability-block other-block all-covered">'
+                + m.group(1))
+    return _GENERAL_RE.sub(one, html)
+
+
 def attr_row_first(html):
     from .page import _split_top_li
 

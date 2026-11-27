@@ -190,6 +190,8 @@ ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8
 /* Rows the abilities card already shows (_iab_covered_change / duplicate descriptions): kept in the page,
    hidden, so tag filters and counts still see their tags (owner 2026-09-27) */
 ul.changes li.iab-covered { display: none !important; }
+/* a GENERAL with only such rows: no empty box (owner 2026-11-27, 7.42 Nyx Assassin; patch/general_rows.py) */
+h4.subgroup.all-covered, .ability-block.other-block.all-covered { display: none !important; }
 /* the numbers those rows change, coloured by the row's tag */
 .iab-num.iab-buff, .iab-m.iab-buff, .iab-lv.iab-buff, .us-v.iab-buff, .us-bar .us-v.iab-buff, .camp-v.iab-buff, .mech-pct-cell.iab-buff { color: #7fd08c; }
 .iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf, .us-v.iab-nerf, .us-bar .us-v.iab-nerf, .camp-v.iab-nerf, .mech-pct-cell.iab-nerf { color: #cf828d; }

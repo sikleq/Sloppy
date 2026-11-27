@@ -621,6 +621,8 @@ def save_html(filename):
     out = drop_grants_card_under_new_ability(out)     # a new ability's "Grants this ability" upgrade card (11-20)
     out = card_sections(out, _stem)        # rows led by an ability's icon: lines between, a head each (2026-11-06)
     out = pair_new_cards(out, _stem)       # two new cards side by side (2026-11-06)
+    from .general_rows import hide_general_all_covered
+    out = hide_general_all_covered(out)    # GENERAL with only rows a card shows: no empty box (11-27, 7.42 Nyx)
     from .card_pairs import pair_replaced_facets
     out = pair_replaced_facets(out, _stem)  # a lost facet left, the new one with its card right (2026-11-06)
     from .card_deck import deck_cards
