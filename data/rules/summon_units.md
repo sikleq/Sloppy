@@ -45,6 +45,8 @@
 | `enigma_eidolon_5`, Major imp, Void Brewling | в игре 7.42a не появляются | `not_in_game: true` |
 | Spiderite | Spawn Spiderite создаёт обычного паучка (`npc_dota_broodmother_spiderling`) с бонусами Spawn Spiderlings; юнит `npc_dota_broodmother_spiderite` код только сравнивает по имени, не создаёт | `not_in_game: true`, его роль — строки Spiderling |
 
+Призывы с числами от героя (решение владельца 2026-11-27): показаны при 1-м уровне героя (`hero_level: 1`), формула — подсказкой ячейки (`formula`). Эйдолоны 198/218/238/258 HP (3% от 620 HP Энигмы 1-го уровня), Zealot 550 HP, 332 скорость, урон 24.61–28.89, Imp 20 HP и 300 скорость, Skeleton Archer урон 8–10 (20% от 44–50 Клинкза). Burning Army даёт того же лучника (`same_as`), отдельной строки нет.
+
 Полный разбор с адресами: заметка сессии `summons_confirm_742a.md` (папка заметок сессий, не в репозитории).
 
 ## Что сделано кодом, а не данными

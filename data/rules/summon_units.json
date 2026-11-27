@@ -756,7 +756,7 @@
   "hero": "Enigma",
   "ability": "enigma_demonic_conversion",
   "level": 1,
-  "hp": 180,
+  "hp": 198,
   "hp_regen": 1,
   "mana": 0,
   "armor": 2,
@@ -772,7 +772,7 @@
   "xp": 10,
   "attack": "ranged",
   "source": {
-   "hp": "ability:enigma_demonic_conversion.eidelon_max_health",
+   "hp": "eidelon_max_health 180 + floor(3% of Enigma current HP) (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "magres": "ability:enigma_demonic_conversion.eidolon_magic_resist",
    "ms": "ability:enigma_demonic_conversion.eidelon_base_movespeed",
    "range": "ability:enigma_demonic_conversion.eidolon_attack_range",
@@ -782,16 +782,13 @@
    "gold_max": "ability:enigma_demonic_conversion.eidolon_gold_bounty_max",
    "xp": "ability:enigma_demonic_conversion.eidolon_xp_bounty"
   },
-  "sure": false,
-  "unsure_fields": [
-   "armor",
-   "hp_regen",
-   "dmg_min",
-   "dmg_max",
-   "hp",
-   "ms"
-  ],
-  "note": "Ability level = Demonic Conversion level. Damage is 0 in KV, so it comes from the ability (spread +-3 assumed). Armor and regen are taken from the KV unit of the same stage (lesser/eidolon/greater/dire): догадка that stage N matches ability level N. Eidolons also grow every split_attack_count=6 attacks (creep_max_level 4); the grown stages use the KV units lesser/eidolon/greater/dire/dire2 (dire here is a growth stage, not the Dire team; Radiant/Dire team split is not found in KV). Code-side level mapping not verified."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "Demonic Conversion level = KV stage lesser/eidolon/greater/dire. Splits on the 7th attack; a split eidolon has the same numbers and does not split again. Shown at hero level 1 (server.dll 6997 (dota2-ida-researcher 2026-11-27)).",
+  "hero_level": 1,
+  "formula": {
+   "hp": "180 + 3% of Enigma's current HP (level 1 Enigma: 620 HP)"
+  }
  },
  {
   "key": "enigma_eidolon_2",
@@ -800,7 +797,7 @@
   "hero": "Enigma",
   "ability": "enigma_demonic_conversion",
   "level": 2,
-  "hp": 200,
+  "hp": 218,
   "hp_regen": 2,
   "mana": 0,
   "armor": 3,
@@ -816,7 +813,7 @@
   "xp": 10,
   "attack": "ranged",
   "source": {
-   "hp": "ability:enigma_demonic_conversion.eidelon_max_health",
+   "hp": "eidelon_max_health 200 + floor(3% of Enigma current HP) (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "magres": "ability:enigma_demonic_conversion.eidolon_magic_resist",
    "ms": "ability:enigma_demonic_conversion.eidelon_base_movespeed",
    "range": "ability:enigma_demonic_conversion.eidolon_attack_range",
@@ -826,16 +823,13 @@
    "gold_max": "ability:enigma_demonic_conversion.eidolon_gold_bounty_max",
    "xp": "ability:enigma_demonic_conversion.eidolon_xp_bounty"
   },
-  "sure": false,
-  "unsure_fields": [
-   "armor",
-   "hp_regen",
-   "dmg_min",
-   "dmg_max",
-   "hp",
-   "ms"
-  ],
-  "note": "Ability level = Demonic Conversion level. Damage is 0 in KV, so it comes from the ability (spread +-3 assumed). Armor and regen are taken from the KV unit of the same stage (lesser/eidolon/greater/dire): догадка that stage N matches ability level N. Eidolons also grow every split_attack_count=6 attacks (creep_max_level 4); the grown stages use the KV units lesser/eidolon/greater/dire/dire2 (dire here is a growth stage, not the Dire team; Radiant/Dire team split is not found in KV). Code-side level mapping not verified."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "Demonic Conversion level = KV stage lesser/eidolon/greater/dire. Splits on the 7th attack; a split eidolon has the same numbers and does not split again. Shown at hero level 1 (server.dll 6997 (dota2-ida-researcher 2026-11-27)).",
+  "hero_level": 1,
+  "formula": {
+   "hp": "200 + 3% of Enigma's current HP (level 1 Enigma: 620 HP)"
+  }
  },
  {
   "key": "enigma_eidolon_3",
@@ -844,7 +838,7 @@
   "hero": "Enigma",
   "ability": "enigma_demonic_conversion",
   "level": 3,
-  "hp": 220,
+  "hp": 238,
   "hp_regen": 3,
   "mana": 0,
   "armor": 4,
@@ -860,7 +854,7 @@
   "xp": 10,
   "attack": "ranged",
   "source": {
-   "hp": "ability:enigma_demonic_conversion.eidelon_max_health",
+   "hp": "eidelon_max_health 220 + floor(3% of Enigma current HP) (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "magres": "ability:enigma_demonic_conversion.eidolon_magic_resist",
    "ms": "ability:enigma_demonic_conversion.eidelon_base_movespeed",
    "range": "ability:enigma_demonic_conversion.eidolon_attack_range",
@@ -870,16 +864,13 @@
    "gold_max": "ability:enigma_demonic_conversion.eidolon_gold_bounty_max",
    "xp": "ability:enigma_demonic_conversion.eidolon_xp_bounty"
   },
-  "sure": false,
-  "unsure_fields": [
-   "armor",
-   "hp_regen",
-   "dmg_min",
-   "dmg_max",
-   "hp",
-   "ms"
-  ],
-  "note": "Ability level = Demonic Conversion level. Damage is 0 in KV, so it comes from the ability (spread +-3 assumed). Armor and regen are taken from the KV unit of the same stage (lesser/eidolon/greater/dire): догадка that stage N matches ability level N. Eidolons also grow every split_attack_count=6 attacks (creep_max_level 4); the grown stages use the KV units lesser/eidolon/greater/dire/dire2 (dire here is a growth stage, not the Dire team; Radiant/Dire team split is not found in KV). Code-side level mapping not verified."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "Demonic Conversion level = KV stage lesser/eidolon/greater/dire. Splits on the 7th attack; a split eidolon has the same numbers and does not split again. Shown at hero level 1 (server.dll 6997 (dota2-ida-researcher 2026-11-27)).",
+  "hero_level": 1,
+  "formula": {
+   "hp": "220 + 3% of Enigma's current HP (level 1 Enigma: 620 HP)"
+  }
  },
  {
   "key": "enigma_eidolon_4",
@@ -888,7 +879,7 @@
   "hero": "Enigma",
   "ability": "enigma_demonic_conversion",
   "level": 4,
-  "hp": 240,
+  "hp": 258,
   "hp_regen": 4,
   "mana": 0,
   "armor": 5,
@@ -904,7 +895,7 @@
   "xp": 10,
   "attack": "ranged",
   "source": {
-   "hp": "ability:enigma_demonic_conversion.eidelon_max_health",
+   "hp": "eidelon_max_health 240 + floor(3% of Enigma current HP) (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "magres": "ability:enigma_demonic_conversion.eidolon_magic_resist",
    "ms": "ability:enigma_demonic_conversion.eidelon_base_movespeed",
    "range": "ability:enigma_demonic_conversion.eidolon_attack_range",
@@ -914,16 +905,13 @@
    "gold_max": "ability:enigma_demonic_conversion.eidolon_gold_bounty_max",
    "xp": "ability:enigma_demonic_conversion.eidolon_xp_bounty"
   },
-  "sure": false,
-  "unsure_fields": [
-   "armor",
-   "hp_regen",
-   "dmg_min",
-   "dmg_max",
-   "hp",
-   "ms"
-  ],
-  "note": "Ability level = Demonic Conversion level. Damage is 0 in KV, so it comes from the ability (spread +-3 assumed). Armor and regen are taken from the KV unit of the same stage (lesser/eidolon/greater/dire): догадка that stage N matches ability level N. Eidolons also grow every split_attack_count=6 attacks (creep_max_level 4); the grown stages use the KV units lesser/eidolon/greater/dire/dire2 (dire here is a growth stage, not the Dire team; Radiant/Dire team split is not found in KV). Code-side level mapping not verified."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "Demonic Conversion level = KV stage lesser/eidolon/greater/dire. Splits on the 7th attack; a split eidolon has the same numbers and does not split again. Shown at hero level 1 (server.dll 6997 (dota2-ida-researcher 2026-11-27)).",
+  "hero_level": 1,
+  "formula": {
+   "hp": "240 + 3% of Enigma's current HP (level 1 Enigma: 620 HP)"
+  }
  },
  {
   "key": "enigma_eidolon_5",
@@ -2117,30 +2105,36 @@
   "mana": 0,
   "armor": 2,
   "magres": 0,
-  "dmg_min": 21,
-  "dmg_max": 25,
+  "dmg_min": 24.61,
+  "dmg_max": 28.89,
   "bat": 1,
   "as": 100,
   "range": 125,
-  "ms": 325,
+  "ms": 332,
   "gold_min": 34,
   "gold_max": 39,
   "xp": 57,
   "attack": "melee",
-  "source": {},
-  "sure": false,
-  "unsure_fields": [
-   "hp",
-   "dmg_min",
-   "dmg_max",
-   "ms"
-  ],
-  "note": "Scales with Chen hero level (hero_levelup keys): health_min 400 +50 per level (talent +1300), damage_bonus 5 +2 per level (talent +12), movement_speed_bonus 5 +2 per level. How these combine with KV (HP 550, damage 21-25, speed 325) is done in code and not verifiable here; KV shown."
+  "source": {
+   "hp": "max(550 + 12n, 400 + 50L) (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "ms": "325 + 5 + 2L (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_min": "(21 + n + 2L) x (1 + (5 + 2L)%) (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_max": "(25 + n + 2L) x (1 + (5 + 2L)%) (server.dll 6997 (dota2-ida-researcher 2026-11-27))"
+  },
+  "sure": true,
+  "unsure_fields": [],
+  "note": "Chen level L, creep upgrades n (every 7:30, as lane creeps). Order of +2L damage and the % is inferred. Shown at hero level 1 (server.dll 6997 (dota2-ida-researcher 2026-11-27)).",
+  "hero_level": 1,
+  "formula": {
+   "hp": "max(550 + 12 per creep upgrade, 400 + 50 per Chen level)",
+   "ms": "330 + 2 per Chen level",
+   "dmg": "(21-25 + 1 per creep upgrade + 2 per Chen level) x (105% + 2% per Chen level)"
+  }
  },
  {
   "key": "clinkz_skeleton_walk",
   "npc": "npc_dota_clinkz_skeleton_archer",
-  "name": "Clinkz Skeleton Archer (Skeleton Walk)",
+  "name": "Skeleton Archer",
   "hero": "Clinkz",
   "ability": "clinkz_wind_walk",
   "level": null,
@@ -2149,8 +2143,8 @@
   "mana": 100,
   "armor": 0,
   "magres": 0,
-  "dmg_min": null,
-  "dmg_max": null,
+  "dmg_min": 8,
+  "dmg_max": 10,
   "bat": 1.6,
   "as": 100,
   "range": 500,
@@ -2162,15 +2156,16 @@
   "source": {
    "hp": "ability:clinkz_wind_walk.skeleton_health = 2 pips, 1 pip = 4 HP (Pip Health, server.dll 6983)",
    "bat": "ability:clinkz_wind_walk.attack_rate",
-   "dmg_min": "code: damage_percent 20 = 20% of Clinkz damage (hero dependent)",
-   "dmg_max": "code: damage_percent 20 = 20% of Clinkz damage (hero dependent)"
+   "dmg_min": "floor(20% of Clinkz damage min) (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_max": "floor(20% of Clinkz damage max) (server.dll 6997 (dota2-ida-researcher 2026-11-27))"
   },
-  "sure": false,
-  "unsure_fields": [
-   "dmg_min",
-   "dmg_max"
-  ],
-  "note": "Skeleton Walk (also Bone and Arrow: same skeleton_health 2, attack_rate 1.6, damage_percent 20). Damage is 20% of Clinkz damage, so it has no fixed number (KV damage 5 is a placeholder). Searing Arrows skeleton_damage_pct 50 applies to the bonus Searing damage. Skeleton count 2/3/4 (+2 talent), duration 20/25/30. KV speed 0 and range 500."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "Skeleton Walk and Burning Army make the same archer: 2 pips, BAT 1.6, -75% damage to buildings. Shown at hero level 1 (server.dll 6997 (dota2-ida-researcher 2026-11-27)).",
+  "hero_level": 1,
+  "formula": {
+   "dmg": "20% of Clinkz's damage (level 1 Clinkz: 44-50)"
+  }
  },
  {
   "key": "clinkz_skeleton_burning_army",
@@ -2206,16 +2201,17 @@
    "dmg_max",
    "bat"
   ],
-  "note": "Burning Army (Aghanim Scepter, 6 archers) has only range/count/interval in its ability. HP, damage and attack rate are set in code (no keys found); likely the same skeleton_health 2 pips / damage_percent 20 as Skeleton Walk (догадка). KV HP 1000 is not real."
+  "note": "The same archer as Skeleton Walk (one spawn function, Skeleton Walk keys; server.dll 6997 (dota2-ida-researcher 2026-11-27)). Burning Army (Aghanim Scepter, 6 archers) has only range/count/interval in its ability. HP, damage and attack rate are set in code (no keys found); likely the same skeleton_health 2 pips / damage_percent 20 as Skeleton Walk (догадка). KV HP 1000 is not real.",
+  "same_as": "clinkz_skeleton_walk"
  },
  {
   "key": "warlock_minor_imp",
   "npc": "npc_dota_warlock_minor_imp",
-  "name": "Warlock Imp (minor)",
+  "name": "Warlock Imp",
   "hero": "Warlock",
   "ability": "warlock_eldritch_summoning",
   "level": null,
-  "hp": null,
+  "hp": 20,
   "hp_regen": 0.5,
   "mana": 0,
   "armor": 1,
@@ -2225,21 +2221,23 @@
   "bat": 2,
   "as": 200,
   "range": 80,
-  "ms": null,
+  "ms": 300,
   "gold_min": 3,
   "gold_max": 3,
   "xp": 17,
   "attack": "melee",
   "source": {
-   "hp": "ability:warlock_eldritch_summoning.imp_health (5 +15 per hero level, +80 Shard)",
-   "ms": "ability:warlock_eldritch_summoning.imp_speed (297 +3 per hero level)"
+   "hp": "imp_health 5 + 15L (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "ms": "imp_speed 297 + 3L (server.dll 6997 (dota2-ida-researcher 2026-11-27))"
   },
-  "sure": false,
-  "unsure_fields": [
-   "hp",
-   "ms"
-  ],
-  "note": "Innate Eldritch Summoning. HP and speed depend on Warlock hero level (hero_levelup); the exact level offset is unknown, so null. Explosion damage 20 +20 per 3 levels (+45 Shard), radius 400. KV HP 50 and speed 300 are not real. Duration 15."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "Innate Eldritch Summoning, 15 s. Explodes for 20 + 20 per 3 Warlock levels (+45 Shard). Shown at hero level 1 (server.dll 6997 (dota2-ida-researcher 2026-11-27)).",
+  "hero_level": 1,
+  "formula": {
+   "hp": "5 + 15 per Warlock level (+80 Shard)",
+   "ms": "297 + 3 per Warlock level"
+  }
  },
  {
   "key": "warlock_major_imp",

@@ -19,8 +19,10 @@ def test_only_sure_entries():
     # confirmed by server.dll 6997 (2026-11-27): Aghanim golem, Book of the Dead (level 3 only), Raptor
     assert {"warlock_golem_scepter_1", "book_of_the_dead_warrior_3", "book_of_the_dead_archer_3",
             "beastmaster_raptor_4"} <= keys
-    # numbers that depend on the hero (Enigma's HP, hero level) and units the game does not summon
-    assert not keys & {"enigma_eidolon_1", "chen_zealot", "warlock_minor_imp", "clinkz_skeleton_walk",
+    # hero-dependent numbers at hero level 1 (owner 2026-11-27)
+    assert {"enigma_eidolon_1", "chen_zealot", "warlock_minor_imp", "clinkz_skeleton_walk"} <= keys
+    # units the game does not summon, or the same unit from another ability
+    assert not keys & {"clinkz_skeleton_burning_army",
                        "book_of_the_dead_warrior_1", "enigma_eidolon_5", "warlock_major_imp", "brewmaster_void_1",
                        "broodmother_spiderite"}   # Spawn Spiderite makes a plain spiderling (server.dll 6997)
 
@@ -33,6 +35,21 @@ def test_confirmed_numbers_from_server_dll():
     assert w["hp"] == 1600 and (w["dmg_min"], w["dmg_max"]) == (122.5, 148.75)         # +100% HP, +75% base damage
     assert cs.display_name(w) == "Demonic Warrior (Book of the Dead)"
     assert by["beastmaster_raptor_1"]["dmg_min"] is None
+
+
+def test_hero_dependent_summons_at_hero_level_1_with_the_formula_hint():
+    # owner 2026-11-27: numbers at hero level 1, the formula in the hint (server.dll 6997)
+    by = {e["key"]: e for e in cs.entries()}
+    assert by["enigma_eidolon_1"]["hp"] == 180 + 18                      # + 3% of level 1 Enigma's 620 HP
+    z = by["chen_zealot"]
+    assert (z["hp"], z["ms"], z["dmg_min"], z["dmg_max"]) == (550, 332, 24.61, 28.89)
+    assert (by["warlock_minor_imp"]["hp"], by["warlock_minor_imp"]["ms"]) == (20, 300)
+    assert (by["clinkz_skeleton_walk"]["dmg_min"], by["clinkz_skeleton_walk"]["dmg_max"]) == (8, 10)
+    assert set(cs.formula_hints(z)) == {"hp", "ms", "dmg_avg", "dmg_min", "dmg_max"}
+    html = (ROOT / "dist" / "units_stats.html").read_text(encoding="utf-8")
+    i = html.find('id="unit-summon_warlock_minor_imp"')
+    row = html[i:html.find("</tr>", i)]
+    assert 'data-formula="1" title="5 + 15 per Warlock level (+80 Shard)"' in row
 
 
 def test_ability_numbers_override_the_unit_kv():

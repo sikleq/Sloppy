@@ -816,6 +816,7 @@ def summon_rows(src):
         data = {**cells, 'lvl': '',
                 'createhero': _creeps_summons.ROW_PREFIX + e['key'], 'name': _creeps_summons.display_name(e),
                 'npc_key': e['npc'], 'icon': _creeps_summons.icon(e), 'camp': '', 'hero_summon': True,
+                '_formula': _creeps_summons.formula_hints(e),    # hero-dependent numbers: the formula as a hint
                 # its abilities are its hero's: they link to the hero's page, not to Unit Abilities
                 'ability_href': _mr_table.hero_href(e.get('hero') or '')}
         out.append({'data': data, 'tier_break': i == 0, 'level': '', 'npc_key': e['npc']})
@@ -1220,6 +1221,9 @@ def _stats_cell(k, row, src, unit_page_slugs):
         return f'<td class="{cls}"{_sort_attr(k, v)}{extra}>{inner}</td>'
     mul = (d.get('_self_mul') or {}).get(k)
     mul_attr = f' data-self-mul="{mul:g}"' if mul else ''      # its own % aura (src/js/creeps-upgrade.js selfAura)
+    tip = (d.get('_formula') or {}).get(k)                     # a summon's number at hero level 1 (creeps_summons)
+    if tip:
+        mul_attr += f' data-formula="1" title="{esc(tip)}"'
     if k in COL_HIST or k in COL_CHANGELOG:
         extra, has_hist = _history_attrs(k, v, row.get('npc_key'), src)
         cls = _col_cls(k, v) + (' has-history' if has_hist else '')
