@@ -28,3 +28,11 @@ def test_the_steps_match_the_games_values():
     for bit in ("30 * L", "0.5 * L", "5 * L", "3 * L", "4 * L", "Math.floor(L / 2)", "Math.floor((L + 1) / 2)",
                 "MAX = 30, STEP_S = 450"):
         assert bit in js, bit
+
+
+def test_an_unchanged_armor_percent_is_not_lit():
+    # put() compared "15" with the base "15%" and only then added the %: every lane creep's Phys. resist was gold on
+    # Upgrade (their armor does not grow), a Mega row's from the start
+    js = (ROOT / "src" / "js" / "creeps-upgrade.js").read_text(encoding="utf-8")
+    assert "put(tr, 'armor_pct', Math.round(pct * 100), 0, armorOn, '%')" in js
+    assert "textContent += '%'" not in js

@@ -22,13 +22,14 @@
     if (td.dataset.base === undefined) td.dataset.base = td.textContent.trim();
     return num(td.dataset.base);
   };
-  const put = (tr, k, v, d, L) => {
+  // unit: what the build writes after the number ("15%"), so the text compares with the base as the cell shows it
+  const put = (tr, k, v, d, L, unit = '') => {
     const td = cell(tr, k);
     if (!td) return;
     if (td.dataset.base === undefined) td.dataset.base = td.textContent.trim();
     if (L && !isFinite(v)) return;
     const dl = selfAura(td, v);
-    td.textContent = !L ? td.dataset.base : (dl ? `${fmt(v, d)} (${fmt(v + dl, d)})` : fmt(v, d));
+    td.textContent = !L ? td.dataset.base : (dl ? `${fmt(v, d)}${unit} (${fmt(v + dl, d)}${unit})` : fmt(v, d) + unit);
     // gold only where the number really changed (a Mega row at step 0 keeps its armor, speed, gold…)
     td.classList.toggle('upg-on', !!L && td.textContent !== td.dataset.base);
   };
@@ -98,8 +99,9 @@
       const pctEff = 0.06 * (armorEff - cut) / (1 + 0.06 * Math.abs(armorEff - cut));
       put(tr, 'hp', hp, 0, on);
       put(tr, 'armor', armor - cut, 1, armorOn);
-      put(tr, 'armor_pct', Math.round(pct * 100), 0, armorOn);
-      if (armorOn) { const td = cell(tr, 'armor_pct'); if (td && td.dataset.base) td.textContent += '%'; }
+      // the % goes in before the compare: added after it, "15" against the base "15%" lit every lane creep's cell
+      // (their armor does not grow) and a Mega row's at step 0
+      put(tr, 'armor_pct', Math.round(pct * 100), 0, armorOn, '%');
       put(tr, 'as', as, 0, on);
       put(tr, 't_per_attack', bat / (as / 100), 2, on);
       // EHP with the unit's own aura even at step 0 (the build wrote them from its numbers without it)
