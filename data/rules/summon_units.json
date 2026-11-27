@@ -128,8 +128,8 @@
   "mana": 0,
   "armor": 8,
   "magres": 33,
-  "dmg_min": 70,
-  "dmg_max": 90,
+  "dmg_min": 75,
+  "dmg_max": 85,
   "bat": 1.2,
   "as": 100,
   "range": 225,
@@ -140,23 +140,17 @@
   "attack": "melee",
   "source": {
    "hp": "ability:warlock_rain_of_chaos.golem_hp_scepter",
-   "hp_regen": "ability:warlock_rain_of_chaos.golem_health_regen",
-   "armor": "ability:warlock_rain_of_chaos.golem_armor",
-   "ms": "ability:warlock_rain_of_chaos.golem_movement_speed",
-   "dmg_min": "ability:warlock_rain_of_chaos.golem_dmg_scepter (spread -10 from KV)",
-   "dmg_max": "ability:warlock_rain_of_chaos.golem_dmg_scepter (spread +10 from KV)",
+   "hp_regen": "ability:warlock_rain_of_chaos.golem_health_regen (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "armor": "ability:warlock_rain_of_chaos.golem_armor (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "ms": "ability:warlock_rain_of_chaos.golem_movement_speed (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_min": "ability:warlock_rain_of_chaos.golem_dmg_scepter -5 (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_max": "ability:warlock_rain_of_chaos.golem_dmg_scepter +5 (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "gold_min": "ability:warlock_rain_of_chaos.golem_gold_bounty_scepter",
    "gold_max": "ability:warlock_rain_of_chaos.golem_gold_bounty_scepter"
   },
   "sure": true,
-  "unsure_fields": [
-   "dmg_min",
-   "dmg_max",
-   "hp_regen",
-   "armor",
-   "ms"
-  ],
-  "note": "With Aghanim Scepter two golems spawn (number_of_golems_scepter 2) with weaker damage 80/120/160. Regen, armor and speed have no *_scepter keys, so the normal golem values are assumed to apply (догадка)."
+  "unsure_fields": [],
+  "note": "Chaotic Offering cast with Aghanim's Scepter. Damage golem_dmg_scepter -+5, armor, regen and speed are the plain golem's keys (server.dll 6997 (dota2-ida-researcher 2026-11-27)). The talent golem on death is always a plain golem."
  },
  {
   "key": "warlock_golem_scepter_2",
@@ -170,8 +164,8 @@
   "mana": 0,
   "armor": 12,
   "magres": 33,
-  "dmg_min": 110,
-  "dmg_max": 130,
+  "dmg_min": 115,
+  "dmg_max": 125,
   "bat": 1.2,
   "as": 100,
   "range": 225,
@@ -182,23 +176,17 @@
   "attack": "melee",
   "source": {
    "hp": "ability:warlock_rain_of_chaos.golem_hp_scepter",
-   "hp_regen": "ability:warlock_rain_of_chaos.golem_health_regen",
-   "armor": "ability:warlock_rain_of_chaos.golem_armor",
-   "ms": "ability:warlock_rain_of_chaos.golem_movement_speed",
-   "dmg_min": "ability:warlock_rain_of_chaos.golem_dmg_scepter (spread -10 from KV)",
-   "dmg_max": "ability:warlock_rain_of_chaos.golem_dmg_scepter (spread +10 from KV)",
+   "hp_regen": "ability:warlock_rain_of_chaos.golem_health_regen (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "armor": "ability:warlock_rain_of_chaos.golem_armor (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "ms": "ability:warlock_rain_of_chaos.golem_movement_speed (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_min": "ability:warlock_rain_of_chaos.golem_dmg_scepter -5 (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_max": "ability:warlock_rain_of_chaos.golem_dmg_scepter +5 (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "gold_min": "ability:warlock_rain_of_chaos.golem_gold_bounty_scepter",
    "gold_max": "ability:warlock_rain_of_chaos.golem_gold_bounty_scepter"
   },
   "sure": true,
-  "unsure_fields": [
-   "dmg_min",
-   "dmg_max",
-   "hp_regen",
-   "armor",
-   "ms"
-  ],
-  "note": "With Aghanim Scepter two golems spawn (number_of_golems_scepter 2) with weaker damage 80/120/160. Regen, armor and speed have no *_scepter keys, so the normal golem values are assumed to apply (догадка)."
+  "unsure_fields": [],
+  "note": "Chaotic Offering cast with Aghanim's Scepter. Damage golem_dmg_scepter -+5, armor, regen and speed are the plain golem's keys (server.dll 6997 (dota2-ida-researcher 2026-11-27)). The talent golem on death is always a plain golem."
  },
  {
   "key": "warlock_golem_scepter_3",
@@ -212,8 +200,8 @@
   "mana": 0,
   "armor": 14,
   "magres": 33,
-  "dmg_min": 150,
-  "dmg_max": 170,
+  "dmg_min": 155,
+  "dmg_max": 165,
   "bat": 1.2,
   "as": 100,
   "range": 225,
@@ -224,23 +212,17 @@
   "attack": "melee",
   "source": {
    "hp": "ability:warlock_rain_of_chaos.golem_hp_scepter",
-   "hp_regen": "ability:warlock_rain_of_chaos.golem_health_regen",
-   "armor": "ability:warlock_rain_of_chaos.golem_armor",
-   "ms": "ability:warlock_rain_of_chaos.golem_movement_speed",
-   "dmg_min": "ability:warlock_rain_of_chaos.golem_dmg_scepter (spread -10 from KV)",
-   "dmg_max": "ability:warlock_rain_of_chaos.golem_dmg_scepter (spread +10 from KV)",
+   "hp_regen": "ability:warlock_rain_of_chaos.golem_health_regen (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "armor": "ability:warlock_rain_of_chaos.golem_armor (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "ms": "ability:warlock_rain_of_chaos.golem_movement_speed (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_min": "ability:warlock_rain_of_chaos.golem_dmg_scepter -5 (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_max": "ability:warlock_rain_of_chaos.golem_dmg_scepter +5 (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "gold_min": "ability:warlock_rain_of_chaos.golem_gold_bounty_scepter",
    "gold_max": "ability:warlock_rain_of_chaos.golem_gold_bounty_scepter"
   },
   "sure": true,
-  "unsure_fields": [
-   "dmg_min",
-   "dmg_max",
-   "hp_regen",
-   "armor",
-   "ms"
-  ],
-  "note": "With Aghanim Scepter two golems spawn (number_of_golems_scepter 2) with weaker damage 80/120/160. Regen, armor and speed have no *_scepter keys, so the normal golem values are assumed to apply (догадка)."
+  "unsure_fields": [],
+  "note": "Chaotic Offering cast with Aghanim's Scepter. Damage golem_dmg_scepter -+5, armor, regen and speed are the plain golem's keys (server.dll 6997 (dota2-ida-researcher 2026-11-27)). The talent golem on death is always a plain golem."
  },
  {
   "key": "lycan_wolf_1",
@@ -976,7 +958,8 @@
    "ms",
    "range"
   ],
-  "note": "KV unit npc_dota_dire_eidolon2 (HP 260, regen 5, armor 6, MR 70, range 525, speed 400), damage 0 in KV. No ability values for a 5th stage exist (ability tables have 4 entries), so how it is used is unknown."
+  "note": "Not summoned in 7.42a (server.dll 6997 (dota2-ida-researcher 2026-11-27)). KV unit npc_dota_dire_eidolon2 (HP 260, regen 5, armor 6, MR 70, range 525, speed 400), damage 0 in KV. No ability values for a 5th stage exist (ability tables have 4 entries), so how it is used is unknown.",
+  "not_in_game": true
  },
  {
   "key": "invoker_forged_spirit_1",
@@ -1483,17 +1466,15 @@
    "gold_min": "ability:beastmaster_summon_raptor.hawk_base_gold_bounty",
    "gold_max": "ability:beastmaster_summon_raptor.hawk_base_gold_bounty",
    "xp": "ability:beastmaster_summon_raptor.hawk_base_xp_bounty",
-   "ms": "ability:beastmaster_summon_raptor.min_move_speed",
+   "ms": "ability:beastmaster_summon_raptor.min_move_speed .. max_move_speed by distance (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "dmg_min": "none: no normal attack",
    "dmg_max": "none: no normal attack",
    "bat": "none: no normal attack",
    "range": "none: no normal attack"
   },
-  "sure": false,
-  "unsure_fields": [
-   "ms"
-  ],
-  "note": "Beastmaster Summon Raptors (internal hawk), 2 raptors. No normal attack (KV NO_ATTACK): they dive for 70/110/150/190 magic damage (dive_damage) every 4 s (hawk_base_attack_interval). Speed: ability gives min 455 and max 1100 (flying); KV 300. The speed shown (455) is only the minimum."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "No normal attack: dives for 70/110/150/190 magic damage (+30 talent). Speed 455 near Beastmaster, rises to 1100 with the distance to its point on the circle around him (server.dll 6997 (dota2-ida-researcher 2026-11-27))."
  },
  {
   "key": "beastmaster_raptor_2",
@@ -1523,17 +1504,15 @@
    "gold_min": "ability:beastmaster_summon_raptor.hawk_base_gold_bounty",
    "gold_max": "ability:beastmaster_summon_raptor.hawk_base_gold_bounty",
    "xp": "ability:beastmaster_summon_raptor.hawk_base_xp_bounty",
-   "ms": "ability:beastmaster_summon_raptor.min_move_speed",
+   "ms": "ability:beastmaster_summon_raptor.min_move_speed .. max_move_speed by distance (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "dmg_min": "none: no normal attack",
    "dmg_max": "none: no normal attack",
    "bat": "none: no normal attack",
    "range": "none: no normal attack"
   },
-  "sure": false,
-  "unsure_fields": [
-   "ms"
-  ],
-  "note": "Beastmaster Summon Raptors (internal hawk), 2 raptors. No normal attack (KV NO_ATTACK): they dive for 70/110/150/190 magic damage (dive_damage) every 4 s (hawk_base_attack_interval). Speed: ability gives min 455 and max 1100 (flying); KV 300. The speed shown (455) is only the minimum."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "No normal attack: dives for 70/110/150/190 magic damage (+30 talent). Speed 455 near Beastmaster, rises to 1100 with the distance to its point on the circle around him (server.dll 6997 (dota2-ida-researcher 2026-11-27))."
  },
  {
   "key": "beastmaster_raptor_3",
@@ -1563,17 +1542,15 @@
    "gold_min": "ability:beastmaster_summon_raptor.hawk_base_gold_bounty",
    "gold_max": "ability:beastmaster_summon_raptor.hawk_base_gold_bounty",
    "xp": "ability:beastmaster_summon_raptor.hawk_base_xp_bounty",
-   "ms": "ability:beastmaster_summon_raptor.min_move_speed",
+   "ms": "ability:beastmaster_summon_raptor.min_move_speed .. max_move_speed by distance (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "dmg_min": "none: no normal attack",
    "dmg_max": "none: no normal attack",
    "bat": "none: no normal attack",
    "range": "none: no normal attack"
   },
-  "sure": false,
-  "unsure_fields": [
-   "ms"
-  ],
-  "note": "Beastmaster Summon Raptors (internal hawk), 2 raptors. No normal attack (KV NO_ATTACK): they dive for 70/110/150/190 magic damage (dive_damage) every 4 s (hawk_base_attack_interval). Speed: ability gives min 455 and max 1100 (flying); KV 300. The speed shown (455) is only the minimum."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "No normal attack: dives for 70/110/150/190 magic damage (+30 talent). Speed 455 near Beastmaster, rises to 1100 with the distance to its point on the circle around him (server.dll 6997 (dota2-ida-researcher 2026-11-27))."
  },
  {
   "key": "beastmaster_raptor_4",
@@ -1603,17 +1580,15 @@
    "gold_min": "ability:beastmaster_summon_raptor.hawk_base_gold_bounty",
    "gold_max": "ability:beastmaster_summon_raptor.hawk_base_gold_bounty",
    "xp": "ability:beastmaster_summon_raptor.hawk_base_xp_bounty",
-   "ms": "ability:beastmaster_summon_raptor.min_move_speed",
+   "ms": "ability:beastmaster_summon_raptor.min_move_speed .. max_move_speed by distance (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
    "dmg_min": "none: no normal attack",
    "dmg_max": "none: no normal attack",
    "bat": "none: no normal attack",
    "range": "none: no normal attack"
   },
-  "sure": false,
-  "unsure_fields": [
-   "ms"
-  ],
-  "note": "Beastmaster Summon Raptors (internal hawk), 2 raptors. No normal attack (KV NO_ATTACK): they dive for 70/110/150/190 magic damage (dive_damage) every 4 s (hawk_base_attack_interval). Speed: ability gives min 455 and max 1100 (flying); KV 300. The speed shown (455) is only the minimum."
+  "sure": true,
+  "unsure_fields": [],
+  "note": "No normal attack: dives for 70/110/150/190 magic damage (+30 talent). Speed 455 near Beastmaster, rises to 1100 with the distance to its point on the circle around him (server.dll 6997 (dota2-ida-researcher 2026-11-27))."
  },
  {
   "key": "beastmaster_thunderhide",
@@ -2066,7 +2041,8 @@
   "unsure_fields": [
    "all"
   ],
-  "note": "Void brewling exists only in KV (levels 1-3); the Primal Split tooltip lists only earth, storm and fire, so how and when it is summoned in 7.42a was not found. KV values only."
+  "note": "Not summoned in 7.42a (server.dll 6997 (dota2-ida-researcher 2026-11-27)). Void brewling exists only in KV (levels 1-3); the Primal Split tooltip lists only earth, storm and fire, so how and when it is summoned in 7.42a was not found. KV values only.",
+  "not_in_game": true
  },
  {
   "key": "brewmaster_void_2",
@@ -2095,7 +2071,8 @@
   "unsure_fields": [
    "all"
   ],
-  "note": "Void brewling exists only in KV (levels 1-3); the Primal Split tooltip lists only earth, storm and fire, so how and when it is summoned in 7.42a was not found. KV values only."
+  "note": "Not summoned in 7.42a (server.dll 6997 (dota2-ida-researcher 2026-11-27)). Void brewling exists only in KV (levels 1-3); the Primal Split tooltip lists only earth, storm and fire, so how and when it is summoned in 7.42a was not found. KV values only.",
+  "not_in_game": true
  },
  {
   "key": "brewmaster_void_3",
@@ -2124,7 +2101,8 @@
   "unsure_fields": [
    "all"
   ],
-  "note": "Void brewling exists only in KV (levels 1-3); the Primal Split tooltip lists only earth, storm and fire, so how and when it is summoned in 7.42a was not found. KV values only."
+  "note": "Not summoned in 7.42a (server.dll 6997 (dota2-ida-researcher 2026-11-27)). Void brewling exists only in KV (levels 1-3); the Primal Split tooltip lists only earth, storm and fire, so how and when it is summoned in 7.42a was not found. KV values only.",
+  "not_in_game": true
  },
  {
   "key": "chen_zealot",
@@ -2293,7 +2271,8 @@
    "dmg_max",
    "ms"
   ],
-  "note": "Ability warlock_imp_explode_major has 5-entry tables (explosion 100-500, bonus HP 0-400, damage 0-32, speed 0-60) but no statement of what drives the level and where the major imp is summoned in 7.42a. KV shown."
+  "note": "Not summoned in 7.42a (server.dll 6997 (dota2-ida-researcher 2026-11-27)). Ability warlock_imp_explode_major has 5-entry tables (explosion 100-500, bonus HP 0-400, damage 0-32, speed 0-60) but no statement of what drives the level and where the major imp is summoned in 7.42a. KV shown.",
+  "not_in_game": true
  },
  {
   "key": "wraith_king_skeleton_1",
@@ -2466,7 +2445,7 @@
   "unsure_fields": [
    "all"
   ],
-  "note": "Book of the Dead (item_demonicon, neutral active, duration 65) has no unit stats in its item KV; which unit level it spawns is in code. KV of the Necronomicon units is shown. The old Necronomicon item (obsolete, not purchasable) tooltips (HP 800/1200/1600) do not match KV."
+  "note": "Not summoned by Book of the Dead (it always makes level 3 units; server.dll 6997 (dota2-ida-researcher 2026-11-27)). Underlord's Abyssal Horde / Dark Portal make levels 1-2."
  },
  {
   "key": "book_of_the_dead_warrior_2",
@@ -2495,22 +2474,22 @@
   "unsure_fields": [
    "all"
   ],
-  "note": "Book of the Dead (item_demonicon, neutral active, duration 65) has no unit stats in its item KV; which unit level it spawns is in code. KV of the Necronomicon units is shown. The old Necronomicon item (obsolete, not purchasable) tooltips (HP 800/1200/1600) do not match KV."
+  "note": "Not summoned by Book of the Dead (it always makes level 3 units; server.dll 6997 (dota2-ida-researcher 2026-11-27)). Underlord's Abyssal Horde / Dark Portal make levels 1-2."
  },
  {
   "key": "book_of_the_dead_warrior_3",
   "npc": "npc_dota_necronomicon_warrior_3",
   "name": "Demonic Warrior",
-  "hero": "Neutral item",
+  "hero": "Book of the Dead",
   "ability": "item_demonicon",
-  "level": 3,
-  "hp": 800,
+  "level": null,
+  "hp": 1600,
   "hp_regen": 5,
   "mana": 0,
   "armor": 4,
   "magres": 40,
-  "dmg_min": 70,
-  "dmg_max": 85,
+  "dmg_min": 122.5,
+  "dmg_max": 148.75,
   "bat": 0.75,
   "as": 109,
   "range": 100,
@@ -2519,12 +2498,14 @@
   "gold_max": 150,
   "xp": 150,
   "attack": "melee",
-  "source": {},
-  "sure": false,
-  "unsure_fields": [
-   "all"
-  ],
-  "note": "Book of the Dead (item_demonicon, neutral active, duration 65) has no unit stats in its item KV; which unit level it spawns is in code. KV of the Necronomicon units is shown. The old Necronomicon item (obsolete, not purchasable) tooltips (HP 800/1200/1600) do not match KV."
+  "source": {
+   "hp": "KV x2: modifier_demonicon_bonus +100% health (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_min": "KV x1.75: modifier_demonicon_bonus +75% base damage (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_max": "KV x1.75: modifier_demonicon_bonus +75% base damage (server.dll 6997 (dota2-ida-researcher 2026-11-27))"
+  },
+  "sure": true,
+  "unsure_fields": [],
+  "note": "item_demonicon summons 2 warriors and 2 archers, always the level 3 units, for 65 s, with modifier_demonicon_bonus (+100% health, +75% base damage, numbers in code; server.dll 6997 (dota2-ida-researcher 2026-11-27)). Whether +100% counts from base or full max health is inferred."
  },
  {
   "key": "book_of_the_dead_archer_1",
@@ -2553,7 +2534,7 @@
   "unsure_fields": [
    "all"
   ],
-  "note": "Book of the Dead (item_demonicon, neutral active, duration 65) has no unit stats in its item KV; which unit level it spawns is in code. KV of the Necronomicon units is shown. The old Necronomicon item (obsolete, not purchasable) tooltips (HP 800/1200/1600) do not match KV."
+  "note": "Not summoned by Book of the Dead (it always makes level 3 units; server.dll 6997 (dota2-ida-researcher 2026-11-27)). Underlord's Abyssal Horde / Dark Portal make levels 1-2."
  },
  {
   "key": "book_of_the_dead_archer_2",
@@ -2582,22 +2563,22 @@
   "unsure_fields": [
    "all"
   ],
-  "note": "Book of the Dead (item_demonicon, neutral active, duration 65) has no unit stats in its item KV; which unit level it spawns is in code. KV of the Necronomicon units is shown. The old Necronomicon item (obsolete, not purchasable) tooltips (HP 800/1200/1600) do not match KV."
+  "note": "Not summoned by Book of the Dead (it always makes level 3 units; server.dll 6997 (dota2-ida-researcher 2026-11-27)). Underlord's Abyssal Horde / Dark Portal make levels 1-2."
  },
  {
   "key": "book_of_the_dead_archer_3",
   "npc": "npc_dota_necronomicon_archer_3",
   "name": "Demonic Archer",
-  "hero": "Neutral item",
+  "hero": "Book of the Dead",
   "ability": "item_demonicon",
-  "level": 3,
-  "hp": 650,
+  "level": null,
+  "hp": 1300,
   "hp_regen": 5,
   "mana": 0,
   "armor": 4,
   "magres": 40,
-  "dmg_min": 70,
-  "dmg_max": 80,
+  "dmg_min": 122.5,
+  "dmg_max": 140.0,
   "bat": 1,
   "as": 109,
   "range": 550,
@@ -2606,11 +2587,13 @@
   "gold_max": 150,
   "xp": 150,
   "attack": "ranged",
-  "source": {},
-  "sure": false,
-  "unsure_fields": [
-   "all"
-  ],
-  "note": "Book of the Dead (item_demonicon, neutral active, duration 65) has no unit stats in its item KV; which unit level it spawns is in code. KV of the Necronomicon units is shown. The old Necronomicon item (obsolete, not purchasable) tooltips (HP 800/1200/1600) do not match KV."
+  "source": {
+   "hp": "KV x2: modifier_demonicon_bonus +100% health (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_min": "KV x1.75: modifier_demonicon_bonus +75% base damage (server.dll 6997 (dota2-ida-researcher 2026-11-27))",
+   "dmg_max": "KV x1.75: modifier_demonicon_bonus +75% base damage (server.dll 6997 (dota2-ida-researcher 2026-11-27))"
+  },
+  "sure": true,
+  "unsure_fields": [],
+  "note": "item_demonicon summons 2 warriors and 2 archers, always the level 3 units, for 65 s, with modifier_demonicon_bonus (+100% health, +75% base damage, numbers in code; server.dll 6997 (dota2-ida-researcher 2026-11-27)). Whether +100% counts from base or full max health is inferred."
  }
 ]

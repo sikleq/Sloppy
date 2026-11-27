@@ -1011,6 +1011,8 @@ def timeline_value(d, stat, step):
     creep by its LANE_UPGRADE (HP and damage to its cap, mega's floor; gold every step; no armor or attack speed;
     without an entry — siege — it does not grow). None when the row has no such number."""
     ch = (d.get('createhero') or '').strip()
+    if unit_group(ch) == 'summon':     # a hero / item summon does not grow with the creep upgrade (2026-11-27)
+        step = 0
     lane = unit_group(ch) == 'lane'
     u = LANE_UPGRADE.get(ch, {}) if lane else {}
     if stat == 'gold':
