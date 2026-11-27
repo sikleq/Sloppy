@@ -689,6 +689,22 @@ def _dmg_max_start(s, h, r):
     return _dmg_max_base(s, h, r) + _primary_dmg(s, h)
 
 
+def _dmg_per_level(s, h, r):
+    """Attack damage a level-up adds through attribute gains (owner 2026-11-27: "Dmg lvl" beside Dmg min / max):
+    the primary attribute's gain, a Universal hero the multiplier on the sum of all three gains."""
+    meta = _attr_of(s, h)
+    if meta is None:
+        return 0.0
+    gains = {"str": "AttributeStrengthGain", "agi": "AttributeAgilityGain", "int": "AttributeIntelligenceGain"}
+    if meta[0] in gains:
+        return round(DMG_PER_PRIMARY * _field(s, h, gains[meta[0]]), 2)
+    mult = _universal_dmg_mult()
+    entry = _innate_entry(h.replace("npc_dota_hero_", ""), "dmg", "dmg_universal_bonus_pct")
+    if entry is not None:
+        mult *= 1 + entry["factor"]
+    return round(mult * sum(_field(s, h, f) for f in gains.values()), 2)
+
+
 def _dmg_avg_start(s, h, r):
     return _dmg_avg_base(s, h, r) + _primary_dmg(s, h)
 
@@ -938,6 +954,7 @@ COLUMNS = [
          fn_base=_dmg_min_base, fn_starting=_dmg_min_start),
     _col("dmax", "Max Dmg", mode="extra", fmt=_g0,
          fn_base=_dmg_max_base, fn_starting=_dmg_max_start),
+    _col("dlvl", "Dmg per level", mode="extra", fmt=_g1, fn_base=_dmg_per_level),
 
     # ── Attack mechanics ──────────────────────────────────────────────
     _col("aspd", "Attack Speed", fmt=_g0,
@@ -985,6 +1002,7 @@ _LABEL_OVERRIDES = {
     "mpr": "MP/sec",
     "dmin": "Dmg\nmin",
     "dmax": "Dmg\nmax",
+    "dlvl": "Dmg\nlvl",
     "aspd": "Speed",
     "range": "Range",
     "proj": "Projectile Speed",
@@ -1002,7 +1020,7 @@ CATEGORIES = [
     ("Attributes", "attributes", ["str", "str_gain", "agi", "agi_gain",
                                    "int", "int_gain", "gper"]),
     ("Defense", "defense", ["armor", "armor_pct", "mr"]),
-    ("Attack", "attack", ["dmg", "dmin", "dmax", "aspd", "t_per_attack",
+    ("Attack", "attack", ["dmg", "dmin", "dmax", "dlvl", "aspd", "t_per_attack",
                            "bat", "range", "proj"]),
     ("Vision", "vision", ["dvision", "nvision"]),
     ("Mobility", "mobility", ["ms", "turn", "collision", "bound"]),
@@ -1219,6 +1237,7 @@ _COL_TO_FIELDS: dict[str, tuple[str, ...]] = {
             "AttributeBaseIntelligence"),
     "dmin": ("AttackDamageMin",),
     "dmax": ("AttackDamageMax",),
+    "dlvl": ("AttributeStrengthGain", "AttributeAgilityGain", "AttributeIntelligenceGain"),
     "aspd": ("BaseAttackSpeed", "AttributeBaseAgility"),
     "ms": ("MovementSpeed",),
     "bat": ("AttackRate",),

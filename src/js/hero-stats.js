@@ -236,6 +236,14 @@ function innateDpm(entry, level) {
     const mult = edge ? C.uniDmg * (1 + edge.factor) : C.uniDmg;
     return Math.floor((a.str + a.agi + a.int) * mult);
   };
+  const dmgPerLevel = (s) => {
+    if (s.attr === 'str') return num(s.strGain);
+    if (s.attr === 'agi') return num(s.agiGain);
+    if (s.attr === 'int') return num(s.intGain);
+    const edge = innateEntry(s.slug, 'dmg', 'dmg_universal_bonus_pct');   // Void Spirit Intrinsic Edge
+    const mult = edge ? C.uniDmg * (1 + edge.factor) : C.uniDmg;
+    return (num(s.strGain) + num(s.agiGain) + num(s.intGain)) * mult;
+  };
   const valueFor = (s, col, mode, level) => {
     const effectiveLevel = mode === 'base' ? 1 : level;
     const usePlus2 = mode !== 'base' && !!plus2Toggle?.checked;
@@ -308,6 +316,7 @@ function innateDpm(entry, level) {
       }
       case 'dmin': return [num(s.dmin) + (start ? bonusDmg : 0), g0];
       case 'dmax': return [num(s.dmax) + (start ? bonusDmg : 0), g0];
+      case 'dlvl': return [dmgPerLevel(s), g1];   // owner 2026-11-27: damage a level-up adds via attribute gains
       case 'aspd': return [start ? startAs : baseAs, g0];
       case 't_per_attack': {
         const ats = start ? startAs : baseAs || 100;
