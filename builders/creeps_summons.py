@@ -3,13 +3,21 @@
 Their numbers are the game's, not the plain unit KV: many summons take HP / damage / armor … from the summoning
 ability's values (data/rules/summon_units.json, gathered 2026-11-26 from data/stats/7.42a: unit KV with
 include_keys_from + the hero ability values; data/rules/summon_units.md says where each number came from).
-Only entries marked sure are shown; an entry whose numbers the game works out from its hero (sure: false: Enigma's HP,
-the hero's level) or a unit the game never summons (not_in_game) is left out. The Aghanim golem, Book of the Dead and
-Raptor were confirmed by server.dll 6997 (2026-11-27). They do not grow with Upgrade.
+Only entries marked sure are shown; a unit the game never summons (not_in_game) or the same unit from another ability
+(same_as) is left out. The Aghanim golem, Book of the Dead and Raptor were confirmed by server.dll 6997 (2026-11-27).
+Summons whose numbers come from their hero (Enigma's HP, Chen / Warlock level, Clinkz's damage) are shown at hero
+level 1 (hero_level), the formula as the cell's hint (formula; owner 2026-11-27). They do not grow with Upgrade.
 A new patch: gather the file again for that patch."""
 import json as _json
 import os as _os
 import re as _re
+
+FORMULA_COLS = {'hp': ('hp',), 'ms': ('ms',), 'dmg': ('dmg_avg', 'dmg_min', 'dmg_max')}
+
+
+def formula_hints(e):
+    """{table column: hint} for the numbers that depend on the hero."""
+    return {col: text for k, text in (e.get('formula') or {}).items() for col in FORMULA_COLS[k]}
 
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 SUMMON_FILE = _os.path.join(_HERE, 'data', 'rules', 'summon_units.json')
@@ -27,7 +35,8 @@ _ICON_SHARED = {r'npc_dota_lycan_wolf\d': 'icons/units/npc_dota_lycan_wolf.png',
                 r'npc_dota_unit_undying_zombie_torso': 'icons/units/npc_dota_unit_undying_zombie.png',
                 r'npc_dota_beastmaster_thunderhide': 'icons/abilities/beastmaster_summon_thunderhide.png',
                 r'npc_dota_wraith_king_skeleton_warrior': 'icons/abilities/skeleton_king_bone_guard.png',
-                r'npc_dota_necronomicon_(warrior|archer)_\d': r'icons/units/npc_dota_necronomicon_\1.png'}
+                r'npc_dota_necronomicon_(warrior|archer)_\d': r'icons/units/npc_dota_necronomicon_\1.png',
+                r'npc_dota_(lesser|greater|dire)_eidolon': 'icons/units/npc_dota_eidolon.png'}
 
 
 def entries(path=SUMMON_FILE):
@@ -38,8 +47,8 @@ def entries(path=SUMMON_FILE):
         raise ValueError(f'{path}: no summon units')
     # 2026-11-27: the Aghanim golem, Book of the Dead and Raptor confirmed by server.dll 6997 (summon_units.md)
     keep = [e for e in data
-            if e.get('sure') and not e.get('not_in_game') and 'all' not in (e.get('unsure_fields') or [])
-            and e.get('hp')]
+            if e.get('sure') and not e.get('not_in_game') and not e.get('same_as')
+            and 'all' not in (e.get('unsure_fields') or []) and e.get('hp')]
     if not keep:
         raise ValueError(f'{path}: no summon marked sure')
     return keep

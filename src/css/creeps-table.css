@@ -523,3 +523,6 @@ body.view-waves .upg-group { display: none !important; }
   body:has(.creeps-table) .toolbar-panel .hs-attack-filter-group .hs-attack-filter > span:not(.atk-badge) {
     display: none; }
 }
+
+/* a summon's number at hero level 1: the formula is the cell's hint (owner 2026-11-27) */
+.creeps-table td[data-formula] { cursor: help; }
