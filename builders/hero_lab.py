@@ -484,6 +484,54 @@ def _item_bonus(fields: dict, *, consumable: bool = False) -> dict[str, float]:
 
 
 
+def _item_on_hit(fields: dict, echo: bool = False) -> dict:
+    """What a shop item does when its holder attacks or is attacked, read from its KV keys (not its name), for the Duel
+    (src/js/hero-lab-duel.js). Only the passives a 1v1 trade of right-clicks meets: crit, bash, a pierce proc
+    (Javelin, Monkey King Bar), chain lightning, armor corruption, an attack poison (Orb of Venom, Mage Slayer, Witch
+    Blade), mana break, Skadi's attack slow, the cut to health restoration, damage block and Echo Sabre's second
+    strike. Cleave (no second target), actives and anything against creeps or buildings stay out."""
+    n = lambda *keys: _first(fields, *keys)
+    cd = _num_at(fields.get("AbilityCooldown", 0), 0)
+    out: dict = {}
+    if n("crit_chance") and n("crit_multiplier"):
+        out["crit"] = {"chance": n("crit_chance"), "mult": n("crit_multiplier")}
+    if n("bash_chance_melee", "bash_chance_ranged"):
+        out["bash"] = {"melee": n("bash_chance_melee"), "ranged": n("bash_chance_ranged"),
+                       "dmg": n("bonus_chance_damage"), "stun": n("bash_duration"),
+                       "cd": n("bash_cooldown") or cd}
+    elif n("bonus_chance") and n("bonus_chance_damage"):
+        out["pierce"] = {"chance": n("bonus_chance"), "dmg": n("bonus_chance_damage")}
+    if n("chain_chance") and n("chain_damage"):
+        out["chain"] = {"chance": n("chain_chance"), "dmg": n("chain_damage"), "cd": n("chain_cooldown")}
+    corruption = n("corruption_armor") or -n("armor_reduction")
+    if corruption:
+        out["corrupt"] = {"armor": abs(corruption), "dur": n("corruption_duration", "duration") or 3}
+    if n("poison_damage_per_second") and n("poison_duration"):                     # Hydra's Breath
+        out["dot"] = {"dps": n("poison_damage_per_second"), "dur": n("poison_duration"), "magic": True, "cd": 0}
+    elif n("poison_duration") and n("tick_interval") and n("damage"):             # Orb of Venom: `damage` per tick
+        out["dot"] = {"dps": n("damage") / n("tick_interval"), "dur": n("poison_duration"), "magic": True, "cd": cd}
+    elif n("dps") and n("duration"):                                               # Mage Slayer
+        out["dot"] = {"dps": n("dps"), "dur": n("duration"), "magic": False, "cd": 0}
+    elif n("int_damage_multiplier") and n("slow_duration"):                        # Witch Blade, Devastator
+        out["dot"] = {"intMult": n("int_damage_multiplier"), "dur": n("slow_duration"), "magic": True,
+                      "cd": n("passive_cooldown") or cd, "trueStrike": True}
+    if n("feedback_mana_burn"):
+        out["manaBreak"] = {"mana": n("feedback_mana_burn"), "dmgPer": n("damage_per_burn") or 1}
+    if n("cold_attack_slow_melee", "cold_attack_slow_ranged"):
+        out["attackSlow"] = {"melee": abs(n("cold_attack_slow_melee")), "ranged": abs(n("cold_attack_slow_ranged")),
+                             "dur": n("cold_duration") or 3}
+    if n("heal_reduction", "restoration_reduction"):
+        out["healCut"] = {"pct": n("heal_reduction", "restoration_reduction"),
+                          "dur": n("duration", "cold_duration", "corruption_duration") or 3}
+    block_melee = n("block_damage_melee", "damage_block_melee")
+    if block_melee and n("block_chance"):
+        out["block"] = {"melee": block_melee, "ranged": n("block_damage_ranged", "damage_block_ranged"),
+                        "chance": n("block_chance"), "chanceHero": n("block_chance_hero")}
+    if echo:                                  # no KV key of its own: the tooltip names it (Echo Sabre, Harpoon)
+        out["echo"] = {"cd": n("passive_cooldown") or cd}
+    return out
+
+
 _BOOT_ITEMS = {
     "item_boots", "item_tranquil_boots", "item_arcane_boots",
     "item_guardian_greaves", "item_travel_boots", "item_travel_boots_2",
@@ -1036,6 +1084,14 @@ def _load_items(version: str) -> list[dict]:
             "consumable": consumable,
             "bonus": bonus,
         }
+        if cls == "regular":
+            on_hit = _item_on_hit(fields, echo="Echo Strike" in str(tooltips.get(item, {}).get("desc", "")))
+            if on_hit:
+                rec["onHit"] = on_hit
+            poison = on_hit.get("dot", {}).get("dps")
+            if poison and bonus and _num(fields.get("tick_interval")) and _num(fields.get("damage")) == poison:
+                # Orb of Venom's `damage` is its poison per second, not attack damage (Hero Lab showed +12 Damage)
+                bonus["damage"] = max(0.0, bonus.get("damage", 0) - poison)
         if item in _BOOT_ITEMS:
             rec["isBoot"] = True
         if cls == "enchant":
@@ -1332,6 +1388,17 @@ def _load_items(version: str) -> list[dict]:
     )
 
 
+def _attack_point(hero: str, raw: dict) -> float:
+    """AttackAnimationPoint of the hero's KV block (npc_dota_hero_base's when the hero has none): the Duel's wind-up
+    before a hit lands, scaled by attack speed in src/js/hero-lab-duel.js."""
+    for block in (raw.get(hero) or {}, raw.get("npc_dota_hero_base") or {}):
+        try:
+            return float(block["AttackAnimationPoint"])
+        except (KeyError, TypeError, ValueError):
+            continue
+    return 0.0
+
+
 def _load_heroes(version: str) -> list[dict]:
     snap = _json.loads((STATS_DIR / version / "heroes.json").read_text(encoding="utf-8"))
     raw = _load_raw_heroes(version)
@@ -1367,6 +1434,7 @@ def _load_heroes(version: str) -> list[dict]:
             "name": name,
             "icon": f"icons/heroes/{icon_slug}.png",
             "attackType": _attack_type(version, hero, raw),
+            "attackPoint": _attack_point(hero, raw),
             "stats": stats,
             "statInnate": {
                 "slug": innate_slug,
@@ -1436,6 +1504,7 @@ def render_html() -> str:
 <div class="hero-lab" data-patch="{_esc(version)}">
   <div class="hl-panel" data-side="a"></div>
   <div class="hl-diff-panel">
+    <section class="hl-duel" id="hl-duel" aria-live="polite"></section>
     <div class="hl-diff-head">
       <strong id="hl-diff-title">DIFFERENCE</strong>
     </div>

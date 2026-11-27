@@ -17,7 +17,7 @@ JS_PARTS = (
     "nav-subnav", "back-arrow", "patch-reanchor", "back-to-top", "version-dropdown", "patch-page", "fold-small", "card-deck", "patch-dynamics", "talent-tree", "dyn-lens", "creeps-table", "unit-abilities-upgrades",
     "creeps-changelog", "creeps-scroll-size", "creeps-pinned", "creeps-upgrade", "tooltips", "nav-height", "mana-items",
     "terrain-stats-rows", "mana-items-filters", "hero-stats", "changes-filters", "changes-item-slots", "entity-curve", "changes-index",
-    "hero-lab", "hero-stats-divider", "mana-items-heatmap", "index-wall", "index-tiles", "formula-calculator", "terrain",
+    "hero-lab-duel", "hero-lab", "hero-stats-divider", "mana-items-heatmap", "index-wall", "index-tiles", "formula-calculator", "terrain",
     "terrain-lightbox", "info-pop-placement", "aoe-increase", "dyn-offscreen", "creeps-scroll-guard", "search-layout",
     "search-fab", "filter-fab", "colorblind", "calendar-builds",
 )
@@ -44,18 +44,20 @@ PART_MARKERS = {
     "changes-index": r"data-ec-search",
     "index-wall": r"inv-signatures",
     "index-tiles": r"inv-book|inv-cell-",
+    "hero-lab-duel": r"hero-lab-data",
     "hero-lab": r"hero-lab-data",
     "calendar-builds": r"tb-panel",
 }
 
-# The kinds of page and their parts beyond the common ones. hero-lab reads innateDpm of hero-stats and ecShopMarkup of changes-item-slots.
+# The kinds of page and their parts beyond the common ones. hero-lab reads innateDpm of hero-stats, ecShopMarkup of changes-item-slots
+# and heroLabDuel of hero-lab-duel.
 JS_PAGES = {
     "base": (),
     "entity": ("changes-filters", "changes-item-slots", "entity-curve"),
     "changes": ("changes-filters", "changes-item-slots", "changes-index", "index-wall"),
     "table": ("creeps-table", "creeps-changelog", "creeps-pinned", "creeps-upgrade", "unit-abilities-upgrades", "dyn-lens", "dyn-offscreen", "mana-items",
               "mana-items-filters", "mana-items-heatmap", "hero-stats", "hero-stats-divider", "terrain-stats-rows", "aoe-increase"),
-    "lab": ("hero-stats", "changes-item-slots", "hero-lab"),
+    "lab": ("hero-stats", "changes-item-slots", "hero-lab-duel", "hero-lab"),
     "home": ("index-wall", "index-tiles"),
     "calendar": ("calendar-builds",),
 }
